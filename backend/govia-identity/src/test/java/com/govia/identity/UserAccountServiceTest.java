@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /** Kich ban test tao tai khoan dang nhap gan voi nhan vien: thanh cong, trung username, da co tai khoan. */
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 class UserAccountServiceTest {
 
     @Autowired
