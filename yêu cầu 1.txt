@@ -1,0 +1,55 @@
+dự án này tôi sẽ xây dựng rất nhiều module 
+
+
+
+
+
+GOVIA People → HR, nhân sự, organizational structure
+
+
+
+GOVIA Identity → User, Employee, Identity Lifecycle
+
+
+
+GOVIA Access → RBAC, ABAC, phân quyền
+
+
+
+GOVIA Audit → Internal Audit, Audit Plan, Finding, Evidence
+
+
+
+GOVIA Risk → Enterprise Risk Management
+
+
+
+GOVIA Compliance → Compliance, Regulation, Policy
+
+
+
+GOVIA Workflow → Approval, workflow, business process
+
+
+
+GOVIA Asset → IT/Business Asset Management
+
+
+
+GOVIA Vendor → Vendor / Third-party Management
+
+
+
+GOVIA Policy → Policy & Control Management
+
+
+
+GOVIA Analytics → Dashboard, BI, Governance Analytics
+
+
+
+GOVIA AI → AI Governance / AI Agent Management sau này
+
+tất cả các module sẽ nằm trên cùng 1 platform này quản lý chung theo mã nhân viên và user đăng nhập, frontend sử dụng React + Vite + Ant + Axios. backend thì sử dụng java, spring security + jwt, spring data JPA, multi-tenant, swager/openapi, database có thể là postgresql hoặc orace hoặc bất kỳ database nào tôi có thể thay đổi mà ko khó khăn đối với platform này
+
+tất cả backend, frontend phải xây dựng độc lập tối ưu perfromance, có sự kế thừa và chuẩn chung theo các dll dựng sẵn ví dụ các nút them mới hay chỉnh sửa hay xuất xxcel xuất word, attachment ở tất cả các màn hình phải giống nhau và dung chung được chỉ cần call dll

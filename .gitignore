@@ -1,0 +1,27 @@
+# Build output
+target/
+dist/
+build/
+
+# Dependencies
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local backups / scratch (not part of the project)
+.deleted-workflow-backup-*/

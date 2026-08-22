@@ -1,0 +1,307 @@
+{
+  "app": {
+    "name": "GOVIA Platform",
+    "tagline": "Governance, Organization, Verification, Identity & Access"
+  },
+  "menu": {
+    "dashboard": "概览",
+    "people": "人事",
+    "employees": "员工",
+    "positions": "职位",
+    "orgUnits": "组织单位",
+    "admin": "系统管理",
+    "roles": "角色与权限",
+    "accounts": "用户账号"
+  },
+  "header": {
+    "logout": "退出登录"
+  },
+  "login": {
+    "tenantLabel": "租户代码",
+    "tenantRequired": "请输入租户代码",
+    "usernameLabel": "用户名",
+    "usernameRequired": "请输入用户名",
+    "passwordLabel": "密码",
+    "passwordRequired": "请输入密码",
+    "submit": "登录",
+    "success": "登录成功",
+    "error": "租户、用户名或密码错误"
+  },
+  "dashboard": {
+    "welcome": "欢迎使用 GOVIA Platform",
+    "username": "用户名",
+    "employeeCode": "员工编号",
+    "tenant": "租户",
+    "roles": "角色"
+  },
+  "common": {
+    "add": "新增",
+    "edit": "编辑",
+    "delete": "删除",
+    "exportExcel": "导出 Excel",
+    "exportWord": "导出 Word",
+    "attachment": "附件",
+    "search": "搜索",
+    "reset": "重置",
+    "confirm": "确定",
+    "yes": "是",
+    "no": "否",
+    "active": "启用",
+    "inactive": "停用",
+    "import": "导入数据",
+    "importResultTitle": "导入结果",
+    "importSummary": "成功：{{success}} — 失败：{{failure}}",
+    "importRow": "第 {{row}} 行",
+    "importSuccess": "已成功导入 {{count}} 行",
+    "importError": "导入文件失败",
+    "view": "查看",
+    "export": "导出",
+    "module": "模块",
+    "noPermission": "您没有权限访问此页面，请联系管理员申请权限。"
+  },
+  "attachment": {
+    "upload": "上传附件",
+    "uploadSuccess": "已上传 \"{{fileName}}\"",
+    "uploadError": "上传 \"{{fileName}}\" 失败",
+    "deleteConfirm": "确定删除此文件？",
+    "deleteSuccess": "附件已删除"
+  },
+  "language": {
+    "select": "语言"
+  },
+  "account": {
+    "changePassword": {
+      "menuLabel": "修改密码",
+      "title": "修改密码",
+      "currentPassword": "当前密码",
+      "currentPasswordRequired": "请输入当前密码",
+      "newPassword": "新密码",
+      "newPasswordRequired": "请输入新密码（至少 8 位）",
+      "confirmPassword": "确认新密码",
+      "confirmPasswordRequired": "请确认新密码",
+      "confirmPasswordMismatch": "两次输入的密码不一致",
+      "submit": "修改密码",
+      "success": "密码修改成功",
+      "error": "密码修改失败，请检查当前密码是否正确。"
+    },
+    "resetPassword": {
+      "title": "为 {{username}} 重置密码",
+      "newPassword": "新密码",
+      "newPasswordRequired": "请输入新密码（至少 8 位）",
+      "confirmPassword": "确认新密码",
+      "confirmPasswordRequired": "请确认新密码",
+      "confirmPasswordMismatch": "两次输入的密码不一致",
+      "submit": "重置密码",
+      "success": "密码已重置",
+      "error": "密码重置失败"
+    },
+    "title": "用户账号",
+    "noRoles": "尚未分配角色 - 无任何权限",
+    "status": {
+      "ACTIVE": "启用",
+      "LOCKED": "已锁定",
+      "DISABLED": "已停用"
+    },
+    "columns": {
+      "username": "用户名",
+      "employeeCode": "员工编号",
+      "employeeName": "员工姓名",
+      "status": "状态",
+      "roles": "角色",
+      "assignRoles": "分配角色",
+      "copyRoles": "复制权限"
+    },
+    "assignRoles": {
+      "action": "分配角色",
+      "title": "为 {{username}} 分配角色",
+      "roles": "角色",
+      "submit": "保存",
+      "success": "角色已更新",
+      "error": "更新角色失败"
+    },
+    "copyRoles": {
+      "action": "复制权限",
+      "title": "将权限复制到 \"{{username}}\"",
+      "description": "下方选择的账号的全部角色将被赋予此账号，替换其当前角色（如有）。",
+      "sourceAccount": "从此账号复制权限",
+      "sourceAccountRequired": "请选择来源账号",
+      "submit": "复制",
+      "success": "权限已复制",
+      "error": "复制权限失败"
+    },
+    "messages": {
+      "loadError": "数据加载失败"
+    }
+  },
+  "employee": {
+    "title": "员工管理",
+    "filterOrgUnit": "组织单位",
+    "filterStatus": "状态",
+    "allOrgUnits": "所有单位",
+    "allStatuses": "所有状态",
+    "columns": {
+      "employeeCode": "编号",
+      "fullName": "姓名",
+      "position": "职位",
+      "orgUnit": "单位",
+      "manager": "上级",
+      "phone": "电话",
+      "email": "邮箱",
+      "status": "状态"
+    },
+    "status": {
+      "ACTIVE": "在职",
+      "ON_LEAVE": "休假",
+      "TERMINATED": "离职"
+    },
+    "gender": {
+      "MALE": "男",
+      "FEMALE": "女",
+      "OTHER": "其他"
+    },
+    "form": {
+      "createTitle": "新增员工",
+      "editTitle": "编辑员工",
+      "employeeCode": "员工编号",
+      "fullName": "姓名",
+      "email": "工作邮箱",
+      "personalEmail": "个人邮箱",
+      "phone": "电话",
+      "orgUnit": "组织单位",
+      "position": "职位",
+      "hireDate": "入职日期",
+      "dateOfBirth": "出生日期",
+      "gender": "性别",
+      "idNumber": "身份证号",
+      "manager": "直属上级",
+      "noManager": "无上级",
+      "save": "保存",
+      "cancel": "取消",
+      "employeeCodeRequired": "请输入员工编号",
+      "fullNameRequired": "请输入姓名",
+      "invalidEmail": "邮箱格式不正确",
+      "deleteConfirmTitle": "确定删除此员工？",
+      "deleteConfirmContent": "此操作无法撤销。",
+      "accountSection": "登录账号",
+      "accountExisting": "登录账号：{{username}}",
+      "accountUsername": "用户名",
+      "accountPassword": "密码",
+      "accountUsernameRequired": "请输入用户名",
+      "accountPasswordRequired": "请输入密码（至少 8 位）",
+      "createAccount": "创建登录账号",
+      "resetPassword": "重置密码"
+    },
+    "messages": {
+      "createSuccess": "员工已创建",
+      "updateSuccess": "员工已更新",
+      "statusUpdateSuccess": "状态已更新",
+      "deleteSuccess": "员工已删除",
+      "deleteError": "删除员工失败",
+      "loadError": "数据加载失败",
+      "saveError": "保存员工失败",
+      "accountCreateSuccess": "登录账号已创建",
+      "accountCreateError": "创建登录账号失败"
+    }
+  },
+  "position": {
+    "title": "职位管理",
+    "columns": {
+      "code": "编号",
+      "name": "职位名称",
+      "active": "状态"
+    },
+    "form": {
+      "createTitle": "新增职位",
+      "editTitle": "编辑职位",
+      "code": "编号",
+      "name": "职位名称",
+      "codeRequired": "请输入编号",
+      "nameRequired": "请输入职位名称",
+      "save": "保存",
+      "cancel": "取消"
+    },
+    "messages": {
+      "createSuccess": "职位已创建",
+      "updateSuccess": "职位已更新",
+      "activeUpdateSuccess": "状态已更新",
+      "loadError": "数据加载失败",
+      "saveError": "保存职位失败"
+    }
+  },
+  "orgUnit": {
+    "title": "组织单位管理",
+    "columns": {
+      "code": "编号",
+      "name": "单位名称",
+      "level": "层级",
+      "parent": "上级单位",
+      "manager": "负责人",
+      "active": "状态"
+    },
+    "level": {
+      "001": "事业群 (Khối)",
+      "002": "中心 (Trung tâm)",
+      "003": "部门 (Phòng ban)",
+      "004": "小组 (Bộ phận)"
+    },
+    "form": {
+      "createTitle": "新增组织单位",
+      "editTitle": "编辑组织单位",
+      "code": "编号",
+      "name": "单位名称",
+      "level": "层级",
+      "parent": "上级单位",
+      "noParent": "无（顶级单位）",
+      "manager": "负责人",
+      "noManager": "暂无负责人",
+      "codeRequired": "请输入编号",
+      "nameRequired": "请输入单位名称",
+      "save": "保存",
+      "cancel": "取消"
+    },
+    "messages": {
+      "createSuccess": "单位已创建",
+      "updateSuccess": "单位已更新",
+      "activeUpdateSuccess": "状态已更新",
+      "loadError": "数据加载失败",
+      "saveError": "保存单位失败"
+    }
+  },
+  "role": {
+    "title": "角色与权限",
+    "assignPermissions": "权限",
+    "permissionsTitle": "\"{{name}}\" 的权限",
+    "systemDefinedYes": "系统角色",
+    "columns": {
+      "code": "编号",
+      "name": "角色名称",
+      "description": "描述",
+      "systemDefined": "系统角色",
+      "permissions": "权限"
+    },
+    "screen": "页面",
+    "form": {
+      "createTitle": "新增角色",
+      "editTitle": "编辑角色",
+      "code": "编号",
+      "name": "角色名称",
+      "description": "描述",
+      "codeRequired": "请输入角色编号",
+      "nameRequired": "请输入角色名称",
+      "save": "保存",
+      "cancel": "取消",
+      "deleteConfirmTitle": "确定删除此角色？"
+    },
+    "messages": {
+      "createSuccess": "角色已创建",
+      "updateSuccess": "角色已更新",
+      "deleteSuccess": "角色已删除",
+      "deleteError": "删除角色失败",
+      "loadError": "数据加载失败",
+      "saveError": "保存角色失败",
+      "loadPermissionsError": "加载权限失败",
+      "permissionsSaved": "权限已保存",
+      "systemDefinedReadOnly": "这是系统角色（SUPER_ADMIN），默认拥有全部权限，不可编辑。"
+    }
+  }
+}

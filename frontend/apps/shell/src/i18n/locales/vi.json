@@ -1,0 +1,307 @@
+{
+  "app": {
+    "name": "GOVIA Platform",
+    "tagline": "Governance, Organization, Verification, Identity & Access"
+  },
+  "menu": {
+    "dashboard": "Tổng quan",
+    "people": "Nhân sự",
+    "employees": "Nhân viên",
+    "positions": "Chức danh",
+    "orgUnits": "Đơn vị tổ chức",
+    "admin": "Quản trị hệ thống",
+    "roles": "Vai trò & Phân quyền",
+    "accounts": "Tài khoản người dùng"
+  },
+  "header": {
+    "logout": "Đăng xuất"
+  },
+  "login": {
+    "tenantLabel": "Mã Tenant",
+    "tenantRequired": "Nhập mã tenant",
+    "usernameLabel": "Tên đăng nhập",
+    "usernameRequired": "Nhập tên đăng nhập",
+    "passwordLabel": "Mật khẩu",
+    "passwordRequired": "Nhập mật khẩu",
+    "submit": "Đăng nhập",
+    "success": "Đăng nhập thành công",
+    "error": "Sai tenant, tên đăng nhập hoặc mật khẩu"
+  },
+  "dashboard": {
+    "welcome": "Chào mừng đến với GOVIA Platform",
+    "username": "Tên đăng nhập",
+    "employeeCode": "Mã nhân viên",
+    "tenant": "Tenant",
+    "roles": "Vai trò"
+  },
+  "common": {
+    "add": "Thêm mới",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa",
+    "exportExcel": "Xuất Excel",
+    "exportWord": "Xuất Word",
+    "attachment": "Đính kèm",
+    "search": "Tìm kiếm",
+    "reset": "Đặt lại",
+    "confirm": "Đồng ý",
+    "yes": "Có",
+    "no": "Không",
+    "active": "Đang hoạt động",
+    "inactive": "Ngưng hoạt động",
+    "import": "Import dữ liệu",
+    "importResultTitle": "Kết quả Import",
+    "importSummary": "Thành công: {{success}} — Lỗi: {{failure}}",
+    "importRow": "Dòng {{row}}",
+    "importSuccess": "Đã import thành công {{count}} dòng",
+    "importError": "Import file thất bại",
+    "view": "Xem",
+    "export": "Xuất dữ liệu",
+    "module": "Module",
+    "noPermission": "Bạn không có quyền truy cập màn hình này. Liên hệ quản trị viên để được cấp quyền."
+  },
+  "attachment": {
+    "upload": "Tải lên tệp đính kèm",
+    "uploadSuccess": "Đã tải lên \"{{fileName}}\"",
+    "uploadError": "Tải lên \"{{fileName}}\" thất bại",
+    "deleteConfirm": "Xóa tệp này?",
+    "deleteSuccess": "Đã xóa tệp đính kèm"
+  },
+  "language": {
+    "select": "Ngôn ngữ"
+  },
+  "account": {
+    "changePassword": {
+      "menuLabel": "Đổi mật khẩu",
+      "title": "Đổi mật khẩu",
+      "currentPassword": "Mật khẩu hiện tại",
+      "currentPasswordRequired": "Nhập mật khẩu hiện tại",
+      "newPassword": "Mật khẩu mới",
+      "newPasswordRequired": "Nhập mật khẩu mới (tối thiểu 8 ký tự)",
+      "confirmPassword": "Xác nhận mật khẩu mới",
+      "confirmPasswordRequired": "Nhập lại mật khẩu mới",
+      "confirmPasswordMismatch": "Mật khẩu xác nhận không khớp",
+      "submit": "Đổi mật khẩu",
+      "success": "Đổi mật khẩu thành công",
+      "error": "Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu hiện tại."
+    },
+    "resetPassword": {
+      "title": "Đặt lại mật khẩu cho {{username}}",
+      "newPassword": "Mật khẩu mới",
+      "newPasswordRequired": "Nhập mật khẩu mới (tối thiểu 8 ký tự)",
+      "confirmPassword": "Xác nhận mật khẩu mới",
+      "confirmPasswordRequired": "Nhập lại mật khẩu mới",
+      "confirmPasswordMismatch": "Mật khẩu xác nhận không khớp",
+      "submit": "Đặt lại mật khẩu",
+      "success": "Đã đặt lại mật khẩu",
+      "error": "Đặt lại mật khẩu thất bại"
+    },
+    "title": "Tài khoản người dùng",
+    "noRoles": "Chưa được gán vai trò - chưa có quyền gì",
+    "status": {
+      "ACTIVE": "Hoạt động",
+      "LOCKED": "Bị khóa",
+      "DISABLED": "Vô hiệu hóa"
+    },
+    "columns": {
+      "username": "Tên đăng nhập",
+      "employeeCode": "Mã nhân viên",
+      "employeeName": "Họ tên nhân viên",
+      "status": "Trạng thái",
+      "roles": "Vai trò",
+      "assignRoles": "Gán vai trò",
+      "copyRoles": "Sao chép quyền"
+    },
+    "assignRoles": {
+      "action": "Gán vai trò",
+      "title": "Gán vai trò cho {{username}}",
+      "roles": "Vai trò",
+      "submit": "Lưu",
+      "success": "Đã cập nhật vai trò",
+      "error": "Cập nhật vai trò thất bại"
+    },
+    "copyRoles": {
+      "action": "Sao chép quyền",
+      "title": "Sao chép quyền vào tài khoản \"{{username}}\"",
+      "description": "Toàn bộ vai trò của tài khoản được chọn bên dưới sẽ được gán cho tài khoản này, thay thế vai trò hiện tại (nếu có).",
+      "sourceAccount": "Sao chép quyền từ tài khoản",
+      "sourceAccountRequired": "Chọn tài khoản nguồn",
+      "submit": "Sao chép",
+      "success": "Đã sao chép quyền",
+      "error": "Sao chép quyền thất bại"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu"
+    }
+  },
+  "employee": {
+    "title": "Quản lý nhân viên",
+    "filterOrgUnit": "Đơn vị tổ chức",
+    "filterStatus": "Trạng thái",
+    "allOrgUnits": "Tất cả đơn vị",
+    "allStatuses": "Tất cả trạng thái",
+    "columns": {
+      "employeeCode": "Mã NV",
+      "fullName": "Họ tên",
+      "position": "Chức danh",
+      "orgUnit": "Đơn vị",
+      "manager": "Quản lý",
+      "phone": "Điện thoại",
+      "email": "Email",
+      "status": "Trạng thái"
+    },
+    "status": {
+      "ACTIVE": "Đang làm việc",
+      "ON_LEAVE": "Nghỉ phép",
+      "TERMINATED": "Đã nghỉ việc"
+    },
+    "gender": {
+      "MALE": "Nam",
+      "FEMALE": "Nữ",
+      "OTHER": "Khác"
+    },
+    "form": {
+      "createTitle": "Thêm nhân viên",
+      "editTitle": "Sửa nhân viên",
+      "employeeCode": "Mã nhân viên",
+      "fullName": "Họ tên",
+      "email": "Email công việc",
+      "personalEmail": "Email cá nhân",
+      "phone": "Số điện thoại",
+      "orgUnit": "Đơn vị tổ chức",
+      "position": "Chức danh",
+      "hireDate": "Ngày vào làm",
+      "dateOfBirth": "Ngày sinh",
+      "gender": "Giới tính",
+      "idNumber": "CCCD/CMND",
+      "manager": "Quản lý trực tiếp",
+      "noManager": "Không có quản lý",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "employeeCodeRequired": "Nhập mã nhân viên",
+      "fullNameRequired": "Nhập họ tên",
+      "invalidEmail": "Email không hợp lệ",
+      "deleteConfirmTitle": "Xóa nhân viên này?",
+      "deleteConfirmContent": "Hành động này không thể hoàn tác.",
+      "accountSection": "Tài khoản đăng nhập",
+      "accountExisting": "Tài khoản đăng nhập: {{username}}",
+      "accountUsername": "Tên đăng nhập",
+      "accountPassword": "Mật khẩu",
+      "accountUsernameRequired": "Nhập tên đăng nhập",
+      "accountPasswordRequired": "Nhập mật khẩu (tối thiểu 8 ký tự)",
+      "createAccount": "Tạo tài khoản đăng nhập",
+      "resetPassword": "Đặt lại mật khẩu"
+    },
+    "messages": {
+      "createSuccess": "Đã tạo nhân viên",
+      "updateSuccess": "Đã cập nhật nhân viên",
+      "statusUpdateSuccess": "Đã cập nhật trạng thái",
+      "deleteSuccess": "Đã xóa nhân viên",
+      "deleteError": "Xóa nhân viên thất bại",
+      "loadError": "Không tải được dữ liệu",
+      "saveError": "Lưu nhân viên thất bại",
+      "accountCreateSuccess": "Đã tạo tài khoản đăng nhập",
+      "accountCreateError": "Tạo tài khoản đăng nhập thất bại"
+    }
+  },
+  "position": {
+    "title": "Quản lý chức danh",
+    "columns": {
+      "code": "Mã",
+      "name": "Tên chức danh",
+      "active": "Trạng thái"
+    },
+    "form": {
+      "createTitle": "Thêm chức danh",
+      "editTitle": "Sửa chức danh",
+      "code": "Mã",
+      "name": "Tên chức danh",
+      "codeRequired": "Nhập mã chức danh",
+      "nameRequired": "Nhập tên chức danh",
+      "save": "Lưu",
+      "cancel": "Hủy"
+    },
+    "messages": {
+      "createSuccess": "Đã tạo chức danh",
+      "updateSuccess": "Đã cập nhật chức danh",
+      "activeUpdateSuccess": "Đã cập nhật trạng thái",
+      "loadError": "Không tải được dữ liệu",
+      "saveError": "Lưu chức danh thất bại"
+    }
+  },
+  "orgUnit": {
+    "title": "Quản lý đơn vị tổ chức",
+    "columns": {
+      "code": "Mã",
+      "name": "Tên đơn vị",
+      "level": "Cấp bậc",
+      "parent": "Đơn vị cha",
+      "manager": "Trưởng đơn vị",
+      "active": "Trạng thái"
+    },
+    "level": {
+      "001": "Khối",
+      "002": "Trung tâm",
+      "003": "Phòng ban",
+      "004": "Bộ phận"
+    },
+    "form": {
+      "createTitle": "Thêm đơn vị tổ chức",
+      "editTitle": "Sửa đơn vị tổ chức",
+      "code": "Mã",
+      "name": "Tên đơn vị",
+      "level": "Cấp bậc",
+      "parent": "Đơn vị cha",
+      "noParent": "Không có (đơn vị cấp cao nhất)",
+      "manager": "Trưởng đơn vị",
+      "noManager": "Chưa có trưởng đơn vị",
+      "codeRequired": "Nhập mã đơn vị",
+      "nameRequired": "Nhập tên đơn vị",
+      "save": "Lưu",
+      "cancel": "Hủy"
+    },
+    "messages": {
+      "createSuccess": "Đã tạo đơn vị",
+      "updateSuccess": "Đã cập nhật đơn vị",
+      "activeUpdateSuccess": "Đã cập nhật trạng thái",
+      "loadError": "Không tải được dữ liệu",
+      "saveError": "Lưu đơn vị thất bại"
+    }
+  },
+  "role": {
+    "title": "Vai trò & Phân quyền",
+    "assignPermissions": "Phân quyền",
+    "permissionsTitle": "Phân quyền cho \"{{name}}\"",
+    "systemDefinedYes": "Vai trò hệ thống",
+    "columns": {
+      "code": "Mã",
+      "name": "Tên vai trò",
+      "description": "Mô tả",
+      "systemDefined": "Vai trò hệ thống",
+      "permissions": "Quyền"
+    },
+    "screen": "Màn hình",
+    "form": {
+      "createTitle": "Thêm vai trò",
+      "editTitle": "Sửa vai trò",
+      "code": "Mã",
+      "name": "Tên vai trò",
+      "description": "Mô tả",
+      "codeRequired": "Nhập mã vai trò",
+      "nameRequired": "Nhập tên vai trò",
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "deleteConfirmTitle": "Xóa vai trò này?"
+    },
+    "messages": {
+      "createSuccess": "Đã tạo vai trò",
+      "updateSuccess": "Đã cập nhật vai trò",
+      "deleteSuccess": "Đã xóa vai trò",
+      "deleteError": "Xóa vai trò thất bại",
+      "loadError": "Không tải được dữ liệu",
+      "saveError": "Lưu vai trò thất bại",
+      "loadPermissionsError": "Không tải được danh sách quyền",
+      "permissionsSaved": "Đã lưu phân quyền",
+      "systemDefinedReadOnly": "Đây là vai trò hệ thống (SUPER_ADMIN) mặc định có toàn quyền, không thể chỉnh sửa."
+    }
+  }
+}

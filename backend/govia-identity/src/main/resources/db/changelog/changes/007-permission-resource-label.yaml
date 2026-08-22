@@ -1,0 +1,35 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION.RESOURCE_LABEL =====================
+  # Ten hien thi cua man hinh (resource) chua quyen, dung de nhom + hien thi tren UI/Excel phan quyen.
+  # Moi module moi CHI CAN khai bao gia tri nay trong changeset seed permission cua minh - khong can
+  # sua code FE (truoc day RESOURCE_LABEL_KEYS hardcode trong RolePermissionsDrawer.tsx, khong scale
+  # duoc khi co hang tram man hinh).
+  - changeSet:
+      id: 007-1-permission-resource-label-column
+      author: govia
+      changes:
+        - addColumn:
+            tableName: permission
+            columns:
+              - column: { name: resource_label, type: VARCHAR(150) }
+
+  - changeSet:
+      id: 007-2-permission-resource-label-backfill-people
+      author: govia
+      changes:
+        - update:
+            tableName: permission
+            columns:
+              - column: { name: resource_label, value: "Quan ly nhan vien" }
+            where: "code LIKE 'PEOPLE.EMPLOYEE.%'"
+        - update:
+            tableName: permission
+            columns:
+              - column: { name: resource_label, value: "Quan ly chuc danh" }
+            where: "code LIKE 'PEOPLE.POSITION.%'"
+        - update:
+            tableName: permission
+            columns:
+              - column: { name: resource_label, value: "Quan ly don vi to chuc" }
+            where: "code LIKE 'PEOPLE.ORGUNIT.%'"

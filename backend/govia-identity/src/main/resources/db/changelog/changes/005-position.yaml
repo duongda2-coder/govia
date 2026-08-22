@@ -1,0 +1,48 @@
+databaseChangeLog:
+
+  # ===================== POSITION (chuc danh - master data) =====================
+  - changeSet:
+      id: 005-1-create-position
+      author: govia
+      changes:
+        - createTable:
+            tableName: position
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_position_tenant, references: tenant(id) } }
+              - column: { name: code, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            tableName: position
+            columnNames: tenant_id, code
+            constraintName: uk_position_tenant_code
+
+  # ===================== EMPLOYEE: chuyen "position" tu chuoi tu do sang tham chieu Position =====================
+  - changeSet:
+      id: 005-2-employee-position-fk
+      author: govia
+      changes:
+        - addColumn:
+            tableName: employee
+            columns:
+              - column: { name: position_id, type: UUID }
+        - addForeignKeyConstraint:
+            baseTableName: employee
+            baseColumnNames: position_id
+            referencedTableName: position
+            referencedColumnNames: id
+            constraintName: fk_employee_position
+        - createIndex:
+            tableName: employee
+            indexName: ix_employee_position
+            columns:
+              - column: { name: position_id }
+        - dropColumn:
+            tableName: employee
+            columnName: position

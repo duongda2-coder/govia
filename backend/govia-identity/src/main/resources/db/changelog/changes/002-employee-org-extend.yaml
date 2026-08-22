@@ -1,0 +1,38 @@
+databaseChangeLog:
+
+  # ===================== EMPLOYEE: bo sung ho so nhan su =====================
+  - changeSet:
+      id: 002-1-alter-employee-profile
+      author: govia
+      changes:
+        - addColumn:
+            tableName: employee
+            columns:
+              - column: { name: date_of_birth, type: DATE }
+              - column: { name: gender, type: VARCHAR(10) }
+              - column: { name: id_number, type: VARCHAR(30) }
+              - column: { name: manager_id, type: UUID }
+        - addForeignKeyConstraint:
+            baseTableName: employee
+            baseColumnNames: manager_id
+            referencedTableName: employee
+            referencedColumnNames: id
+            constraintName: fk_employee_manager
+        - createIndex:
+            tableName: employee
+            indexName: ix_employee_manager
+            columns:
+              - column: { name: manager_id }
+
+  # ===================== ORGANIZATION_UNIT: cap bac don vi =====================
+  # Quy uoc level_code: 001 = Khoi, 002 = Trung tam, 003 = Phong ban, 004 = Bo phan.
+  # parent_id (da co tu 001-core-schema) de trong (null) neu la don vi cao nhat, khong co cha.
+  - changeSet:
+      id: 002-2-alter-org-unit-level-code
+      author: govia
+      comment: "level_code: 001=Khoi, 002=Trung tam, 003=Phong ban, 004=Bo phan"
+      changes:
+        - addColumn:
+            tableName: organization_unit
+            columns:
+              - column: { name: level_code, type: VARCHAR(10) }

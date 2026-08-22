@@ -1,0 +1,256 @@
+databaseChangeLog:
+
+  # ===================== TENANT =====================
+  - changeSet:
+      id: 001-1-create-tenant
+      author: govia
+      changes:
+        - createTable:
+            tableName: tenant
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: code, type: VARCHAR(50), constraints: { nullable: false, unique: true, uniqueConstraintName: uk_tenant_code } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: status, type: VARCHAR(20), defaultValue: ACTIVE, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+
+  # ===================== ORGANIZATION UNIT =====================
+  - changeSet:
+      id: 001-2-create-organization-unit
+      author: govia
+      changes:
+        - createTable:
+            tableName: organization_unit
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_org_unit_tenant, references: tenant(id) } }
+              - column: { name: parent_id, type: UUID }
+              - column: { name: code, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: type, type: VARCHAR(50) }
+              - column: { name: manager_employee_id, type: UUID }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            tableName: organization_unit
+            columnNames: tenant_id, code
+            constraintName: uk_org_unit_tenant_code
+        - addForeignKeyConstraint:
+            baseTableName: organization_unit
+            baseColumnNames: parent_id
+            referencedTableName: organization_unit
+            referencedColumnNames: id
+            constraintName: fk_org_unit_parent
+        - createIndex:
+            tableName: organization_unit
+            indexName: ix_org_unit_tenant
+            columns:
+              - column: { name: tenant_id }
+
+  # ===================== EMPLOYEE =====================
+  - changeSet:
+      id: 001-3-create-employee
+      author: govia
+      changes:
+        - createTable:
+            tableName: employee
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_employee_tenant, references: tenant(id) } }
+              - column: { name: employee_code, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: full_name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: email, type: VARCHAR(255) }
+              - column: { name: phone, type: VARCHAR(30) }
+              - column: { name: org_unit_id, type: UUID, constraints: { foreignKeyName: fk_employee_org_unit, references: organization_unit(id) } }
+              - column: { name: position, type: VARCHAR(150) }
+              - column: { name: hire_date, type: DATE }
+              - column: { name: status, type: VARCHAR(20), defaultValue: ACTIVE, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            tableName: employee
+            columnNames: tenant_id, employee_code
+            constraintName: uk_employee_tenant_code
+        - createIndex:
+            tableName: employee
+            indexName: ix_employee_org_unit
+            columns:
+              - column: { name: org_unit_id }
+
+  # ===================== USER ACCOUNT =====================
+  - changeSet:
+      id: 001-4-create-user-account
+      author: govia
+      changes:
+        - createTable:
+            tableName: user_account
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_user_account_tenant, references: tenant(id) } }
+              - column: { name: employee_id, type: UUID, constraints: { foreignKeyName: fk_user_account_employee, references: employee(id) } }
+              - column: { name: username, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: password_hash, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: email, type: VARCHAR(255) }
+              - column: { name: status, type: VARCHAR(20), defaultValue: ACTIVE, constraints: { nullable: false } }
+              - column: { name: last_login_at, type: TIMESTAMP }
+              - column: { name: mfa_enabled, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            tableName: user_account
+            columnNames: tenant_id, username
+            constraintName: uk_user_account_tenant_username
+
+  # ===================== PERMISSION (catalog toan platform, khong tenant) =====================
+  - changeSet:
+      id: 001-5-create-permission
+      author: govia
+      changes:
+        - createTable:
+            tableName: permission
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: code, type: VARCHAR(150), constraints: { nullable: false, unique: true, uniqueConstraintName: uk_permission_code } }
+              - column: { name: module, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: description, type: VARCHAR(500) }
+
+  # ===================== ROLE =====================
+  - changeSet:
+      id: 001-6-create-role
+      author: govia
+      changes:
+        - createTable:
+            tableName: role
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_role_tenant, references: tenant(id) } }
+              - column: { name: code, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: description, type: VARCHAR(500) }
+              - column: { name: system_defined, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            tableName: role
+            columnNames: tenant_id, code
+            constraintName: uk_role_tenant_code
+
+  # ===================== ROLE_PERMISSION =====================
+  - changeSet:
+      id: 001-7-create-role-permission
+      author: govia
+      changes:
+        - createTable:
+            tableName: role_permission
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_role_permission_tenant, references: tenant(id) } }
+              - column: { name: role_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_role_permission_role, references: role(id) } }
+              - column: { name: permission_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_role_permission_permission, references: permission(id) } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            tableName: role_permission
+            columnNames: role_id, permission_id
+            constraintName: uk_role_permission
+
+  # ===================== USER_ROLE (RBAC + ABAC qua scope_org_unit_id) =====================
+  - changeSet:
+      id: 001-8-create-user-role
+      author: govia
+      changes:
+        - createTable:
+            tableName: user_role
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_user_role_tenant, references: tenant(id) } }
+              - column: { name: user_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_user_role_user, references: user_account(id) } }
+              - column: { name: role_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_user_role_role, references: role(id) } }
+              - column: { name: scope_org_unit_id, type: UUID, constraints: { foreignKeyName: fk_user_role_scope_org_unit, references: organization_unit(id) } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - createIndex:
+            tableName: user_role
+            indexName: ix_user_role_user
+            columns:
+              - column: { name: user_id }
+
+  # ===================== ATTACHMENT (dung chung moi module - polymorphic) =====================
+  - changeSet:
+      id: 001-9-create-attachment
+      author: govia
+      changes:
+        - createTable:
+            tableName: attachment
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_attachment_tenant, references: tenant(id) } }
+              - column: { name: entity_name, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: entity_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: file_name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: content_type, type: VARCHAR(150) }
+              - column: { name: size_bytes, type: BIGINT }
+              - column: { name: storage_path, type: VARCHAR(500), constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - createIndex:
+            tableName: attachment
+            indexName: ix_attachment_entity
+            columns:
+              - column: { name: entity_name }
+              - column: { name: entity_id }
+
+  # ===================== AUDIT_LOG (dung chung moi module - polymorphic) =====================
+  - changeSet:
+      id: 001-10-create-audit-log
+      author: govia
+      changes:
+        - createTable:
+            tableName: audit_log
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false, foreignKeyName: fk_audit_log_tenant, references: tenant(id) } }
+              - column: { name: entity_name, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: entity_id, type: UUID }
+              - column: { name: action, type: VARCHAR(30), constraints: { nullable: false } }
+              - column: { name: detail, type: CLOB }
+              - column: { name: source_ip, type: VARCHAR(64) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - createIndex:
+            tableName: audit_log
+            indexName: ix_audit_log_entity
+            columns:
+              - column: { name: entity_name }
+              - column: { name: entity_id }
+        - createIndex:
+            tableName: audit_log
+            indexName: ix_audit_log_tenant_created
+            columns:
+              - column: { name: tenant_id }
+              - column: { name: created_at }

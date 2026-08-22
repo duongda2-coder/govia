@@ -1,0 +1,14 @@
+{
+  "name": "govia-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:shell": "npm run dev --workspace=@govia/shell",
+    "build:shell": "npm run build --workspace=@govia/shell",
+    "build:ui-kit": "npm run build --workspace=@govia/ui-kit"
+  }
+}

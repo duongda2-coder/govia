@@ -1,0 +1,307 @@
+{
+  "app": {
+    "name": "GOVIA Platform",
+    "tagline": "Governance, Organization, Verification, Identity & Access"
+  },
+  "menu": {
+    "dashboard": "Übersicht",
+    "people": "Personal",
+    "employees": "Mitarbeiter",
+    "positions": "Positionen",
+    "orgUnits": "Organisationseinheiten",
+    "admin": "Systemverwaltung",
+    "roles": "Rollen & Berechtigungen",
+    "accounts": "Benutzerkonten"
+  },
+  "header": {
+    "logout": "Abmelden"
+  },
+  "login": {
+    "tenantLabel": "Mandanten-Code",
+    "tenantRequired": "Bitte Mandanten-Code eingeben",
+    "usernameLabel": "Benutzername",
+    "usernameRequired": "Bitte Benutzernamen eingeben",
+    "passwordLabel": "Passwort",
+    "passwordRequired": "Bitte Passwort eingeben",
+    "submit": "Anmelden",
+    "success": "Anmeldung erfolgreich",
+    "error": "Falscher Mandant, Benutzername oder Passwort"
+  },
+  "dashboard": {
+    "welcome": "Willkommen bei GOVIA Platform",
+    "username": "Benutzername",
+    "employeeCode": "Mitarbeiter-Code",
+    "tenant": "Mandant",
+    "roles": "Rollen"
+  },
+  "common": {
+    "add": "Hinzufügen",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "exportExcel": "Excel exportieren",
+    "exportWord": "Word exportieren",
+    "attachment": "Anhang",
+    "search": "Suchen",
+    "reset": "Zurücksetzen",
+    "confirm": "OK",
+    "yes": "Ja",
+    "no": "Nein",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "import": "Daten importieren",
+    "importResultTitle": "Importergebnis",
+    "importSummary": "Erfolgreich: {{success}} — Fehlgeschlagen: {{failure}}",
+    "importRow": "Zeile {{row}}",
+    "importSuccess": "{{count}} Zeile(n) erfolgreich importiert",
+    "importError": "Datei konnte nicht importiert werden",
+    "view": "Anzeigen",
+    "export": "Exportieren",
+    "module": "Modul",
+    "noPermission": "Sie haben keine Berechtigung für diesen Bildschirm. Wenden Sie sich an Ihren Administrator."
+  },
+  "attachment": {
+    "upload": "Anhang hochladen",
+    "uploadSuccess": "\"{{fileName}}\" hochgeladen",
+    "uploadError": "Hochladen von \"{{fileName}}\" fehlgeschlagen",
+    "deleteConfirm": "Diese Datei löschen?",
+    "deleteSuccess": "Anhang gelöscht"
+  },
+  "language": {
+    "select": "Sprache"
+  },
+  "account": {
+    "changePassword": {
+      "menuLabel": "Passwort ändern",
+      "title": "Passwort ändern",
+      "currentPassword": "Aktuelles Passwort",
+      "currentPasswordRequired": "Bitte aktuelles Passwort eingeben",
+      "newPassword": "Neues Passwort",
+      "newPasswordRequired": "Bitte neues Passwort eingeben (mind. 8 Zeichen)",
+      "confirmPassword": "Neues Passwort bestätigen",
+      "confirmPasswordRequired": "Bitte neues Passwort bestätigen",
+      "confirmPasswordMismatch": "Passwörter stimmen nicht überein",
+      "submit": "Passwort ändern",
+      "success": "Passwort erfolgreich geändert",
+      "error": "Passwort konnte nicht geändert werden. Bitte aktuelles Passwort prüfen."
+    },
+    "resetPassword": {
+      "title": "Passwort zurücksetzen für {{username}}",
+      "newPassword": "Neues Passwort",
+      "newPasswordRequired": "Bitte neues Passwort eingeben (mind. 8 Zeichen)",
+      "confirmPassword": "Neues Passwort bestätigen",
+      "confirmPasswordRequired": "Bitte neues Passwort bestätigen",
+      "confirmPasswordMismatch": "Passwörter stimmen nicht überein",
+      "submit": "Passwort zurücksetzen",
+      "success": "Passwort erfolgreich zurückgesetzt",
+      "error": "Passwort konnte nicht zurückgesetzt werden"
+    },
+    "title": "Benutzerkonten",
+    "noRoles": "Keine Rolle zugewiesen - kein Zugriff",
+    "status": {
+      "ACTIVE": "Aktiv",
+      "LOCKED": "Gesperrt",
+      "DISABLED": "Deaktiviert"
+    },
+    "columns": {
+      "username": "Benutzername",
+      "employeeCode": "Mitarbeiter-Code",
+      "employeeName": "Mitarbeitername",
+      "status": "Status",
+      "roles": "Rollen",
+      "assignRoles": "Rollen zuweisen",
+      "copyRoles": "Berechtigungen kopieren"
+    },
+    "assignRoles": {
+      "action": "Rollen zuweisen",
+      "title": "Rollen zuweisen für {{username}}",
+      "roles": "Rollen",
+      "submit": "Speichern",
+      "success": "Rollen aktualisiert",
+      "error": "Rollen konnten nicht aktualisiert werden"
+    },
+    "copyRoles": {
+      "action": "Berechtigungen kopieren",
+      "title": "Berechtigungen kopieren nach \"{{username}}\"",
+      "description": "Alle Rollen des unten ausgewählten Kontos werden diesem Konto zugewiesen und ersetzen dessen aktuelle Rollen (falls vorhanden).",
+      "sourceAccount": "Berechtigungen kopieren von Konto",
+      "sourceAccountRequired": "Quellkonto auswählen",
+      "submit": "Kopieren",
+      "success": "Berechtigungen kopiert",
+      "error": "Berechtigungen konnten nicht kopiert werden"
+    },
+    "messages": {
+      "loadError": "Daten konnten nicht geladen werden"
+    }
+  },
+  "employee": {
+    "title": "Mitarbeiterverwaltung",
+    "filterOrgUnit": "Organisationseinheit",
+    "filterStatus": "Status",
+    "allOrgUnits": "Alle Einheiten",
+    "allStatuses": "Alle Status",
+    "columns": {
+      "employeeCode": "Code",
+      "fullName": "Name",
+      "position": "Position",
+      "orgUnit": "Einheit",
+      "manager": "Vorgesetzter",
+      "phone": "Telefon",
+      "email": "E-Mail",
+      "status": "Status"
+    },
+    "status": {
+      "ACTIVE": "Aktiv",
+      "ON_LEAVE": "Beurlaubt",
+      "TERMINATED": "Ausgeschieden"
+    },
+    "gender": {
+      "MALE": "Männlich",
+      "FEMALE": "Weiblich",
+      "OTHER": "Divers"
+    },
+    "form": {
+      "createTitle": "Mitarbeiter hinzufügen",
+      "editTitle": "Mitarbeiter bearbeiten",
+      "employeeCode": "Mitarbeiter-Code",
+      "fullName": "Name",
+      "email": "Geschäftliche E-Mail",
+      "personalEmail": "Private E-Mail",
+      "phone": "Telefon",
+      "orgUnit": "Organisationseinheit",
+      "position": "Position",
+      "hireDate": "Eintrittsdatum",
+      "dateOfBirth": "Geburtsdatum",
+      "gender": "Geschlecht",
+      "idNumber": "Ausweisnummer",
+      "manager": "Vorgesetzter",
+      "noManager": "Kein Vorgesetzter",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "employeeCodeRequired": "Bitte Mitarbeiter-Code eingeben",
+      "fullNameRequired": "Bitte Namen eingeben",
+      "invalidEmail": "Ungültige E-Mail-Adresse",
+      "deleteConfirmTitle": "Diesen Mitarbeiter löschen?",
+      "deleteConfirmContent": "Diese Aktion kann nicht rückgängig gemacht werden.",
+      "accountSection": "Login-Konto",
+      "accountExisting": "Login-Konto: {{username}}",
+      "accountUsername": "Benutzername",
+      "accountPassword": "Passwort",
+      "accountUsernameRequired": "Bitte Benutzernamen eingeben",
+      "accountPasswordRequired": "Bitte Passwort eingeben (mind. 8 Zeichen)",
+      "createAccount": "Login-Konto erstellen",
+      "resetPassword": "Passwort zurücksetzen"
+    },
+    "messages": {
+      "createSuccess": "Mitarbeiter erstellt",
+      "updateSuccess": "Mitarbeiter aktualisiert",
+      "statusUpdateSuccess": "Status aktualisiert",
+      "deleteSuccess": "Mitarbeiter gelöscht",
+      "deleteError": "Mitarbeiter konnte nicht gelöscht werden",
+      "loadError": "Daten konnten nicht geladen werden",
+      "saveError": "Mitarbeiter konnte nicht gespeichert werden",
+      "accountCreateSuccess": "Login-Konto erstellt",
+      "accountCreateError": "Login-Konto konnte nicht erstellt werden"
+    }
+  },
+  "position": {
+    "title": "Positionsverwaltung",
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "active": "Status"
+    },
+    "form": {
+      "createTitle": "Position hinzufügen",
+      "editTitle": "Position bearbeiten",
+      "code": "Code",
+      "name": "Name",
+      "codeRequired": "Bitte Code eingeben",
+      "nameRequired": "Bitte Namen eingeben",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "messages": {
+      "createSuccess": "Position erstellt",
+      "updateSuccess": "Position aktualisiert",
+      "activeUpdateSuccess": "Status aktualisiert",
+      "loadError": "Daten konnten nicht geladen werden",
+      "saveError": "Position konnte nicht gespeichert werden"
+    }
+  },
+  "orgUnit": {
+    "title": "Organisationseinheiten-Verwaltung",
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "level": "Ebene",
+      "parent": "Übergeordnete Einheit",
+      "manager": "Leiter",
+      "active": "Status"
+    },
+    "level": {
+      "001": "Division (Khối)",
+      "002": "Center (Trung tâm)",
+      "003": "Abteilung (Phòng ban)",
+      "004": "Einheit (Bộ phận)"
+    },
+    "form": {
+      "createTitle": "Organisationseinheit hinzufügen",
+      "editTitle": "Organisationseinheit bearbeiten",
+      "code": "Code",
+      "name": "Name",
+      "level": "Ebene",
+      "parent": "Übergeordnete Einheit",
+      "noParent": "Keine (oberste Ebene)",
+      "manager": "Leiter",
+      "noManager": "Kein Leiter",
+      "codeRequired": "Bitte Code eingeben",
+      "nameRequired": "Bitte Namen eingeben",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
+    },
+    "messages": {
+      "createSuccess": "Einheit erstellt",
+      "updateSuccess": "Einheit aktualisiert",
+      "activeUpdateSuccess": "Status aktualisiert",
+      "loadError": "Daten konnten nicht geladen werden",
+      "saveError": "Einheit konnte nicht gespeichert werden"
+    }
+  },
+  "role": {
+    "title": "Rollen & Berechtigungen",
+    "assignPermissions": "Berechtigungen",
+    "permissionsTitle": "Berechtigungen für \"{{name}}\"",
+    "systemDefinedYes": "Systemrolle",
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "description": "Beschreibung",
+      "systemDefined": "Systemrolle",
+      "permissions": "Berechtigungen"
+    },
+    "screen": "Bildschirm",
+    "form": {
+      "createTitle": "Rolle hinzufügen",
+      "editTitle": "Rolle bearbeiten",
+      "code": "Code",
+      "name": "Name",
+      "description": "Beschreibung",
+      "codeRequired": "Bitte Rollen-Code eingeben",
+      "nameRequired": "Bitte Rollennamen eingeben",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "deleteConfirmTitle": "Diese Rolle löschen?"
+    },
+    "messages": {
+      "createSuccess": "Rolle erstellt",
+      "updateSuccess": "Rolle aktualisiert",
+      "deleteSuccess": "Rolle gelöscht",
+      "deleteError": "Rolle konnte nicht gelöscht werden",
+      "loadError": "Daten konnten nicht geladen werden",
+      "saveError": "Rolle konnte nicht gespeichert werden",
+      "loadPermissionsError": "Berechtigungen konnten nicht geladen werden",
+      "permissionsSaved": "Berechtigungen gespeichert",
+      "systemDefinedReadOnly": "Dies ist eine Systemrolle (SUPER_ADMIN) mit vollem Zugriff und kann nicht bearbeitet werden."
+    }
+  }
+}

@@ -1,0 +1,307 @@
+{
+  "app": {
+    "name": "GOVIA Platform",
+    "tagline": "Governance, Organization, Verification, Identity & Access"
+  },
+  "menu": {
+    "dashboard": "Dashboard",
+    "people": "People",
+    "employees": "Employees",
+    "positions": "Positions",
+    "orgUnits": "Organization Units",
+    "admin": "System Administration",
+    "roles": "Roles & Permissions",
+    "accounts": "User Accounts"
+  },
+  "header": {
+    "logout": "Log out"
+  },
+  "login": {
+    "tenantLabel": "Tenant Code",
+    "tenantRequired": "Please enter tenant code",
+    "usernameLabel": "Username",
+    "usernameRequired": "Please enter username",
+    "passwordLabel": "Password",
+    "passwordRequired": "Please enter password",
+    "submit": "Log in",
+    "success": "Login successful",
+    "error": "Wrong tenant, username, or password"
+  },
+  "dashboard": {
+    "welcome": "Welcome to GOVIA Platform",
+    "username": "Username",
+    "employeeCode": "Employee Code",
+    "tenant": "Tenant",
+    "roles": "Roles"
+  },
+  "common": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "exportExcel": "Export Excel",
+    "exportWord": "Export Word",
+    "attachment": "Attachment",
+    "search": "Search",
+    "reset": "Reset",
+    "confirm": "OK",
+    "yes": "Yes",
+    "no": "No",
+    "active": "Active",
+    "inactive": "Inactive",
+    "import": "Import Data",
+    "importResultTitle": "Import Result",
+    "importSummary": "Success: {{success}} — Failed: {{failure}}",
+    "importRow": "Row {{row}}",
+    "importSuccess": "Imported {{count}} row(s) successfully",
+    "importError": "Failed to import file",
+    "view": "View",
+    "export": "Export",
+    "module": "Module",
+    "noPermission": "You do not have permission to access this screen. Contact your administrator to be granted access."
+  },
+  "attachment": {
+    "upload": "Upload attachment",
+    "uploadSuccess": "Uploaded \"{{fileName}}\"",
+    "uploadError": "Failed to upload \"{{fileName}}\"",
+    "deleteConfirm": "Delete this file?",
+    "deleteSuccess": "Attachment deleted"
+  },
+  "language": {
+    "select": "Language"
+  },
+  "account": {
+    "changePassword": {
+      "menuLabel": "Change Password",
+      "title": "Change Password",
+      "currentPassword": "Current Password",
+      "currentPasswordRequired": "Please enter your current password",
+      "newPassword": "New Password",
+      "newPasswordRequired": "Please enter a new password (min 8 characters)",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordRequired": "Please confirm your new password",
+      "confirmPasswordMismatch": "Passwords do not match",
+      "submit": "Change Password",
+      "success": "Password changed successfully",
+      "error": "Failed to change password. Please check your current password."
+    },
+    "resetPassword": {
+      "title": "Reset Password for {{username}}",
+      "newPassword": "New Password",
+      "newPasswordRequired": "Please enter a new password (min 8 characters)",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordRequired": "Please confirm the new password",
+      "confirmPasswordMismatch": "Passwords do not match",
+      "submit": "Reset Password",
+      "success": "Password reset successfully",
+      "error": "Failed to reset password"
+    },
+    "title": "User Accounts",
+    "noRoles": "No role assigned - no access",
+    "status": {
+      "ACTIVE": "Active",
+      "LOCKED": "Locked",
+      "DISABLED": "Disabled"
+    },
+    "columns": {
+      "username": "Username",
+      "employeeCode": "Employee Code",
+      "employeeName": "Employee Name",
+      "status": "Status",
+      "roles": "Roles",
+      "assignRoles": "Assign Roles",
+      "copyRoles": "Copy Roles"
+    },
+    "assignRoles": {
+      "action": "Assign Roles",
+      "title": "Assign Roles for {{username}}",
+      "roles": "Roles",
+      "submit": "Save",
+      "success": "Roles updated",
+      "error": "Failed to update roles"
+    },
+    "copyRoles": {
+      "action": "Copy Roles",
+      "title": "Copy roles into \"{{username}}\"",
+      "description": "All roles of the account selected below will be assigned to this account, replacing its current roles (if any).",
+      "sourceAccount": "Copy roles from account",
+      "sourceAccountRequired": "Select a source account",
+      "submit": "Copy",
+      "success": "Roles copied",
+      "error": "Failed to copy roles"
+    },
+    "messages": {
+      "loadError": "Failed to load data"
+    }
+  },
+  "employee": {
+    "title": "Employee Management",
+    "filterOrgUnit": "Organization Unit",
+    "filterStatus": "Status",
+    "allOrgUnits": "All units",
+    "allStatuses": "All statuses",
+    "columns": {
+      "employeeCode": "Code",
+      "fullName": "Full Name",
+      "position": "Position",
+      "orgUnit": "Org Unit",
+      "manager": "Manager",
+      "phone": "Phone",
+      "email": "Email",
+      "status": "Status"
+    },
+    "status": {
+      "ACTIVE": "Active",
+      "ON_LEAVE": "On Leave",
+      "TERMINATED": "Terminated"
+    },
+    "gender": {
+      "MALE": "Male",
+      "FEMALE": "Female",
+      "OTHER": "Other"
+    },
+    "form": {
+      "createTitle": "Add Employee",
+      "editTitle": "Edit Employee",
+      "employeeCode": "Employee Code",
+      "fullName": "Full Name",
+      "email": "Work Email",
+      "personalEmail": "Personal Email",
+      "phone": "Phone",
+      "orgUnit": "Organization Unit",
+      "position": "Position",
+      "hireDate": "Hire Date",
+      "dateOfBirth": "Date of Birth",
+      "gender": "Gender",
+      "idNumber": "ID Number",
+      "manager": "Manager",
+      "noManager": "No manager",
+      "save": "Save",
+      "cancel": "Cancel",
+      "employeeCodeRequired": "Please enter employee code",
+      "fullNameRequired": "Please enter full name",
+      "invalidEmail": "Invalid email address",
+      "deleteConfirmTitle": "Delete this employee?",
+      "deleteConfirmContent": "This action cannot be undone.",
+      "accountSection": "Login Account",
+      "accountExisting": "Login account: {{username}}",
+      "accountUsername": "Username",
+      "accountPassword": "Password",
+      "accountUsernameRequired": "Please enter a username",
+      "accountPasswordRequired": "Please enter a password (min 8 characters)",
+      "createAccount": "Create login account",
+      "resetPassword": "Reset Password"
+    },
+    "messages": {
+      "createSuccess": "Employee created",
+      "updateSuccess": "Employee updated",
+      "statusUpdateSuccess": "Status updated",
+      "deleteSuccess": "Employee deleted",
+      "deleteError": "Failed to delete employee",
+      "loadError": "Failed to load data",
+      "saveError": "Failed to save employee",
+      "accountCreateSuccess": "Login account created",
+      "accountCreateError": "Failed to create login account"
+    }
+  },
+  "position": {
+    "title": "Position Management",
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "active": "Status"
+    },
+    "form": {
+      "createTitle": "Add Position",
+      "editTitle": "Edit Position",
+      "code": "Code",
+      "name": "Name",
+      "codeRequired": "Please enter code",
+      "nameRequired": "Please enter name",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "createSuccess": "Position created",
+      "updateSuccess": "Position updated",
+      "activeUpdateSuccess": "Status updated",
+      "loadError": "Failed to load data",
+      "saveError": "Failed to save position"
+    }
+  },
+  "orgUnit": {
+    "title": "Organization Unit Management",
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "level": "Level",
+      "parent": "Parent Unit",
+      "manager": "Manager",
+      "active": "Status"
+    },
+    "level": {
+      "001": "Division (Khối)",
+      "002": "Center (Trung tâm)",
+      "003": "Department (Phòng ban)",
+      "004": "Unit (Bộ phận)"
+    },
+    "form": {
+      "createTitle": "Add Organization Unit",
+      "editTitle": "Edit Organization Unit",
+      "code": "Code",
+      "name": "Name",
+      "level": "Level",
+      "parent": "Parent Unit",
+      "noParent": "No parent (top-level unit)",
+      "manager": "Manager",
+      "noManager": "No manager",
+      "codeRequired": "Please enter code",
+      "nameRequired": "Please enter name",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "messages": {
+      "createSuccess": "Organization unit created",
+      "updateSuccess": "Organization unit updated",
+      "activeUpdateSuccess": "Status updated",
+      "loadError": "Failed to load data",
+      "saveError": "Failed to save organization unit"
+    }
+  },
+  "role": {
+    "title": "Roles & Permissions",
+    "assignPermissions": "Permissions",
+    "permissionsTitle": "Permissions for \"{{name}}\"",
+    "systemDefinedYes": "System role",
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "description": "Description",
+      "systemDefined": "System role",
+      "permissions": "Permissions"
+    },
+    "screen": "Screen",
+    "form": {
+      "createTitle": "Add Role",
+      "editTitle": "Edit Role",
+      "code": "Code",
+      "name": "Name",
+      "description": "Description",
+      "codeRequired": "Please enter a role code",
+      "nameRequired": "Please enter a role name",
+      "save": "Save",
+      "cancel": "Cancel",
+      "deleteConfirmTitle": "Delete this role?"
+    },
+    "messages": {
+      "createSuccess": "Role created",
+      "updateSuccess": "Role updated",
+      "deleteSuccess": "Role deleted",
+      "deleteError": "Failed to delete role",
+      "loadError": "Failed to load data",
+      "saveError": "Failed to save role",
+      "loadPermissionsError": "Failed to load permissions",
+      "permissionsSaved": "Permissions saved",
+      "systemDefinedReadOnly": "This is a system role (SUPER_ADMIN) with full access by default and cannot be edited."
+    }
+  }
+}

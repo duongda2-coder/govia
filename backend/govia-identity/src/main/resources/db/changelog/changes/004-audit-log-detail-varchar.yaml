@@ -1,0 +1,16 @@
+databaseChangeLog:
+
+  # ===================== AUDIT_LOG: chuan hoa kieu cot "detail" =====================
+  # Kieu CLOB truu tuong cua Liquibase tao ra cot vat ly KHAC NHAU tren tung DB
+  # (Postgres -> text, H2 -> CLOB that), khien Hibernate schema-validation luon lech
+  # tren mot trong hai DB du dung @Lob hay @JdbcTypeCode. Chuyen sang VARCHAR(4000)
+  # tuong minh de moi DB (Postgres/H2/Oracle) tao cung mot kieu cot, entity dung String
+  # thuong khong can annotation dac biet.
+  - changeSet:
+      id: 004-1-audit-log-detail-varchar
+      author: govia
+      changes:
+        - modifyDataType:
+            tableName: audit_log
+            columnName: detail
+            newDataType: VARCHAR(4000)

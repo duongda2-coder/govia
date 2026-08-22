@@ -1,0 +1,137 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: man hinh People (Employee/Position/OrgUnit) =====================
+  # Moi man hinh co 6 quyen chuan, khop voi cac nut tren StandardToolbar dung chung: VIEW, CREATE, EDIT, DELETE, EXPORT, IMPORT.
+  # Tai khoan moi tao mac dinh KHONG duoc gan role nao => khong co quyen gi, phai duoc admin gan role/quyen tuong ung.
+  - changeSet:
+      id: 006-1-permission-catalog-people
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000001" }
+              - column: { name: code, value: "PEOPLE.EMPLOYEE.VIEW" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Xem danh sach va chi tiet nhan vien" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000002" }
+              - column: { name: code, value: "PEOPLE.EMPLOYEE.CREATE" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Them moi nhan vien" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000003" }
+              - column: { name: code, value: "PEOPLE.EMPLOYEE.EDIT" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Chinh sua nhan vien" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000004" }
+              - column: { name: code, value: "PEOPLE.EMPLOYEE.DELETE" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Xoa nhan vien" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000005" }
+              - column: { name: code, value: "PEOPLE.EMPLOYEE.EXPORT" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Xuat du lieu nhan vien (Excel/Word)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000006" }
+              - column: { name: code, value: "PEOPLE.EMPLOYEE.IMPORT" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Import du lieu nhan vien" }
+
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000011" }
+              - column: { name: code, value: "PEOPLE.POSITION.VIEW" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Xem danh sach chuc danh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000012" }
+              - column: { name: code, value: "PEOPLE.POSITION.CREATE" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Them moi chuc danh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000013" }
+              - column: { name: code, value: "PEOPLE.POSITION.EDIT" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Chinh sua chuc danh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000014" }
+              - column: { name: code, value: "PEOPLE.POSITION.DELETE" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Xoa chuc danh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000015" }
+              - column: { name: code, value: "PEOPLE.POSITION.EXPORT" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Xuat du lieu chuc danh (Excel/Word)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000016" }
+              - column: { name: code, value: "PEOPLE.POSITION.IMPORT" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Import du lieu chuc danh" }
+
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000021" }
+              - column: { name: code, value: "PEOPLE.ORGUNIT.VIEW" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Xem danh sach don vi to chuc" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000022" }
+              - column: { name: code, value: "PEOPLE.ORGUNIT.CREATE" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Them moi don vi to chuc" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000023" }
+              - column: { name: code, value: "PEOPLE.ORGUNIT.EDIT" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Chinh sua don vi to chuc" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000024" }
+              - column: { name: code, value: "PEOPLE.ORGUNIT.DELETE" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Xoa don vi to chuc" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000025" }
+              - column: { name: code, value: "PEOPLE.ORGUNIT.EXPORT" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Xuat du lieu don vi to chuc (Excel/Word)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a1000000-0000-0000-0000-000000000026" }
+              - column: { name: code, value: "PEOPLE.ORGUNIT.IMPORT" }
+              - column: { name: module, value: "PEOPLE" }
+              - column: { name: description, value: "Import du lieu don vi to chuc" }

@@ -1,0 +1,23 @@
+GOVIA = Governance, Organization, Verification, Identity & Access
+G — Governance: Quản trị doanh nghiệp, chính sách, quy trình, compliance
+O — Organization: Tổ chức, cơ cấu phòng ban, nhân sự
+V — Verification: Kiểm soát, xác minh, audit, evidence
+I — Identity: Quản lý danh tính, tài khoản, vòng đời user
+A — Access: Phân quyền và kiểm soát quyền truy cập
+
+=> GOVIA — Governance, Organization, Verification, Identity & Access
+
+Sau này GOVIA có thể mở rộng thành:
+
+GOVIA People → HR, nhân sự, organizational structure
+GOVIA Identity → User, Employee, Identity Lifecycle
+GOVIA Access → RBAC, ABAC, phân quyền
+GOVIA Audit → Internal Audit, Audit Plan, Finding, Evidence
+GOVIA Risk → Enterprise Risk Management
+GOVIA Compliance → Compliance, Regulation, Policy
+GOVIA Workflow → Approval, workflow, business process
+GOVIA Asset → IT/Business Asset Management
+GOVIA Vendor → Vendor / Third-party Management
+GOVIA Policy → Policy & Control Management
+GOVIA Analytics → Dashboard, BI, Governance Analytics
+GOVIA AI → AI Governance / AI Agent Management sau này

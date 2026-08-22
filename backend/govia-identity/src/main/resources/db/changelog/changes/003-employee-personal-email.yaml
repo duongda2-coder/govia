@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  # ===================== EMPLOYEE: email ca nhan, tach biet voi email cong ty/dang nhap =====================
+  - changeSet:
+      id: 003-1-alter-employee-personal-email
+      author: govia
+      changes:
+        - addColumn:
+            tableName: employee
+            columns:
+              - column: { name: personal_email, type: VARCHAR(255) }
