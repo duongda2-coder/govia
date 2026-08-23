@@ -15,7 +15,16 @@
     "workflow": "Workflow",
     "workflowTasks": "My Tasks",
     "workflowInstances": "Running Processes",
-    "workflowApprovalMatrix": "Approval Matrix"
+    "workflowApprovalMatrix": "Approval Matrix",
+    "audit": "Internal Audit",
+    "auditMasterData": "Master Data",
+    "auditMdAudit": "Audit Catalog",
+    "auditMdFinding": "Finding & Remediation Catalog",
+    "auditMdRisk": "Risk Catalog",
+    "auditMdControl": "Control Catalog",
+    "auditMdProcess": "Process Catalog",
+    "auditMdCompliance": "Compliance Catalog",
+    "auditMdGeneral": "General Catalog"
   },
   "header": {
     "logout": "Log out"
@@ -39,6 +48,7 @@
     "roles": "Roles"
   },
   "common": {
+    "resizeSidebar": "Drag to resize",
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
@@ -413,6 +423,42 @@
         "deleteError": "Failed to delete rule",
         "saveError": "Failed to save rule"
       }
+    }
+  },
+  "auditMasterData": {
+    "groups": {
+      "AUDIT": "Audit Catalog",
+      "FINDING": "Finding & Remediation Catalog",
+      "RISK": "Risk Catalog",
+      "CONTROL": "Control Catalog",
+      "PROCESS": "Process Catalog",
+      "COMPLIANCE": "Compliance Catalog",
+      "GENERAL": "General Catalog"
+    },
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "description": "Description",
+      "sortOrder": "Sort Order"
+    },
+    "form": {
+      "createTitle": "Add {{label}}",
+      "editTitle": "Edit {{label}}",
+      "code": "Code",
+      "name": "Name",
+      "description": "Description",
+      "validFrom": "Valid From",
+      "validTo": "Valid To",
+      "sortOrder": "Sort Order"
+    },
+    "deleteConfirmTitle": "Delete this item?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
     }
   }
 }

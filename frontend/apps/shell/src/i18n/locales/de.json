@@ -15,7 +15,16 @@
     "workflow": "Workflow",
     "workflowTasks": "Meine Aufgaben",
     "workflowInstances": "Laufende Prozesse",
-    "workflowApprovalMatrix": "Genehmigungsmatrix"
+    "workflowApprovalMatrix": "Genehmigungsmatrix",
+    "audit": "Interne Revision",
+    "auditMasterData": "Stammdaten",
+    "auditMdAudit": "Prüfungskatalog",
+    "auditMdFinding": "Feststellungs- und Abhilfekatalog",
+    "auditMdRisk": "Risikokatalog",
+    "auditMdControl": "Kontrollkatalog",
+    "auditMdProcess": "Prozesskatalog",
+    "auditMdCompliance": "Compliance-Katalog",
+    "auditMdGeneral": "Allgemeiner Katalog"
   },
   "header": {
     "logout": "Abmelden"
@@ -39,6 +48,7 @@
     "roles": "Rollen"
   },
   "common": {
+    "resizeSidebar": "Zum Ändern der Breite ziehen",
     "add": "Hinzufügen",
     "edit": "Bearbeiten",
     "delete": "Löschen",
@@ -413,6 +423,42 @@
         "deleteError": "Regel konnte nicht gelöscht werden",
         "saveError": "Regel konnte nicht gespeichert werden"
       }
+    }
+  },
+  "auditMasterData": {
+    "groups": {
+      "AUDIT": "Prüfungskatalog",
+      "FINDING": "Feststellungs- und Abhilfekatalog",
+      "RISK": "Risikokatalog",
+      "CONTROL": "Kontrollkatalog",
+      "PROCESS": "Prozesskatalog",
+      "COMPLIANCE": "Compliance-Katalog",
+      "GENERAL": "Allgemeiner Katalog"
+    },
+    "columns": {
+      "code": "Code",
+      "name": "Name",
+      "description": "Beschreibung",
+      "sortOrder": "Reihenfolge"
+    },
+    "form": {
+      "createTitle": "{{label}} hinzufügen",
+      "editTitle": "{{label}} bearbeiten",
+      "code": "Code",
+      "name": "Name",
+      "description": "Beschreibung",
+      "validFrom": "Gültig ab",
+      "validTo": "Gültig bis",
+      "sortOrder": "Reihenfolge"
+    },
+    "deleteConfirmTitle": "Diesen Eintrag löschen?",
+    "messages": {
+      "loadError": "Daten konnten nicht geladen werden",
+      "createSuccess": "Erstellt",
+      "updateSuccess": "Aktualisiert",
+      "deleteSuccess": "Gelöscht",
+      "deleteError": "Löschen fehlgeschlagen",
+      "saveError": "Speichern fehlgeschlagen"
     }
   }
 }

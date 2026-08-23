@@ -1,0 +1,63 @@
+databaseChangeLog:
+
+  # ===================== AUDIT.MASTER_DATA: doi tu 2 quyen (VIEW/MANAGE) sang chuan 6 quyen =====================
+  # Man hinh "Vai tro & Phan quyen" (RolePermissionsDrawer) mong doi DUNG 6 hanh dong VIEW/CREATE/EDIT/
+  # DELETE/EXPORT/IMPORT cho moi resource (giong PEOPLE.EMPLOYEE.*) de ve du 6 cot tren ma tran quyen -
+  # "MANAGE" khong khop hanh dong nao nen 5 cot con lai bi trong, khong the gan quyen tao/sua/xoa/xuat/
+  # import rieng cho role thuong (chi SUPER_ADMIN co wildcard "*" la khong bi anh huong).
+  - changeSet:
+      id: 014-1-audit-master-data-permission-actions
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a3000000-0000-0000-0000-000000000003" }
+              - column: { name: code, value: "AUDIT.MASTER_DATA.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi danh muc kiem toan noi bo" }
+              - column: { name: resource_label, value: "Danh muc Kiem toan noi bo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a3000000-0000-0000-0000-000000000004" }
+              - column: { name: code, value: "AUDIT.MASTER_DATA.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua danh muc kiem toan noi bo" }
+              - column: { name: resource_label, value: "Danh muc Kiem toan noi bo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a3000000-0000-0000-0000-000000000005" }
+              - column: { name: code, value: "AUDIT.MASTER_DATA.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa danh muc kiem toan noi bo" }
+              - column: { name: resource_label, value: "Danh muc Kiem toan noi bo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a3000000-0000-0000-0000-000000000006" }
+              - column: { name: code, value: "AUDIT.MASTER_DATA.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu danh muc kiem toan noi bo" }
+              - column: { name: resource_label, value: "Danh muc Kiem toan noi bo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a3000000-0000-0000-0000-000000000007" }
+              - column: { name: code, value: "AUDIT.MASTER_DATA.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu danh muc kiem toan noi bo" }
+              - column: { name: resource_label, value: "Danh muc Kiem toan noi bo" }
+
+  - changeSet:
+      id: 014-2-remove-audit-master-data-manage-permission
+      author: govia
+      comment: "Xoa quyen MANAGE cu (thay bang 5 quyen chi tiet o tren) - vua tao hom nay, chua co role thuong nao duoc gan nen xoa an toan."
+      changes:
+        - delete:
+            tableName: role_permission
+            where: "permission_id = 'a3000000-0000-0000-0000-000000000002'"
+        - delete:
+            tableName: permission
+            where: "id = 'a3000000-0000-0000-0000-000000000002'"

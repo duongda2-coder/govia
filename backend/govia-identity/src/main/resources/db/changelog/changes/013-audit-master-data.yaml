@@ -1,0 +1,72 @@
+databaseChangeLog:
+
+  # ===================== AUDIT_MASTER_DATA_ITEM: danh muc dung chung module Kiem toan noi bo =====================
+  # 1 bang cho TAT CA danh muc (phan biet qua cot category, xem enum AuditMasterDataCategory trong code) -
+  # them/bot 1 loai danh muc la sua code (enum), KHONG can migration moi.
+  - changeSet:
+      id: 013-1-create-audit-master-data-item
+      author: govia
+      changes:
+        - createTable:
+            tableName: audit_master_data_item
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: category, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: parent_id, type: UUID }
+              - column: { name: code, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: description, type: VARCHAR(1000) }
+              - column: { name: valid_from, type: DATE }
+              - column: { name: valid_to, type: DATE }
+              - column: { name: sort_order, type: INT }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_master_data_item
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_master_data_item_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_master_data_item
+            baseColumnNames: parent_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_master_data_item_parent
+        - addUniqueConstraint:
+            tableName: audit_master_data_item
+            columnNames: tenant_id, category, code
+            constraintName: uk_audit_master_data_item_tenant_category_code
+        - createIndex:
+            tableName: audit_master_data_item
+            indexName: ix_audit_master_data_item_tenant_category
+            columns:
+              - column: { name: tenant_id }
+              - column: { name: category }
+
+  # ===================== PERMISSION CATALOG: Audit Master Data =====================
+  - changeSet:
+      id: 013-2-permission-catalog-audit-master-data
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a3000000-0000-0000-0000-000000000001" }
+              - column: { name: code, value: "AUDIT.MASTER_DATA.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc kiem toan noi bo" }
+              - column: { name: resource_label, value: "Danh muc Kiem toan noi bo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a3000000-0000-0000-0000-000000000002" }
+              - column: { name: code, value: "AUDIT.MASTER_DATA.MANAGE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them/sua/xoa danh muc kiem toan noi bo" }
+              - column: { name: resource_label, value: "Danh muc Kiem toan noi bo" }

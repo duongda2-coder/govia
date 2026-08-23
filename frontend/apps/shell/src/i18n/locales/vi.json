@@ -15,7 +15,16 @@
     "workflow": "Quy trình",
     "workflowTasks": "Việc cần xử lý",
     "workflowInstances": "Quy trình đang chạy",
-    "workflowApprovalMatrix": "Ma trận phê duyệt"
+    "workflowApprovalMatrix": "Ma trận phê duyệt",
+    "audit": "Kiểm toán nội bộ",
+    "auditMasterData": "Danh mục",
+    "auditMdAudit": "Danh mục Kiểm toán",
+    "auditMdFinding": "Danh mục Phát hiện & Khắc phục",
+    "auditMdRisk": "Danh mục Rủi ro",
+    "auditMdControl": "Danh mục Kiểm soát",
+    "auditMdProcess": "Danh mục Quy trình",
+    "auditMdCompliance": "Danh mục Tuân thủ",
+    "auditMdGeneral": "Danh mục Chung"
   },
   "header": {
     "logout": "Đăng xuất"
@@ -39,6 +48,7 @@
     "roles": "Vai trò"
   },
   "common": {
+    "resizeSidebar": "Kéo để thay đổi độ rộng",
     "add": "Thêm mới",
     "edit": "Chỉnh sửa",
     "delete": "Xóa",
@@ -413,6 +423,42 @@
         "deleteError": "Xóa quy tắc thất bại",
         "saveError": "Lưu quy tắc thất bại"
       }
+    }
+  },
+  "auditMasterData": {
+    "groups": {
+      "AUDIT": "Danh mục Kiểm toán",
+      "FINDING": "Danh mục Phát hiện & Khắc phục",
+      "RISK": "Danh mục Rủi ro",
+      "CONTROL": "Danh mục Kiểm soát",
+      "PROCESS": "Danh mục Quy trình",
+      "COMPLIANCE": "Danh mục Tuân thủ",
+      "GENERAL": "Danh mục Chung"
+    },
+    "columns": {
+      "code": "Mã",
+      "name": "Tên",
+      "description": "Mô tả",
+      "sortOrder": "Thứ tự"
+    },
+    "form": {
+      "createTitle": "Thêm {{label}}",
+      "editTitle": "Sửa {{label}}",
+      "code": "Mã",
+      "name": "Tên",
+      "description": "Mô tả",
+      "validFrom": "Hiệu lực từ",
+      "validTo": "Hiệu lực đến",
+      "sortOrder": "Thứ tự"
+    },
+    "deleteConfirmTitle": "Xóa mục này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
     }
   }
 }

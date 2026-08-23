@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Layout, Menu, Avatar, Dropdown, Typography, Space } from "antd";
 import type { MenuProps } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { DashboardOutlined, KeyOutlined, LogoutOutlined, NodeIndexOutlined, SafetyCertificateOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+import { AuditOutlined, DashboardOutlined, KeyOutlined, LogoutOutlined, NodeIndexOutlined, SafetyCertificateOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthContext";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
@@ -24,7 +24,24 @@ const MENU_ROUTES: Record<string, string> = {
   "workflow-tasks": "/workflow/tasks",
   "workflow-instances": "/workflow/instances",
   "workflow-approval-matrix": "/workflow/approval-matrix",
+  "audit-md-audit": "/audit/master-data/audit",
+  "audit-md-finding": "/audit/master-data/finding",
+  "audit-md-risk": "/audit/master-data/risk",
+  "audit-md-control": "/audit/master-data/control",
+  "audit-md-process": "/audit/master-data/process",
+  "audit-md-compliance": "/audit/master-data/compliance",
+  "audit-md-general": "/audit/master-data/general",
 };
+
+/** Gan title HTML len nhan menu de trinh duyet tu hien tooltip khi chu bi cat ngan (...) do sider hep. */
+function menuLabel(text: string) {
+  return <span title={text}>{text}</span>;
+}
+
+const SIDER_WIDTH_STORAGE_KEY = "govia.siderWidth";
+const SIDER_MIN_WIDTH = 180;
+const SIDER_MAX_WIDTH = 420;
+const SIDER_DEFAULT_WIDTH = 220;
 
 export function AppLayout() {
   const { user, logout } = useAuth();
@@ -32,6 +49,55 @@ export function AppLayout() {
   const location = useLocation();
   const { t } = useTranslation();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+
+  const [siderWidth, setSiderWidth] = useState(() => {
+    const stored = Number(localStorage.getItem(SIDER_WIDTH_STORAGE_KEY));
+    return stored >= SIDER_MIN_WIDTH && stored <= SIDER_MAX_WIDTH ? stored : SIDER_DEFAULT_WIDTH;
+  });
+  const resizingRef = useRef(false);
+  const siderRef = useRef<HTMLDivElement>(null);
+
+  // Sider voi prop "breakpoint" tu chen CSS !important co dinh width luc mount (de responsive) -
+  // ghi de qua prop "width" binh thuong khong thang duoc !important do, nen phai set truc tiep len
+  // DOM voi priority "important" (chi co inline style + !important moi thang duoc !important khac).
+  useEffect(() => {
+    const node = siderRef.current;
+    if (!node) return;
+    const px = `${siderWidth}px`;
+    node.style.setProperty("width", px, "important");
+    node.style.setProperty("min-width", px, "important");
+    node.style.setProperty("max-width", px, "important");
+    node.style.setProperty("flex", `0 0 ${px}`, "important");
+  }, [siderWidth]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!resizingRef.current) return;
+      setSiderWidth(Math.min(Math.max(e.clientX, SIDER_MIN_WIDTH), SIDER_MAX_WIDTH));
+    };
+    const handleMouseUp = () => {
+      if (!resizingRef.current) return;
+      resizingRef.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      setSiderWidth((current) => {
+        localStorage.setItem(SIDER_WIDTH_STORAGE_KEY, String(current));
+        return current;
+      });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
+  const startResizing = () => {
+    resizingRef.current = true;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  };
 
   /**
    * Menu chi liet ke module da co man hinh that. Cac module khac trong NOTE.txt / yeu cau 1
@@ -41,25 +107,47 @@ export function AppLayout() {
   const isSuperAdmin = user?.roles.includes("SUPER_ADMIN") ?? false;
 
   const moduleMenuItems: MenuProps["items"] = [
-    { key: "dashboard", icon: <DashboardOutlined />, label: t("menu.dashboard") },
+    { key: "dashboard", icon: <DashboardOutlined />, label: menuLabel(t("menu.dashboard")) },
     {
       key: "people",
       icon: <TeamOutlined />,
-      label: t("menu.people"),
+      label: menuLabel(t("menu.people")),
       children: [
-        { key: "people-employees", label: t("menu.employees") },
-        { key: "people-positions", label: t("menu.positions") },
-        { key: "people-org-units", label: t("menu.orgUnits") },
+        { key: "people-employees", label: menuLabel(t("menu.employees")) },
+        { key: "people-positions", label: menuLabel(t("menu.positions")) },
+        { key: "people-org-units", label: menuLabel(t("menu.orgUnits")) },
       ],
     },
     {
       key: "workflow",
       icon: <NodeIndexOutlined />,
-      label: t("menu.workflow"),
+      label: menuLabel(t("menu.workflow")),
       children: [
-        { key: "workflow-tasks", label: t("menu.workflowTasks") },
-        { key: "workflow-instances", label: t("menu.workflowInstances") },
-        { key: "workflow-approval-matrix", label: t("menu.workflowApprovalMatrix") },
+        { key: "workflow-tasks", label: menuLabel(t("menu.workflowTasks")) },
+        { key: "workflow-instances", label: menuLabel(t("menu.workflowInstances")) },
+        { key: "workflow-approval-matrix", label: menuLabel(t("menu.workflowApprovalMatrix")) },
+      ],
+    },
+    {
+      key: "audit",
+      icon: <AuditOutlined />,
+      label: menuLabel(t("menu.audit")),
+      children: [
+        {
+          key: "audit-master-data",
+          label: menuLabel(t("menu.auditMasterData")),
+          children: [
+            { key: "audit-md-audit", label: menuLabel(t("menu.auditMdAudit")) },
+            { key: "audit-md-finding", label: menuLabel(t("menu.auditMdFinding")) },
+            { key: "audit-md-risk", label: menuLabel(t("menu.auditMdRisk")) },
+            { key: "audit-md-control", label: menuLabel(t("menu.auditMdControl")) },
+            { key: "audit-md-process", label: menuLabel(t("menu.auditMdProcess")) },
+            { key: "audit-md-compliance", label: menuLabel(t("menu.auditMdCompliance")) },
+            { key: "audit-md-general", label: menuLabel(t("menu.auditMdGeneral")) },
+          ],
+        },
+        // Ke hoach (Audit Plan/Universe) va Thuc hien (Work Program/Finding...) se them vao day
+        // khi tung phan thuc su co man hinh, cung cap voi "audit-master-data".
       ],
     },
     ...(isSuperAdmin
@@ -67,10 +155,10 @@ export function AppLayout() {
           {
             key: "admin",
             icon: <SafetyCertificateOutlined />,
-            label: t("menu.admin"),
+            label: menuLabel(t("menu.admin")),
             children: [
-              { key: "admin-roles", label: t("menu.roles") },
-              { key: "admin-accounts", label: t("menu.accounts") },
+              { key: "admin-roles", label: menuLabel(t("menu.roles")) },
+              { key: "admin-accounts", label: menuLabel(t("menu.accounts")) },
             ],
           },
         ]
@@ -90,7 +178,19 @@ export function AppLayout() {
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
-      <Sider breakpoint="lg" collapsedWidth="0" theme="light" style={{ background: "#dbeafe", borderRight: "1px solid #bfdbfe" }}>
+      <Sider
+        ref={siderRef}
+        breakpoint="lg"
+        collapsedWidth="0"
+        theme="light"
+        width={siderWidth}
+        style={{ background: "#dbeafe", borderRight: "1px solid #bfdbfe", position: "relative" }}
+      >
+        <div
+          onMouseDown={startResizing}
+          title={t("common.resizeSidebar")}
+          style={{ position: "absolute", top: 0, right: -3, width: 6, height: "100%", cursor: "col-resize", zIndex: 10 }}
+        />
         <div style={{ color: "#1d4ed8", textAlign: "center", padding: 16, fontWeight: 700, fontSize: 18 }}>
           GOVIA
         </div>

@@ -15,7 +15,16 @@
     "workflow": "工作流程",
     "workflowTasks": "待办任务",
     "workflowInstances": "运行中的流程",
-    "workflowApprovalMatrix": "审批矩阵"
+    "workflowApprovalMatrix": "审批矩阵",
+    "audit": "内部审计",
+    "auditMasterData": "主数据",
+    "auditMdAudit": "审计类别",
+    "auditMdFinding": "发现与整改类别",
+    "auditMdRisk": "风险类别",
+    "auditMdControl": "控制类别",
+    "auditMdProcess": "流程类别",
+    "auditMdCompliance": "合规类别",
+    "auditMdGeneral": "通用类别"
   },
   "header": {
     "logout": "退出登录"
@@ -39,6 +48,7 @@
     "roles": "角色"
   },
   "common": {
+    "resizeSidebar": "拖动以调整宽度",
     "add": "新增",
     "edit": "编辑",
     "delete": "删除",
@@ -413,6 +423,42 @@
         "deleteError": "删除规则失败",
         "saveError": "保存规则失败"
       }
+    }
+  },
+  "auditMasterData": {
+    "groups": {
+      "AUDIT": "审计类别",
+      "FINDING": "发现与整改类别",
+      "RISK": "风险类别",
+      "CONTROL": "控制类别",
+      "PROCESS": "流程类别",
+      "COMPLIANCE": "合规类别",
+      "GENERAL": "通用类别"
+    },
+    "columns": {
+      "code": "编码",
+      "name": "名称",
+      "description": "说明",
+      "sortOrder": "排序"
+    },
+    "form": {
+      "createTitle": "新增{{label}}",
+      "editTitle": "编辑{{label}}",
+      "code": "编码",
+      "name": "名称",
+      "description": "说明",
+      "validFrom": "生效日期",
+      "validTo": "失效日期",
+      "sortOrder": "排序"
+    },
+    "deleteConfirmTitle": "确定删除此项？",
+    "messages": {
+      "loadError": "数据加载失败",
+      "createSuccess": "已创建",
+      "updateSuccess": "已更新",
+      "deleteSuccess": "已删除",
+      "deleteError": "删除失败",
+      "saveError": "保存失败"
     }
   }
 }
