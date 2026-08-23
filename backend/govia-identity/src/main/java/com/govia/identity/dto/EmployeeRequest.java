@@ -1,5 +1,6 @@
 package com.govia.identity.dto;
 
+import com.govia.identity.entity.EmployeeRankLevel;
 import com.govia.identity.entity.Gender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -19,6 +20,7 @@ public record EmployeeRequest(
         LocalDate dateOfBirth,
         Gender gender,
         String idNumber,
-        UUID managerId
+        UUID managerId,
+        EmployeeRankLevel rankLevel
 ) {
 }

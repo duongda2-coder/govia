@@ -23,6 +23,7 @@ import com.govia.identity.repository.UserAccountRepository;
 import com.govia.identity.repository.UserRoleRepository;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
  * user "admin"/"Admin@123", role SUPER_ADMIN voi quyen "*".
  * Chi chay 1 lan (kiem tra tenant "default" da ton tai chua) - xoa/tat class nay
  * khi trien khai production that.
+ * @Order(1): phai chay TRUOC WorkflowSampleProcessSeeder (can tenant "default" da ton tai).
  */
 @Component
+@Order(1)
 public class DataSeeder implements ApplicationRunner {
 
     private final TenantRepository tenantRepository;

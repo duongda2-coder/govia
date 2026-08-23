@@ -1,6 +1,11 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:govia;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    # ${random.uuid}: moi Spring context test (vd cau hinh khac nhau giua cac lop @SpringBootTest
+    # thuan tuy voi lop co them @AutoConfigureMockMvc) duoc cap 1 DB H2 in-memory RIENG BIET, tranh
+    # cac context nay vo tinh dung chung 1 instance H2 (do cung ten "govia" + DB_CLOSE_DELAY=-1 giu
+    # song trong ca JVM) - dieu tung vo hai voi Liquibase (tu track changeset da chay) nhung lam
+    # Flowable (ProcessEngine engine thu 2 tren cung DB) tuong tao lai bang da ton tai va loi.
+    url: jdbc:h2:mem:govia-${random.uuid};MODE=PostgreSQL;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sa
     password:

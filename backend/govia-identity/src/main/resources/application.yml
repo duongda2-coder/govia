@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: ${PORT:8081}   # Render (va nhieu host khac) inject PORT luc runtime
 
 spring:
   application:
@@ -19,6 +19,12 @@ spring:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
+
+flowable:
+  database-schema-update: true   # Flowable tu tao/migrate bang ACT_* rieng, khong quan ly qua Liquibase
+  async-executor-activate: true  # can bat de Timer/Job chay duoc
+  check-process-definitions: false  # tat auto-deploy classpath:/processes/ cua Flowable (khong gan tenantId) -
+                                     # quy trinh mau duoc WorkflowSampleProcessSeeder tu deploy co tenantId cu the
 
 govia:
   security:

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="com.govia.workflow">
+
+    <!--
+      Quy trinh trinh dien cac cau truc BPMN chua duoc dung o simple_approval/employee_approval:
+      Parallel Fork/Join, embedded Sub-process, Service Task bat dong bo co RETRY (RetryableServiceTaskDelegate),
+      Service Task co the loi + Boundary Error Event (RiskyServiceTaskDelegate), va Signal Event.
+      Khong gan voi nghiep vu module nao - chi de kiem chung ha tang Flowable dung du cac kha nang nay.
+
+      Bien vao (tuy chon):
+        - simulateRiskyError (boolean, mac dinh true neu khong truyen): co lam serviceTask "riskyServiceTask"
+          nem loi hay khong, de test duoc ca 2 nhanh (loi -> errorHandledEnd, thanh cong -> endShowcase).
+      Bien do quy trinh tu dat: retryServiceTaskSucceeded, riskyServiceTaskSucceeded (khi khong loi).
+    -->
+    <error id="riskyFailureError" errorCode="RISKY_FAILURE" />
+    <signal id="showcaseDoneSignal" name="showcaseDone" />
+
+    <process id="framework_showcase" name="Framework Showcase" isExecutable="true">
+
+        <startEvent id="start" />
+        <parallelGateway id="forkGateway" name="Fork" />
+
+        <userTask id="taskA" name="Task A (song song)" />
+        <userTask id="taskB" name="Task B (song song)" />
+        <parallelGateway id="joinGateway" name="Join" />
+
+        <subProcess id="reviewSubProcess" name="Sub-process xem xet">
+            <startEvent id="subStart" />
+            <userTask id="subReviewTask" name="Duyệt trong sub-process" />
+            <endEvent id="subEnd" />
+            <sequenceFlow sourceRef="subStart" targetRef="subReviewTask" />
+            <sequenceFlow sourceRef="subReviewTask" targetRef="subEnd" />
+        </subProcess>
+
+        <serviceTask id="retryServiceTask" name="Gọi dịch vụ ngoài (có retry)"
+                     flowable:delegateExpression="${retryableServiceTaskDelegate}"
+                     flowable:async="true">
+            <extensionElements>
+                <flowable:failedJobRetryTimeCycle>R2/PT1S</flowable:failedJobRetryTimeCycle>
+            </extensionElements>
+        </serviceTask>
+
+        <serviceTask id="riskyServiceTask" name="Gọi dịch vụ có thể lỗi"
+                     flowable:delegateExpression="${riskyServiceTaskDelegate}" />
+        <boundaryEvent id="riskyErrorBoundary" attachedToRef="riskyServiceTask">
+            <errorEventDefinition errorRef="riskyFailureError" />
+        </boundaryEvent>
+        <endEvent id="errorHandledEnd" name="Lỗi đã được xử lý" />
+
+        <intermediateThrowEvent id="signalThrow" name="Báo hiệu hoàn tất">
+            <signalEventDefinition signalRef="showcaseDoneSignal" />
+        </intermediateThrowEvent>
+        <endEvent id="endShowcase" name="Hoàn tất" />
+
+        <sequenceFlow sourceRef="start" targetRef="forkGateway" />
+        <sequenceFlow sourceRef="forkGateway" targetRef="taskA" />
+        <sequenceFlow sourceRef="forkGateway" targetRef="taskB" />
+        <sequenceFlow sourceRef="taskA" targetRef="joinGateway" />
+        <sequenceFlow sourceRef="taskB" targetRef="joinGateway" />
+        <sequenceFlow sourceRef="joinGateway" targetRef="reviewSubProcess" />
+        <sequenceFlow sourceRef="reviewSubProcess" targetRef="retryServiceTask" />
+        <sequenceFlow sourceRef="retryServiceTask" targetRef="riskyServiceTask" />
+        <sequenceFlow sourceRef="riskyServiceTask" targetRef="signalThrow" />
+        <sequenceFlow sourceRef="signalThrow" targetRef="endShowcase" />
+        <sequenceFlow sourceRef="riskyErrorBoundary" targetRef="errorHandledEnd" />
+
+    </process>
+</definitions>

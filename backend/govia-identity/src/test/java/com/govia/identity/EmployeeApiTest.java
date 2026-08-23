@@ -36,7 +36,7 @@ class EmployeeApiTest extends AbstractApiTest {
 
         EmployeeRequest request = new EmployeeRequest("NV-1001", "Nguyen Van A", "a@govia.local",
                 "a.canhan@gmail.com", "0901234567", orgUnitId, positionId, LocalDate.of(2024, 1, 15),
-                LocalDate.of(1995, 5, 20), Gender.MALE, "079095001234", null);
+                LocalDate.of(1995, 5, 20), Gender.MALE, "079095001234", null, null);
 
         mockMvc.perform(post("/api/employees")
                         .header("Authorization", "Bearer " + adminToken)
@@ -200,6 +200,6 @@ class EmployeeApiTest extends AbstractApiTest {
     }
 
     private EmployeeRequest employeeRequest(String code, String fullName, UUID orgUnitId, UUID managerId) {
-        return new EmployeeRequest(code, fullName, null, null, null, orgUnitId, null, null, null, null, null, managerId);
+        return new EmployeeRequest(code, fullName, null, null, null, orgUnitId, null, null, null, null, null, managerId, null);
     }
 }

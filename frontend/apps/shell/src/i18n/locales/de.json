@@ -11,7 +11,11 @@
     "orgUnits": "Organisationseinheiten",
     "admin": "Systemverwaltung",
     "roles": "Rollen & Berechtigungen",
-    "accounts": "Benutzerkonten"
+    "accounts": "Benutzerkonten",
+    "workflow": "Workflow",
+    "workflowTasks": "Meine Aufgaben",
+    "workflowInstances": "Laufende Prozesse",
+    "workflowApprovalMatrix": "Genehmigungsmatrix"
   },
   "header": {
     "logout": "Abmelden"
@@ -152,7 +156,9 @@
     "status": {
       "ACTIVE": "Aktiv",
       "ON_LEAVE": "Beurlaubt",
-      "TERMINATED": "Ausgeschieden"
+      "TERMINATED": "Ausgeschieden",
+      "PENDING_APPROVAL": "Warten auf Genehmigung",
+      "REJECTED": "Abgelehnt"
     },
     "gender": {
       "MALE": "Männlich",
@@ -175,6 +181,8 @@
       "idNumber": "Ausweisnummer",
       "manager": "Vorgesetzter",
       "noManager": "Kein Vorgesetzter",
+      "rankLevel": "Rangstufe (N1-N6)",
+      "rankLevelHint": "Dient als Abbruchschwelle fur die dynamische Genehmigungskette - siehe Genehmigungsmatrix",
       "save": "Speichern",
       "cancel": "Abbrechen",
       "employeeCodeRequired": "Bitte Mitarbeiter-Code eingeben",
@@ -302,6 +310,109 @@
       "loadPermissionsError": "Berechtigungen konnten nicht geladen werden",
       "permissionsSaved": "Berechtigungen gespeichert",
       "systemDefinedReadOnly": "Dies ist eine Systemrolle (SUPER_ADMIN) mit vollem Zugriff und kann nicht bearbeitet werden."
+    }
+  },
+  "workflow": {
+    "task": {
+      "title": "Meine Aufgaben",
+      "columns": {
+        "name": "Aufgabe",
+        "businessKey": "Referenznummer",
+        "assignee": "Zuständig",
+        "delegation": "Delegation",
+        "createTime": "Erstellt am",
+        "actions": "Aktionen"
+      },
+      "actions": {
+        "approve": "Genehmigen",
+        "reject": "Ablehnen",
+        "complete": "Abschließen",
+        "claim": "Übernehmen",
+        "forward": "Weiterleiten",
+        "delegate": "Delegieren",
+        "resolve": "Delegation abschließen"
+      },
+      "delegation": {
+        "pending": "Delegiert",
+        "resolved": "Erledigt - wartet auf finale Prüfung"
+      },
+      "transferModal": {
+        "forwardTitle": "Aufgabe weiterleiten",
+        "delegateTitle": "Aufgabe delegieren",
+        "selectPlaceholder": "Empfänger auswählen"
+      },
+      "messages": {
+        "loadError": "Daten konnten nicht geladen werden",
+        "completeSuccess": "Aufgabe abgeschlossen",
+        "claimSuccess": "Aufgabe übernommen",
+        "reassignSuccess": "Aufgabe weitergeleitet",
+        "delegateSuccess": "Aufgabe delegiert",
+        "resolveSuccess": "Delegation abgeschlossen",
+        "actionError": "Aktion fehlgeschlagen"
+      }
+    },
+    "instance": {
+      "title": "Laufende Prozesse",
+      "columns": {
+        "processDefinitionKey": "Prozess",
+        "businessKey": "Referenznummer",
+        "startTime": "Gestartet am",
+        "status": "Status",
+        "actions": "Aktionen"
+      },
+      "status": {
+        "running": "Läuft",
+        "ended": "Beendet"
+      },
+      "actions": {
+        "cancel": "Abbrechen",
+        "viewTasks": "Aufgaben"
+      },
+      "tasksModal": {
+        "title": "Aufgaben in diesem Prozess"
+      },
+      "startModal": {
+        "title": "Neuen Prozess starten",
+        "processDefinition": "Prozess",
+        "businessKey": "Referenznummer",
+        "approver": "Genehmiger",
+        "approverPlaceholder": "Genehmiger auswählen"
+      },
+      "messages": {
+        "loadError": "Daten konnten nicht geladen werden",
+        "startSuccess": "Prozess gestartet",
+        "startError": "Prozess konnte nicht gestartet werden",
+        "cancelSuccess": "Prozess abgebrochen",
+        "cancelError": "Prozess konnte nicht abgebrochen werden"
+      }
+    },
+    "approvalMatrix": {
+      "title": "Genehmigungsmatrix",
+      "description": "Konfiguriert die dynamische Genehmigungskette fur neue Mitarbeiter: die Vorgesetztenkette wird durchlaufen, bis jemand mit der konfigurierten Rangstufe (N1-N6) erreicht wird, danach optional ein abschliessender Super-Admin-Schritt. Jede Organisationseinheit hat hochstens eine Regel (oder es gilt die Standardregel fur den gesamten Mandanten).",
+      "defaultScope": "Standard (gesamter Mandant)",
+      "columns": {
+        "scope": "Gilt fur",
+        "finalApprovalLevel": "Letzte Genehmigungsstufe",
+        "requireFinalStep": "Super-Admin-Schritt",
+        "active": "Status"
+      },
+      "form": {
+        "createTitle": "Regel hinzufugen",
+        "editTitle": "Regel bearbeiten",
+        "orgUnit": "Organisationseinheit",
+        "orgUnitPlaceholder": "Leer lassen = Standardregel (gesamter Mandant)",
+        "finalApprovalLevel": "Letzte Genehmigungsstufe (N1-N6)",
+        "requireFinalStep": "Hat abschliessenden Super-Admin-Schritt"
+      },
+      "deleteConfirmTitle": "Diese Regel löschen?",
+      "messages": {
+        "loadError": "Daten konnten nicht geladen werden",
+        "createSuccess": "Regel erstellt",
+        "updateSuccess": "Regel aktualisiert",
+        "deleteSuccess": "Regel gelöscht",
+        "deleteError": "Regel konnte nicht gelöscht werden",
+        "saveError": "Regel konnte nicht gespeichert werden"
+      }
     }
   }
 }

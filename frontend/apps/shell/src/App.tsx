@@ -8,6 +8,9 @@ import { PositionListPage } from "./pages/People/PositionListPage";
 import { OrganizationUnitListPage } from "./pages/People/OrganizationUnitListPage";
 import { RoleListPage } from "./pages/Admin/RoleListPage";
 import { AccountListPage } from "./pages/Admin/AccountListPage";
+import { TaskInbox } from "./pages/Workflow/TaskInbox";
+import { ProcessInstances } from "./pages/Workflow/ProcessInstances";
+import { ApprovalMatrixPage } from "./pages/Workflow/ApprovalMatrixPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -32,6 +35,9 @@ function App() {
         <Route path="people/org-units" element={<OrganizationUnitListPage />} />
         <Route path="admin/roles" element={<RoleListPage />} />
         <Route path="admin/accounts" element={<AccountListPage />} />
+        <Route path="workflow/tasks" element={<TaskInbox />} />
+        <Route path="workflow/instances" element={<ProcessInstances />} />
+        <Route path="workflow/approval-matrix" element={<ApprovalMatrixPage />} />
       </Route>
     </Routes>
   );

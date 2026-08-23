@@ -53,6 +53,7 @@ public class EmployeeService {
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
     private final ExcelImportService excelImportService;
+    private final EmployeeApprovalService employeeApprovalService;
 
     public EmployeeService(EmployeeRepository repository,
                             OrganizationUnitRepository orgUnitRepository,
@@ -61,7 +62,8 @@ public class EmployeeService {
                             AuditLogService auditLogService,
                             ExcelExportService excelExportService,
                             WordExportService wordExportService,
-                            ExcelImportService excelImportService) {
+                            ExcelImportService excelImportService,
+                            EmployeeApprovalService employeeApprovalService) {
         this.repository = repository;
         this.orgUnitRepository = orgUnitRepository;
         this.positionRepository = positionRepository;
@@ -70,6 +72,7 @@ public class EmployeeService {
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
         this.excelImportService = excelImportService;
+        this.employeeApprovalService = employeeApprovalService;
     }
 
     @Transactional(readOnly = true)
@@ -99,10 +102,20 @@ public class EmployeeService {
         Employee employee = new Employee();
         employee.setTenantId(tenantId);
         applyRequest(employee, request);
-        employee.setStatus(EmployeeStatus.ACTIVE);
+        /*
+         * Nhan vien co quan ly truc tiep (managerId) se cho duyet qua quy trinh Flowable
+         * "employee_approval" (di nguoc chuoi quan ly toi da 3 cap + buoc cuoi Super Admin) truoc khi
+         * chuyen ACTIVE - xem EmployeeApprovalService. Khong co quan ly (vd nhan vien dau tien cua 1
+         * don vi) thi ACTIVE ngay, khong can duyet.
+         */
+        employee.setStatus(request.managerId() != null ? EmployeeStatus.PENDING_APPROVAL : EmployeeStatus.ACTIVE);
         employee = repository.save(employee);
 
         auditLogService.record("Employee", employee.getId(), AuditAction.CREATE, "Tao nhan vien " + employee.getEmployeeCode());
+
+        if (employee.getManagerId() != null) {
+            employeeApprovalService.startApprovalIfNeeded(employee);
+        }
 
         return toResponse(employee, buildResponseContext(List.of(employee)));
     }
@@ -214,7 +227,7 @@ public class EmployeeService {
                 EmployeeStatus status = resolveStatus(row.get("status"));
 
                 EmployeeRequest request = new EmployeeRequest(employeeCode.trim(), fullName.trim(), null, null,
-                        emptyToNull(row.get("phone")), orgUnitId, positionId, null, null, null, null, null);
+                        emptyToNull(row.get("phone")), orgUnitId, positionId, null, null, null, null, null, null);
                 EmployeeResponse created = create(request);
                 if (status != EmployeeStatus.ACTIVE) {
                     changeStatus(created.id(), status);
@@ -374,6 +387,7 @@ public class EmployeeService {
         employee.setGender(request.gender());
         employee.setIdNumber(request.idNumber());
         employee.setManagerId(request.managerId());
+        employee.setRankLevel(request.rankLevel());
     }
 
     private Employee getOwnedOrThrow(UUID tenantId, UUID id) {
@@ -413,7 +427,7 @@ public class EmployeeService {
                 e.getPositionId(), position == null ? null : position.getCode(), position == null ? null : position.getName(),
                 e.getHireDate(), e.getStatus(), e.getDateOfBirth(), e.getGender(), e.getIdNumber(),
                 e.getManagerId(), manager == null ? null : manager.getEmployeeCode(), manager == null ? null : manager.getFullName(),
-                ctx.usernames.get(e.getId()),
+                e.getRankLevel(), ctx.usernames.get(e.getId()),
                 e.getCreatedAt(), e.getUpdatedAt());
     }
 

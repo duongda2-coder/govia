@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="com.govia.workflow">
+
+    <!--
+      Duyet nhan vien moi theo DAY QUAN LY DONG (do dai thay doi tuy cau hinh "ma tran phe duyet" -
+      xem ApprovalMatrixRule/EmployeeApprovalService): di nguoc chuoi quan ly (manager_id) toi khi
+      gap nguoi co cap bac (rank_level) dat nguong cau hinh cho don vi to chuc do (hoac quy tac mac
+      dinh). Danh sach nguoi duyet (chi tinh nhung ai co tai khoan dang nhap) duoc EmployeeApprovalService
+      tinh SAN va truyen vao qua bien approverChain - quy trinh chi viec lap qua tung nguoi bang
+      Multi-Instance Sequential User Task, KHONG con gioi han cung 3 cap nhu ban truoc.
+      Sau khi het chuoi (hoac chuoi rong), neu requireFinalStep=true thi co them 1 buoc Super Admin
+      (candidate group) - day la phan CO THE tat qua cau hinh rule. Bat ky buoc nao tu choi
+      (approved=false) thi dung ngay, khong di tiep.
+
+      Bien vao (do EmployeeApprovalService thiet lap luc start):
+        - employeeId (bat buoc)   : id cua Employee dang cho duyet
+        - approverChain (bat buoc): List<String> UserAccount.id theo dung thu tu duyet (co the rong)
+        - requireFinalStep (bat buoc): co buoc Super Admin sau cung hay khong
+        - approved (mac dinh true luc start): de xu ly dung khi approverChain rong (0 vong lap)
+      Bien can nguoi duyet tra ve luc complete tung task: approved (boolean)
+    -->
+    <process id="employee_approval" name="Employee Approval" isExecutable="true">
+
+        <startEvent id="start" />
+
+        <userTask id="chainApprovalTask" name="Duyệt theo dây quản lý" flowable:assignee="${currentApproverId}">
+            <multiInstanceLoopCharacteristics isSequential="true"
+                                               flowable:collection="${approverChain}"
+                                               flowable:elementVariable="currentApproverId">
+                <completionCondition>${approved == false}</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+
+        <exclusiveGateway id="chainOutcomeGateway" name="Dây duyệt: đạt?" />
+        <exclusiveGateway id="needsFinalStepGateway" name="Cần Super Admin?" />
+
+        <userTask id="finalTask" name="Duyệt cuối (Super Admin)" flowable:candidateGroups="SUPER_ADMIN" />
+        <exclusiveGateway id="finalDecision" name="Super Admin duyệt?" />
+
+        <endEvent id="endApproved" name="Approved">
+            <extensionElements>
+                <flowable:executionListener event="end" delegateExpression="${employeeApprovalApprovedListener}" />
+            </extensionElements>
+        </endEvent>
+        <endEvent id="endRejected" name="Rejected">
+            <extensionElements>
+                <flowable:executionListener event="end" delegateExpression="${employeeApprovalRejectedListener}" />
+            </extensionElements>
+        </endEvent>
+
+        <sequenceFlow sourceRef="start" targetRef="chainApprovalTask" />
+        <sequenceFlow sourceRef="chainApprovalTask" targetRef="chainOutcomeGateway" />
+
+        <sequenceFlow sourceRef="chainOutcomeGateway" targetRef="needsFinalStepGateway">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="chainOutcomeGateway" targetRef="endRejected">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == false}]]></conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow sourceRef="needsFinalStepGateway" targetRef="finalTask">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${requireFinalStep == true}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="needsFinalStepGateway" targetRef="endApproved">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${requireFinalStep == false}]]></conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow sourceRef="finalTask" targetRef="finalDecision" />
+        <sequenceFlow sourceRef="finalDecision" targetRef="endApproved">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="finalDecision" targetRef="endRejected">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == false}]]></conditionExpression>
+        </sequenceFlow>
+
+    </process>
+</definitions>

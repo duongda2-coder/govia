@@ -77,6 +77,11 @@ public class Employee extends BaseEntity {
     @Column(name = "manager_id", columnDefinition = "uuid")
     private UUID managerId;
 
+    /** Cap bac nhan su (N1..N6) - dung lam nguong dung dây phe duyet dong, xem EmployeeRankLevel. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rank_level", length = 10)
+    private EmployeeRankLevel rankLevel;
+
     /** Chi doc, dung de join khi loc/sort theo ten quan ly (vd "manager.fullName") - ghi du lieu van qua managerId o tren. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id", insertable = false, updatable = false)

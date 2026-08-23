@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { App, Drawer, Form, Input, Select, DatePicker, Button, Space, Row, Col, Divider, Typography } from "antd";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
-import type { Employee, EmployeeRequest } from "../../api/employees";
+import type { Employee, EmployeeRankLevel, EmployeeRequest } from "../../api/employees";
 import { createEmployee, createEmployeeAccount, updateEmployee } from "../../api/employees";
 import type { OrganizationUnit } from "../../api/orgUnits";
 import type { Position } from "../../api/positions";
@@ -31,9 +31,12 @@ interface FormValues {
   gender?: "MALE" | "FEMALE" | "OTHER";
   idNumber?: string;
   managerId?: string;
+  rankLevel?: EmployeeRankLevel;
   accountUsername?: string;
   accountPassword?: string;
 }
+
+const RANK_LEVELS: EmployeeRankLevel[] = ["N1", "N2", "N3", "N4", "N5", "N6"];
 
 export function EmployeeFormDrawer({ open, employee, orgUnits, positions, employees, onClose, onSaved }: EmployeeFormDrawerProps) {
   const [form] = Form.useForm<FormValues>();
@@ -57,6 +60,7 @@ export function EmployeeFormDrawer({ open, employee, orgUnits, positions, employ
         gender: employee.gender ?? undefined,
         idNumber: employee.idNumber ?? undefined,
         managerId: employee.managerId ?? undefined,
+        rankLevel: employee.rankLevel ?? undefined,
       });
     } else {
       form.resetFields();
@@ -77,6 +81,7 @@ export function EmployeeFormDrawer({ open, employee, orgUnits, positions, employ
       gender: values.gender || null,
       idNumber: values.idNumber || null,
       managerId: values.managerId || null,
+      rankLevel: values.rankLevel || null,
     };
 
     try {
@@ -222,6 +227,14 @@ export function EmployeeFormDrawer({ open, employee, orgUnits, positions, employ
             </Form.Item>
           </Col>
         </Row>
+
+        <Form.Item
+          label={t("employee.form.rankLevel")}
+          name="rankLevel"
+          tooltip={t("employee.form.rankLevelHint")}
+        >
+          <Select allowClear options={RANK_LEVELS.map((level) => ({ value: level, label: level }))} />
+        </Form.Item>
 
         <Divider orientation="left" plain>
           {t("employee.form.accountSection")}

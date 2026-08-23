@@ -11,7 +11,11 @@
     "orgUnits": "组织单位",
     "admin": "系统管理",
     "roles": "角色与权限",
-    "accounts": "用户账号"
+    "accounts": "用户账号",
+    "workflow": "工作流程",
+    "workflowTasks": "待办任务",
+    "workflowInstances": "运行中的流程",
+    "workflowApprovalMatrix": "审批矩阵"
   },
   "header": {
     "logout": "退出登录"
@@ -152,7 +156,9 @@
     "status": {
       "ACTIVE": "在职",
       "ON_LEAVE": "休假",
-      "TERMINATED": "离职"
+      "TERMINATED": "离职",
+      "PENDING_APPROVAL": "待审批",
+      "REJECTED": "已拒绝"
     },
     "gender": {
       "MALE": "男",
@@ -175,6 +181,8 @@
       "idNumber": "身份证号",
       "manager": "直属上级",
       "noManager": "无上级",
+      "rankLevel": "级别 (N1-N6)",
+      "rankLevelHint": "用作动态审批链的停止阈值 - 参见审批矩阵配置",
       "save": "保存",
       "cancel": "取消",
       "employeeCodeRequired": "请输入员工编号",
@@ -302,6 +310,109 @@
       "loadPermissionsError": "加载权限失败",
       "permissionsSaved": "权限已保存",
       "systemDefinedReadOnly": "这是系统角色（SUPER_ADMIN），默认拥有全部权限，不可编辑。"
+    }
+  },
+  "workflow": {
+    "task": {
+      "title": "待办任务",
+      "columns": {
+        "name": "任务名称",
+        "businessKey": "业务标识",
+        "assignee": "处理人",
+        "delegation": "委派",
+        "createTime": "创建时间",
+        "actions": "操作"
+      },
+      "actions": {
+        "approve": "批准",
+        "reject": "拒绝",
+        "complete": "完成",
+        "claim": "认领",
+        "forward": "转交",
+        "delegate": "委派",
+        "resolve": "完成委派"
+      },
+      "delegation": {
+        "pending": "委派中",
+        "resolved": "已处理 - 等待最终审核"
+      },
+      "transferModal": {
+        "forwardTitle": "转交任务",
+        "delegateTitle": "委派任务",
+        "selectPlaceholder": "选择接收人"
+      },
+      "messages": {
+        "loadError": "数据加载失败",
+        "completeSuccess": "任务已完成",
+        "claimSuccess": "已认领任务",
+        "reassignSuccess": "任务已转交",
+        "delegateSuccess": "任务已委派",
+        "resolveSuccess": "委派已完成",
+        "actionError": "操作失败"
+      }
+    },
+    "instance": {
+      "title": "运行中的流程",
+      "columns": {
+        "processDefinitionKey": "流程",
+        "businessKey": "业务标识",
+        "startTime": "开始时间",
+        "status": "状态",
+        "actions": "操作"
+      },
+      "status": {
+        "running": "运行中",
+        "ended": "已结束"
+      },
+      "actions": {
+        "cancel": "取消",
+        "viewTasks": "任务"
+      },
+      "tasksModal": {
+        "title": "此流程中的任务"
+      },
+      "startModal": {
+        "title": "启动新流程",
+        "processDefinition": "流程",
+        "businessKey": "业务标识",
+        "approver": "审批人",
+        "approverPlaceholder": "选择审批人"
+      },
+      "messages": {
+        "loadError": "数据加载失败",
+        "startSuccess": "流程已启动",
+        "startError": "启动流程失败",
+        "cancelSuccess": "流程已取消",
+        "cancelError": "取消流程失败"
+      }
+    },
+    "approvalMatrix": {
+      "title": "审批矩阵",
+      "description": "配置新员工的动态审批链：沿管理链向上查找，直到遇到级别（N1-N6）达到配置阈值的人，之后可选择再加一个 Super Admin 最终审批步骤。每个组织单位最多一条规则（或使用适用于整个租户的默认规则）。",
+      "defaultScope": "默认（整个租户）",
+      "columns": {
+        "scope": "适用于",
+        "finalApprovalLevel": "最终审批级别",
+        "requireFinalStep": "是否有 Super Admin 步骤",
+        "active": "状态"
+      },
+      "form": {
+        "createTitle": "新增规则",
+        "editTitle": "编辑规则",
+        "orgUnit": "组织单位",
+        "orgUnitPlaceholder": "留空 = 默认规则（整个租户）",
+        "finalApprovalLevel": "最终审批级别 (N1-N6)",
+        "requireFinalStep": "有最终 Super Admin 步骤"
+      },
+      "deleteConfirmTitle": "确定删除此规则？",
+      "messages": {
+        "loadError": "数据加载失败",
+        "createSuccess": "规则已创建",
+        "updateSuccess": "规则已更新",
+        "deleteSuccess": "规则已删除",
+        "deleteError": "删除规则失败",
+        "saveError": "保存规则失败"
+      }
     }
   }
 }

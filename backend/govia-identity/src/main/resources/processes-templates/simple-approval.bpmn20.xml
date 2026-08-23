@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="com.govia.workflow">
+
+    <!--
+      Quy trinh mau toi gian de kiem chung ha tang Workflow (Flowable engine nhung trong
+      govia-identity): User Task + Exclusive Gateway + Boundary Timer Event + Job (async
+      executor thuc thi timer). Chua gan cung vao nghiep vu module nao - businessKey/variables
+      do noi goi (Employee, Audit...) tu truyen vao khi tai su dung sau nay.
+
+      Bien vao:
+        - approverUserId (bat buoc)  : UserAccount.id (string) cua nguoi duyet task "Approve"
+        - escalationDuration (tuy chon, mac dinh PT1H): ISO-8601 duration cho boundary timer
+      Bien do he thong tu dat:
+        - initiatorUserId: UserAccount.id cua nguoi start quy trinh (gan lam assignee task Submit)
+      Bien can task "Approve" tra ve luc complete:
+        - approved (boolean): true -> nhanh Approved, false -> nhanh Rejected
+    -->
+    <process id="simple_approval" name="Simple Approval" isExecutable="true">
+
+        <startEvent id="start" />
+
+        <userTask id="submitTask" name="Submit" flowable:assignee="${initiatorUserId}" />
+
+        <userTask id="approveTask" name="Approve">
+            <extensionElements>
+                <flowable:taskListener event="create"
+                                        class="com.govia.identity.workflow.delegate.DynamicAssigneeTaskListener" />
+            </extensionElements>
+        </userTask>
+
+        <boundaryEvent id="approveTimeout" attachedToRef="approveTask" cancelActivity="true">
+            <timerEventDefinition>
+                <timeDuration>${escalationDuration}</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+
+        <exclusiveGateway id="approvalGateway" name="Approved?" />
+
+        <endEvent id="endApproved" name="Approved" />
+        <endEvent id="endRejected" name="Rejected" />
+        <endEvent id="endEscalated" name="Escalated" />
+
+        <sequenceFlow id="flowStartToSubmit" sourceRef="start" targetRef="submitTask" />
+        <sequenceFlow id="flowSubmitToApprove" sourceRef="submitTask" targetRef="approveTask" />
+        <sequenceFlow id="flowApproveToGateway" sourceRef="approveTask" targetRef="approvalGateway" />
+        <sequenceFlow id="flowTimeoutToEscalated" sourceRef="approveTimeout" targetRef="endEscalated" />
+
+        <sequenceFlow id="flowApproved" sourceRef="approvalGateway" targetRef="endApproved">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flowRejected" sourceRef="approvalGateway" targetRef="endRejected">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == false}]]></conditionExpression>
+        </sequenceFlow>
+
+    </process>
+</definitions>

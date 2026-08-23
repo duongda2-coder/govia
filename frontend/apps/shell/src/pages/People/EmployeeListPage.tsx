@@ -18,9 +18,11 @@ const STATUS_COLORS: Record<EmployeeStatus, string> = {
   ACTIVE: "green",
   ON_LEAVE: "orange",
   TERMINATED: "default",
+  PENDING_APPROVAL: "gold",
+  REJECTED: "red",
 };
 
-const STATUSES: EmployeeStatus[] = ["ACTIVE", "ON_LEAVE", "TERMINATED"];
+const STATUSES: EmployeeStatus[] = ["ACTIVE", "ON_LEAVE", "TERMINATED", "PENDING_APPROVAL", "REJECTED"];
 
 /** dataIndex cua cot -> duong dan sort ma backend hieu (cot tham chieu can join sang bang khac). */
 const SORT_FIELD_MAP: Record<string, string> = {
@@ -195,7 +197,8 @@ export function EmployeeListPage() {
           size="small"
           value={value}
           variant="borderless"
-          style={{ width: 130 }}
+          style={{ width: 150 }}
+          disabled={value === "PENDING_APPROVAL"}
           onChange={(next) => handleStatusChange(record, next)}
           options={STATUSES.map((s) => ({
             value: s,

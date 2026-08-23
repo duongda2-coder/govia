@@ -1,8 +1,9 @@
 import type { ApiResponse, ImportResult } from "@govia/ui-kit";
 import { httpClient } from "./client";
 
-export type EmployeeStatus = "ACTIVE" | "ON_LEAVE" | "TERMINATED";
+export type EmployeeStatus = "ACTIVE" | "ON_LEAVE" | "TERMINATED" | "PENDING_APPROVAL" | "REJECTED";
 export type Gender = "MALE" | "FEMALE" | "OTHER";
+export type EmployeeRankLevel = "N1" | "N2" | "N3" | "N4" | "N5" | "N6";
 
 export interface Employee {
   id: string;
@@ -25,6 +26,7 @@ export interface Employee {
   managerId: string | null;
   managerCode: string | null;
   managerName: string | null;
+  rankLevel: EmployeeRankLevel | null;
   /** Username tai khoan dang nhap gan voi nhan vien nay - null neu chua co tai khoan. */
   username: string | null;
   createdAt: string;
@@ -44,6 +46,7 @@ export interface EmployeeRequest {
   gender?: Gender | null;
   idNumber?: string | null;
   managerId?: string | null;
+  rankLevel?: EmployeeRankLevel | null;
 }
 
 export interface CreateUserAccountRequest {

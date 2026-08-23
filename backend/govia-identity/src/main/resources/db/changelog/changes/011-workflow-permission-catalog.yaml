@@ -1,0 +1,77 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: module Workflow (Flowable engine) =====================
+  # Ha tang dung chung cho moi quy trinh BPMN chay tren nen Flowable (xem package
+  # com.govia.identity.workflow). Khong theo dung 6 quyen chuan VIEW/CREATE/EDIT/DELETE/EXPORT/IMPORT
+  # cua man hinh CRUD thong thuong vi ban chat nghiep vu la deploy dinh nghia / start-cancel instance /
+  # claim-complete task, khong phai CRUD 1 ban ghi.
+  - changeSet:
+      id: 011-1-permission-catalog-workflow
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2000000-0000-0000-0000-000000000001" }
+              - column: { name: code, value: "WORKFLOW.DEFINITION.VIEW" }
+              - column: { name: module, value: "WORKFLOW" }
+              - column: { name: description, value: "Xem danh sach dinh nghia quy trinh (BPMN) da trien khai" }
+              - column: { name: resource_label, value: "Dinh nghia quy trinh (BPMN)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2000000-0000-0000-0000-000000000002" }
+              - column: { name: code, value: "WORKFLOW.DEFINITION.DEPLOY" }
+              - column: { name: module, value: "WORKFLOW" }
+              - column: { name: description, value: "Trien khai (deploy) dinh nghia quy trinh BPMN moi" }
+              - column: { name: resource_label, value: "Dinh nghia quy trinh (BPMN)" }
+
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2000000-0000-0000-0000-000000000011" }
+              - column: { name: code, value: "WORKFLOW.INSTANCE.VIEW" }
+              - column: { name: module, value: "WORKFLOW" }
+              - column: { name: description, value: "Xem danh sach quy trinh dang chay/da hoan tat" }
+              - column: { name: resource_label, value: "Quy trinh dang chay" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2000000-0000-0000-0000-000000000012" }
+              - column: { name: code, value: "WORKFLOW.INSTANCE.START" }
+              - column: { name: module, value: "WORKFLOW" }
+              - column: { name: description, value: "Khoi tao mot quy trinh moi (start process instance)" }
+              - column: { name: resource_label, value: "Quy trinh dang chay" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2000000-0000-0000-0000-000000000013" }
+              - column: { name: code, value: "WORKFLOW.INSTANCE.CANCEL" }
+              - column: { name: module, value: "WORKFLOW" }
+              - column: { name: description, value: "Huy mot quy trinh dang chay" }
+              - column: { name: resource_label, value: "Quy trinh dang chay" }
+
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2000000-0000-0000-0000-000000000021" }
+              - column: { name: code, value: "WORKFLOW.TASK.VIEW" }
+              - column: { name: module, value: "WORKFLOW" }
+              - column: { name: description, value: "Xem cong viec (task) dang giao cho chinh minh" }
+              - column: { name: resource_label, value: "Cong viec (Task) quy trinh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2000000-0000-0000-0000-000000000022" }
+              - column: { name: code, value: "WORKFLOW.TASK.VIEW_ALL" }
+              - column: { name: module, value: "WORKFLOW" }
+              - column: { name: description, value: "Xem toan bo cong viec quy trinh trong tenant (giam sat/quan tri)" }
+              - column: { name: resource_label, value: "Cong viec (Task) quy trinh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2000000-0000-0000-0000-000000000023" }
+              - column: { name: code, value: "WORKFLOW.TASK.COMPLETE" }
+              - column: { name: module, value: "WORKFLOW" }
+              - column: { name: description, value: "Nhan (claim) va hoan tat cong viec quy trinh" }
+              - column: { name: resource_label, value: "Cong viec (Task) quy trinh" }

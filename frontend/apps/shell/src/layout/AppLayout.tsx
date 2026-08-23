@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Layout, Menu, Avatar, Dropdown, Typography, Space } from "antd";
 import type { MenuProps } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { DashboardOutlined, KeyOutlined, LogoutOutlined, SafetyCertificateOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+import { DashboardOutlined, KeyOutlined, LogoutOutlined, NodeIndexOutlined, SafetyCertificateOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthContext";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
@@ -21,6 +21,9 @@ const MENU_ROUTES: Record<string, string> = {
   "people-org-units": "/people/org-units",
   "admin-roles": "/admin/roles",
   "admin-accounts": "/admin/accounts",
+  "workflow-tasks": "/workflow/tasks",
+  "workflow-instances": "/workflow/instances",
+  "workflow-approval-matrix": "/workflow/approval-matrix",
 };
 
 export function AppLayout() {
@@ -47,6 +50,16 @@ export function AppLayout() {
         { key: "people-employees", label: t("menu.employees") },
         { key: "people-positions", label: t("menu.positions") },
         { key: "people-org-units", label: t("menu.orgUnits") },
+      ],
+    },
+    {
+      key: "workflow",
+      icon: <NodeIndexOutlined />,
+      label: t("menu.workflow"),
+      children: [
+        { key: "workflow-tasks", label: t("menu.workflowTasks") },
+        { key: "workflow-instances", label: t("menu.workflowInstances") },
+        { key: "workflow-approval-matrix", label: t("menu.workflowApprovalMatrix") },
       ],
     },
     ...(isSuperAdmin

@@ -1,0 +1,80 @@
+databaseChangeLog:
+
+  # ===================== EMPLOYEE: cap bac nhan su (N1..N6) =====================
+  # Dung lam nguong dung dây phe duyet dong (xem ApprovalMatrixRule ben duoi + EmployeeApprovalService):
+  # di nguoc chuoi quan ly (manager_id) toi khi gap nguoi co rank_level >= nguong cau hinh.
+  - changeSet:
+      id: 012-1-employee-rank-level
+      author: govia
+      changes:
+        - addColumn:
+            tableName: employee
+            columns:
+              - column: { name: rank_level, type: VARCHAR(10) }
+
+  # ===================== APPROVAL_MATRIX_RULE: cau hinh dây phe duyet dong =====================
+  # 1 dong = 1 quy tac: neu org_unit_id NULL thi la quy tac MAC DINH (fallback) cho ca tenant, khac
+  # NULL thi chi ap dung cho don vi to chuc do. final_approval_level: di nguoc chuoi quan ly toi khi
+  # gap nguoi co rank_level >= gia tri nay thi dung lai (nguoi do la nguoi duyet cuoi cua "day"), sau
+  # do neu require_final_super_admin_step=true thi co them 1 buoc Super Admin sau cung.
+  - changeSet:
+      id: 012-2-create-approval-matrix-rule
+      author: govia
+      changes:
+        - createTable:
+            tableName: approval_matrix_rule
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: org_unit_id, type: UUID }
+              - column: { name: final_approval_level, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: require_final_super_admin_step, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: approval_matrix_rule
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_approval_matrix_rule_tenant
+        - addForeignKeyConstraint:
+            baseTableName: approval_matrix_rule
+            baseColumnNames: org_unit_id
+            referencedTableName: organization_unit
+            referencedColumnNames: id
+            constraintName: fk_approval_matrix_rule_org_unit
+        - addUniqueConstraint:
+            tableName: approval_matrix_rule
+            columnNames: tenant_id, org_unit_id
+            constraintName: uk_approval_matrix_rule_tenant_org_unit
+        - createIndex:
+            tableName: approval_matrix_rule
+            indexName: ix_approval_matrix_rule_tenant
+            columns:
+              - column: { name: tenant_id }
+
+  # ===================== PERMISSION CATALOG: Approval Matrix =====================
+  - changeSet:
+      id: 012-3-permission-catalog-approval-matrix
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2000000-0000-0000-0000-000000000031" }
+              - column: { name: code, value: "WORKFLOW.APPROVAL_MATRIX.VIEW" }
+              - column: { name: module, value: "WORKFLOW" }
+              - column: { name: description, value: "Xem cau hinh ma tran phe duyet" }
+              - column: { name: resource_label, value: "Ma tran phe duyet" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2000000-0000-0000-0000-000000000032" }
+              - column: { name: code, value: "WORKFLOW.APPROVAL_MATRIX.MANAGE" }
+              - column: { name: module, value: "WORKFLOW" }
+              - column: { name: description, value: "Them/sua/xoa quy tac ma tran phe duyet" }
+              - column: { name: resource_label, value: "Ma tran phe duyet" }

@@ -11,7 +11,11 @@
     "orgUnits": "Đơn vị tổ chức",
     "admin": "Quản trị hệ thống",
     "roles": "Vai trò & Phân quyền",
-    "accounts": "Tài khoản người dùng"
+    "accounts": "Tài khoản người dùng",
+    "workflow": "Quy trình",
+    "workflowTasks": "Việc cần xử lý",
+    "workflowInstances": "Quy trình đang chạy",
+    "workflowApprovalMatrix": "Ma trận phê duyệt"
   },
   "header": {
     "logout": "Đăng xuất"
@@ -152,7 +156,9 @@
     "status": {
       "ACTIVE": "Đang làm việc",
       "ON_LEAVE": "Nghỉ phép",
-      "TERMINATED": "Đã nghỉ việc"
+      "TERMINATED": "Đã nghỉ việc",
+      "PENDING_APPROVAL": "Chờ phê duyệt",
+      "REJECTED": "Bị từ chối"
     },
     "gender": {
       "MALE": "Nam",
@@ -175,6 +181,8 @@
       "idNumber": "CCCD/CMND",
       "manager": "Quản lý trực tiếp",
       "noManager": "Không có quản lý",
+      "rankLevel": "Cấp bậc (N1-N6)",
+      "rankLevelHint": "Dùng làm ngưỡng dừng cho dây phê duyệt động - xem cấu hình ở Ma trận phê duyệt",
       "save": "Lưu",
       "cancel": "Hủy",
       "employeeCodeRequired": "Nhập mã nhân viên",
@@ -302,6 +310,109 @@
       "loadPermissionsError": "Không tải được danh sách quyền",
       "permissionsSaved": "Đã lưu phân quyền",
       "systemDefinedReadOnly": "Đây là vai trò hệ thống (SUPER_ADMIN) mặc định có toàn quyền, không thể chỉnh sửa."
+    }
+  },
+  "workflow": {
+    "task": {
+      "title": "Việc cần xử lý",
+      "columns": {
+        "name": "Tên công việc",
+        "businessKey": "Mã tham chiếu",
+        "assignee": "Người xử lý",
+        "delegation": "Uỷ quyền",
+        "createTime": "Thời gian tạo",
+        "actions": "Thao tác"
+      },
+      "actions": {
+        "approve": "Duyệt",
+        "reject": "Từ chối",
+        "complete": "Hoàn tất",
+        "claim": "Nhận việc",
+        "forward": "Chuyển tiếp",
+        "delegate": "Uỷ quyền",
+        "resolve": "Hoàn tất uỷ quyền"
+      },
+      "delegation": {
+        "pending": "Đang uỷ quyền",
+        "resolved": "Đã xử lý xong - chờ duyệt cuối"
+      },
+      "transferModal": {
+        "forwardTitle": "Chuyển tiếp công việc",
+        "delegateTitle": "Uỷ quyền công việc",
+        "selectPlaceholder": "Chọn người nhận"
+      },
+      "messages": {
+        "loadError": "Không tải được dữ liệu",
+        "completeSuccess": "Đã hoàn tất công việc",
+        "claimSuccess": "Đã nhận việc",
+        "reassignSuccess": "Đã chuyển tiếp công việc",
+        "delegateSuccess": "Đã uỷ quyền công việc",
+        "resolveSuccess": "Đã hoàn tất phần uỷ quyền",
+        "actionError": "Thao tác thất bại"
+      }
+    },
+    "instance": {
+      "title": "Quy trình đang chạy",
+      "columns": {
+        "processDefinitionKey": "Quy trình",
+        "businessKey": "Mã tham chiếu",
+        "startTime": "Thời gian bắt đầu",
+        "status": "Trạng thái",
+        "actions": "Thao tác"
+      },
+      "status": {
+        "running": "Đang chạy",
+        "ended": "Đã kết thúc"
+      },
+      "actions": {
+        "cancel": "Hủy",
+        "viewTasks": "Công việc"
+      },
+      "tasksModal": {
+        "title": "Công việc trong quy trình này"
+      },
+      "startModal": {
+        "title": "Bắt đầu quy trình mới",
+        "processDefinition": "Quy trình",
+        "businessKey": "Mã tham chiếu",
+        "approver": "Người duyệt",
+        "approverPlaceholder": "Chọn người duyệt"
+      },
+      "messages": {
+        "loadError": "Không tải được dữ liệu",
+        "startSuccess": "Đã bắt đầu quy trình",
+        "startError": "Bắt đầu quy trình thất bại",
+        "cancelSuccess": "Đã hủy quy trình",
+        "cancelError": "Hủy quy trình thất bại"
+      }
+    },
+    "approvalMatrix": {
+      "title": "Ma trận phê duyệt",
+      "description": "Cấu hình dây phê duyệt động cho nhân viên mới: đi ngược chuỗi quản lý tới khi gặp người có cấp bậc (N1-N6) đạt ngưỡng cấu hình, sau đó tuỳ chọn thêm bước Super Admin cuối cùng. Mỗi đơn vị tổ chức chỉ có 1 quy tắc riêng (hoặc dùng quy tắc mặc định áp dụng cho toàn bộ tenant).",
+      "defaultScope": "Mặc định (toàn tenant)",
+      "columns": {
+        "scope": "Áp dụng cho",
+        "finalApprovalLevel": "Cấp duyệt cuối",
+        "requireFinalStep": "Có bước Super Admin",
+        "active": "Trạng thái"
+      },
+      "form": {
+        "createTitle": "Thêm quy tắc",
+        "editTitle": "Sửa quy tắc",
+        "orgUnit": "Đơn vị tổ chức",
+        "orgUnitPlaceholder": "Để trống = quy tắc mặc định (toàn tenant)",
+        "finalApprovalLevel": "Cấp duyệt cuối (N1-N6)",
+        "requireFinalStep": "Có bước Super Admin cuối cùng"
+      },
+      "deleteConfirmTitle": "Xóa quy tắc này?",
+      "messages": {
+        "loadError": "Không tải được dữ liệu",
+        "createSuccess": "Đã tạo quy tắc",
+        "updateSuccess": "Đã cập nhật quy tắc",
+        "deleteSuccess": "Đã xóa quy tắc",
+        "deleteError": "Xóa quy tắc thất bại",
+        "saveError": "Lưu quy tắc thất bại"
+      }
     }
   }
 }

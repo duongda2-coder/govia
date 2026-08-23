@@ -11,7 +11,11 @@
     "orgUnits": "Organization Units",
     "admin": "System Administration",
     "roles": "Roles & Permissions",
-    "accounts": "User Accounts"
+    "accounts": "User Accounts",
+    "workflow": "Workflow",
+    "workflowTasks": "My Tasks",
+    "workflowInstances": "Running Processes",
+    "workflowApprovalMatrix": "Approval Matrix"
   },
   "header": {
     "logout": "Log out"
@@ -152,7 +156,9 @@
     "status": {
       "ACTIVE": "Active",
       "ON_LEAVE": "On Leave",
-      "TERMINATED": "Terminated"
+      "TERMINATED": "Terminated",
+      "PENDING_APPROVAL": "Pending Approval",
+      "REJECTED": "Rejected"
     },
     "gender": {
       "MALE": "Male",
@@ -175,6 +181,8 @@
       "idNumber": "ID Number",
       "manager": "Manager",
       "noManager": "No manager",
+      "rankLevel": "Rank Level (N1-N6)",
+      "rankLevelHint": "Used as the stopping threshold for the dynamic approval chain - see Approval Matrix",
       "save": "Save",
       "cancel": "Cancel",
       "employeeCodeRequired": "Please enter employee code",
@@ -302,6 +310,109 @@
       "loadPermissionsError": "Failed to load permissions",
       "permissionsSaved": "Permissions saved",
       "systemDefinedReadOnly": "This is a system role (SUPER_ADMIN) with full access by default and cannot be edited."
+    }
+  },
+  "workflow": {
+    "task": {
+      "title": "My Tasks",
+      "columns": {
+        "name": "Task",
+        "businessKey": "Business Key",
+        "assignee": "Assignee",
+        "delegation": "Delegation",
+        "createTime": "Created At",
+        "actions": "Actions"
+      },
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject",
+        "complete": "Complete",
+        "claim": "Claim",
+        "forward": "Forward",
+        "delegate": "Delegate",
+        "resolve": "Resolve"
+      },
+      "delegation": {
+        "pending": "Delegated",
+        "resolved": "Resolved - awaiting final review"
+      },
+      "transferModal": {
+        "forwardTitle": "Forward Task",
+        "delegateTitle": "Delegate Task",
+        "selectPlaceholder": "Select recipient"
+      },
+      "messages": {
+        "loadError": "Failed to load data",
+        "completeSuccess": "Task completed",
+        "claimSuccess": "Task claimed",
+        "reassignSuccess": "Task forwarded",
+        "delegateSuccess": "Task delegated",
+        "resolveSuccess": "Delegation resolved",
+        "actionError": "Action failed"
+      }
+    },
+    "instance": {
+      "title": "Running Processes",
+      "columns": {
+        "processDefinitionKey": "Process",
+        "businessKey": "Business Key",
+        "startTime": "Started At",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "status": {
+        "running": "Running",
+        "ended": "Ended"
+      },
+      "actions": {
+        "cancel": "Cancel",
+        "viewTasks": "Tasks"
+      },
+      "tasksModal": {
+        "title": "Tasks in this process"
+      },
+      "startModal": {
+        "title": "Start New Process",
+        "processDefinition": "Process",
+        "businessKey": "Business Key",
+        "approver": "Approver",
+        "approverPlaceholder": "Select approver"
+      },
+      "messages": {
+        "loadError": "Failed to load data",
+        "startSuccess": "Process started",
+        "startError": "Failed to start process",
+        "cancelSuccess": "Process cancelled",
+        "cancelError": "Failed to cancel process"
+      }
+    },
+    "approvalMatrix": {
+      "title": "Approval Matrix",
+      "description": "Configure the dynamic approval chain for new employees: walk up the manager chain until reaching someone whose rank (N1-N6) meets the configured threshold, then optionally add a final Super Admin step. Each org unit has at most one rule (or use the default rule applied tenant-wide).",
+      "defaultScope": "Default (whole tenant)",
+      "columns": {
+        "scope": "Applies to",
+        "finalApprovalLevel": "Final Approval Level",
+        "requireFinalStep": "Has Super Admin Step",
+        "active": "Status"
+      },
+      "form": {
+        "createTitle": "Add Rule",
+        "editTitle": "Edit Rule",
+        "orgUnit": "Organization Unit",
+        "orgUnitPlaceholder": "Leave blank = default rule (whole tenant)",
+        "finalApprovalLevel": "Final Approval Level (N1-N6)",
+        "requireFinalStep": "Has final Super Admin step"
+      },
+      "deleteConfirmTitle": "Delete this rule?",
+      "messages": {
+        "loadError": "Failed to load data",
+        "createSuccess": "Rule created",
+        "updateSuccess": "Rule updated",
+        "deleteSuccess": "Rule deleted",
+        "deleteError": "Failed to delete rule",
+        "saveError": "Failed to save rule"
+      }
     }
   }
 }

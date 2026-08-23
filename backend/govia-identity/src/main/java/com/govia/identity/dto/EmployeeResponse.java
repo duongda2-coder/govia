@@ -1,5 +1,6 @@
 package com.govia.identity.dto;
 
+import com.govia.identity.entity.EmployeeRankLevel;
 import com.govia.identity.entity.EmployeeStatus;
 import com.govia.identity.entity.Gender;
 
@@ -28,6 +29,7 @@ public record EmployeeResponse(
         UUID managerId,
         String managerCode,
         String managerName,
+        EmployeeRankLevel rankLevel,
         /** Username tai khoan dang nhap gan voi nhan vien nay - null neu chua co tai khoan. */
         String username,
         Instant createdAt,
