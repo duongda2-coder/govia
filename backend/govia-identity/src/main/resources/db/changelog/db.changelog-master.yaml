@@ -32,3 +32,9 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/014-audit-master-data-permission-actions.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/015-risk-scoring-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/016-risk-scoring-permission-catalog.yaml
+      relativeToChangelogFile: false

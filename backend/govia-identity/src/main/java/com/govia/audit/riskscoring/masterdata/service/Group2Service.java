@@ -1,0 +1,243 @@
+package com.govia.audit.riskscoring.masterdata.service;
+
+import com.govia.audit.riskscoring.masterdata.dto.Group2Request;
+import com.govia.audit.riskscoring.masterdata.dto.Group2Response;
+import com.govia.audit.riskscoring.masterdata.entity.RiskGroup1;
+import com.govia.audit.riskscoring.masterdata.entity.RiskGroup2;
+import com.govia.audit.riskscoring.masterdata.repository.RiskGroup1Repository;
+import com.govia.audit.riskscoring.masterdata.repository.RiskGroup2Repository;
+import com.govia.core.audit.AuditAction;
+import com.govia.core.audit.AuditLogService;
+import com.govia.core.export.ExcelExportService;
+import com.govia.core.export.ExcelImportService;
+import com.govia.core.export.ExportColumn;
+import com.govia.core.export.ImportResult;
+import com.govia.core.export.WordExportService;
+import com.govia.core.tenant.TenantContext;
+import com.govia.core.web.BusinessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+/** CRUD + Import/Export cho danh muc "Nhom chi tieu cap 2" (sheet ZTC_DGRR_Group2), thuoc 1 Group1. */
+@Service
+public class Group2Service {
+
+    private final RiskGroup2Repository repository;
+    private final RiskGroup1Repository group1Repository;
+    private final AuditLogService auditLogService;
+    private final ExcelExportService excelExportService;
+    private final WordExportService wordExportService;
+    private final ExcelImportService excelImportService;
+
+    public Group2Service(RiskGroup2Repository repository, RiskGroup1Repository group1Repository, AuditLogService auditLogService,
+                          ExcelExportService excelExportService, WordExportService wordExportService,
+                          ExcelImportService excelImportService) {
+        this.repository = repository;
+        this.group1Repository = group1Repository;
+        this.auditLogService = auditLogService;
+        this.excelExportService = excelExportService;
+        this.wordExportService = wordExportService;
+        this.excelImportService = excelImportService;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Group2Response> list() {
+        UUID tenantId = TenantContext.getTenantId();
+        Map<UUID, String> group1Codes = group1CodesById(tenantId);
+        return repository.findByTenantIdOrderByCodeAsc(tenantId).stream().map(item -> toResponse(item, group1Codes)).toList();
+    }
+
+    @Transactional
+    public Group2Response create(Group2Request request) {
+        UUID tenantId = TenantContext.getTenantId();
+        checkNoDuplicateCode(tenantId, request.code(), null);
+        RiskGroup1 group1 = getGroup1OrThrow(tenantId, request.group1Id());
+
+        RiskGroup2 item = new RiskGroup2();
+        item.setTenantId(tenantId);
+        applyRequest(item, request);
+        item = repository.save(item);
+
+        auditLogService.record("RiskGroup2", item.getId(), AuditAction.CREATE, "Tao nhom chi tieu cap 2: " + item.getCode());
+        return toResponse(item, Map.of(group1.getId(), group1.getCode()));
+    }
+
+    @Transactional
+    public Group2Response update(UUID id, Group2Request request) {
+        UUID tenantId = TenantContext.getTenantId();
+        RiskGroup2 item = getOwnedOrThrow(tenantId, id);
+        checkNoDuplicateCode(tenantId, request.code(), id);
+        RiskGroup1 group1 = getGroup1OrThrow(tenantId, request.group1Id());
+
+        applyRequest(item, request);
+        item = repository.save(item);
+
+        auditLogService.record("RiskGroup2", item.getId(), AuditAction.UPDATE, "Cap nhat nhom chi tieu cap 2: " + item.getCode());
+        return toResponse(item, Map.of(group1.getId(), group1.getCode()));
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        UUID tenantId = TenantContext.getTenantId();
+        RiskGroup2 item = getOwnedOrThrow(tenantId, id);
+        repository.delete(item);
+        auditLogService.record("RiskGroup2", id, AuditAction.DELETE, "Xoa nhom chi tieu cap 2: " + item.getCode());
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportExcel() {
+        return excelExportService.export("risk_score_group2", exportColumns(), exportRows());
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportWord() {
+        return wordExportService.export("Nhóm chỉ tiêu cấp 2", exportColumns(), exportRows());
+    }
+
+    @Transactional
+    public ImportResult importFromExcel(MultipartFile file) {
+        List<Map<String, String>> rows;
+        try {
+            rows = excelImportService.parse(file.getInputStream(), exportColumns());
+        } catch (IOException e) {
+            throw new UncheckedIOException("Khong doc duoc file", e);
+        }
+
+        UUID tenantId = TenantContext.getTenantId();
+        Map<String, UUID> group1IdsByCode = new HashMap<>();
+        group1Repository.findByTenantIdOrderByCodeAsc(tenantId).forEach(g -> group1IdsByCode.put(g.getCode(), g.getId()));
+
+        int success = 0;
+        List<ImportResult.ImportRowError> errors = new ArrayList<>();
+        for (int i = 0; i < rows.size(); i++) {
+            int rowNumber = i + 2;
+            Map<String, String> row = rows.get(i);
+            try {
+                String group1Code = row.get("group1Code");
+                String code = row.get("code");
+                String name = row.get("name");
+                if (isBlank(group1Code) || isBlank(code) || isBlank(name)) {
+                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Ma nhom cap 1, Ma hoac Ten");
+                }
+                UUID group1Id = group1IdsByCode.get(group1Code.trim());
+                if (group1Id == null) {
+                    throw new BusinessException("RISK_GROUP1_NOT_FOUND", "Khong tim thay nhom cap 1: " + group1Code);
+                }
+                create(new Group2Request(group1Id, code.trim(), name.trim(), parseDecimal(row.get("weight")),
+                        parseDate(row.get("validFrom")), parseDate(row.get("validTo")), true));
+                success++;
+            } catch (Exception e) {
+                errors.add(new ImportResult.ImportRowError(rowNumber, e.getMessage()));
+            }
+        }
+
+        auditLogService.record("RiskGroup2", null, AuditAction.CREATE,
+                "Import Excel nhom chi tieu cap 2: " + success + " thanh cong, " + errors.size() + " loi");
+        return new ImportResult(success, errors.size(), errors);
+    }
+
+    private void applyRequest(RiskGroup2 item, Group2Request request) {
+        item.setGroup1Id(request.group1Id());
+        item.setCode(request.code());
+        item.setName(request.name());
+        item.setWeight(request.weight());
+        item.setValidFrom(request.validFrom());
+        item.setValidTo(request.validTo());
+        item.setActive(request.active());
+    }
+
+    private void checkNoDuplicateCode(UUID tenantId, String code, UUID excludingId) {
+        repository.findByTenantIdAndCode(tenantId, code)
+                .filter(existing -> excludingId == null || !existing.getId().equals(excludingId))
+                .ifPresent(existing -> {
+                    throw new BusinessException("RISK_GROUP2_CODE_DUPLICATE", "Ma nhom cap 2 da ton tai: " + code);
+                });
+    }
+
+    private RiskGroup1 getGroup1OrThrow(UUID tenantId, UUID group1Id) {
+        return group1Repository.findById(group1Id)
+                .filter(g -> g.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("RISK_GROUP1_NOT_FOUND", "Khong tim thay nhom chi tieu cap 1"));
+    }
+
+    private RiskGroup2 getOwnedOrThrow(UUID tenantId, UUID id) {
+        return repository.findById(id)
+                .filter(item -> item.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("RISK_GROUP2_NOT_FOUND", "Khong tim thay nhom chi tieu cap 2", HttpStatus.NOT_FOUND));
+    }
+
+    private Map<UUID, String> group1CodesById(UUID tenantId) {
+        Map<UUID, String> map = new HashMap<>();
+        group1Repository.findByTenantIdOrderByCodeAsc(tenantId).forEach(g -> map.put(g.getId(), g.getCode()));
+        return map;
+    }
+
+    private List<ExportColumn> exportColumns() {
+        return List.of(
+                new ExportColumn("group1Code", "Ma nhom cap 1"),
+                new ExportColumn("code", "Ma nhom cap 2"),
+                new ExportColumn("name", "Ten nhom cap 2"),
+                new ExportColumn("weight", "Ti trong"),
+                new ExportColumn("validFrom", "Hieu luc tu"),
+                new ExportColumn("validTo", "Hieu luc den"));
+    }
+
+    private List<Map<String, Object>> exportRows() {
+        UUID tenantId = TenantContext.getTenantId();
+        Map<UUID, String> group1Codes = group1CodesById(tenantId);
+        return repository.findByTenantIdOrderByCodeAsc(tenantId).stream()
+                .map(item -> {
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("group1Code", group1Codes.get(item.getGroup1Id()));
+                    row.put("code", item.getCode());
+                    row.put("name", item.getName());
+                    row.put("weight", item.getWeight());
+                    row.put("validFrom", item.getValidFrom());
+                    row.put("validTo", item.getValidTo());
+                    return row;
+                }).toList();
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    private LocalDate parseDate(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(value.trim());
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private BigDecimal parseDecimal(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return new BigDecimal(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private Group2Response toResponse(RiskGroup2 item, Map<UUID, String> group1Codes) {
+        return new Group2Response(item.getId(), item.getGroup1Id(), group1Codes.get(item.getGroup1Id()), item.getCode(),
+                item.getName(), item.getWeight(), item.getValidFrom(), item.getValidTo(), item.isActive());
+    }
+}

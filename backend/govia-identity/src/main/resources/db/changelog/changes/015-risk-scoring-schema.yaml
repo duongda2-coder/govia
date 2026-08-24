@@ -1,0 +1,371 @@
+﻿databaseChangeLog:
+
+  # ===================== Module "Cham diem rui ro" - song song voi Audit Master Data =====================
+  # 10 bang rieng (khong dung 1 bang da hinh nhu audit_master_data_item) vi moi danh muc co hinh dang du
+  # lieu that su khac nhau (trong so, he so, ma tran, phan quyen user...) - dung theo dung 10 sheet cua tai
+  # lieu dac ta "Cham diem - master data.xlsx" (bo qua sheet trong).
+
+  - changeSet:
+      id: 015-1-risk-score-group1
+      author: govia
+      changes:
+        - createTable:
+            tableName: risk_score_group1
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: object_type, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: weight, type: "NUMERIC(9,4)" }
+              - column: { name: valid_from, type: DATE }
+              - column: { name: valid_to, type: DATE }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_group1
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_group1_tenant
+        - addUniqueConstraint:
+            tableName: risk_score_group1
+            columnNames: tenant_id, object_type, code
+            constraintName: uk_risk_score_group1_tenant_type_code
+
+  - changeSet:
+      id: 015-2-risk-score-group2
+      author: govia
+      changes:
+        - createTable:
+            tableName: risk_score_group2
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: group1_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: weight, type: "NUMERIC(9,4)" }
+              - column: { name: valid_from, type: DATE }
+              - column: { name: valid_to, type: DATE }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_group2
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_group2_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_group2
+            baseColumnNames: group1_id
+            referencedTableName: risk_score_group1
+            referencedColumnNames: id
+            constraintName: fk_risk_score_group2_group1
+        - addUniqueConstraint:
+            tableName: risk_score_group2
+            columnNames: tenant_id, code
+            constraintName: uk_risk_score_group2_tenant_code
+
+  - changeSet:
+      id: 015-3-risk-score-criteria-qualitative
+      author: govia
+      changes:
+        - createTable:
+            tableName: risk_score_criteria_qualitative
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: object_type, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: group1_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: group2_id, type: UUID }
+              - column: { name: code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(1000), constraints: { nullable: false } }
+              - column: { name: weight, type: "NUMERIC(9,4)" }
+              - column: { name: impact_level, type: INT }
+              - column: { name: likelihood_level, type: INT }
+              - column: { name: include_current_year, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_qualitative
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dt_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_qualitative
+            baseColumnNames: group1_id
+            referencedTableName: risk_score_group1
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dt_group1
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_qualitative
+            baseColumnNames: group2_id
+            referencedTableName: risk_score_group2
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dt_group2
+        - addUniqueConstraint:
+            tableName: risk_score_criteria_qualitative
+            columnNames: tenant_id, code
+            constraintName: uk_risk_score_crit_dt_tenant_code
+
+  - changeSet:
+      id: 015-4-risk-score-criteria-quantitative
+      author: govia
+      changes:
+        - createTable:
+            tableName: risk_score_criteria_quantitative
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: object_type, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: group1_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: group2_id, type: UUID }
+              - column: { name: code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(1000), constraints: { nullable: false } }
+              - column: { name: criteria_type, type: INT }
+              - column: { name: business_threshold, type: "NUMERIC(12,4)" }
+              - column: { name: view_threshold, type: "NUMERIC(12,4)" }
+              - column: { name: score_20, type: "NUMERIC(12,4)" }
+              - column: { name: score_40, type: "NUMERIC(12,4)" }
+              - column: { name: score_60, type: "NUMERIC(12,4)" }
+              - column: { name: score_80, type: "NUMERIC(12,4)" }
+              - column: { name: score_100, type: "NUMERIC(12,4)" }
+              - column: { name: scoring_guide, type: VARCHAR(2000) }
+              - column: { name: include_current_year, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_quantitative
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dl_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_quantitative
+            baseColumnNames: group1_id
+            referencedTableName: risk_score_group1
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dl_group1
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_quantitative
+            baseColumnNames: group2_id
+            referencedTableName: risk_score_group2
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dl_group2
+        - addUniqueConstraint:
+            tableName: risk_score_criteria_quantitative
+            columnNames: tenant_id, code
+            constraintName: uk_risk_score_crit_dl_tenant_code
+
+  - changeSet:
+      id: 015-5-risk-score-frequency-coefficient
+      author: govia
+      changes:
+        - createTable:
+            tableName: risk_score_frequency_coefficient
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(25), constraints: { nullable: false } }
+              - column: { name: from_year, type: INT }
+              - column: { name: to_year, type: INT }
+              - column: { name: label, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: value, type: "NUMERIC(9,4)" }
+              - column: { name: bonus_point, type: "NUMERIC(9,2)" }
+              - column: { name: repeat_flag, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: repeat_count, type: VARCHAR(10) }
+              - column: { name: repeat_risk_point, type: "NUMERIC(9,2)" }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_frequency_coefficient
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_freq_coef_tenant
+        - addUniqueConstraint:
+            tableName: risk_score_frequency_coefficient
+            columnNames: tenant_id, code
+            constraintName: uk_risk_score_freq_coef_tenant_code
+
+  - changeSet:
+      id: 015-6-risk-score-weight-by-business
+      author: govia
+      changes:
+        - createTable:
+            tableName: risk_score_weight_by_business
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: business_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: qualitative_weight, type: "NUMERIC(9,4)" }
+              - column: { name: quantitative_weight, type: "NUMERIC(9,4)" }
+              - column: { name: from_year, type: INT }
+              - column: { name: to_year, type: INT }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_weight_by_business
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_wt_biz_tenant
+        - addUniqueConstraint:
+            tableName: risk_score_weight_by_business
+            columnNames: tenant_id, business_code, from_year
+            constraintName: uk_risk_score_wt_biz_tenant_code_year
+
+  - changeSet:
+      id: 015-7-risk-score-weight-by-business-segment
+      author: govia
+      changes:
+        - createTable:
+            tableName: risk_score_weight_by_business_segment
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: segment_code, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: qualitative_weight, type: "NUMERIC(9,4)" }
+              - column: { name: quantitative_weight, type: "NUMERIC(9,4)" }
+              - column: { name: from_year, type: INT }
+              - column: { name: to_year, type: INT }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_weight_by_business_segment
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_wt_seg_tenant
+        - addUniqueConstraint:
+            tableName: risk_score_weight_by_business_segment
+            columnNames: tenant_id, segment_code, from_year
+            constraintName: uk_risk_score_wt_seg_tenant_code_year
+
+  - changeSet:
+      id: 015-8-risk-score-user-assignment
+      author: govia
+      changes:
+        - createTable:
+            tableName: risk_score_user_assignment
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: username, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: criteria_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: branch_code, type: VARCHAR(10) }
+              - column: { name: classification, type: VARCHAR(255) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_user_assignment
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_user_assign_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_user_assignment
+            baseColumnNames: criteria_id
+            referencedTableName: risk_score_criteria_quantitative
+            referencedColumnNames: id
+            constraintName: fk_risk_score_user_assign_criteria
+        - addUniqueConstraint:
+            tableName: risk_score_user_assignment
+            columnNames: tenant_id, username, criteria_id, branch_code
+            constraintName: uk_risk_score_user_assign_tenant_user_crit_branch
+
+  - changeSet:
+      id: 015-9-risk-score-matrix
+      author: govia
+      changes:
+        - createTable:
+            tableName: risk_score_matrix
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: frequency_level, type: INT, constraints: { nullable: false } }
+              - column: { name: frequency_label, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: score_low_severity, type: "NUMERIC(9,2)" }
+              - column: { name: score_medium_severity, type: "NUMERIC(9,2)" }
+              - column: { name: score_high_severity, type: "NUMERIC(9,2)" }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_matrix
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_matrix_tenant
+        - addUniqueConstraint:
+            tableName: risk_score_matrix
+            columnNames: tenant_id, frequency_level
+            constraintName: uk_risk_score_matrix_tenant_freq
+
+  - changeSet:
+      id: 015-10-risk-score-rank
+      author: govia
+      changes:
+        - createTable:
+            tableName: risk_score_rank
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: score_from, type: "NUMERIC(10,2)", constraints: { nullable: false } }
+              - column: { name: score_to, type: "NUMERIC(10,2)", constraints: { nullable: false } }
+              - column: { name: rank_label, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: from_year, type: INT, constraints: { nullable: false } }
+              - column: { name: to_year, type: INT, constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_rank
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_rank_tenant
+        - addUniqueConstraint:
+            tableName: risk_score_rank
+            columnNames: tenant_id, rank_label, from_year
+            constraintName: uk_risk_score_rank_tenant_label_year

@@ -13,6 +13,11 @@ import { TaskInbox } from "./pages/Workflow/TaskInbox";
 import { ProcessInstances } from "./pages/Workflow/ProcessInstances";
 import { ApprovalMatrixPage } from "./pages/Workflow/ApprovalMatrixPage";
 import { MasterDataGroupPage } from "./pages/Audit/MasterDataGroupPage";
+import { RiskScoringGroupsPage } from "./pages/Audit/RiskScoring/RiskScoringGroupsPage";
+import { RiskScoringCriteriaPage } from "./pages/Audit/RiskScoring/RiskScoringCriteriaPage";
+import { RiskScoringWeightPage } from "./pages/Audit/RiskScoring/RiskScoringWeightPage";
+import { RiskScoringCoefficientMatrixPage } from "./pages/Audit/RiskScoring/RiskScoringCoefficientMatrixPage";
+import { RiskScoringUserAssignmentPage } from "./pages/Audit/RiskScoring/RiskScoringUserAssignmentPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -48,6 +53,12 @@ function App() {
         <Route path="audit/master-data/process" element={<MasterDataGroupPage group="PROCESS" title={t("auditMasterData.groups.PROCESS")} />} />
         <Route path="audit/master-data/compliance" element={<MasterDataGroupPage group="COMPLIANCE" title={t("auditMasterData.groups.COMPLIANCE")} />} />
         <Route path="audit/master-data/general" element={<MasterDataGroupPage group="GENERAL" title={t("auditMasterData.groups.GENERAL")} />} />
+        <Route path="audit/risk-scoring/master-data/groups" element={<RiskScoringGroupsPage />} />
+        <Route path="audit/risk-scoring/master-data/criteria" element={<RiskScoringCriteriaPage />} />
+        <Route path="audit/risk-scoring/master-data/weight" element={<RiskScoringWeightPage />} />
+        <Route path="audit/risk-scoring/master-data/coefficient-matrix" element={<RiskScoringCoefficientMatrixPage />} />
+        <Route path="audit/risk-scoring/master-data/user-assignment" element={<RiskScoringUserAssignmentPage />} />
+        {/* Sub-module "Cham diem" (thuc hien cham diem) se them route vao day khi co man hinh, song song voi "master-data". */}
       </Route>
     </Routes>
   );

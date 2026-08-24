@@ -10,6 +10,8 @@ import { ChangePasswordModal } from "../components/ChangePasswordModal";
 
 const { Header, Sider, Content } = Layout;
 
+type MenuItemType = NonNullable<MenuProps["items"]>[number];
+
 /**
  * Route ung voi key cua tung mo-dun trong menu - dung de dieu huong khi bam menu
  * va de xac dinh menu nao dang duoc chon dua theo URL hien tai.
@@ -31,6 +33,11 @@ const MENU_ROUTES: Record<string, string> = {
   "audit-md-process": "/audit/master-data/process",
   "audit-md-compliance": "/audit/master-data/compliance",
   "audit-md-general": "/audit/master-data/general",
+  "audit-rs-groups": "/audit/risk-scoring/master-data/groups",
+  "audit-rs-criteria": "/audit/risk-scoring/master-data/criteria",
+  "audit-rs-weight": "/audit/risk-scoring/master-data/weight",
+  "audit-rs-coefficient-matrix": "/audit/risk-scoring/master-data/coefficient-matrix",
+  "audit-rs-user-assignment": "/audit/risk-scoring/master-data/user-assignment",
 };
 
 /** Gan title HTML len nhan menu de trinh duyet tu hien tooltip khi chu bi cat ngan (...) do sider hep. */
@@ -44,7 +51,7 @@ const SIDER_MAX_WIDTH = 420;
 const SIDER_DEFAULT_WIDTH = 220;
 
 export function AppLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout, hasPermission } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
@@ -106,64 +113,82 @@ export function AppLayout() {
    */
   const isSuperAdmin = user?.roles.includes("SUPER_ADMIN") ?? false;
 
-  const moduleMenuItems: MenuProps["items"] = [
-    { key: "dashboard", icon: <DashboardOutlined />, label: menuLabel(t("menu.dashboard")) },
-    {
-      key: "people",
-      icon: <TeamOutlined />,
-      label: menuLabel(t("menu.people")),
+  /**
+   * Loc menu theo dung quyen VIEW cua tung man hinh (cung ma quyen ma chinh trang do dang tu kiem
+   * tra qua hasPermission, xem vd MasterDataGroupPage/RiskScoring tables) - user khong co quyen thi
+   * KHONG thay module/man hinh do trong sidebar, khong chi bi chan luc bam vao. "false" bi loai boi
+   * dropNulls, nen 1 dong co the vua la dieu kien vua la item.
+   */
+  const dropNulls = (items: (MenuItemType | false | null | undefined)[]): MenuItemType[] =>
+    items.filter((item): item is MenuItemType => Boolean(item));
+
+  const peopleChildren = dropNulls([
+    hasPermission("PEOPLE.EMPLOYEE.VIEW") && { key: "people-employees", label: menuLabel(t("menu.employees")) },
+    hasPermission("PEOPLE.POSITION.VIEW") && { key: "people-positions", label: menuLabel(t("menu.positions")) },
+    hasPermission("PEOPLE.ORGUNIT.VIEW") && { key: "people-org-units", label: menuLabel(t("menu.orgUnits")) },
+  ]);
+
+  const workflowChildren = dropNulls([
+    hasPermission("WORKFLOW.TASK.VIEW") && { key: "workflow-tasks", label: menuLabel(t("menu.workflowTasks")) },
+    hasPermission("WORKFLOW.INSTANCE.VIEW") && { key: "workflow-instances", label: menuLabel(t("menu.workflowInstances")) },
+    hasPermission("WORKFLOW.APPROVAL_MATRIX.VIEW") && { key: "workflow-approval-matrix", label: menuLabel(t("menu.workflowApprovalMatrix")) },
+  ]);
+
+  const canViewAuditMasterData = hasPermission("AUDIT.MASTER_DATA.VIEW");
+  const canViewRiskScoring = hasPermission("AUDIT.RISK_SCORING.VIEW");
+
+  const auditChildren = dropNulls([
+    canViewAuditMasterData && {
+      key: "audit-master-data",
+      label: menuLabel(t("menu.auditMasterData")),
       children: [
-        { key: "people-employees", label: menuLabel(t("menu.employees")) },
-        { key: "people-positions", label: menuLabel(t("menu.positions")) },
-        { key: "people-org-units", label: menuLabel(t("menu.orgUnits")) },
+        { key: "audit-md-audit", label: menuLabel(t("menu.auditMdAudit")) },
+        { key: "audit-md-finding", label: menuLabel(t("menu.auditMdFinding")) },
+        { key: "audit-md-risk", label: menuLabel(t("menu.auditMdRisk")) },
+        { key: "audit-md-control", label: menuLabel(t("menu.auditMdControl")) },
+        { key: "audit-md-process", label: menuLabel(t("menu.auditMdProcess")) },
+        { key: "audit-md-compliance", label: menuLabel(t("menu.auditMdCompliance")) },
+        { key: "audit-md-general", label: menuLabel(t("menu.auditMdGeneral")) },
       ],
     },
-    {
-      key: "workflow",
-      icon: <NodeIndexOutlined />,
-      label: menuLabel(t("menu.workflow")),
-      children: [
-        { key: "workflow-tasks", label: menuLabel(t("menu.workflowTasks")) },
-        { key: "workflow-instances", label: menuLabel(t("menu.workflowInstances")) },
-        { key: "workflow-approval-matrix", label: menuLabel(t("menu.workflowApprovalMatrix")) },
-      ],
-    },
-    {
-      key: "audit",
-      icon: <AuditOutlined />,
-      label: menuLabel(t("menu.audit")),
+    canViewRiskScoring && {
+      key: "audit-risk-scoring",
+      label: menuLabel(t("menu.riskScoring")),
       children: [
         {
-          key: "audit-master-data",
-          label: menuLabel(t("menu.auditMasterData")),
+          key: "audit-rs-master-data",
+          label: menuLabel(t("menu.riskScoringMasterData")),
           children: [
-            { key: "audit-md-audit", label: menuLabel(t("menu.auditMdAudit")) },
-            { key: "audit-md-finding", label: menuLabel(t("menu.auditMdFinding")) },
-            { key: "audit-md-risk", label: menuLabel(t("menu.auditMdRisk")) },
-            { key: "audit-md-control", label: menuLabel(t("menu.auditMdControl")) },
-            { key: "audit-md-process", label: menuLabel(t("menu.auditMdProcess")) },
-            { key: "audit-md-compliance", label: menuLabel(t("menu.auditMdCompliance")) },
-            { key: "audit-md-general", label: menuLabel(t("menu.auditMdGeneral")) },
+            { key: "audit-rs-groups", label: menuLabel(t("menu.riskScoringGroups")) },
+            { key: "audit-rs-criteria", label: menuLabel(t("menu.riskScoringCriteria")) },
+            { key: "audit-rs-weight", label: menuLabel(t("menu.riskScoringWeight")) },
+            { key: "audit-rs-coefficient-matrix", label: menuLabel(t("menu.riskScoringCoefficientMatrix")) },
+            { key: "audit-rs-user-assignment", label: menuLabel(t("menu.riskScoringUserAssignment")) },
           ],
         },
-        // Ke hoach (Audit Plan/Universe) va Thuc hien (Work Program/Finding...) se them vao day
-        // khi tung phan thuc su co man hinh, cung cap voi "audit-master-data".
+        // Sub-module "Cham diem" (thuc hien cham diem, dung du lieu tu "audit-rs-master-data")
+        // se them vao day khi co man hinh, cung cap voi "audit-rs-master-data".
       ],
     },
-    ...(isSuperAdmin
-      ? [
-          {
-            key: "admin",
-            icon: <SafetyCertificateOutlined />,
-            label: menuLabel(t("menu.admin")),
-            children: [
-              { key: "admin-roles", label: menuLabel(t("menu.roles")) },
-              { key: "admin-accounts", label: menuLabel(t("menu.accounts")) },
-            ],
-          },
-        ]
-      : []),
-  ];
+    // Ke hoach (Audit Plan/Universe) va Thuc hien (Work Program/Finding...) se them vao day
+    // khi tung phan thuc su co man hinh, cung cap voi "audit-master-data".
+  ]);
+
+  const moduleMenuItems: MenuProps["items"] = dropNulls([
+    { key: "dashboard", icon: <DashboardOutlined />, label: menuLabel(t("menu.dashboard")) },
+    peopleChildren.length > 0 && { key: "people", icon: <TeamOutlined />, label: menuLabel(t("menu.people")), children: peopleChildren },
+    workflowChildren.length > 0 && { key: "workflow", icon: <NodeIndexOutlined />, label: menuLabel(t("menu.workflow")), children: workflowChildren },
+    auditChildren.length > 0 && { key: "audit", icon: <AuditOutlined />, label: menuLabel(t("menu.audit")), children: auditChildren },
+    isSuperAdmin && {
+      key: "admin",
+      icon: <SafetyCertificateOutlined />,
+      label: menuLabel(t("menu.admin")),
+      children: [
+        { key: "admin-roles", label: menuLabel(t("menu.roles")) },
+        { key: "admin-accounts", label: menuLabel(t("menu.accounts")) },
+      ],
+    },
+  ]);
 
   const selectedKey =
     Object.entries(MENU_ROUTES)
