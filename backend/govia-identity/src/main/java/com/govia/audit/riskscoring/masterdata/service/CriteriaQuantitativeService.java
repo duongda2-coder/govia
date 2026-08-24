@@ -71,6 +71,7 @@ public class CriteriaQuantitativeService {
         UUID tenantId = TenantContext.getTenantId();
         checkNoDuplicateCode(tenantId, request.code(), null);
         validateGroups(tenantId, request.group1Id(), request.group2Id());
+        validateCriteriaType(request.criteriaType());
 
         RiskCriteriaQuantitative item = new RiskCriteriaQuantitative();
         item.setTenantId(tenantId);
@@ -87,6 +88,7 @@ public class CriteriaQuantitativeService {
         RiskCriteriaQuantitative item = getOwnedOrThrow(tenantId, id);
         checkNoDuplicateCode(tenantId, request.code(), id);
         validateGroups(tenantId, request.group1Id(), request.group2Id());
+        validateCriteriaType(request.criteriaType());
 
         applyRequest(item, request);
         item = repository.save(item);
@@ -195,9 +197,19 @@ public class CriteriaQuantitativeService {
                 .filter(g -> g.getTenantId().equals(tenantId))
                 .orElseThrow(() -> new BusinessException("RISK_GROUP1_NOT_FOUND", "Khong tim thay nhom chi tieu cap 1"));
         if (group2Id != null) {
-            group2Repository.findById(group2Id)
+            RiskGroup2 group2 = group2Repository.findById(group2Id)
                     .filter(g -> g.getTenantId().equals(tenantId))
                     .orElseThrow(() -> new BusinessException("RISK_GROUP2_NOT_FOUND", "Khong tim thay nhom chi tieu cap 2"));
+            if (!group2.getGroup1Id().equals(group1Id)) {
+                throw new BusinessException("RISK_GROUP2_NOT_IN_GROUP1", "Nhom chi tieu cap 2 khong thuoc nhom cap 1 da chon");
+            }
+        }
+    }
+
+    /** Theo dung mo ta trong tai lieu goc ("Loai CT": Number, List 1,2,3) - chi 3 gia tri nay hop le. */
+    private void validateCriteriaType(Integer criteriaType) {
+        if (criteriaType != null && criteriaType != 1 && criteriaType != 2 && criteriaType != 3) {
+            throw new BusinessException("RISK_CRITERIA_DL_TYPE_INVALID", "Loai chi tieu chi nhan gia tri 1, 2 hoac 3");
         }
     }
 

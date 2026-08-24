@@ -187,9 +187,12 @@ public class CriteriaQualitativeService {
                 .filter(g -> g.getTenantId().equals(tenantId))
                 .orElseThrow(() -> new BusinessException("RISK_GROUP1_NOT_FOUND", "Khong tim thay nhom chi tieu cap 1"));
         if (group2Id != null) {
-            group2Repository.findById(group2Id)
+            RiskGroup2 group2 = group2Repository.findById(group2Id)
                     .filter(g -> g.getTenantId().equals(tenantId))
                     .orElseThrow(() -> new BusinessException("RISK_GROUP2_NOT_FOUND", "Khong tim thay nhom chi tieu cap 2"));
+            if (!group2.getGroup1Id().equals(group1Id)) {
+                throw new BusinessException("RISK_GROUP2_NOT_IN_GROUP1", "Nhom chi tieu cap 2 khong thuoc nhom cap 1 da chon");
+            }
         }
     }
 

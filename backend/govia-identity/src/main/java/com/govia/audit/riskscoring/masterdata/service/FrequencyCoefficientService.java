@@ -56,6 +56,7 @@ public class FrequencyCoefficientService {
     public FrequencyCoefficientResponse create(FrequencyCoefficientRequest request) {
         UUID tenantId = TenantContext.getTenantId();
         checkNoDuplicateCode(tenantId, request.code(), null);
+        validateYearRange(request.fromYear(), request.toYear());
 
         RiskFrequencyCoefficient item = new RiskFrequencyCoefficient();
         item.setTenantId(tenantId);
@@ -71,6 +72,7 @@ public class FrequencyCoefficientService {
         UUID tenantId = TenantContext.getTenantId();
         RiskFrequencyCoefficient item = getOwnedOrThrow(tenantId, id);
         checkNoDuplicateCode(tenantId, request.code(), id);
+        validateYearRange(request.fromYear(), request.toYear());
 
         applyRequest(item, request);
         item = repository.save(item);
@@ -150,6 +152,12 @@ public class FrequencyCoefficientService {
                 .ifPresent(existing -> {
                     throw new BusinessException("RISK_FREQ_COEF_CODE_DUPLICATE", "Ma he so da ton tai: " + code);
                 });
+    }
+
+    private void validateYearRange(Integer fromYear, Integer toYear) {
+        if (fromYear != null && toYear != null && fromYear > toYear) {
+            throw new BusinessException("RISK_FREQ_COEF_YEAR_RANGE_INVALID", "Tu nam phai nho hon hoac bang Den nam");
+        }
     }
 
     private RiskFrequencyCoefficient getOwnedOrThrow(UUID tenantId, UUID id) {

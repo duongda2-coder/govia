@@ -526,9 +526,15 @@
       "scoreTo": "Score To",
       "rankLabel": "Rank"
     },
+    "criteriaTypeOptions": {
+      "1": "Type 1",
+      "2": "Type 2",
+      "3": "Type 3"
+    },
     "form": {
       "createTitle": "Add",
-      "editTitle": "Edit"
+      "editTitle": "Edit",
+      "selectGroup1First": "Select Level-1 Group first"
     },
     "deleteConfirmTitle": "Delete this item?",
     "messages": {
@@ -537,7 +543,9 @@
       "updateSuccess": "Updated",
       "deleteSuccess": "Deleted",
       "deleteError": "Failed to delete",
-      "saveError": "Failed to save"
+      "saveError": "Failed to save",
+      "weightSumInvalid": "Qualitative + Quantitative weight must add up to 100%",
+      "weightSumHint": "Current total: {{percent}}%"
     }
   }
 }

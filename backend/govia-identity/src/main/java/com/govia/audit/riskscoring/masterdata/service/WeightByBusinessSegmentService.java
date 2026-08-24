@@ -56,6 +56,8 @@ public class WeightByBusinessSegmentService {
     public WeightByBusinessSegmentResponse create(WeightByBusinessSegmentRequest request) {
         UUID tenantId = TenantContext.getTenantId();
         checkNoDuplicate(tenantId, request.segmentCode(), request.fromYear(), null);
+        validateWeightSum(request.qualitativeWeight(), request.quantitativeWeight());
+        validateYearRange(request.fromYear(), request.toYear());
 
         RiskWeightByBusinessSegment item = new RiskWeightByBusinessSegment();
         item.setTenantId(tenantId);
@@ -71,6 +73,8 @@ public class WeightByBusinessSegmentService {
         UUID tenantId = TenantContext.getTenantId();
         RiskWeightByBusinessSegment item = getOwnedOrThrow(tenantId, id);
         checkNoDuplicate(tenantId, request.segmentCode(), request.fromYear(), id);
+        validateWeightSum(request.qualitativeWeight(), request.quantitativeWeight());
+        validateYearRange(request.fromYear(), request.toYear());
 
         applyRequest(item, request);
         item = repository.save(item);
@@ -144,6 +148,26 @@ public class WeightByBusinessSegmentService {
                 .ifPresent(existing -> {
                     throw new BusinessException("RISK_WEIGHT_SEG_DUPLICATE", "Da ton tai ty trong cho mang NV " + segmentCode + " tu nam " + fromYear);
                 });
+    }
+
+    /** Theo dung du lieu mau trong tai lieu goc, Ty trong dinh tinh + Ty trong dinh luong luon phai
+     * bang 1 (100%) - chi check khi ca 2 gia tri deu duoc nhap. */
+    private static final BigDecimal WEIGHT_SUM_TOLERANCE = new BigDecimal("0.001");
+
+    private void validateWeightSum(BigDecimal qualitativeWeight, BigDecimal quantitativeWeight) {
+        if (qualitativeWeight == null || quantitativeWeight == null) {
+            return;
+        }
+        BigDecimal sum = qualitativeWeight.add(quantitativeWeight);
+        if (sum.subtract(BigDecimal.ONE).abs().compareTo(WEIGHT_SUM_TOLERANCE) > 0) {
+            throw new BusinessException("RISK_WEIGHT_SEG_SUM_INVALID", "Tong Ty trong dinh tinh + Ty trong dinh luong phai bang 1 (100%)");
+        }
+    }
+
+    private void validateYearRange(Integer fromYear, Integer toYear) {
+        if (fromYear != null && toYear != null && fromYear > toYear) {
+            throw new BusinessException("RISK_WEIGHT_SEG_YEAR_RANGE_INVALID", "Tu nam phai nho hon hoac bang Den nam");
+        }
     }
 
     private RiskWeightByBusinessSegment getOwnedOrThrow(UUID tenantId, UUID id) {

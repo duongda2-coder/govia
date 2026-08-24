@@ -36,6 +36,10 @@ export function WeightByBusinessTable() {
   const [editing, setEditing] = useState<WeightByBusinessItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm<FormValues>();
+  const qualitativeWeightWatch = Form.useWatch("qualitativeWeight", form);
+  const quantitativeWeightWatch = Form.useWatch("quantitativeWeight", form);
+  const weightSum =
+    qualitativeWeightWatch != null && quantitativeWeightWatch != null ? qualitativeWeightWatch + quantitativeWeightWatch : null;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -187,10 +191,31 @@ export function WeightByBusinessTable() {
             <Input />
           </Form.Item>
           <Form.Item name="qualitativeWeight" label={t("riskScoring.columns.qualitativeWeight")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
+            <InputNumber style={{ width: "100%" }} step={0.01} min={0} max={1} />
           </Form.Item>
-          <Form.Item name="quantitativeWeight" label={t("riskScoring.columns.quantitativeWeight")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
+          <Form.Item
+            name="quantitativeWeight"
+            label={t("riskScoring.columns.quantitativeWeight")}
+            dependencies={["qualitativeWeight"]}
+            extra={
+              weightSum != null && (
+                <span style={{ color: Math.abs(weightSum - 1) > 0.001 ? "#dc2626" : "#16a34a" }}>
+                  {t("riskScoring.messages.weightSumHint", { percent: Math.round(weightSum * 100) })}
+                </span>
+              )
+            }
+            rules={[
+              {
+                validator: async (_, value) => {
+                  const qualitative = form.getFieldValue("qualitativeWeight");
+                  if (qualitative != null && value != null && Math.abs(qualitative + value - 1) > 0.001) {
+                    throw new Error(t("riskScoring.messages.weightSumInvalid"));
+                  }
+                },
+              },
+            ]}
+          >
+            <InputNumber style={{ width: "100%" }} step={0.01} min={0} max={1} />
           </Form.Item>
           <Form.Item name="fromYear" label={t("riskScoring.columns.fromYear")}>
             <InputNumber style={{ width: "100%" }} />

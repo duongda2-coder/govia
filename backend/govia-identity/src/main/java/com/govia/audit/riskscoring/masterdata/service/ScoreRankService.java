@@ -62,6 +62,8 @@ public class ScoreRankService {
     public ScoreRankResponse create(ScoreRankRequest request) {
         UUID tenantId = TenantContext.getTenantId();
         int toYear = request.toYear() != null ? request.toYear() : OPEN_END_YEAR;
+        validateScoreRange(request.scoreFrom(), request.scoreTo());
+        validateYearRange(request.fromYear(), request.toYear());
         checkNoDuplicate(tenantId, request.rankLabel(), request.fromYear(), null);
         closePreviousOpenPeriod(tenantId, request.rankLabel(), request.fromYear());
 
@@ -79,6 +81,8 @@ public class ScoreRankService {
         UUID tenantId = TenantContext.getTenantId();
         RiskScoreRank item = getOwnedOrThrow(tenantId, id);
         int toYear = request.toYear() != null ? request.toYear() : OPEN_END_YEAR;
+        validateScoreRange(request.scoreFrom(), request.scoreTo());
+        validateYearRange(request.fromYear(), request.toYear());
         checkNoDuplicate(tenantId, request.rankLabel(), request.fromYear(), id);
 
         applyRequest(item, request, toYear);
@@ -165,6 +169,18 @@ public class ScoreRankService {
                 .ifPresent(existing -> {
                     throw new BusinessException("RISK_SCORE_RANK_DUPLICATE", "Da ton tai xep loai " + rankLabel + " tu nam " + fromYear);
                 });
+    }
+
+    private void validateScoreRange(BigDecimal scoreFrom, BigDecimal scoreTo) {
+        if (scoreFrom.compareTo(scoreTo) >= 0) {
+            throw new BusinessException("RISK_SCORE_RANK_RANGE_INVALID", "Gia tri bat dau phai nho hon Gia tri ket thuc");
+        }
+    }
+
+    private void validateYearRange(Integer fromYear, Integer toYear) {
+        if (toYear != null && fromYear > toYear) {
+            throw new BusinessException("RISK_SCORE_RANK_YEAR_RANGE_INVALID", "Tu nam phai nho hon hoac bang Den nam");
+        }
     }
 
     private RiskScoreRank getOwnedOrThrow(UUID tenantId, UUID id) {

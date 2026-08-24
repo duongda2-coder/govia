@@ -52,6 +52,8 @@ export function CriteriaQualitativeTable() {
   const [editing, setEditing] = useState<CriteriaQualitativeItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm<FormValues>();
+  const group1IdWatch = Form.useWatch("group1Id", form);
+  const group2OptionsForGroup1 = group2Options.filter((g) => g.group1Id === group1IdWatch);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -228,12 +230,24 @@ export function CriteriaQualitativeTable() {
             <Select options={OBJECT_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))} />
           </Form.Item>
           <Form.Item name="group1Id" label={t("riskScoring.columns.group1")} rules={[{ required: true }]}>
-            <Select options={group1Options.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))} showSearch optionFilterProp="label" />
+            <Select
+              options={group1Options.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
+              showSearch
+              optionFilterProp="label"
+              onChange={(value) => {
+                const current = form.getFieldValue("group2Id") as string | undefined;
+                if (current && !group2Options.some((g) => g.id === current && g.group1Id === value)) {
+                  form.setFieldValue("group2Id", undefined);
+                }
+              }}
+            />
           </Form.Item>
           <Form.Item name="group2Id" label={t("riskScoring.columns.group2")}>
             <Select
               allowClear
-              options={group2Options.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
+              disabled={!group1IdWatch}
+              placeholder={!group1IdWatch ? t("riskScoring.form.selectGroup1First") : undefined}
+              options={group2OptionsForGroup1.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
               showSearch
               optionFilterProp="label"
             />

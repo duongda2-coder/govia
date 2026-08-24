@@ -58,6 +58,8 @@ export function CriteriaQuantitativeTable() {
   const [editing, setEditing] = useState<CriteriaQuantitativeItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm<FormValues>();
+  const group1IdWatch = Form.useWatch("group1Id", form);
+  const group2OptionsForGroup1 = group2Options.filter((g) => g.group1Id === group1IdWatch);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -184,7 +186,12 @@ export function CriteriaQuantitativeTable() {
     { title: t("riskScoring.columns.group2"), dataIndex: "group2Code", width: 100, render: (v: string | null) => v ?? "-" },
     { title: t("riskScoring.columns.code"), width: 110, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
-    { title: t("riskScoring.columns.criteriaType"), dataIndex: "criteriaType", width: 90, render: (v: number | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.criteriaType"),
+      dataIndex: "criteriaType",
+      width: 90,
+      render: (v: number | null) => (v ? t("riskScoring.criteriaTypeOptions." + v) : "-"),
+    },
     { title: t("riskScoring.columns.score20"), dataIndex: "score20", width: 80, render: (v: number | null) => v ?? "-" },
     { title: t("riskScoring.columns.score40"), dataIndex: "score40", width: 80, render: (v: number | null) => v ?? "-" },
     { title: t("riskScoring.columns.score60"), dataIndex: "score60", width: 80, render: (v: number | null) => v ?? "-" },
@@ -243,12 +250,24 @@ export function CriteriaQuantitativeTable() {
             <Select options={OBJECT_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))} />
           </Form.Item>
           <Form.Item name="group1Id" label={t("riskScoring.columns.group1")} rules={[{ required: true }]}>
-            <Select options={group1Options.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))} showSearch optionFilterProp="label" />
+            <Select
+              options={group1Options.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
+              showSearch
+              optionFilterProp="label"
+              onChange={(value) => {
+                const current = form.getFieldValue("group2Id") as string | undefined;
+                if (current && !group2Options.some((g) => g.id === current && g.group1Id === value)) {
+                  form.setFieldValue("group2Id", undefined);
+                }
+              }}
+            />
           </Form.Item>
           <Form.Item name="group2Id" label={t("riskScoring.columns.group2")}>
             <Select
               allowClear
-              options={group2Options.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
+              disabled={!group1IdWatch}
+              placeholder={!group1IdWatch ? t("riskScoring.form.selectGroup1First") : undefined}
+              options={group2OptionsForGroup1.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
               showSearch
               optionFilterProp="label"
             />
@@ -260,7 +279,10 @@ export function CriteriaQuantitativeTable() {
             <Input.TextArea rows={2} />
           </Form.Item>
           <Form.Item name="criteriaType" label={t("riskScoring.columns.criteriaType")}>
-            <InputNumber style={{ width: "100%" }} />
+            <Select
+              allowClear
+              options={[1, 2, 3].map((value) => ({ value, label: t("riskScoring.criteriaTypeOptions." + value) }))}
+            />
           </Form.Item>
           <Form.Item name="businessThreshold" label={t("riskScoring.columns.businessThreshold")}>
             <InputNumber style={{ width: "100%" }} step={0.01} />

@@ -526,9 +526,15 @@
       "scoreTo": "Giá trị kết thúc",
       "rankLabel": "Xếp loại"
     },
+    "criteriaTypeOptions": {
+      "1": "Loại 1",
+      "2": "Loại 2",
+      "3": "Loại 3"
+    },
     "form": {
       "createTitle": "Thêm mới",
-      "editTitle": "Sửa"
+      "editTitle": "Sửa",
+      "selectGroup1First": "Chọn Nhóm cấp 1 trước"
     },
     "deleteConfirmTitle": "Xóa mục này?",
     "messages": {
@@ -537,7 +543,9 @@
       "updateSuccess": "Đã cập nhật",
       "deleteSuccess": "Đã xóa",
       "deleteError": "Xóa thất bại",
-      "saveError": "Lưu thất bại"
+      "saveError": "Lưu thất bại",
+      "weightSumInvalid": "Tổng Tỷ trọng ĐT + ĐL phải bằng 100%",
+      "weightSumHint": "Tổng hiện tại: {{percent}}%"
     }
   }
 }
