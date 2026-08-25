@@ -2,10 +2,11 @@ package com.govia.audit.riskscoring.masterdata.service;
 
 import com.govia.audit.riskscoring.masterdata.dto.CriteriaQualitativeRequest;
 import com.govia.audit.riskscoring.masterdata.dto.CriteriaQualitativeResponse;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectType;
+import com.govia.audit.riskscoring.masterdata.entity.AuditObjectCategory;
 import com.govia.audit.riskscoring.masterdata.entity.RiskCriteriaQualitative;
 import com.govia.audit.riskscoring.masterdata.entity.RiskGroup1;
 import com.govia.audit.riskscoring.masterdata.entity.RiskGroup2;
+import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepository;
 import com.govia.audit.riskscoring.masterdata.repository.RiskCriteriaQualitativeRepository;
 import com.govia.audit.riskscoring.masterdata.repository.RiskGroup1Repository;
 import com.govia.audit.riskscoring.masterdata.repository.RiskGroup2Repository;
@@ -39,20 +40,20 @@ public class CriteriaQualitativeService {
     private final RiskCriteriaQualitativeRepository repository;
     private final RiskGroup1Repository group1Repository;
     private final RiskGroup2Repository group2Repository;
-    private final AuditObjectReferenceService auditObjectReferenceService;
+    private final AuditObjectCategoryRepository auditObjectCategoryRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
     private final ExcelImportService excelImportService;
 
     public CriteriaQualitativeService(RiskCriteriaQualitativeRepository repository, RiskGroup1Repository group1Repository,
-                                       RiskGroup2Repository group2Repository, AuditObjectReferenceService auditObjectReferenceService,
+                                       RiskGroup2Repository group2Repository, AuditObjectCategoryRepository auditObjectCategoryRepository,
                                        AuditLogService auditLogService, ExcelExportService excelExportService,
                                        WordExportService wordExportService, ExcelImportService excelImportService) {
         this.repository = repository;
         this.group1Repository = group1Repository;
         this.group2Repository = group2Repository;
-        this.auditObjectReferenceService = auditObjectReferenceService;
+        this.auditObjectCategoryRepository = auditObjectCategoryRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
@@ -64,9 +65,9 @@ public class CriteriaQualitativeService {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, String> group1Codes = group1CodesById(tenantId);
         Map<UUID, String> group2Codes = group2CodesById(tenantId);
-        Map<AuditObjectType, Map<UUID, AuditObjectReferenceService.Ref>> auditObjectRefs = auditObjectReferenceService.loadAllRefs(tenantId);
+        Map<UUID, AuditObjectCategory> categories = auditObjectCategoriesById(tenantId);
         return repository.findByTenantIdOrderByCodeAsc(tenantId).stream()
-                .map(item -> toResponse(item, group1Codes, group2Codes, auditObjectRefs)).toList();
+                .map(item -> toResponse(item, group1Codes, group2Codes, categories)).toList();
     }
 
     @Transactional
@@ -74,7 +75,7 @@ public class CriteriaQualitativeService {
         UUID tenantId = TenantContext.getTenantId();
         checkNoDuplicateCode(tenantId, request.code(), null);
         validateGroups(tenantId, request.group1Id(), request.group2Id());
-        auditObjectReferenceService.validateExists(tenantId, request.auditObjectType(), request.auditObjectId());
+        validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
 
         RiskCriteriaQualitative item = new RiskCriteriaQualitative();
         item.setTenantId(tenantId);
@@ -82,7 +83,7 @@ public class CriteriaQualitativeService {
         item = repository.save(item);
 
         auditLogService.record("RiskCriteriaQualitative", item.getId(), AuditAction.CREATE, "Tao chi tieu dinh tinh: " + item.getCode());
-        return toResponse(item, group1CodesById(tenantId), group2CodesById(tenantId), auditObjectReferenceService.loadAllRefs(tenantId));
+        return toResponse(item, group1CodesById(tenantId), group2CodesById(tenantId), auditObjectCategoriesById(tenantId));
     }
 
     @Transactional
@@ -91,13 +92,13 @@ public class CriteriaQualitativeService {
         RiskCriteriaQualitative item = getOwnedOrThrow(tenantId, id);
         checkNoDuplicateCode(tenantId, request.code(), id);
         validateGroups(tenantId, request.group1Id(), request.group2Id());
-        auditObjectReferenceService.validateExists(tenantId, request.auditObjectType(), request.auditObjectId());
+        validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
 
         applyRequest(item, request);
         item = repository.save(item);
 
         auditLogService.record("RiskCriteriaQualitative", item.getId(), AuditAction.UPDATE, "Cap nhat chi tieu dinh tinh: " + item.getCode());
-        return toResponse(item, group1CodesById(tenantId), group2CodesById(tenantId), auditObjectReferenceService.loadAllRefs(tenantId));
+        return toResponse(item, group1CodesById(tenantId), group2CodesById(tenantId), auditObjectCategoriesById(tenantId));
     }
 
     @Transactional
@@ -128,6 +129,8 @@ public class CriteriaQualitativeService {
         }
 
         UUID tenantId = TenantContext.getTenantId();
+        Map<String, UUID> categoryIdsByCode = new HashMap<>();
+        auditObjectCategoryRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> categoryIdsByCode.put(c.getCode(), c.getId()));
         Map<String, UUID> group1IdsByCode = new HashMap<>();
         group1Repository.findByTenantIdOrderByCodeAsc(tenantId).forEach(g -> group1IdsByCode.put(g.getCode(), g.getId()));
         Map<String, UUID> group2IdsByCode = new HashMap<>();
@@ -139,26 +142,24 @@ public class CriteriaQualitativeService {
             int rowNumber = i + 2;
             Map<String, String> row = rows.get(i);
             try {
-                String auditObjectTypeStr = row.get("auditObjectType");
-                String auditObjectCode = row.get("auditObjectCode");
+                String auditObjectCategoryCode = row.get("auditObjectCategoryCode");
                 String group1Code = row.get("group1Code");
                 String code = row.get("code");
                 String name = row.get("name");
-                if (isBlank(auditObjectTypeStr) || isBlank(auditObjectCode) || isBlank(group1Code) || isBlank(code) || isBlank(name)) {
-                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Loai doi tuong, Ma doi tuong kiem toan, Ma nhom cap 1, Ma hoac Ten");
+                if (isBlank(auditObjectCategoryCode) || isBlank(group1Code) || isBlank(code) || isBlank(name)) {
+                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Loai doi tuong kiem toan, Ma nhom cap 1, Ma hoac Ten");
+                }
+                UUID auditObjectCategoryId = categoryIdsByCode.get(auditObjectCategoryCode.trim());
+                if (auditObjectCategoryId == null) {
+                    throw new BusinessException("AUDIT_OBJECT_CATEGORY_NOT_FOUND", "Khong tim thay loai doi tuong kiem toan: " + auditObjectCategoryCode);
                 }
                 UUID group1Id = group1IdsByCode.get(group1Code.trim());
                 if (group1Id == null) {
                     throw new BusinessException("RISK_GROUP1_NOT_FOUND", "Khong tim thay nhom cap 1: " + group1Code);
                 }
-                AuditObjectType auditObjectType = AuditObjectType.valueOf(auditObjectTypeStr.trim());
-                UUID auditObjectId = auditObjectReferenceService.resolveIdByCode(tenantId, auditObjectType, auditObjectCode.trim());
-                if (auditObjectId == null) {
-                    throw new BusinessException("AUDIT_OBJECT_REFERENCE_NOT_FOUND", "Khong tim thay doi tuong kiem toan: " + auditObjectCode);
-                }
                 String group2Code = row.get("group2Code");
                 UUID group2Id = isBlank(group2Code) ? null : group2IdsByCode.get(group2Code.trim());
-                create(new CriteriaQualitativeRequest(auditObjectType, auditObjectId, group1Id, group2Id,
+                create(new CriteriaQualitativeRequest(auditObjectCategoryId, group1Id, group2Id,
                         code.trim(), name.trim(), parseDecimal(row.get("weight")), parseInt(row.get("impactLevel")),
                         parseInt(row.get("likelihoodLevel")), true, true));
                 success++;
@@ -173,8 +174,7 @@ public class CriteriaQualitativeService {
     }
 
     private void applyRequest(RiskCriteriaQualitative item, CriteriaQualitativeRequest request) {
-        item.setAuditObjectType(request.auditObjectType());
-        item.setAuditObjectId(request.auditObjectId());
+        item.setAuditObjectCategoryId(request.auditObjectCategoryId());
         item.setGroup1Id(request.group1Id());
         item.setGroup2Id(request.group2Id());
         item.setCode(request.code());
@@ -208,6 +208,12 @@ public class CriteriaQualitativeService {
         }
     }
 
+    private void validateAuditObjectCategory(UUID tenantId, UUID auditObjectCategoryId) {
+        auditObjectCategoryRepository.findById(auditObjectCategoryId)
+                .filter(c -> c.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("AUDIT_OBJECT_CATEGORY_NOT_FOUND", "Khong tim thay loai doi tuong kiem toan"));
+    }
+
     private RiskCriteriaQualitative getOwnedOrThrow(UUID tenantId, UUID id) {
         return repository.findById(id)
                 .filter(item -> item.getTenantId().equals(tenantId))
@@ -230,10 +236,17 @@ public class CriteriaQualitativeService {
         return map;
     }
 
+    private Map<UUID, AuditObjectCategory> auditObjectCategoriesById(UUID tenantId) {
+        Map<UUID, AuditObjectCategory> map = new HashMap<>();
+        for (AuditObjectCategory c : auditObjectCategoryRepository.findByTenantIdOrderByCodeAsc(tenantId)) {
+            map.put(c.getId(), c);
+        }
+        return map;
+    }
+
     private List<ExportColumn> exportColumns() {
         return List.of(
-                new ExportColumn("auditObjectType", "Loai doi tuong"),
-                new ExportColumn("auditObjectCode", "Ma doi tuong kiem toan"),
+                new ExportColumn("auditObjectCategoryCode", "Loai doi tuong kiem toan"),
                 new ExportColumn("group1Code", "Nhom cap 1"),
                 new ExportColumn("group2Code", "Nhom cap 2"),
                 new ExportColumn("code", "Ma chi tieu"),
@@ -247,13 +260,12 @@ public class CriteriaQualitativeService {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, String> group1Codes = group1CodesById(tenantId);
         Map<UUID, String> group2Codes = group2CodesById(tenantId);
-        Map<AuditObjectType, Map<UUID, AuditObjectReferenceService.Ref>> auditObjectRefs = auditObjectReferenceService.loadAllRefs(tenantId);
+        Map<UUID, AuditObjectCategory> categories = auditObjectCategoriesById(tenantId);
         return repository.findByTenantIdOrderByCodeAsc(tenantId).stream()
                 .map(item -> {
-                    AuditObjectReferenceService.Ref ref = auditObjectReferenceService.lookup(auditObjectRefs, item.getAuditObjectType(), item.getAuditObjectId());
+                    AuditObjectCategory category = categories.get(item.getAuditObjectCategoryId());
                     Map<String, Object> row = new HashMap<>();
-                    row.put("auditObjectType", item.getAuditObjectType());
-                    row.put("auditObjectCode", ref != null ? ref.code() : null);
+                    row.put("auditObjectCategoryCode", category != null ? category.getCode() : null);
                     row.put("group1Code", group1Codes.get(item.getGroup1Id()));
                     row.put("group2Code", group2Codes.get(item.getGroup2Id()));
                     row.put("code", item.getCode());
@@ -292,10 +304,10 @@ public class CriteriaQualitativeService {
     }
 
     private CriteriaQualitativeResponse toResponse(RiskCriteriaQualitative item, Map<UUID, String> group1Codes, Map<UUID, String> group2Codes,
-                                                     Map<AuditObjectType, Map<UUID, AuditObjectReferenceService.Ref>> auditObjectRefs) {
-        AuditObjectReferenceService.Ref ref = auditObjectReferenceService.lookup(auditObjectRefs, item.getAuditObjectType(), item.getAuditObjectId());
-        return new CriteriaQualitativeResponse(item.getId(), item.getAuditObjectType().name(), item.getAuditObjectId(),
-                ref != null ? ref.code() : null, ref != null ? ref.name() : null,
+                                                     Map<UUID, AuditObjectCategory> categories) {
+        AuditObjectCategory category = categories.get(item.getAuditObjectCategoryId());
+        return new CriteriaQualitativeResponse(item.getId(), item.getAuditObjectCategoryId(),
+                category != null ? category.getCode() : null, category != null ? category.getName() : null,
                 item.getGroup1Id(), group1Codes.get(item.getGroup1Id()), item.getGroup2Id(), group2Codes.get(item.getGroup2Id()),
                 item.getCode(), item.getName(), item.getWeight(), item.getImpactLevel(), item.getLikelihoodLevel(),
                 item.isIncludeCurrentYear(), item.isActive());

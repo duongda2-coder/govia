@@ -29,6 +29,10 @@ public class AuditObjectUnit extends BaseEntity {
     @Column(name = "unit_type", nullable = false, length = 10)
     private AuditUnitType unitType;
 
+    /** "Loai doi tuong kiem toan" - link toi danh muc goc AuditObjectCategory (sheet ZTC_Loai_Dtkt). */
+    @Column(name = "audit_object_category_id", columnDefinition = "uuid")
+    private UUID auditObjectCategoryId;
+
     @Column(name = "established_date")
     private LocalDate establishedDate;
 

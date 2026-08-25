@@ -2,8 +2,10 @@ package com.govia.audit.riskscoring.masterdata.service;
 
 import com.govia.audit.riskscoring.masterdata.dto.AuditObjectUnitRequest;
 import com.govia.audit.riskscoring.masterdata.dto.AuditObjectUnitResponse;
+import com.govia.audit.riskscoring.masterdata.entity.AuditObjectCategory;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.riskscoring.masterdata.entity.AuditUnitType;
+import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepository;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
 import com.govia.audit.riskscoring.scoring.entity.RiskGroupHO;
 import com.govia.audit.riskscoring.scoring.repository.RiskGroupHORepository;
@@ -40,16 +42,19 @@ public class AuditObjectUnitService {
 
     private final AuditObjectUnitRepository repository;
     private final RiskGroupHORepository groupHORepository;
+    private final AuditObjectCategoryRepository auditObjectCategoryRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
     private final ExcelImportService excelImportService;
 
     public AuditObjectUnitService(AuditObjectUnitRepository repository, RiskGroupHORepository groupHORepository,
-                                   AuditLogService auditLogService, ExcelExportService excelExportService,
-                                   WordExportService wordExportService, ExcelImportService excelImportService) {
+                                   AuditObjectCategoryRepository auditObjectCategoryRepository, AuditLogService auditLogService,
+                                   ExcelExportService excelExportService, WordExportService wordExportService,
+                                   ExcelImportService excelImportService) {
         this.repository = repository;
         this.groupHORepository = groupHORepository;
+        this.auditObjectCategoryRepository = auditObjectCategoryRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
@@ -60,7 +65,8 @@ public class AuditObjectUnitService {
     public List<AuditObjectUnitResponse> list() {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, String> groupCodes = groupHOCodesById(tenantId);
-        return repository.findByTenantIdOrderByCodeAsc(tenantId).stream().map(item -> toResponse(item, groupCodes)).toList();
+        Map<UUID, String> categoryCodes = auditObjectCategoryCodesById(tenantId);
+        return repository.findByTenantIdOrderByCodeAsc(tenantId).stream().map(item -> toResponse(item, groupCodes, categoryCodes)).toList();
     }
 
     @Transactional
@@ -68,6 +74,7 @@ public class AuditObjectUnitService {
         UUID tenantId = TenantContext.getTenantId();
         checkNoDuplicateCode(tenantId, request.code(), null);
         validateDefenseLineGroup(tenantId, request.defenseLineGroupId());
+        validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
 
         AuditObjectUnit item = new AuditObjectUnit();
         item.setTenantId(tenantId);
@@ -76,7 +83,7 @@ public class AuditObjectUnitService {
         item = repository.save(item);
 
         auditLogService.record("AuditObjectUnit", item.getId(), AuditAction.CREATE, "Tao doi tuong kiem toan: " + item.getCode());
-        return toResponse(item, groupHOCodesById(tenantId));
+        return toResponse(item, groupHOCodesById(tenantId), auditObjectCategoryCodesById(tenantId));
     }
 
     @Transactional
@@ -85,13 +92,14 @@ public class AuditObjectUnitService {
         AuditObjectUnit item = getOwnedOrThrow(tenantId, id);
         checkNoDuplicateCode(tenantId, request.code(), id);
         validateDefenseLineGroup(tenantId, request.defenseLineGroupId());
+        validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
 
         applyRequest(item, request);
         item.setInfoUpdatedDate(LocalDate.now());
         item = repository.save(item);
 
         auditLogService.record("AuditObjectUnit", item.getId(), AuditAction.UPDATE, "Cap nhat doi tuong kiem toan: " + item.getCode());
-        return toResponse(item, groupHOCodesById(tenantId));
+        return toResponse(item, groupHOCodesById(tenantId), auditObjectCategoryCodesById(tenantId));
     }
 
     @Transactional
@@ -124,6 +132,8 @@ public class AuditObjectUnitService {
         UUID tenantId = TenantContext.getTenantId();
         Map<String, UUID> groupIdsByCode = new HashMap<>();
         groupHORepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(g -> groupIdsByCode.put(g.getCode(), g.getId()));
+        Map<String, UUID> categoryIdsByCode = new HashMap<>();
+        auditObjectCategoryRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> categoryIdsByCode.put(c.getCode(), c.getId()));
 
         int success = 0;
         List<ImportResult.ImportRowError> errors = new ArrayList<>();
@@ -139,7 +149,9 @@ public class AuditObjectUnitService {
                 }
                 String defenseLineGroupCode = row.get("defenseLineGroupCode");
                 UUID defenseLineGroupId = isBlank(defenseLineGroupCode) ? null : groupIdsByCode.get(defenseLineGroupCode.trim());
-                create(new AuditObjectUnitRequest(code.trim(), name.trim(), AuditUnitType.valueOf(unitType.trim()),
+                String auditObjectCategoryCode = row.get("auditObjectCategoryCode");
+                UUID auditObjectCategoryId = isBlank(auditObjectCategoryCode) ? null : categoryIdsByCode.get(auditObjectCategoryCode.trim());
+                create(new AuditObjectUnitRequest(code.trim(), name.trim(), AuditUnitType.valueOf(unitType.trim()), auditObjectCategoryId,
                         parseDate(row.get("establishedDate")), parseDate(row.get("restructureDate")),
                         emptyToNull(row.get("restructureNote")), parseInt(row.get("totalStaff")), parseInt(row.get("leaderCount")),
                         parseInt(row.get("staffCount")), parseInt(row.get("rankValue")), defenseLineGroupId,
@@ -160,6 +172,7 @@ public class AuditObjectUnitService {
         item.setCode(request.code());
         item.setName(request.name());
         item.setUnitType(request.unitType());
+        item.setAuditObjectCategoryId(request.auditObjectCategoryId());
         item.setEstablishedDate(request.establishedDate());
         item.setRestructureDate(request.restructureDate());
         item.setRestructureNote(request.restructureNote());
@@ -191,6 +204,15 @@ public class AuditObjectUnitService {
                 .orElseThrow(() -> new BusinessException("RISK_GROUP_HO_NOT_FOUND", "Khong tim thay nhom rui ro HO (tuyen bao ve)"));
     }
 
+    private void validateAuditObjectCategory(UUID tenantId, UUID auditObjectCategoryId) {
+        if (auditObjectCategoryId == null) {
+            return;
+        }
+        auditObjectCategoryRepository.findById(auditObjectCategoryId)
+                .filter(c -> c.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("AUDIT_OBJECT_CATEGORY_NOT_FOUND", "Khong tim thay loai doi tuong kiem toan"));
+    }
+
     private AuditObjectUnit getOwnedOrThrow(UUID tenantId, UUID id) {
         return repository.findById(id)
                 .filter(item -> item.getTenantId().equals(tenantId))
@@ -205,11 +227,20 @@ public class AuditObjectUnitService {
         return map;
     }
 
+    private Map<UUID, String> auditObjectCategoryCodesById(UUID tenantId) {
+        Map<UUID, String> map = new HashMap<>();
+        for (AuditObjectCategory c : auditObjectCategoryRepository.findByTenantIdOrderByCodeAsc(tenantId)) {
+            map.put(c.getId(), c.getCode());
+        }
+        return map;
+    }
+
     private List<ExportColumn> exportColumns() {
         return List.of(
                 new ExportColumn("code", "Ma don vi"),
                 new ExportColumn("name", "Ten don vi"),
                 new ExportColumn("unitType", "Loai don vi"),
+                new ExportColumn("auditObjectCategoryCode", "Loai doi tuong kiem toan"),
                 new ExportColumn("establishedDate", "Ngay thanh lap"),
                 new ExportColumn("restructureDate", "Ngay chia tach/sap nhap"),
                 new ExportColumn("restructureNote", "Ghi chu chia tach/sap nhap"),
@@ -226,12 +257,14 @@ public class AuditObjectUnitService {
     private List<Map<String, Object>> exportRows() {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, String> groupCodes = groupHOCodesById(tenantId);
+        Map<UUID, String> categoryCodes = auditObjectCategoryCodesById(tenantId);
         return repository.findByTenantIdOrderByCodeAsc(tenantId).stream()
                 .map(item -> {
                     Map<String, Object> row = new HashMap<>();
                     row.put("code", item.getCode());
                     row.put("name", item.getName());
                     row.put("unitType", item.getUnitType());
+                    row.put("auditObjectCategoryCode", categoryCodes.get(item.getAuditObjectCategoryId()));
                     row.put("establishedDate", item.getEstablishedDate());
                     row.put("restructureDate", item.getRestructureDate());
                     row.put("restructureNote", item.getRestructureNote());
@@ -277,8 +310,9 @@ public class AuditObjectUnitService {
         }
     }
 
-    private AuditObjectUnitResponse toResponse(AuditObjectUnit item, Map<UUID, String> groupCodes) {
+    private AuditObjectUnitResponse toResponse(AuditObjectUnit item, Map<UUID, String> groupCodes, Map<UUID, String> categoryCodes) {
         return new AuditObjectUnitResponse(item.getId(), item.getCode(), item.getName(), item.getUnitType().name(),
+                item.getAuditObjectCategoryId(), categoryCodes.get(item.getAuditObjectCategoryId()),
                 item.getEstablishedDate(), item.getRestructureDate(), item.getRestructureNote(), item.getTotalStaff(),
                 item.getLeaderCount(), item.getStaffCount(), item.getRankValue(), item.getDefenseLineGroupId(),
                 groupCodes.get(item.getDefenseLineGroupId()), item.getOperatingRegulation(), item.getMainFunction(),

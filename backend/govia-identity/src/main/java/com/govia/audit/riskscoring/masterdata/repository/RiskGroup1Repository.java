@@ -10,5 +10,5 @@ import java.util.UUID;
 public interface RiskGroup1Repository extends JpaRepository<RiskGroup1, UUID> {
     List<RiskGroup1> findByTenantIdOrderByCodeAsc(UUID tenantId);
 
-    Optional<RiskGroup1> findByTenantIdAndAuditObjectIdAndCode(UUID tenantId, UUID auditObjectId, String code);
+    Optional<RiskGroup1> findByTenantIdAndAuditObjectCategoryIdAndCode(UUID tenantId, UUID auditObjectCategoryId, String code);
 }

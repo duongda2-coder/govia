@@ -3,8 +3,6 @@ package com.govia.audit.riskscoring.masterdata.entity;
 import com.govia.core.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,12 +17,8 @@ import java.util.UUID;
 @Table(name = "risk_score_criteria_qualitative")
 public class RiskCriteriaQualitative extends BaseEntity {
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "audit_object_type", nullable = false, length = 20)
-    private AuditObjectType auditObjectType;
-
-    @Column(name = "audit_object_id", nullable = false, columnDefinition = "uuid")
-    private UUID auditObjectId;
+    @Column(name = "audit_object_category_id", nullable = false, columnDefinition = "uuid")
+    private UUID auditObjectCategoryId;
 
     @Column(name = "group1_id", nullable = false, columnDefinition = "uuid")
     private UUID group1Id;

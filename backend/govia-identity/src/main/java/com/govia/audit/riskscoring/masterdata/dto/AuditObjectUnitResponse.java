@@ -8,6 +8,8 @@ public record AuditObjectUnitResponse(
         String code,
         String name,
         String unitType,
+        UUID auditObjectCategoryId,
+        String auditObjectCategoryCode,
         LocalDate establishedDate,
         LocalDate restructureDate,
         String restructureNote,

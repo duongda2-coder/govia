@@ -481,13 +481,15 @@
       "frequencyCoefficient": "Frequency Coefficient",
       "matrix": "Risk Matrix",
       "rank": "Score Rank",
+      "auditObjectCategory": "Audit Object Category",
       "auditObjectUnit": "Unit (HO/Branch Supervision/Branch)",
       "auditObjectSubsidiary": "Subsidiary",
       "auditObjectProject": "Project/Outsourced Service",
       "auditObjectProcess": "Process"
     },
     "columns": {
-      "auditObject": "Audit Object",
+      "auditObjectCategory": "Audit Object Category",
+      "note": "Note",
       "code": "Code",
       "name": "Name",
       "weight": "Weight",
@@ -576,7 +578,7 @@
       "createTitle": "Add",
       "editTitle": "Edit",
       "selectGroup1First": "Select Level-1 Group first",
-      "selectAuditObjectFirst": "Select Audit Object first"
+      "selectAuditObjectFirst": "Select Audit Object Category first"
     },
     "deleteConfirmTitle": "Delete this item?",
     "messages": {

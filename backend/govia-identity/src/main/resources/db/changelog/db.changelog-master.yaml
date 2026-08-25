@@ -50,3 +50,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/020-risk-scoring-audit-object-reference.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/021-risk-scoring-audit-object-category.yaml
+      relativeToChangelogFile: false

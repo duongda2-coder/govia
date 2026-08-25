@@ -3,8 +3,6 @@ package com.govia.audit.riskscoring.masterdata.entity;
 import com.govia.core.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,19 +11,19 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
-/** Nhom chi tieu cham diem rui ro cap 1 (sheet ZTC_DGRR_Group1 - bang ZTB_DGRR_GROUP). */
+/**
+ * Nhom chi tieu cham diem rui ro cap 1 (sheet ZTC_DGRR_Group1 - bang ZTB_DGRR_GROUP).
+ * auditObjectCategoryId tro toi danh muc goc "Loai doi tuong kiem toan" (sheet ZTC_Loai_Dtkt,
+ * xem AuditObjectCategory) - la cha cua Group1 (Group1 la cha cua Group2).
+ */
 @Getter
 @Setter
 @Entity
 @Table(name = "risk_score_group1")
 public class RiskGroup1 extends BaseEntity {
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "audit_object_type", nullable = false, length = 20)
-    private AuditObjectType auditObjectType;
-
-    @Column(name = "audit_object_id", nullable = false, columnDefinition = "uuid")
-    private UUID auditObjectId;
+    @Column(name = "audit_object_category_id", nullable = false, columnDefinition = "uuid")
+    private UUID auditObjectCategoryId;
 
     @Column(name = "code", nullable = false, length = 10)
     private String code;

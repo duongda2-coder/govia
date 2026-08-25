@@ -1,29 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, DatePicker, Form, Input, InputNumber, Modal, Select, Switch } from "antd";
+import { App, Form, Input, Modal, Switch } from "antd";
 import type { TableProps } from "antd";
-import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
-import {
-  group1Api,
-  type Group1Item,
-  type Group1Request,
-} from "../../../api/riskScoring";
+import { auditObjectCategoryApi, type AuditObjectCategoryItem, type AuditObjectCategoryRequest } from "../../../api/riskScoring";
 import { useAuth } from "../../../auth/AuthContext";
-import { useAuditObjectOptions } from "./useAuditObjectOptions";
 
 interface FormValues {
-  auditObjectCategoryId: string;
   code: string;
   name: string;
-  weight?: number;
-  validFrom?: dayjs.Dayjs;
-  validTo?: dayjs.Dayjs;
+  note?: string;
   active: boolean;
 }
 
-/** Danh muc "Nhom chi tieu cap 1" (sheet ZTC_DGRR_Group1). */
-export function Group1Table() {
+/**
+ * Danh muc goc "Loai doi tuong kiem toan" (sheet ZTC_Loai_Dtkt, tcode ztc_loai_dtkt) - la cha cua
+ * Nhom cap 1 (Nhom cap 1 la cha cua Nhom cap 2).
+ */
+export function AuditObjectCategoryTable() {
   const { t } = useTranslation();
   const { message, modal } = App.useApp();
   const { hasPermission } = useAuth();
@@ -33,22 +27,21 @@ export function Group1Table() {
   const canDelete = hasPermission("AUDIT.RISK_SCORING.DELETE");
   const canExport = hasPermission("AUDIT.RISK_SCORING.EXPORT");
   const canImport = hasPermission("AUDIT.RISK_SCORING.IMPORT");
-  const { getSearchColumnProps } = useClientSearchColumn<Group1Item>();
+  const { getSearchColumnProps } = useClientSearchColumn<AuditObjectCategoryItem>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
-  const { options: auditObjectCategoryOptions } = useAuditObjectOptions();
 
-  const [items, setItems] = useState<Group1Item[]>([]);
+  const [items, setItems] = useState<AuditObjectCategoryItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState<Group1Item[]>([]);
+  const [selected, setSelected] = useState<AuditObjectCategoryItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<Group1Item | null>(null);
+  const [editing, setEditing] = useState<AuditObjectCategoryItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm<FormValues>();
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setItems(await group1Api.list());
+      setItems(await auditObjectCategoryApi.list());
     } catch {
       message.error(t("riskScoring.messages.loadError"));
     } finally {
@@ -72,12 +65,9 @@ export function Group1Table() {
     if (!target) return;
     setEditing(target);
     form.setFieldsValue({
-      auditObjectCategoryId: target.auditObjectCategoryId,
       code: target.code,
       name: target.name,
-      weight: target.weight ?? undefined,
-      validFrom: target.validFrom ? dayjs(target.validFrom) : undefined,
-      validTo: target.validTo ? dayjs(target.validTo) : undefined,
+      note: target.note ?? undefined,
       active: target.active,
     });
     setModalOpen(true);
@@ -92,20 +82,17 @@ export function Group1Table() {
     }
     setSubmitting(true);
     try {
-      const request: Group1Request = {
-        auditObjectCategoryId: values.auditObjectCategoryId,
+      const request: AuditObjectCategoryRequest = {
         code: values.code,
         name: values.name,
-        weight: values.weight ?? null,
-        validFrom: values.validFrom ? values.validFrom.format("YYYY-MM-DD") : null,
-        validTo: values.validTo ? values.validTo.format("YYYY-MM-DD") : null,
+        note: values.note || null,
         active: values.active,
       };
       if (editing) {
-        await group1Api.update(editing.id, request);
+        await auditObjectCategoryApi.update(editing.id, request);
         message.success(t("riskScoring.messages.updateSuccess"));
       } else {
-        await group1Api.create(request);
+        await auditObjectCategoryApi.create(request);
         message.success(t("riskScoring.messages.createSuccess"));
       }
       setModalOpen(false);
@@ -128,7 +115,7 @@ export function Group1Table() {
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
-          await group1Api.remove(target.id);
+          await auditObjectCategoryApi.remove(target.id);
           message.success(t("riskScoring.messages.deleteSuccess"));
           setSelected([]);
           await load();
@@ -139,18 +126,10 @@ export function Group1Table() {
     });
   };
 
-  const columns: TableProps<Group1Item>["columns"] = [
-    {
-      title: t("riskScoring.columns.auditObjectCategory"),
-      width: 220,
-      render: (_: unknown, record: Group1Item) =>
-        record.auditObjectCategoryCode ? `${record.auditObjectCategoryCode} - ${record.auditObjectCategoryName}` : "-",
-    },
-    { title: t("riskScoring.columns.code"), width: 120, ...getSearchColumnProps("code", searchLabels) },
+  const columns: TableProps<AuditObjectCategoryItem>["columns"] = [
+    { title: t("riskScoring.columns.code"), width: 100, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
-    { title: t("riskScoring.columns.weight"), dataIndex: "weight", width: 100, render: (v: number | null) => v ?? "-" },
-    { title: t("riskScoring.columns.validFrom"), dataIndex: "validFrom", width: 120, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoring.columns.validTo"), dataIndex: "validTo", width: 120, render: (v: string | null) => v ?? "-" },
+    { title: t("riskScoring.columns.note"), dataIndex: "note", render: (v: string | null) => v ?? "-" },
     {
       title: t("common.active"),
       dataIndex: "active",
@@ -166,7 +145,7 @@ export function Group1Table() {
 
   return (
     <div>
-      <CrudTable<Group1Item>
+      <CrudTable<AuditObjectCategoryItem>
         columns={columns}
         dataSource={items}
         rowKey="id"
@@ -177,12 +156,12 @@ export function Group1Table() {
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
-        onExportExcel={canExport ? () => group1Api.exportFile("excel") : undefined}
-        onExportWord={canExport ? () => group1Api.exportFile("word") : undefined}
+        onExportExcel={canExport ? () => auditObjectCategoryApi.exportFile("excel") : undefined}
+        onExportWord={canExport ? () => auditObjectCategoryApi.exportFile("word") : undefined}
         onImport={
           canImport
             ? async (file) => {
-                const result = await group1Api.importExcel(file);
+                const result = await auditObjectCategoryApi.importExcel(file);
                 await load();
                 return result;
               }
@@ -199,23 +178,14 @@ export function Group1Table() {
         destroyOnClose
       >
         <Form<FormValues> form={form} layout="vertical">
-          <Form.Item name="auditObjectCategoryId" label={t("riskScoring.columns.auditObjectCategory")} rules={[{ required: true }]}>
-            <Select options={auditObjectCategoryOptions} showSearch optionFilterProp="label" />
+          <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }, { max: 4 }]}>
+            <Input maxLength={4} />
           </Form.Item>
-          <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
-            <Input />
+          <Form.Item name="name" label={t("riskScoring.columns.name")} rules={[{ required: true }, { max: 50 }]}>
+            <Input maxLength={50} />
           </Form.Item>
-          <Form.Item name="name" label={t("riskScoring.columns.name")} rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="weight" label={t("riskScoring.columns.weight")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="validFrom" label={t("riskScoring.columns.validFrom")}>
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item name="validTo" label={t("riskScoring.columns.validTo")}>
-            <DatePicker style={{ width: "100%" }} />
+          <Form.Item name="note" label={t("riskScoring.columns.note")}>
+            <Input.TextArea rows={2} maxLength={200} />
           </Form.Item>
           <Form.Item name="active" label={t("common.active")} valuePropName="checked">
             <Switch />

@@ -1,13 +1,13 @@
 package com.govia.identity;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.govia.audit.riskscoring.masterdata.dto.AuditObjectCategoryRequest;
 import com.govia.audit.riskscoring.masterdata.dto.AuditObjectUnitRequest;
 import com.govia.audit.riskscoring.masterdata.dto.CriteriaQuantitativeRequest;
 import com.govia.audit.riskscoring.masterdata.dto.Group1Request;
 import com.govia.audit.riskscoring.masterdata.dto.Group2Request;
 import com.govia.audit.riskscoring.masterdata.dto.ScoreRankRequest;
 import com.govia.audit.riskscoring.masterdata.dto.WeightByBusinessRequest;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectType;
 import com.govia.audit.riskscoring.masterdata.entity.AuditUnitType;
 import com.govia.audit.riskscoring.scoring.dto.GroupHORequest;
 import com.govia.identity.dto.AssignRolesRequest;
@@ -52,16 +52,16 @@ class RiskScoringApiTest extends AbstractApiTest {
 
     @Test
     void createUpdateDeleteGroup1() throws Exception {
-        UUID auditObjectId = createAuditObjectUnit("AU1");
+        UUID categoryId = createAuditObjectCategory("AU1");
         String createBody = mockMvc.perform(post("/api/audit/risk-scoring/master-data/group1")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(AuditObjectType.UNIT, auditObjectId, "CM", "MÔI TRƯỜNG KIỂM SOÁT (ĐL)",
+                                new Group1Request(categoryId, "CM", "MÔI TRƯỜNG KIỂM SOÁT (ĐL)",
                                         new BigDecimal("0.1"), null, null, true))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.code").value("CM"))
-                .andExpect(jsonPath("$.data.auditObjectCode").value("AU1"))
+                .andExpect(jsonPath("$.data.auditObjectCategoryCode").value("AU1"))
                 .andReturn().getResponse().getContentAsString();
         String id = objectMapper.readTree(createBody).get("data").get("id").asText();
 
@@ -73,7 +73,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(AuditObjectType.UNIT, auditObjectId, "CM", "MÔI TRƯỜNG KIỂM SOÁT (sửa)",
+                                new Group1Request(categoryId, "CM", "MÔI TRƯỜNG KIỂM SOÁT (sửa)",
                                         new BigDecimal("0.2"), null, null, true))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.name").value("MÔI TRƯỜNG KIỂM SOÁT (sửa)"));
@@ -88,13 +88,13 @@ class RiskScoringApiTest extends AbstractApiTest {
 
     @Test
     void createCriteriaQuantitativeRequiresValidGroup1() throws Exception {
-        UUID auditObjectId = createAuditObjectUnit("AU2");
+        UUID categoryId = createAuditObjectCategory("AU2");
         String randomGroup1Id = "00000000-0000-0000-0000-000000000000";
         mockMvc.perform(post("/api/audit/risk-scoring/master-data/criteria-quantitative")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new CriteriaQuantitativeRequest(AuditObjectType.UNIT, auditObjectId, java.util.UUID.fromString(randomGroup1Id), null,
+                                new CriteriaQuantitativeRequest(categoryId, java.util.UUID.fromString(randomGroup1Id), null,
                                         "CEAT01", "Đã được kiểm tra toàn diện", 1, new BigDecimal("0.05"), null,
                                         new BigDecimal("2"), new BigDecimal("3"), new BigDecimal("4"), new BigDecimal("5"),
                                         new BigDecimal("100"), null, true, true))))
@@ -105,7 +105,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(AuditObjectType.UNIT, auditObjectId, "CM", "Nhóm CM", new BigDecimal("0.1"), null, null, true))))
+                                new Group1Request(categoryId, "CM", "Nhóm CM", new BigDecimal("0.1"), null, null, true))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         String group1Id = objectMapper.readTree(group1Body).get("data").get("id").asText();
@@ -114,7 +114,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new CriteriaQuantitativeRequest(AuditObjectType.UNIT, auditObjectId, java.util.UUID.fromString(group1Id), null,
+                                new CriteriaQuantitativeRequest(categoryId, java.util.UUID.fromString(group1Id), null,
                                         "CEAT01", "Đã được kiểm tra toàn diện", 1, new BigDecimal("0.05"), null,
                                         new BigDecimal("2"), new BigDecimal("3"), new BigDecimal("4"), new BigDecimal("5"),
                                         new BigDecimal("100"), null, true, true))))
@@ -167,12 +167,12 @@ class RiskScoringApiTest extends AbstractApiTest {
 
     @Test
     void criteriaQuantitativeRejectsInvalidCriteriaTypeAndMismatchedGroup2() throws Exception {
-        UUID auditObjectId = createAuditObjectUnit("AU3");
+        UUID categoryId = createAuditObjectCategory("AU3");
         String group1Body = mockMvc.perform(post("/api/audit/risk-scoring/master-data/group1")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(AuditObjectType.UNIT, auditObjectId, "CE", "Nhóm CE", null, null, null, true))))
+                                new Group1Request(categoryId, "CE", "Nhóm CE", null, null, null, true))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         UUID group1Id = UUID.fromString(objectMapper.readTree(group1Body).get("data").get("id").asText());
@@ -181,7 +181,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(AuditObjectType.UNIT, auditObjectId, "LN", "Nhóm LN", null, null, null, true))))
+                                new Group1Request(categoryId, "LN", "Nhóm LN", null, null, null, true))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         UUID otherGroup1Id = UUID.fromString(objectMapper.readTree(otherGroup1Body).get("data").get("id").asText());
@@ -200,7 +200,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new CriteriaQuantitativeRequest(AuditObjectType.UNIT, auditObjectId, group1Id, null, "CEAT99", "Test", 5,
+                                new CriteriaQuantitativeRequest(categoryId, group1Id, null, "CEAT99", "Test", 5,
                                         null, null, null, null, null, null, null, null, true, true))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("RISK_CRITERIA_DL_TYPE_INVALID"));
@@ -210,7 +210,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new CriteriaQuantitativeRequest(AuditObjectType.UNIT, auditObjectId, group1Id, group2IdUnderOtherGroup1, "CEAT99", "Test", 1,
+                                new CriteriaQuantitativeRequest(categoryId, group1Id, group2IdUnderOtherGroup1, "CEAT99", "Test", 1,
                                         null, null, null, null, null, null, null, null, true, true))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("RISK_GROUP2_NOT_IN_GROUP1"));
@@ -243,7 +243,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new AuditObjectUnitRequest("1234", "Chi nhánh Thăng Long", AuditUnitType.CN, null, null, null,
+                                new AuditObjectUnitRequest("1234", "Chi nhánh Thăng Long", AuditUnitType.CN, null, null, null, null,
                                         100, 10, 500, 1, UUID.fromString(groupId), null, null, null, true))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.code").value("1234"))
@@ -260,7 +260,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new AuditObjectUnitRequest("1234", "Trung", AuditUnitType.CN, null, null, null,
+                                new AuditObjectUnitRequest("1234", "Trung", AuditUnitType.CN, null, null, null, null,
                                         null, null, null, null, null, null, null, null, true))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("AUDIT_OBJECT_UNIT_CODE_DUPLICATE"));
@@ -271,14 +271,14 @@ class RiskScoringApiTest extends AbstractApiTest {
 
     @Test
     void importExcel_createsNewRowFromTemplate() throws Exception {
-        createAuditObjectUnit("AU4");
+        createAuditObjectCategory("AU4");
         // Lay dung file mau (header) tu chinh endpoint export cua danh muc nay, roi them 1 dong du lieu moi -
         // dam bao ExcelImportService khop dung header voi ExportColumn cua Group1Service.
         byte[] template = mockMvc.perform(get("/api/audit/risk-scoring/master-data/group1/export/excel")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsByteArray();
-        byte[] withNewRow = appendRow(template, List.of("UNIT", "AU4", "ZZ", "Nhom Import Test", "0.15", "", ""));
+        byte[] withNewRow = appendRow(template, List.of("AU4", "ZZ", "Nhom Import Test", "0.15", "", ""));
         MockMultipartFile file = new MockMultipartFile("file", "group1.xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", withNewRow);
 
@@ -299,12 +299,12 @@ class RiskScoringApiTest extends AbstractApiTest {
 
     @Test
     void importExcel_reimportingSameTemplateFailsOnDuplicateCode() throws Exception {
-        UUID auditObjectId = createAuditObjectUnit("AU5");
+        UUID categoryId = createAuditObjectCategory("AU5");
         mockMvc.perform(post("/api/audit/risk-scoring/master-data/group1")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(AuditObjectType.UNIT, auditObjectId, "IMP", "Nhom da ton tai", null, null, null, true))))
+                                new Group1Request(categoryId, "IMP", "Nhom da ton tai", null, null, null, true))))
                 .andExpect(status().isOk());
 
         byte[] excel = mockMvc.perform(get("/api/audit/risk-scoring/master-data/group1/export/excel")
@@ -325,14 +325,13 @@ class RiskScoringApiTest extends AbstractApiTest {
         assertThat(result.get("errors").get(0).get("message").asText()).contains("da ton tai");
     }
 
-    /** Tao 1 doi tuong kiem toan (danh muc ZTC_DTKT1) de lam auditObjectId cho Group1/CriteriaQuantitative trong test. */
-    private UUID createAuditObjectUnit(String code) throws Exception {
-        String body = mockMvc.perform(post("/api/audit/risk-scoring/master-data/audit-object-unit")
+    /** Tao 1 loai doi tuong kiem toan (danh muc goc ZTC_Loai_Dtkt) de lam auditObjectCategoryId cho Group1/Criteria trong test. */
+    private UUID createAuditObjectCategory(String code) throws Exception {
+        String body = mockMvc.perform(post("/api/audit/risk-scoring/master-data/audit-object-category")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new AuditObjectUnitRequest(code, "Don vi test " + code, AuditUnitType.CN, null, null, null,
-                                        null, null, null, null, null, null, null, null, true))))
+                                new AuditObjectCategoryRequest(code, "Loai test " + code, null, true))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         return UUID.fromString(objectMapper.readTree(body).get("data").get("id").asText());
@@ -373,7 +372,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + plainUserToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(AuditObjectType.UNIT, UUID.randomUUID(), "XX", "Khong duoc phep", null, null, null, true))))
+                                new Group1Request(UUID.randomUUID(), "XX", "Khong duoc phep", null, null, null, true))))
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(get("/api/audit/risk-scoring/master-data/group1").header("Authorization", "Bearer " + adminToken))

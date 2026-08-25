@@ -481,13 +481,15 @@
       "frequencyCoefficient": "Hệ số tần suất",
       "matrix": "Ma trận rủi ro",
       "rank": "Thang điểm xếp loại",
+      "auditObjectCategory": "Loại đối tượng kiểm toán",
       "auditObjectUnit": "Đơn vị (HO/GSCC/CN)",
       "auditObjectSubsidiary": "Công ty con",
       "auditObjectProject": "Dự án/DVTN",
       "auditObjectProcess": "Quy trình"
     },
     "columns": {
-      "auditObject": "Đối tượng kiểm toán",
+      "auditObjectCategory": "Loại đối tượng kiểm toán",
+      "note": "Ghi chú",
       "code": "Mã",
       "name": "Tên",
       "weight": "Trọng số",
@@ -576,7 +578,7 @@
       "createTitle": "Thêm mới",
       "editTitle": "Sửa",
       "selectGroup1First": "Chọn Nhóm cấp 1 trước",
-      "selectAuditObjectFirst": "Chọn Đối tượng kiểm toán trước"
+      "selectAuditObjectFirst": "Chọn Loại đối tượng kiểm toán trước"
     },
     "deleteConfirmTitle": "Xóa mục này?",
     "messages": {

@@ -1,0 +1,174 @@
+databaseChangeLog:
+
+  # ===================== Danh muc goc "Loai doi tuong kiem toan" (sheet ZTC_Loai_Dtkt) =====================
+  # Day la CHA cua Group1 (Group1 la cha cua Group2) - khac voi 4 danh muc "Doi tuong kiem toan" cu
+  # the (Unit/Subsidiary/Project/Process, xem 019) von la CAC BAN GHI doi tuong duoc kiem toan, con
+  # danh muc nay chi la PHAN LOAI (CNDT/CNDL/HO/IT/DA...). Thay audit_object_type+audit_object_id
+  # (tham chieu da hinh toi 4 danh muc, xem 020) bang 1 FK don gian toi danh muc goc nay.
+
+  - changeSet:
+      id: 021-1-risk-score-audit-object-category-schema
+      author: govia
+      comment: "Tao bang risk_score_audit_object_category"
+      changes:
+        - createTable:
+            tableName: risk_score_audit_object_category
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(4), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: note, type: VARCHAR(200) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_audit_object_category
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_ao_cat_tenant
+        - addUniqueConstraint:
+            tableName: risk_score_audit_object_category
+            columnNames: tenant_id, code
+            constraintName: uk_risk_score_ao_cat_tenant_code
+
+  - changeSet:
+      id: 021-2-risk-score-audit-object-category-seed
+      author: govia
+      comment: "Seed 5 loai doi tuong kiem toan mac dinh (CNDT/CNDL/HO/IT/DA) moi tenant, dung theo sheet ZTC_Loai_Dtkt"
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO risk_score_audit_object_category (id, tenant_id, code, name, active, created_at, row_version)
+              SELECT gen_random_uuid(), t.id, v.code, v.name, true, now(), 0
+              FROM tenant t
+              CROSS JOIN (VALUES
+                ('CNDT', 'Định tính của chi nhánh'),
+                ('CNDL', 'Định lượng của chi nhánh'),
+                ('HO', 'Trụ sở chính'),
+                ('IT', 'Công nghệ thông tin'),
+                ('DA', 'Dự án')
+              ) AS v(code, name)
+              WHERE NOT EXISTS (
+                SELECT 1 FROM risk_score_audit_object_category c WHERE c.tenant_id = t.id AND c.code = v.code
+              );
+
+  - changeSet:
+      id: 021-3-risk-score-group1-audit-object-category
+      author: govia
+      comment: "RiskGroup1: audit_object_type/audit_object_id (tham chieu da hinh, xem 020) -> audit_object_category_id (FK don toi danh muc goc); du lieu cu backfill ve loai 'HO'"
+      changes:
+        - dropUniqueConstraint:
+            tableName: risk_score_group1
+            constraintName: uk_risk_score_group1_tenant_object_code
+        - dropColumn:
+            tableName: risk_score_group1
+            columnName: audit_object_type
+        - dropColumn:
+            tableName: risk_score_group1
+            columnName: audit_object_id
+        - addColumn:
+            tableName: risk_score_group1
+            columns:
+              - column: { name: audit_object_category_id, type: UUID }
+        - sql:
+            sql: >
+              UPDATE risk_score_group1 g SET audit_object_category_id =
+                (SELECT c.id FROM risk_score_audit_object_category c WHERE c.tenant_id = g.tenant_id AND c.code = 'HO')
+              WHERE g.audit_object_category_id IS NULL;
+        - addNotNullConstraint:
+            tableName: risk_score_group1
+            columnName: audit_object_category_id
+            columnDataType: UUID
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_group1
+            baseColumnNames: audit_object_category_id
+            referencedTableName: risk_score_audit_object_category
+            referencedColumnNames: id
+            constraintName: fk_risk_score_group1_ao_category
+        - addUniqueConstraint:
+            tableName: risk_score_group1
+            columnNames: tenant_id, audit_object_category_id, code
+            constraintName: uk_risk_score_group1_tenant_category_code
+
+  - changeSet:
+      id: 021-4-risk-score-criteria-qualitative-audit-object-category
+      author: govia
+      comment: "RiskCriteriaQualitative: audit_object_type/audit_object_id -> audit_object_category_id; du lieu cu backfill ve loai 'HO'"
+      changes:
+        - dropColumn:
+            tableName: risk_score_criteria_qualitative
+            columnName: audit_object_type
+        - dropColumn:
+            tableName: risk_score_criteria_qualitative
+            columnName: audit_object_id
+        - addColumn:
+            tableName: risk_score_criteria_qualitative
+            columns:
+              - column: { name: audit_object_category_id, type: UUID }
+        - sql:
+            sql: >
+              UPDATE risk_score_criteria_qualitative g SET audit_object_category_id =
+                (SELECT c.id FROM risk_score_audit_object_category c WHERE c.tenant_id = g.tenant_id AND c.code = 'HO')
+              WHERE g.audit_object_category_id IS NULL;
+        - addNotNullConstraint:
+            tableName: risk_score_criteria_qualitative
+            columnName: audit_object_category_id
+            columnDataType: UUID
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_qualitative
+            baseColumnNames: audit_object_category_id
+            referencedTableName: risk_score_audit_object_category
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dt_ao_category
+
+  - changeSet:
+      id: 021-5-risk-score-criteria-quantitative-audit-object-category
+      author: govia
+      comment: "RiskCriteriaQuantitative: audit_object_type/audit_object_id -> audit_object_category_id; du lieu cu backfill ve loai 'HO'"
+      changes:
+        - dropColumn:
+            tableName: risk_score_criteria_quantitative
+            columnName: audit_object_type
+        - dropColumn:
+            tableName: risk_score_criteria_quantitative
+            columnName: audit_object_id
+        - addColumn:
+            tableName: risk_score_criteria_quantitative
+            columns:
+              - column: { name: audit_object_category_id, type: UUID }
+        - sql:
+            sql: >
+              UPDATE risk_score_criteria_quantitative g SET audit_object_category_id =
+                (SELECT c.id FROM risk_score_audit_object_category c WHERE c.tenant_id = g.tenant_id AND c.code = 'HO')
+              WHERE g.audit_object_category_id IS NULL;
+        - addNotNullConstraint:
+            tableName: risk_score_criteria_quantitative
+            columnName: audit_object_category_id
+            columnDataType: UUID
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_quantitative
+            baseColumnNames: audit_object_category_id
+            referencedTableName: risk_score_audit_object_category
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dl_ao_category
+
+  - changeSet:
+      id: 021-6-risk-score-audit-object-unit-category
+      author: govia
+      comment: "AuditObjectUnit: them truong tuy chon audit_object_category_id - luc tao Don vi (HO/GSCC/CN) se chon Loai doi tuong kiem toan tu danh muc goc nay"
+      changes:
+        - addColumn:
+            tableName: risk_score_audit_object_unit
+            columns:
+              - column: { name: audit_object_category_id, type: UUID }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_audit_object_unit
+            baseColumnNames: audit_object_category_id
+            referencedTableName: risk_score_audit_object_category
+            referencedColumnNames: id
+            constraintName: fk_risk_score_ao_unit_ao_category

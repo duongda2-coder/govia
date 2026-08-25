@@ -5,10 +5,9 @@ import java.util.UUID;
 
 public record CriteriaQualitativeResponse(
         UUID id,
-        String auditObjectType,
-        UUID auditObjectId,
-        String auditObjectCode,
-        String auditObjectName,
+        UUID auditObjectCategoryId,
+        String auditObjectCategoryCode,
+        String auditObjectCategoryName,
         UUID group1Id,
         String group1Code,
         UUID group2Id,

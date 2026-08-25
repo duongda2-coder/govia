@@ -2,8 +2,9 @@ package com.govia.audit.riskscoring.masterdata.service;
 
 import com.govia.audit.riskscoring.masterdata.dto.Group1Request;
 import com.govia.audit.riskscoring.masterdata.dto.Group1Response;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectType;
+import com.govia.audit.riskscoring.masterdata.entity.AuditObjectCategory;
 import com.govia.audit.riskscoring.masterdata.entity.RiskGroup1;
+import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepository;
 import com.govia.audit.riskscoring.masterdata.repository.RiskGroup1Repository;
 import com.govia.core.audit.AuditAction;
 import com.govia.core.audit.AuditLogService;
@@ -34,17 +35,17 @@ import java.util.UUID;
 public class Group1Service {
 
     private final RiskGroup1Repository repository;
-    private final AuditObjectReferenceService auditObjectReferenceService;
+    private final AuditObjectCategoryRepository auditObjectCategoryRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
     private final ExcelImportService excelImportService;
 
-    public Group1Service(RiskGroup1Repository repository, AuditObjectReferenceService auditObjectReferenceService,
+    public Group1Service(RiskGroup1Repository repository, AuditObjectCategoryRepository auditObjectCategoryRepository,
                           AuditLogService auditLogService, ExcelExportService excelExportService,
                           WordExportService wordExportService, ExcelImportService excelImportService) {
         this.repository = repository;
-        this.auditObjectReferenceService = auditObjectReferenceService;
+        this.auditObjectCategoryRepository = auditObjectCategoryRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
@@ -54,15 +55,15 @@ public class Group1Service {
     @Transactional(readOnly = true)
     public List<Group1Response> list() {
         UUID tenantId = TenantContext.getTenantId();
-        Map<AuditObjectType, Map<UUID, AuditObjectReferenceService.Ref>> auditObjectRefs = auditObjectReferenceService.loadAllRefs(tenantId);
-        return repository.findByTenantIdOrderByCodeAsc(tenantId).stream().map(item -> toResponse(item, auditObjectRefs)).toList();
+        Map<UUID, AuditObjectCategory> categories = auditObjectCategoriesById(tenantId);
+        return repository.findByTenantIdOrderByCodeAsc(tenantId).stream().map(item -> toResponse(item, categories)).toList();
     }
 
     @Transactional
     public Group1Response create(Group1Request request) {
         UUID tenantId = TenantContext.getTenantId();
-        checkNoDuplicateCode(tenantId, request.auditObjectId(), request.code(), null);
-        auditObjectReferenceService.validateExists(tenantId, request.auditObjectType(), request.auditObjectId());
+        checkNoDuplicateCode(tenantId, request.auditObjectCategoryId(), request.code(), null);
+        validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
 
         RiskGroup1 item = new RiskGroup1();
         item.setTenantId(tenantId);
@@ -70,21 +71,21 @@ public class Group1Service {
         item = repository.save(item);
 
         auditLogService.record("RiskGroup1", item.getId(), AuditAction.CREATE, "Tao nhom chi tieu cap 1: " + item.getCode());
-        return toResponse(item, auditObjectReferenceService.loadAllRefs(tenantId));
+        return toResponse(item, auditObjectCategoriesById(tenantId));
     }
 
     @Transactional
     public Group1Response update(UUID id, Group1Request request) {
         UUID tenantId = TenantContext.getTenantId();
         RiskGroup1 item = getOwnedOrThrow(tenantId, id);
-        checkNoDuplicateCode(tenantId, request.auditObjectId(), request.code(), id);
-        auditObjectReferenceService.validateExists(tenantId, request.auditObjectType(), request.auditObjectId());
+        checkNoDuplicateCode(tenantId, request.auditObjectCategoryId(), request.code(), id);
+        validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
 
         applyRequest(item, request);
         item = repository.save(item);
 
         auditLogService.record("RiskGroup1", item.getId(), AuditAction.UPDATE, "Cap nhat nhom chi tieu cap 1: " + item.getCode());
-        return toResponse(item, auditObjectReferenceService.loadAllRefs(tenantId));
+        return toResponse(item, auditObjectCategoriesById(tenantId));
     }
 
     @Transactional
@@ -115,25 +116,26 @@ public class Group1Service {
         }
 
         UUID tenantId = TenantContext.getTenantId();
+        Map<String, UUID> categoryIdsByCode = new HashMap<>();
+        auditObjectCategoryRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> categoryIdsByCode.put(c.getCode(), c.getId()));
+
         int success = 0;
         List<ImportResult.ImportRowError> errors = new ArrayList<>();
         for (int i = 0; i < rows.size(); i++) {
             int rowNumber = i + 2;
             Map<String, String> row = rows.get(i);
             try {
-                String auditObjectTypeStr = row.get("auditObjectType");
-                String auditObjectCode = row.get("auditObjectCode");
+                String auditObjectCategoryCode = row.get("auditObjectCategoryCode");
                 String code = row.get("code");
                 String name = row.get("name");
-                if (isBlank(auditObjectTypeStr) || isBlank(auditObjectCode) || isBlank(code) || isBlank(name)) {
-                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Loai doi tuong, Ma doi tuong kiem toan, Ma hoac Ten");
+                if (isBlank(auditObjectCategoryCode) || isBlank(code) || isBlank(name)) {
+                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Loai doi tuong kiem toan, Ma hoac Ten");
                 }
-                AuditObjectType auditObjectType = AuditObjectType.valueOf(auditObjectTypeStr.trim());
-                UUID auditObjectId = auditObjectReferenceService.resolveIdByCode(tenantId, auditObjectType, auditObjectCode.trim());
-                if (auditObjectId == null) {
-                    throw new BusinessException("AUDIT_OBJECT_REFERENCE_NOT_FOUND", "Khong tim thay doi tuong kiem toan: " + auditObjectCode);
+                UUID auditObjectCategoryId = categoryIdsByCode.get(auditObjectCategoryCode.trim());
+                if (auditObjectCategoryId == null) {
+                    throw new BusinessException("AUDIT_OBJECT_CATEGORY_NOT_FOUND", "Khong tim thay loai doi tuong kiem toan: " + auditObjectCategoryCode);
                 }
-                create(new Group1Request(auditObjectType, auditObjectId,
+                create(new Group1Request(auditObjectCategoryId,
                         code.trim(), name.trim(), parseDecimal(row.get("weight")),
                         parseDate(row.get("validFrom")), parseDate(row.get("validTo")), true));
                 success++;
@@ -148,8 +150,7 @@ public class Group1Service {
     }
 
     private void applyRequest(RiskGroup1 item, Group1Request request) {
-        item.setAuditObjectType(request.auditObjectType());
-        item.setAuditObjectId(request.auditObjectId());
+        item.setAuditObjectCategoryId(request.auditObjectCategoryId());
         item.setCode(request.code());
         item.setName(request.name());
         item.setWeight(request.weight());
@@ -158,12 +159,18 @@ public class Group1Service {
         item.setActive(request.active());
     }
 
-    private void checkNoDuplicateCode(UUID tenantId, UUID auditObjectId, String code, UUID excludingId) {
-        repository.findByTenantIdAndAuditObjectIdAndCode(tenantId, auditObjectId, code)
+    private void checkNoDuplicateCode(UUID tenantId, UUID auditObjectCategoryId, String code, UUID excludingId) {
+        repository.findByTenantIdAndAuditObjectCategoryIdAndCode(tenantId, auditObjectCategoryId, code)
                 .filter(existing -> excludingId == null || !existing.getId().equals(excludingId))
                 .ifPresent(existing -> {
                     throw new BusinessException("RISK_GROUP1_CODE_DUPLICATE", "Ma nhom da ton tai: " + code);
                 });
+    }
+
+    private void validateAuditObjectCategory(UUID tenantId, UUID auditObjectCategoryId) {
+        auditObjectCategoryRepository.findById(auditObjectCategoryId)
+                .filter(c -> c.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("AUDIT_OBJECT_CATEGORY_NOT_FOUND", "Khong tim thay loai doi tuong kiem toan"));
     }
 
     private RiskGroup1 getOwnedOrThrow(UUID tenantId, UUID id) {
@@ -172,10 +179,17 @@ public class Group1Service {
                 .orElseThrow(() -> new BusinessException("RISK_GROUP1_NOT_FOUND", "Khong tim thay nhom chi tieu cap 1", HttpStatus.NOT_FOUND));
     }
 
+    private Map<UUID, AuditObjectCategory> auditObjectCategoriesById(UUID tenantId) {
+        Map<UUID, AuditObjectCategory> map = new HashMap<>();
+        for (AuditObjectCategory c : auditObjectCategoryRepository.findByTenantIdOrderByCodeAsc(tenantId)) {
+            map.put(c.getId(), c);
+        }
+        return map;
+    }
+
     private List<ExportColumn> exportColumns() {
         return List.of(
-                new ExportColumn("auditObjectType", "Loai doi tuong"),
-                new ExportColumn("auditObjectCode", "Ma doi tuong kiem toan"),
+                new ExportColumn("auditObjectCategoryCode", "Loai doi tuong kiem toan"),
                 new ExportColumn("code", "Ma nhom"),
                 new ExportColumn("name", "Ten nhom"),
                 new ExportColumn("weight", "Trong so"),
@@ -185,13 +199,12 @@ public class Group1Service {
 
     private List<Map<String, Object>> exportRows() {
         UUID tenantId = TenantContext.getTenantId();
-        Map<AuditObjectType, Map<UUID, AuditObjectReferenceService.Ref>> auditObjectRefs = auditObjectReferenceService.loadAllRefs(tenantId);
+        Map<UUID, AuditObjectCategory> categories = auditObjectCategoriesById(tenantId);
         return repository.findByTenantIdOrderByCodeAsc(tenantId).stream()
                 .map(item -> {
-                    AuditObjectReferenceService.Ref ref = auditObjectReferenceService.lookup(auditObjectRefs, item.getAuditObjectType(), item.getAuditObjectId());
+                    AuditObjectCategory category = categories.get(item.getAuditObjectCategoryId());
                     Map<String, Object> row = new HashMap<>();
-                    row.put("auditObjectType", item.getAuditObjectType());
-                    row.put("auditObjectCode", ref != null ? ref.code() : null);
+                    row.put("auditObjectCategoryCode", category != null ? category.getCode() : null);
                     row.put("code", item.getCode());
                     row.put("name", item.getName());
                     row.put("weight", item.getWeight());
@@ -227,10 +240,10 @@ public class Group1Service {
         }
     }
 
-    private Group1Response toResponse(RiskGroup1 item, Map<AuditObjectType, Map<UUID, AuditObjectReferenceService.Ref>> auditObjectRefs) {
-        AuditObjectReferenceService.Ref ref = auditObjectReferenceService.lookup(auditObjectRefs, item.getAuditObjectType(), item.getAuditObjectId());
-        return new Group1Response(item.getId(), item.getAuditObjectType().name(), item.getAuditObjectId(),
-                ref != null ? ref.code() : null, ref != null ? ref.name() : null,
+    private Group1Response toResponse(RiskGroup1 item, Map<UUID, AuditObjectCategory> categories) {
+        AuditObjectCategory category = categories.get(item.getAuditObjectCategoryId());
+        return new Group1Response(item.getId(), item.getAuditObjectCategoryId(),
+                category != null ? category.getCode() : null, category != null ? category.getName() : null,
                 item.getCode(), item.getName(), item.getWeight(), item.getValidFrom(), item.getValidTo(), item.isActive());
     }
 }

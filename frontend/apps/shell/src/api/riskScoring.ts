@@ -2,25 +2,29 @@ import type { ApiResponse, ImportResult } from "@govia/ui-kit";
 import { httpClient } from "./client";
 
 /**
- * Loai bang cua "Doi tuong kiem toan" ma Group1/CriteriaQualitative/CriteriaQuantitative tham chieu
- * toi - thay the enum "Loai doi tuong" cu (CNDT/CNDL/HO/CNTT/DA fix cung) bang tham chieu that toi
- * 1 ban ghi cu the trong 4 danh muc ZTC_DTKT1-4 (xem AuditObjectUnit/Subsidiary/Project/ProcessItem).
+ * Danh muc goc "Loai doi tuong kiem toan" (sheet ZTC_Loai_Dtkt) - la CHA cua Group1 (Group1 la cha
+ * cua Group2). Khac voi 4 danh muc "Doi tuong kiem toan" cu the (Unit/Subsidiary/Project/Process)
+ * von la cac ban ghi doi tuong duoc kiem toan - danh muc nay chi la PHAN LOAI (CNDT/CNDL/HO/IT/DA).
  */
-export type AuditObjectRefType = "UNIT" | "SUBSIDIARY" | "PROJECT" | "PROCESS";
-
-export const AUDIT_OBJECT_REF_TYPE_LABELS: Record<AuditObjectRefType, string> = {
-  UNIT: "Đơn vị",
-  SUBSIDIARY: "Công ty con",
-  PROJECT: "Dự án/DVTN",
-  PROCESS: "Quy trình",
-};
+export interface AuditObjectCategoryItem {
+  id: string;
+  code: string;
+  name: string;
+  note: string | null;
+  active: boolean;
+}
+export interface AuditObjectCategoryRequest {
+  code: string;
+  name: string;
+  note?: string | null;
+  active: boolean;
+}
 
 export interface Group1Item {
   id: string;
-  auditObjectType: AuditObjectRefType;
-  auditObjectId: string;
-  auditObjectCode: string | null;
-  auditObjectName: string | null;
+  auditObjectCategoryId: string;
+  auditObjectCategoryCode: string | null;
+  auditObjectCategoryName: string | null;
   code: string;
   name: string;
   weight: number | null;
@@ -29,8 +33,7 @@ export interface Group1Item {
   active: boolean;
 }
 export interface Group1Request {
-  auditObjectType: AuditObjectRefType;
-  auditObjectId: string;
+  auditObjectCategoryId: string;
   code: string;
   name: string;
   weight?: number | null;
@@ -62,10 +65,9 @@ export interface Group2Request {
 
 export interface CriteriaQualitativeItem {
   id: string;
-  auditObjectType: AuditObjectRefType;
-  auditObjectId: string;
-  auditObjectCode: string | null;
-  auditObjectName: string | null;
+  auditObjectCategoryId: string;
+  auditObjectCategoryCode: string | null;
+  auditObjectCategoryName: string | null;
   group1Id: string;
   group1Code: string | null;
   group2Id: string | null;
@@ -79,8 +81,7 @@ export interface CriteriaQualitativeItem {
   active: boolean;
 }
 export interface CriteriaQualitativeRequest {
-  auditObjectType: AuditObjectRefType;
-  auditObjectId: string;
+  auditObjectCategoryId: string;
   group1Id: string;
   group2Id?: string | null;
   code: string;
@@ -94,10 +95,9 @@ export interface CriteriaQualitativeRequest {
 
 export interface CriteriaQuantitativeItem {
   id: string;
-  auditObjectType: AuditObjectRefType;
-  auditObjectId: string;
-  auditObjectCode: string | null;
-  auditObjectName: string | null;
+  auditObjectCategoryId: string;
+  auditObjectCategoryCode: string | null;
+  auditObjectCategoryName: string | null;
   group1Id: string;
   group1Code: string | null;
   group2Id: string | null;
@@ -117,8 +117,7 @@ export interface CriteriaQuantitativeItem {
   active: boolean;
 }
 export interface CriteriaQuantitativeRequest {
-  auditObjectType: AuditObjectRefType;
-  auditObjectId: string;
+  auditObjectCategoryId: string;
   group1Id: string;
   group2Id?: string | null;
   code: string;
@@ -264,6 +263,8 @@ export interface AuditObjectUnitItem {
   code: string;
   name: string;
   unitType: AuditUnitType;
+  auditObjectCategoryId: string | null;
+  auditObjectCategoryCode: string | null;
   establishedDate: string | null;
   restructureDate: string | null;
   restructureNote: string | null;
@@ -283,6 +284,7 @@ export interface AuditObjectUnitRequest {
   code: string;
   name: string;
   unitType: AuditUnitType;
+  auditObjectCategoryId?: string | null;
   establishedDate?: string | null;
   restructureDate?: string | null;
   restructureNote?: string | null;
@@ -445,6 +447,8 @@ function createResourceApi<TItem, TRequest>(basePath: string, fileBaseName: stri
 // duong dan voi cac endpoint CRUD danh muc o day.
 const BASE = "/api/audit/risk-scoring/master-data";
 
+export const auditObjectCategoryApi = createResourceApi<AuditObjectCategoryItem, AuditObjectCategoryRequest>(
+  `${BASE}/audit-object-category`, "risk_score_audit_object_category");
 export const group1Api = createResourceApi<Group1Item, Group1Request>(`${BASE}/group1`, "risk_score_group1");
 export const group2Api = createResourceApi<Group2Item, Group2Request>(`${BASE}/group2`, "risk_score_group2");
 export const criteriaQualitativeApi = createResourceApi<CriteriaQualitativeItem, CriteriaQualitativeRequest>(

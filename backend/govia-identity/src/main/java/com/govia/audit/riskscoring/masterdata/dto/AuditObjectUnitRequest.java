@@ -11,6 +11,7 @@ public record AuditObjectUnitRequest(
         @NotBlank String code,
         @NotBlank String name,
         @NotNull AuditUnitType unitType,
+        UUID auditObjectCategoryId,
         LocalDate establishedDate,
         LocalDate restructureDate,
         String restructureNote,

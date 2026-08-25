@@ -13,11 +13,13 @@ import {
 } from "../../../api/riskScoring";
 import { groupHOApi, type GroupHOItem } from "../../../api/riskScoringExec";
 import { useAuth } from "../../../auth/AuthContext";
+import { useAuditObjectOptions } from "./useAuditObjectOptions";
 
 interface FormValues {
   code: string;
   name: string;
   unitType: AuditUnitType;
+  auditObjectCategoryId?: string;
   establishedDate?: dayjs.Dayjs;
   restructureDate?: dayjs.Dayjs;
   restructureNote?: string;
@@ -45,6 +47,7 @@ export function AuditObjectUnitTable() {
   const canImport = hasPermission("AUDIT.RISK_SCORING.IMPORT");
   const { getSearchColumnProps } = useClientSearchColumn<AuditObjectUnitItem>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
+  const { options: auditObjectCategoryOptions } = useAuditObjectOptions();
 
   const [items, setItems] = useState<AuditObjectUnitItem[]>([]);
   const [groupHOOptions, setGroupHOOptions] = useState<GroupHOItem[]>([]);
@@ -87,6 +90,7 @@ export function AuditObjectUnitTable() {
       code: target.code,
       name: target.name,
       unitType: target.unitType,
+      auditObjectCategoryId: target.auditObjectCategoryId ?? undefined,
       establishedDate: target.establishedDate ? dayjs(target.establishedDate) : undefined,
       restructureDate: target.restructureDate ? dayjs(target.restructureDate) : undefined,
       restructureNote: target.restructureNote ?? undefined,
@@ -116,6 +120,7 @@ export function AuditObjectUnitTable() {
         code: values.code,
         name: values.name,
         unitType: values.unitType,
+        auditObjectCategoryId: values.auditObjectCategoryId ?? null,
         establishedDate: values.establishedDate ? values.establishedDate.format("YYYY-MM-DD") : null,
         restructureDate: values.restructureDate ? values.restructureDate.format("YYYY-MM-DD") : null,
         restructureNote: values.restructureNote ?? null,
@@ -175,6 +180,12 @@ export function AuditObjectUnitTable() {
       dataIndex: "unitType",
       width: 140,
       render: (v: AuditUnitType) => AUDIT_UNIT_TYPE_OPTIONS.find((o) => o.value === v)?.label ?? v,
+    },
+    {
+      title: t("riskScoring.columns.auditObjectCategory"),
+      dataIndex: "auditObjectCategoryCode",
+      width: 150,
+      render: (v: string | null) => v ?? "-",
     },
     { title: t("riskScoring.columns.totalStaff"), dataIndex: "totalStaff", width: 100, render: (v: number | null) => v ?? "-" },
     { title: t("riskScoring.columns.leaderCount"), dataIndex: "leaderCount", width: 100, render: (v: number | null) => v ?? "-" },
@@ -249,6 +260,9 @@ export function AuditObjectUnitTable() {
           </Form.Item>
           <Form.Item name="unitType" label={t("riskScoring.columns.unitType")} rules={[{ required: true }]}>
             <Select options={AUDIT_UNIT_TYPE_OPTIONS} />
+          </Form.Item>
+          <Form.Item name="auditObjectCategoryId" label={t("riskScoring.columns.auditObjectCategory")}>
+            <Select allowClear showSearch optionFilterProp="label" options={auditObjectCategoryOptions} />
           </Form.Item>
           <Form.Item name="establishedDate" label={t("riskScoring.columns.establishedDate")}>
             <DatePicker style={{ width: "100%" }} />
