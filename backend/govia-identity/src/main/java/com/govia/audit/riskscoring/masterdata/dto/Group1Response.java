@@ -6,7 +6,10 @@ import java.util.UUID;
 
 public record Group1Response(
         UUID id,
-        String objectType,
+        String auditObjectType,
+        UUID auditObjectId,
+        String auditObjectCode,
+        String auditObjectName,
         String code,
         String name,
         BigDecimal weight,

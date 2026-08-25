@@ -1,0 +1,172 @@
+databaseChangeLog:
+
+  # ===================== Bo sung 4 danh muc "Doi tuong kiem toan" vao sub-module Master Data CDRR =====================
+  # Sheet ZTC_DTKT1-4 (file "Chấm điểm - master data (1).xlsx") - dung chung quyen AUDIT.RISK_SCORING.*
+  # da co (013-016), khong tao permission moi vi day la danh muc them vao sub-module da co san.
+
+  - changeSet:
+      id: 019-1-risk-score-audit-object-unit
+      author: govia
+      comment: "Sheet ZTC_DTKT1 - Doi tuong kiem toan HO, Giam sat CC, Chi nhanh (bang ZTB_DTKT10)"
+      changes:
+        - createTable:
+            tableName: risk_score_audit_object_unit
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: unit_type, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: established_date, type: DATE }
+              - column: { name: restructure_date, type: DATE }
+              - column: { name: restructure_note, type: VARCHAR(255) }
+              - column: { name: total_staff, type: INT }
+              - column: { name: leader_count, type: INT }
+              - column: { name: staff_count, type: INT }
+              - column: { name: rank_value, type: INT }
+              - column: { name: defense_line_group_id, type: UUID }
+              - column: { name: operating_regulation, type: VARCHAR(500) }
+              - column: { name: main_function, type: VARCHAR(500) }
+              - column: { name: key_findings, type: VARCHAR(500) }
+              - column: { name: info_updated_date, type: DATE }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_audit_object_unit
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_ao_unit_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_audit_object_unit
+            baseColumnNames: defense_line_group_id
+            referencedTableName: risk_score_group_ho
+            referencedColumnNames: id
+            constraintName: fk_risk_score_ao_unit_defense_line_group
+        - addUniqueConstraint:
+            tableName: risk_score_audit_object_unit
+            columnNames: tenant_id, code
+            constraintName: uk_risk_score_ao_unit_tenant_code
+
+  - changeSet:
+      id: 019-2-risk-score-audit-object-subsidiary
+      author: govia
+      comment: "Sheet ZTC_DTKT2 - Doi tuong kiem toan Cong ty con"
+      changes:
+        - createTable:
+            tableName: risk_score_audit_object_subsidiary
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: company_type, type: VARCHAR(100) }
+              - column: { name: established_date, type: DATE }
+              - column: { name: staff_count, type: INT }
+              - column: { name: leader_count, type: INT }
+              - column: { name: inspection_year, type: INT }
+              - column: { name: inspection_result, type: VARCHAR(1000) }
+              - column: { name: inspection_recommendation, type: VARCHAR(1000) }
+              - column: { name: audit_year, type: INT }
+              - column: { name: audit_result, type: VARCHAR(1000) }
+              - column: { name: audit_recommendation, type: VARCHAR(1000) }
+              - column: { name: revenue, type: "NUMERIC(20,2)" }
+              - column: { name: cost, type: "NUMERIC(20,2)" }
+              - column: { name: profit, type: "NUMERIC(20,2)" }
+              - column: { name: salary_fund, type: "NUMERIC(20,2)" }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_audit_object_subsidiary
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_ao_sub_tenant
+        - addUniqueConstraint:
+            tableName: risk_score_audit_object_subsidiary
+            columnNames: tenant_id, code
+            constraintName: uk_risk_score_ao_sub_tenant_code
+
+  - changeSet:
+      id: 019-3-risk-score-audit-object-project
+      author: govia
+      comment: "Sheet ZTC_DTKT3 - Doi tuong kiem toan Du an/Dich vu thue ngoai"
+      changes:
+        - createTable:
+            tableName: risk_score_audit_object_project
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: project_type, type: VARCHAR(50) }
+              - column: { name: approval_authority, type: VARCHAR(100) }
+              - column: { name: purpose, type: VARCHAR(255) }
+              - column: { name: investment_value, type: "NUMERIC(20,2)" }
+              - column: { name: provider, type: VARCHAR(255) }
+              - column: { name: related_parties, type: VARCHAR(255) }
+              - column: { name: inspection_year, type: INT }
+              - column: { name: inspection_result, type: VARCHAR(1000) }
+              - column: { name: inspection_recommendation, type: VARCHAR(1000) }
+              - column: { name: audit_year, type: INT }
+              - column: { name: audit_result, type: VARCHAR(1000) }
+              - column: { name: audit_recommendation, type: VARCHAR(1000) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_audit_object_project
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_ao_proj_tenant
+        - addUniqueConstraint:
+            tableName: risk_score_audit_object_project
+            columnNames: tenant_id, code
+            constraintName: uk_risk_score_ao_proj_tenant_code
+
+  - changeSet:
+      id: 019-4-risk-score-audit-object-process
+      author: govia
+      comment: "Sheet ZTC_DTKT4 - Doi tuong kiem toan Quy trinh"
+      changes:
+        - createTable:
+            tableName: risk_score_audit_object_process
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: segment_code, type: VARCHAR(20) }
+              - column: { name: code, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(500), constraints: { nullable: false } }
+              - column: { name: reference_document, type: VARCHAR(2000) }
+              - column: { name: audit_result, type: VARCHAR(2000) }
+              - column: { name: event_note, type: VARCHAR(2000) }
+              - column: { name: incident_note, type: VARCHAR(2000) }
+              - column: { name: review_result, type: VARCHAR(1000) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_audit_object_process
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_ao_proc_tenant
+        - addUniqueConstraint:
+            tableName: risk_score_audit_object_process
+            columnNames: tenant_id, code
+            constraintName: uk_risk_score_ao_proc_tenant_code

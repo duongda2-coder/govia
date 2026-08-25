@@ -7,17 +7,16 @@ import {
   criteriaQuantitativeApi,
   group1Api,
   group2Api,
-  OBJECT_TYPE_OPTIONS,
   type CriteriaQuantitativeItem,
   type CriteriaQuantitativeRequest,
   type Group1Item,
   type Group2Item,
-  type ObjectType,
 } from "../../../api/riskScoring";
 import { useAuth } from "../../../auth/AuthContext";
+import { auditObjectRefValue, parseAuditObjectRefValue, useAuditObjectOptions } from "./useAuditObjectOptions";
 
 interface FormValues {
-  objectType: ObjectType;
+  auditObjectRef: string;
   group1Id: string;
   group2Id?: string;
   code: string;
@@ -48,6 +47,7 @@ export function CriteriaQuantitativeTable() {
   const canImport = hasPermission("AUDIT.RISK_SCORING.IMPORT");
   const { getSearchColumnProps } = useClientSearchColumn<CriteriaQuantitativeItem>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
+  const { groups: auditObjectGroups } = useAuditObjectOptions();
 
   const [items, setItems] = useState<CriteriaQuantitativeItem[]>([]);
   const [group1Options, setGroup1Options] = useState<Group1Item[]>([]);
@@ -58,7 +58,14 @@ export function CriteriaQuantitativeTable() {
   const [editing, setEditing] = useState<CriteriaQuantitativeItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm<FormValues>();
+  const auditObjectRefWatch = Form.useWatch("auditObjectRef", form);
   const group1IdWatch = Form.useWatch("group1Id", form);
+  const group1OptionsForAuditObject = auditObjectRefWatch
+    ? group1Options.filter((g) => {
+        const { type, id } = parseAuditObjectRefValue(auditObjectRefWatch);
+        return g.auditObjectType === type && g.auditObjectId === id;
+      })
+    : [];
   const group2OptionsForGroup1 = group2Options.filter((g) => g.group1Id === group1IdWatch);
 
   const load = useCallback(async () => {
@@ -95,7 +102,7 @@ export function CriteriaQuantitativeTable() {
     if (!target) return;
     setEditing(target);
     form.setFieldsValue({
-      objectType: target.objectType,
+      auditObjectRef: auditObjectRefValue(target.auditObjectType, target.auditObjectId),
       group1Id: target.group1Id,
       group2Id: target.group2Id ?? undefined,
       code: target.code,
@@ -124,8 +131,10 @@ export function CriteriaQuantitativeTable() {
     }
     setSubmitting(true);
     try {
+      const { type: auditObjectType, id: auditObjectId } = parseAuditObjectRefValue(values.auditObjectRef);
       const request: CriteriaQuantitativeRequest = {
-        objectType: values.objectType,
+        auditObjectType,
+        auditObjectId,
         group1Id: values.group1Id,
         group2Id: values.group2Id ?? null,
         code: values.code,
@@ -181,7 +190,11 @@ export function CriteriaQuantitativeTable() {
   };
 
   const columns: TableProps<CriteriaQuantitativeItem>["columns"] = [
-    { title: t("riskScoring.columns.objectType"), dataIndex: "objectType", width: 140 },
+    {
+      title: t("riskScoring.columns.auditObject"),
+      width: 200,
+      render: (_: unknown, record: CriteriaQuantitativeItem) => (record.auditObjectCode ? `${record.auditObjectCode} - ${record.auditObjectName}` : "-"),
+    },
     { title: t("riskScoring.columns.group1"), dataIndex: "group1Code", width: 100, render: (v: string | null) => v ?? "-" },
     { title: t("riskScoring.columns.group2"), dataIndex: "group2Code", width: 100, render: (v: string | null) => v ?? "-" },
     { title: t("riskScoring.columns.code"), width: 110, ...getSearchColumnProps("code", searchLabels) },
@@ -246,12 +259,28 @@ export function CriteriaQuantitativeTable() {
         width={720}
       >
         <Form<FormValues> form={form} layout="vertical">
-          <Form.Item name="objectType" label={t("riskScoring.columns.objectType")} rules={[{ required: true }]}>
-            <Select options={OBJECT_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))} />
+          <Form.Item name="auditObjectRef" label={t("riskScoring.columns.auditObject")} rules={[{ required: true }]}>
+            <Select
+              options={auditObjectGroups}
+              showSearch
+              optionFilterProp="label"
+              onChange={(value) => {
+                const currentGroup1 = form.getFieldValue("group1Id") as string | undefined;
+                if (!currentGroup1) return;
+                const { type, id } = parseAuditObjectRefValue(value);
+                const stillValid = group1Options.some((g) => g.id === currentGroup1 && g.auditObjectType === type && g.auditObjectId === id);
+                if (!stillValid) {
+                  form.setFieldValue("group1Id", undefined);
+                  form.setFieldValue("group2Id", undefined);
+                }
+              }}
+            />
           </Form.Item>
           <Form.Item name="group1Id" label={t("riskScoring.columns.group1")} rules={[{ required: true }]}>
             <Select
-              options={group1Options.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
+              disabled={!auditObjectRefWatch}
+              placeholder={!auditObjectRefWatch ? t("riskScoring.form.selectAuditObjectFirst") : undefined}
+              options={group1OptionsForAuditObject.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
               showSearch
               optionFilterProp="label"
               onChange={(value) => {

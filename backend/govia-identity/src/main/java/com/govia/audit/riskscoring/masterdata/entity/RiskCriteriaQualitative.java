@@ -20,8 +20,11 @@ import java.util.UUID;
 public class RiskCriteriaQualitative extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "object_type", nullable = false, length = 10)
-    private ObjectType objectType;
+    @Column(name = "audit_object_type", nullable = false, length = 20)
+    private AuditObjectType auditObjectType;
+
+    @Column(name = "audit_object_id", nullable = false, columnDefinition = "uuid")
+    private UUID auditObjectId;
 
     @Column(name = "group1_id", nullable = false, columnDefinition = "uuid")
     private UUID group1Id;

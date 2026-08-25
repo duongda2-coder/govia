@@ -18,6 +18,8 @@ import { RiskScoringCriteriaPage } from "./pages/Audit/RiskScoring/RiskScoringCr
 import { RiskScoringWeightPage } from "./pages/Audit/RiskScoring/RiskScoringWeightPage";
 import { RiskScoringCoefficientMatrixPage } from "./pages/Audit/RiskScoring/RiskScoringCoefficientMatrixPage";
 import { RiskScoringUserAssignmentPage } from "./pages/Audit/RiskScoring/RiskScoringUserAssignmentPage";
+import { RiskScoringAuditObjectsPage } from "./pages/Audit/RiskScoring/RiskScoringAuditObjectsPage";
+import { RiskScoringExecPage } from "./pages/Audit/RiskScoringExec/RiskScoringExecPage";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -58,7 +60,9 @@ function App() {
         <Route path="audit/risk-scoring/master-data/weight" element={<RiskScoringWeightPage />} />
         <Route path="audit/risk-scoring/master-data/coefficient-matrix" element={<RiskScoringCoefficientMatrixPage />} />
         <Route path="audit/risk-scoring/master-data/user-assignment" element={<RiskScoringUserAssignmentPage />} />
-        {/* Sub-module "Cham diem" (thuc hien cham diem) se them route vao day khi co man hinh, song song voi "master-data". */}
+        <Route path="audit/risk-scoring/master-data/audit-objects" element={<RiskScoringAuditObjectsPage />} />
+        <Route path="audit/risk-scoring/scoring" element={<RiskScoringExecPage />} />
+        {/* Cac sheet tiep theo cua "2. Cham diem.xlsx" se them tab moi vao RiskScoringExecPage, khong can them route moi. */}
       </Route>
     </Routes>
   );

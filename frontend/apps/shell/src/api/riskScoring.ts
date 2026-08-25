@@ -1,19 +1,26 @@
 import type { ApiResponse, ImportResult } from "@govia/ui-kit";
 import { httpClient } from "./client";
 
-export type ObjectType = "CNDT" | "CNDL" | "HO" | "CNTT" | "DA";
+/**
+ * Loai bang cua "Doi tuong kiem toan" ma Group1/CriteriaQualitative/CriteriaQuantitative tham chieu
+ * toi - thay the enum "Loai doi tuong" cu (CNDT/CNDL/HO/CNTT/DA fix cung) bang tham chieu that toi
+ * 1 ban ghi cu the trong 4 danh muc ZTC_DTKT1-4 (xem AuditObjectUnit/Subsidiary/Project/ProcessItem).
+ */
+export type AuditObjectRefType = "UNIT" | "SUBSIDIARY" | "PROJECT" | "PROCESS";
 
-export const OBJECT_TYPE_OPTIONS: { value: ObjectType; label: string }[] = [
-  { value: "CNDT", label: "Chi nhánh - Định tính" },
-  { value: "CNDL", label: "Chi nhánh - Định lượng" },
-  { value: "HO", label: "Hội sở" },
-  { value: "CNTT", label: "Công nghệ thông tin" },
-  { value: "DA", label: "Dự án" },
-];
+export const AUDIT_OBJECT_REF_TYPE_LABELS: Record<AuditObjectRefType, string> = {
+  UNIT: "Đơn vị",
+  SUBSIDIARY: "Công ty con",
+  PROJECT: "Dự án/DVTN",
+  PROCESS: "Quy trình",
+};
 
 export interface Group1Item {
   id: string;
-  objectType: ObjectType;
+  auditObjectType: AuditObjectRefType;
+  auditObjectId: string;
+  auditObjectCode: string | null;
+  auditObjectName: string | null;
   code: string;
   name: string;
   weight: number | null;
@@ -22,7 +29,8 @@ export interface Group1Item {
   active: boolean;
 }
 export interface Group1Request {
-  objectType: ObjectType;
+  auditObjectType: AuditObjectRefType;
+  auditObjectId: string;
   code: string;
   name: string;
   weight?: number | null;
@@ -54,7 +62,10 @@ export interface Group2Request {
 
 export interface CriteriaQualitativeItem {
   id: string;
-  objectType: ObjectType;
+  auditObjectType: AuditObjectRefType;
+  auditObjectId: string;
+  auditObjectCode: string | null;
+  auditObjectName: string | null;
   group1Id: string;
   group1Code: string | null;
   group2Id: string | null;
@@ -68,7 +79,8 @@ export interface CriteriaQualitativeItem {
   active: boolean;
 }
 export interface CriteriaQualitativeRequest {
-  objectType: ObjectType;
+  auditObjectType: AuditObjectRefType;
+  auditObjectId: string;
   group1Id: string;
   group2Id?: string | null;
   code: string;
@@ -82,7 +94,10 @@ export interface CriteriaQualitativeRequest {
 
 export interface CriteriaQuantitativeItem {
   id: string;
-  objectType: ObjectType;
+  auditObjectType: AuditObjectRefType;
+  auditObjectId: string;
+  auditObjectCode: string | null;
+  auditObjectName: string | null;
   group1Id: string;
   group1Code: string | null;
   group2Id: string | null;
@@ -102,7 +117,8 @@ export interface CriteriaQuantitativeItem {
   active: boolean;
 }
 export interface CriteriaQuantitativeRequest {
-  objectType: ObjectType;
+  auditObjectType: AuditObjectRefType;
+  auditObjectId: string;
   group1Id: string;
   group2Id?: string | null;
   code: string;
@@ -235,6 +251,152 @@ export interface ScoreRankRequest {
   active: boolean;
 }
 
+export type AuditUnitType = "HO" | "GSCC" | "CN";
+
+export const AUDIT_UNIT_TYPE_OPTIONS: { value: AuditUnitType; label: string }[] = [
+  { value: "HO", label: "Hội sở" },
+  { value: "GSCC", label: "Giám sát chi nhánh" },
+  { value: "CN", label: "Chi nhánh" },
+];
+
+export interface AuditObjectUnitItem {
+  id: string;
+  code: string;
+  name: string;
+  unitType: AuditUnitType;
+  establishedDate: string | null;
+  restructureDate: string | null;
+  restructureNote: string | null;
+  totalStaff: number | null;
+  leaderCount: number | null;
+  staffCount: number | null;
+  rankValue: number | null;
+  defenseLineGroupId: string | null;
+  defenseLineGroupCode: string | null;
+  operatingRegulation: string | null;
+  mainFunction: string | null;
+  keyFindings: string | null;
+  infoUpdatedDate: string | null;
+  active: boolean;
+}
+export interface AuditObjectUnitRequest {
+  code: string;
+  name: string;
+  unitType: AuditUnitType;
+  establishedDate?: string | null;
+  restructureDate?: string | null;
+  restructureNote?: string | null;
+  totalStaff?: number | null;
+  leaderCount?: number | null;
+  staffCount?: number | null;
+  rankValue?: number | null;
+  defenseLineGroupId?: string | null;
+  operatingRegulation?: string | null;
+  mainFunction?: string | null;
+  keyFindings?: string | null;
+  active: boolean;
+}
+
+export interface AuditObjectSubsidiaryItem {
+  id: string;
+  code: string;
+  name: string;
+  companyType: string | null;
+  establishedDate: string | null;
+  staffCount: number | null;
+  leaderCount: number | null;
+  inspectionYear: number | null;
+  inspectionResult: string | null;
+  inspectionRecommendation: string | null;
+  auditYear: number | null;
+  auditResult: string | null;
+  auditRecommendation: string | null;
+  revenue: number | null;
+  cost: number | null;
+  profit: number | null;
+  salaryFund: number | null;
+  active: boolean;
+}
+export interface AuditObjectSubsidiaryRequest {
+  code: string;
+  name: string;
+  companyType?: string | null;
+  establishedDate?: string | null;
+  staffCount?: number | null;
+  leaderCount?: number | null;
+  inspectionYear?: number | null;
+  inspectionResult?: string | null;
+  inspectionRecommendation?: string | null;
+  auditYear?: number | null;
+  auditResult?: string | null;
+  auditRecommendation?: string | null;
+  revenue?: number | null;
+  cost?: number | null;
+  profit?: number | null;
+  salaryFund?: number | null;
+  active: boolean;
+}
+
+export interface AuditObjectProjectItem {
+  id: string;
+  code: string;
+  name: string;
+  projectType: string | null;
+  approvalAuthority: string | null;
+  purpose: string | null;
+  investmentValue: number | null;
+  provider: string | null;
+  relatedParties: string | null;
+  inspectionYear: number | null;
+  inspectionResult: string | null;
+  inspectionRecommendation: string | null;
+  auditYear: number | null;
+  auditResult: string | null;
+  auditRecommendation: string | null;
+  active: boolean;
+}
+export interface AuditObjectProjectRequest {
+  code: string;
+  name: string;
+  projectType?: string | null;
+  approvalAuthority?: string | null;
+  purpose?: string | null;
+  investmentValue?: number | null;
+  provider?: string | null;
+  relatedParties?: string | null;
+  inspectionYear?: number | null;
+  inspectionResult?: string | null;
+  inspectionRecommendation?: string | null;
+  auditYear?: number | null;
+  auditResult?: string | null;
+  auditRecommendation?: string | null;
+  active: boolean;
+}
+
+export interface AuditObjectProcessItem {
+  id: string;
+  segmentCode: string | null;
+  code: string;
+  name: string;
+  referenceDocument: string | null;
+  auditResult: string | null;
+  eventNote: string | null;
+  incidentNote: string | null;
+  reviewResult: string | null;
+  active: boolean;
+}
+export interface AuditObjectProcessRequest {
+  segmentCode?: string | null;
+  code: string;
+  name: string;
+  referenceDocument?: string | null;
+  auditResult?: string | null;
+  eventNote?: string | null;
+  incidentNote?: string | null;
+  reviewResult?: string | null;
+  active: boolean;
+}
+
 /**
  * Factory dung chung cho ca 10 danh muc cua module Cham diem rui ro - moi danh muc co hinh dang
  * du lieu rieng (xem cac interface o tren) nhung deu dung chung 1 bo endpoint CRUD + export/import,
@@ -299,3 +461,14 @@ export const userAssignmentApi = createResourceApi<UserAssignmentItem, UserAssig
   `${BASE}/user-assignment`, "risk_score_user_assignment");
 export const matrixApi = createResourceApi<MatrixItem, MatrixRequest>(`${BASE}/matrix`, "risk_score_matrix");
 export const rankApi = createResourceApi<ScoreRankItem, ScoreRankRequest>(`${BASE}/rank`, "risk_score_rank");
+
+// 4 danh muc "Doi tuong kiem toan" (sheet ZTC_DTKT1-4, file "Cham diem - master data (1).xlsx") -
+// them vao sub-module Master Data CDRR da co san, dung chung permission AUDIT.RISK_SCORING.*
+export const auditObjectUnitApi = createResourceApi<AuditObjectUnitItem, AuditObjectUnitRequest>(
+  `${BASE}/audit-object-unit`, "risk_score_audit_object_unit");
+export const auditObjectSubsidiaryApi = createResourceApi<AuditObjectSubsidiaryItem, AuditObjectSubsidiaryRequest>(
+  `${BASE}/audit-object-subsidiary`, "risk_score_audit_object_subsidiary");
+export const auditObjectProjectApi = createResourceApi<AuditObjectProjectItem, AuditObjectProjectRequest>(
+  `${BASE}/audit-object-project`, "risk_score_audit_object_project");
+export const auditObjectProcessApi = createResourceApi<AuditObjectProcessItem, AuditObjectProcessRequest>(
+  `${BASE}/audit-object-process`, "risk_score_audit_object_process");

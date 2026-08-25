@@ -37,7 +37,9 @@ const MENU_ROUTES: Record<string, string> = {
   "audit-rs-criteria": "/audit/risk-scoring/master-data/criteria",
   "audit-rs-weight": "/audit/risk-scoring/master-data/weight",
   "audit-rs-coefficient-matrix": "/audit/risk-scoring/master-data/coefficient-matrix",
+  "audit-rs-audit-objects": "/audit/risk-scoring/master-data/audit-objects",
   "audit-rs-user-assignment": "/audit/risk-scoring/master-data/user-assignment",
+  "audit-rse-scoring": "/audit/risk-scoring/scoring",
 };
 
 /** Gan title HTML len nhan menu de trinh duyet tu hien tooltip khi chu bi cat ngan (...) do sider hep. */
@@ -136,6 +138,7 @@ export function AppLayout() {
 
   const canViewAuditMasterData = hasPermission("AUDIT.MASTER_DATA.VIEW");
   const canViewRiskScoring = hasPermission("AUDIT.RISK_SCORING.VIEW");
+  const canViewRiskScoringExec = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
 
   const auditChildren = dropNulls([
     canViewAuditMasterData && {
@@ -151,11 +154,11 @@ export function AppLayout() {
         { key: "audit-md-general", label: menuLabel(t("menu.auditMdGeneral")) },
       ],
     },
-    canViewRiskScoring && {
+    (canViewRiskScoring || canViewRiskScoringExec) && {
       key: "audit-risk-scoring",
       label: menuLabel(t("menu.riskScoring")),
-      children: [
-        {
+      children: dropNulls([
+        canViewRiskScoring && {
           key: "audit-rs-master-data",
           label: menuLabel(t("menu.riskScoringMasterData")),
           children: [
@@ -164,11 +167,11 @@ export function AppLayout() {
             { key: "audit-rs-weight", label: menuLabel(t("menu.riskScoringWeight")) },
             { key: "audit-rs-coefficient-matrix", label: menuLabel(t("menu.riskScoringCoefficientMatrix")) },
             { key: "audit-rs-user-assignment", label: menuLabel(t("menu.riskScoringUserAssignment")) },
+            { key: "audit-rs-audit-objects", label: menuLabel(t("menu.riskScoringAuditObjects")) },
           ],
         },
-        // Sub-module "Cham diem" (thuc hien cham diem, dung du lieu tu "audit-rs-master-data")
-        // se them vao day khi co man hinh, cung cap voi "audit-rs-master-data".
-      ],
+        canViewRiskScoringExec && { key: "audit-rse-scoring", label: menuLabel(t("menu.riskScoringExec")) },
+      ]),
     },
     // Ke hoach (Audit Plan/Universe) va Thuc hien (Work Program/Finding...) se them vao day
     // khi tung phan thuc su co man hinh, cung cap voi "audit-master-data".

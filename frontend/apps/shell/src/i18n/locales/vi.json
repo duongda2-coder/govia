@@ -31,7 +31,9 @@
     "riskScoringCriteria": "Chỉ tiêu chấm điểm",
     "riskScoringWeight": "Tỷ trọng ĐT/ĐL",
     "riskScoringCoefficientMatrix": "Hệ số & Ma trận điểm",
-    "riskScoringUserAssignment": "Phân quyền chỉ tiêu"
+    "riskScoringUserAssignment": "Phân quyền chỉ tiêu",
+    "riskScoringAuditObjects": "Đối tượng kiểm toán",
+    "riskScoringExec": "Chấm Điểm"
   },
   "header": {
     "logout": "Đăng xuất"
@@ -478,10 +480,14 @@
       "weightBySegment": "Theo mảng nghiệp vụ",
       "frequencyCoefficient": "Hệ số tần suất",
       "matrix": "Ma trận rủi ro",
-      "rank": "Thang điểm xếp loại"
+      "rank": "Thang điểm xếp loại",
+      "auditObjectUnit": "Đơn vị (HO/GSCC/CN)",
+      "auditObjectSubsidiary": "Công ty con",
+      "auditObjectProject": "Dự án/DVTN",
+      "auditObjectProcess": "Quy trình"
     },
     "columns": {
-      "objectType": "Loại đối tượng",
+      "auditObject": "Đối tượng kiểm toán",
       "code": "Mã",
       "name": "Tên",
       "weight": "Trọng số",
@@ -524,7 +530,42 @@
       "scoreHigh": "Điểm - RR cao",
       "scoreFrom": "Giá trị bắt đầu",
       "scoreTo": "Giá trị kết thúc",
-      "rankLabel": "Xếp loại"
+      "rankLabel": "Xếp loại",
+      "unitType": "Loại đơn vị",
+      "establishedDate": "Ngày thành lập",
+      "restructureDate": "Ngày tái cơ cấu",
+      "restructureNote": "Ghi chú tái cơ cấu",
+      "totalStaff": "Tổng số CBNV",
+      "leaderCount": "Số lãnh đạo",
+      "staffCount": "Số nhân viên",
+      "rankValue": "Xếp hạng",
+      "defenseLineGroup": "Thuộc tuyến bảo vệ",
+      "operatingRegulation": "Quy chế hoạt động",
+      "mainFunction": "Chức năng chính",
+      "keyFindings": "Phát hiện trọng yếu",
+      "infoUpdatedDate": "Ngày cập nhật thông tin",
+      "companyType": "Loại hình công ty",
+      "inspectionYear": "Năm kiểm tra",
+      "inspectionResult": "Kết quả kiểm tra",
+      "inspectionRecommendation": "Kiến nghị kiểm tra",
+      "auditYear": "Năm kiểm toán",
+      "auditResult": "Kết quả kiểm toán",
+      "auditRecommendation": "Kiến nghị kiểm toán",
+      "revenue": "Doanh thu",
+      "cost": "Chi phí",
+      "profit": "Lợi nhuận",
+      "salaryFund": "Quỹ lương",
+      "projectType": "Loại dự án",
+      "approvalAuthority": "Cấp phê duyệt",
+      "purpose": "Mục đích",
+      "investmentValue": "Giá trị đầu tư",
+      "provider": "Nhà cung cấp",
+      "relatedParties": "Các bên liên quan",
+      "segmentCodeProcess": "Mã mảng nghiệp vụ",
+      "referenceDocument": "Văn bản tham chiếu",
+      "eventNote": "Ghi nhận sự kiện",
+      "incidentNote": "Ghi nhận sự cố",
+      "reviewResult": "Kết quả rà soát"
     },
     "criteriaTypeOptions": {
       "1": "Loại 1",
@@ -534,7 +575,8 @@
     "form": {
       "createTitle": "Thêm mới",
       "editTitle": "Sửa",
-      "selectGroup1First": "Chọn Nhóm cấp 1 trước"
+      "selectGroup1First": "Chọn Nhóm cấp 1 trước",
+      "selectAuditObjectFirst": "Chọn Đối tượng kiểm toán trước"
     },
     "deleteConfirmTitle": "Xóa mục này?",
     "messages": {
@@ -546,6 +588,30 @@
       "saveError": "Lưu thất bại",
       "weightSumInvalid": "Tổng Tỷ trọng ĐT + ĐL phải bằng 100%",
       "weightSumHint": "Tổng hiện tại: {{percent}}%"
+    }
+  },
+  "riskScoringExec": {
+    "tabs": {
+      "groupHO": "Nhóm rủi ro HO"
+    },
+    "columns": {
+      "code": "Mã nhóm",
+      "name": "Tên nhóm",
+      "note": "Ghi chú"
+    },
+    "form": {
+      "createTitle": "Thêm mới",
+      "editTitle": "Sửa",
+      "codeMaxLength": "Mã nhóm tối đa 2 ký tự"
+    },
+    "deleteConfirmTitle": "Xóa mục này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
     }
   }
 }

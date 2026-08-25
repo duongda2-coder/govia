@@ -1,0 +1,35 @@
+databaseChangeLog:
+
+  # ===================== Sub-module "Cham Diem" ben trong module Cham diem rui ro =====================
+  # Song song voi sub-module "Master Data CDRR" (xem 015/016) - xu ly cac man hinh nghiep vu trong file
+  # dac ta "2. Cham diem.xlsx" (Downloads), xay dung tung sheet mot.
+
+  - changeSet:
+      id: 017-1-risk-score-group-ho
+      author: govia
+      comment: "Sheet ZTC_Nhom_DGRR_HO - danh muc phan nhom rui ro cua HO theo tuyen bao ve"
+      changes:
+        - createTable:
+            tableName: risk_score_group_ho
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: note, type: VARCHAR(255) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_group_ho
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_group_ho_tenant
+        - addUniqueConstraint:
+            tableName: risk_score_group_ho
+            columnNames: tenant_id, code
+            constraintName: uk_risk_score_group_ho_tenant_code

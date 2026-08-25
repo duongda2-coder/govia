@@ -1,0 +1,58 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Sub-module "Cham Diem" =====================
+  # Tach rieng khoi AUDIT.RISK_SCORING.* (Master Data CDRR) vi day la 2 sub-module co the phan quyen
+  # doc lap (nguoi nhap diem khac nguoi quan tri danh muc) - theo dung mau 6 quyen VIEW/CREATE/EDIT/
+  # DELETE/EXPORT/IMPORT da chuan hoa cho toan bo cac resource khac trong he thong.
+  - changeSet:
+      id: 018-1-permission-catalog-risk-scoring-exec
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a5000000-0000-0000-0000-000000000001" }
+              - column: { name: code, value: "AUDIT.RISK_SCORING_EXEC.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem du lieu Cham diem rui ro" }
+              - column: { name: resource_label, value: "Chấm Điểm" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a5000000-0000-0000-0000-000000000002" }
+              - column: { name: code, value: "AUDIT.RISK_SCORING_EXEC.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi du lieu Cham diem rui ro" }
+              - column: { name: resource_label, value: "Chấm Điểm" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a5000000-0000-0000-0000-000000000003" }
+              - column: { name: code, value: "AUDIT.RISK_SCORING_EXEC.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua du lieu Cham diem rui ro" }
+              - column: { name: resource_label, value: "Chấm Điểm" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a5000000-0000-0000-0000-000000000004" }
+              - column: { name: code, value: "AUDIT.RISK_SCORING_EXEC.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa du lieu Cham diem rui ro" }
+              - column: { name: resource_label, value: "Chấm Điểm" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a5000000-0000-0000-0000-000000000005" }
+              - column: { name: code, value: "AUDIT.RISK_SCORING_EXEC.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu Cham diem rui ro" }
+              - column: { name: resource_label, value: "Chấm Điểm" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a5000000-0000-0000-0000-000000000006" }
+              - column: { name: code, value: "AUDIT.RISK_SCORING_EXEC.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu Cham diem rui ro" }
+              - column: { name: resource_label, value: "Chấm Điểm" }

@@ -5,7 +5,10 @@ import java.util.UUID;
 
 public record CriteriaQuantitativeResponse(
         UUID id,
-        String objectType,
+        String auditObjectType,
+        UUID auditObjectId,
+        String auditObjectCode,
+        String auditObjectName,
         UUID group1Id,
         String group1Code,
         UUID group2Id,

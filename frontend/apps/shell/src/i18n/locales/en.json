@@ -31,7 +31,9 @@
     "riskScoringCriteria": "Scoring Criteria",
     "riskScoringWeight": "Qualitative/Quantitative Weight",
     "riskScoringCoefficientMatrix": "Coefficients & Score Matrix",
-    "riskScoringUserAssignment": "Criteria User Assignment"
+    "riskScoringUserAssignment": "Criteria User Assignment",
+    "riskScoringAuditObjects": "Audit Objects",
+    "riskScoringExec": "Scoring"
   },
   "header": {
     "logout": "Log out"
@@ -478,10 +480,14 @@
       "weightBySegment": "By Business Segment",
       "frequencyCoefficient": "Frequency Coefficient",
       "matrix": "Risk Matrix",
-      "rank": "Score Rank"
+      "rank": "Score Rank",
+      "auditObjectUnit": "Unit (HO/Branch Supervision/Branch)",
+      "auditObjectSubsidiary": "Subsidiary",
+      "auditObjectProject": "Project/Outsourced Service",
+      "auditObjectProcess": "Process"
     },
     "columns": {
-      "objectType": "Object Type",
+      "auditObject": "Audit Object",
       "code": "Code",
       "name": "Name",
       "weight": "Weight",
@@ -524,7 +530,42 @@
       "scoreHigh": "Score - High Risk",
       "scoreFrom": "Score From",
       "scoreTo": "Score To",
-      "rankLabel": "Rank"
+      "rankLabel": "Rank",
+      "unitType": "Unit Type",
+      "establishedDate": "Established Date",
+      "restructureDate": "Restructure Date",
+      "restructureNote": "Restructure Note",
+      "totalStaff": "Total Staff",
+      "leaderCount": "Leader Count",
+      "staffCount": "Staff Count",
+      "rankValue": "Rank",
+      "defenseLineGroup": "Defense Line Group",
+      "operatingRegulation": "Operating Regulation",
+      "mainFunction": "Main Function",
+      "keyFindings": "Key Findings",
+      "infoUpdatedDate": "Info Updated Date",
+      "companyType": "Company Type",
+      "inspectionYear": "Inspection Year",
+      "inspectionResult": "Inspection Result",
+      "inspectionRecommendation": "Inspection Recommendation",
+      "auditYear": "Audit Year",
+      "auditResult": "Audit Result",
+      "auditRecommendation": "Audit Recommendation",
+      "revenue": "Revenue",
+      "cost": "Cost",
+      "profit": "Profit",
+      "salaryFund": "Salary Fund",
+      "projectType": "Project Type",
+      "approvalAuthority": "Approval Authority",
+      "purpose": "Purpose",
+      "investmentValue": "Investment Value",
+      "provider": "Provider",
+      "relatedParties": "Related Parties",
+      "segmentCodeProcess": "Business Segment Code",
+      "referenceDocument": "Reference Document",
+      "eventNote": "Event Note",
+      "incidentNote": "Incident Note",
+      "reviewResult": "Review Result"
     },
     "criteriaTypeOptions": {
       "1": "Type 1",
@@ -534,7 +575,8 @@
     "form": {
       "createTitle": "Add",
       "editTitle": "Edit",
-      "selectGroup1First": "Select Level-1 Group first"
+      "selectGroup1First": "Select Level-1 Group first",
+      "selectAuditObjectFirst": "Select Audit Object first"
     },
     "deleteConfirmTitle": "Delete this item?",
     "messages": {
@@ -546,6 +588,30 @@
       "saveError": "Failed to save",
       "weightSumInvalid": "Qualitative + Quantitative weight must add up to 100%",
       "weightSumHint": "Current total: {{percent}}%"
+    }
+  },
+  "riskScoringExec": {
+    "tabs": {
+      "groupHO": "HO Risk Group"
+    },
+    "columns": {
+      "code": "Group Code",
+      "name": "Group Name",
+      "note": "Note"
+    },
+    "form": {
+      "createTitle": "Add",
+      "editTitle": "Edit",
+      "codeMaxLength": "Group code is at most 2 characters"
+    },
+    "deleteConfirmTitle": "Delete this item?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
     }
   }
 }

@@ -6,15 +6,14 @@ import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
 import {
   group1Api,
-  OBJECT_TYPE_OPTIONS,
   type Group1Item,
   type Group1Request,
-  type ObjectType,
 } from "../../../api/riskScoring";
 import { useAuth } from "../../../auth/AuthContext";
+import { auditObjectRefValue, parseAuditObjectRefValue, useAuditObjectOptions } from "./useAuditObjectOptions";
 
 interface FormValues {
-  objectType: ObjectType;
+  auditObjectRef: string;
   code: string;
   name: string;
   weight?: number;
@@ -36,6 +35,7 @@ export function Group1Table() {
   const canImport = hasPermission("AUDIT.RISK_SCORING.IMPORT");
   const { getSearchColumnProps } = useClientSearchColumn<Group1Item>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
+  const { groups: auditObjectGroups } = useAuditObjectOptions();
 
   const [items, setItems] = useState<Group1Item[]>([]);
   const [loading, setLoading] = useState(false);
@@ -72,7 +72,7 @@ export function Group1Table() {
     if (!target) return;
     setEditing(target);
     form.setFieldsValue({
-      objectType: target.objectType,
+      auditObjectRef: auditObjectRefValue(target.auditObjectType, target.auditObjectId),
       code: target.code,
       name: target.name,
       weight: target.weight ?? undefined,
@@ -92,8 +92,10 @@ export function Group1Table() {
     }
     setSubmitting(true);
     try {
+      const { type: auditObjectType, id: auditObjectId } = parseAuditObjectRefValue(values.auditObjectRef);
       const request: Group1Request = {
-        objectType: values.objectType,
+        auditObjectType,
+        auditObjectId,
         code: values.code,
         name: values.name,
         weight: values.weight ?? null,
@@ -140,7 +142,11 @@ export function Group1Table() {
   };
 
   const columns: TableProps<Group1Item>["columns"] = [
-    { title: t("riskScoring.columns.objectType"), dataIndex: "objectType", width: 160 },
+    {
+      title: t("riskScoring.columns.auditObject"),
+      width: 220,
+      render: (_: unknown, record: Group1Item) => (record.auditObjectCode ? `${record.auditObjectCode} - ${record.auditObjectName}` : "-"),
+    },
     { title: t("riskScoring.columns.code"), width: 120, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("riskScoring.columns.weight"), dataIndex: "weight", width: 100, render: (v: number | null) => v ?? "-" },
@@ -194,8 +200,8 @@ export function Group1Table() {
         destroyOnClose
       >
         <Form<FormValues> form={form} layout="vertical">
-          <Form.Item name="objectType" label={t("riskScoring.columns.objectType")} rules={[{ required: true }]}>
-            <Select options={OBJECT_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))} />
+          <Form.Item name="auditObjectRef" label={t("riskScoring.columns.auditObject")} rules={[{ required: true }]}>
+            <Select options={auditObjectGroups} showSearch optionFilterProp="label" />
           </Form.Item>
           <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
             <Input />

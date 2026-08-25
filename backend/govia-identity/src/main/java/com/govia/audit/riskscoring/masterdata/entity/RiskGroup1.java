@@ -11,6 +11,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 /** Nhom chi tieu cham diem rui ro cap 1 (sheet ZTC_DGRR_Group1 - bang ZTB_DGRR_GROUP). */
 @Getter
@@ -20,8 +21,11 @@ import java.time.LocalDate;
 public class RiskGroup1 extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "object_type", nullable = false, length = 10)
-    private ObjectType objectType;
+    @Column(name = "audit_object_type", nullable = false, length = 20)
+    private AuditObjectType auditObjectType;
+
+    @Column(name = "audit_object_id", nullable = false, columnDefinition = "uuid")
+    private UUID auditObjectId;
 
     @Column(name = "code", nullable = false, length = 10)
     private String code;

@@ -1,0 +1,54 @@
+databaseChangeLog:
+
+  # ===================== Thay "Loai doi tuong" (enum CNDT/CNDL/HO/CNTT/DA fix cung) bang tham chieu that =====================
+  # toi 1 ban ghi cu the trong 4 danh muc "Doi tuong kiem toan" (risk_score_audit_object_unit/subsidiary/
+  # project/process, xem 019). Ca 3 bang nay dang rong nen doi truc tiep, khong can backfill du lieu cu.
+
+  - changeSet:
+      id: 020-1-risk-score-group1-audit-object
+      author: govia
+      comment: "RiskGroup1: object_type -> audit_object_type + audit_object_id"
+      changes:
+        - dropUniqueConstraint:
+            tableName: risk_score_group1
+            constraintName: uk_risk_score_group1_tenant_type_code
+        - dropColumn:
+            tableName: risk_score_group1
+            columnName: object_type
+        - addColumn:
+            tableName: risk_score_group1
+            columns:
+              - column: { name: audit_object_type, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: audit_object_id, type: UUID, constraints: { nullable: false } }
+        - addUniqueConstraint:
+            tableName: risk_score_group1
+            columnNames: tenant_id, audit_object_id, code
+            constraintName: uk_risk_score_group1_tenant_object_code
+
+  - changeSet:
+      id: 020-2-risk-score-criteria-qualitative-audit-object
+      author: govia
+      comment: "RiskCriteriaQualitative: object_type -> audit_object_type + audit_object_id"
+      changes:
+        - dropColumn:
+            tableName: risk_score_criteria_qualitative
+            columnName: object_type
+        - addColumn:
+            tableName: risk_score_criteria_qualitative
+            columns:
+              - column: { name: audit_object_type, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: audit_object_id, type: UUID, constraints: { nullable: false } }
+
+  - changeSet:
+      id: 020-3-risk-score-criteria-quantitative-audit-object
+      author: govia
+      comment: "RiskCriteriaQuantitative: object_type -> audit_object_type + audit_object_id"
+      changes:
+        - dropColumn:
+            tableName: risk_score_criteria_quantitative
+            columnName: object_type
+        - addColumn:
+            tableName: risk_score_criteria_quantitative
+            columns:
+              - column: { name: audit_object_type, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: audit_object_id, type: UUID, constraints: { nullable: false } }
