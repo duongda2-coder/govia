@@ -2,12 +2,27 @@ databaseChangeLog:
 
   # ===================== Thay "Loai doi tuong" (enum CNDT/CNDL/HO/CNTT/DA fix cung) bang tham chieu that =====================
   # toi 1 ban ghi cu the trong 4 danh muc "Doi tuong kiem toan" (risk_score_audit_object_unit/subsidiary/
-  # project/process, xem 019). Ca 3 bang nay dang rong nen doi truc tiep, khong can backfill du lieu cu.
+  # project/process, xem 019). Moi truong da co du lieu cu (object_type) truoc khi co danh muc nay, nen
+  # backfill ve 1 "Don vi" placeholder (UNCLASS) moi tenant thay vi xoa du lieu.
+
+  - changeSet:
+      id: 020-0-audit-object-unit-placeholder-for-legacy-data
+      author: govia
+      comment: "Tao 1 dong AuditObjectUnit placeholder moi tenant (UNCLASS) de backfill du lieu Group1/Criteria da ton tai truoc khi co danh muc Doi tuong kiem toan."
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO risk_score_audit_object_unit (id, tenant_id, code, name, unit_type, active, created_at, row_version)
+              SELECT gen_random_uuid(), t.id, 'UNCLASS', 'Chua phan loai (du lieu truoc khi co danh muc Doi tuong kiem toan)', 'HO', true, now(), 0
+              FROM tenant t
+              WHERE NOT EXISTS (
+                SELECT 1 FROM risk_score_audit_object_unit u WHERE u.tenant_id = t.id AND u.code = 'UNCLASS'
+              );
 
   - changeSet:
       id: 020-1-risk-score-group1-audit-object
       author: govia
-      comment: "RiskGroup1: object_type -> audit_object_type + audit_object_id"
+      comment: "RiskGroup1: object_type -> audit_object_type + audit_object_id (backfill du lieu cu ve placeholder UNCLASS)"
       changes:
         - dropUniqueConstraint:
             tableName: risk_score_group1
@@ -18,8 +33,21 @@ databaseChangeLog:
         - addColumn:
             tableName: risk_score_group1
             columns:
-              - column: { name: audit_object_type, type: VARCHAR(20), constraints: { nullable: false } }
-              - column: { name: audit_object_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_type, type: VARCHAR(20) }
+              - column: { name: audit_object_id, type: UUID }
+        - sql:
+            sql: >
+              UPDATE risk_score_group1 g SET audit_object_type = 'UNIT',
+                audit_object_id = (SELECT u.id FROM risk_score_audit_object_unit u WHERE u.tenant_id = g.tenant_id AND u.code = 'UNCLASS')
+              WHERE g.audit_object_type IS NULL;
+        - addNotNullConstraint:
+            tableName: risk_score_group1
+            columnName: audit_object_type
+            columnDataType: VARCHAR(20)
+        - addNotNullConstraint:
+            tableName: risk_score_group1
+            columnName: audit_object_id
+            columnDataType: UUID
         - addUniqueConstraint:
             tableName: risk_score_group1
             columnNames: tenant_id, audit_object_id, code
@@ -28,7 +56,7 @@ databaseChangeLog:
   - changeSet:
       id: 020-2-risk-score-criteria-qualitative-audit-object
       author: govia
-      comment: "RiskCriteriaQualitative: object_type -> audit_object_type + audit_object_id"
+      comment: "RiskCriteriaQualitative: object_type -> audit_object_type + audit_object_id (backfill du lieu cu ve placeholder UNCLASS)"
       changes:
         - dropColumn:
             tableName: risk_score_criteria_qualitative
@@ -36,13 +64,26 @@ databaseChangeLog:
         - addColumn:
             tableName: risk_score_criteria_qualitative
             columns:
-              - column: { name: audit_object_type, type: VARCHAR(20), constraints: { nullable: false } }
-              - column: { name: audit_object_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_type, type: VARCHAR(20) }
+              - column: { name: audit_object_id, type: UUID }
+        - sql:
+            sql: >
+              UPDATE risk_score_criteria_qualitative g SET audit_object_type = 'UNIT',
+                audit_object_id = (SELECT u.id FROM risk_score_audit_object_unit u WHERE u.tenant_id = g.tenant_id AND u.code = 'UNCLASS')
+              WHERE g.audit_object_type IS NULL;
+        - addNotNullConstraint:
+            tableName: risk_score_criteria_qualitative
+            columnName: audit_object_type
+            columnDataType: VARCHAR(20)
+        - addNotNullConstraint:
+            tableName: risk_score_criteria_qualitative
+            columnName: audit_object_id
+            columnDataType: UUID
 
   - changeSet:
       id: 020-3-risk-score-criteria-quantitative-audit-object
       author: govia
-      comment: "RiskCriteriaQuantitative: object_type -> audit_object_type + audit_object_id"
+      comment: "RiskCriteriaQuantitative: object_type -> audit_object_type + audit_object_id (backfill du lieu cu ve placeholder UNCLASS)"
       changes:
         - dropColumn:
             tableName: risk_score_criteria_quantitative
@@ -50,5 +91,18 @@ databaseChangeLog:
         - addColumn:
             tableName: risk_score_criteria_quantitative
             columns:
-              - column: { name: audit_object_type, type: VARCHAR(20), constraints: { nullable: false } }
-              - column: { name: audit_object_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_type, type: VARCHAR(20) }
+              - column: { name: audit_object_id, type: UUID }
+        - sql:
+            sql: >
+              UPDATE risk_score_criteria_quantitative g SET audit_object_type = 'UNIT',
+                audit_object_id = (SELECT u.id FROM risk_score_audit_object_unit u WHERE u.tenant_id = g.tenant_id AND u.code = 'UNCLASS')
+              WHERE g.audit_object_type IS NULL;
+        - addNotNullConstraint:
+            tableName: risk_score_criteria_quantitative
+            columnName: audit_object_type
+            columnDataType: VARCHAR(20)
+        - addNotNullConstraint:
+            tableName: risk_score_criteria_quantitative
+            columnName: audit_object_id
+            columnDataType: UUID
