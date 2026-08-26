@@ -3,6 +3,7 @@ import { App, Button, List, Modal, Space, Typography, Upload } from "antd";
 import {
   PlusOutlined,
   EditOutlined,
+  CopyOutlined,
   DeleteOutlined,
   FileExcelOutlined,
   FileWordOutlined,
@@ -19,25 +20,42 @@ export interface ImportResult {
 
 /**
  * Toolbar hanh dong CHUAN dung chung cho TAT CA man hinh cua moi module GOVIA.
- * Man hinh nao can nut Them/Sua/Xoa/Xuat Excel/Xuat Word/Attachment/Import thi chi
+ * Man hinh nao can nut Them/Sua/Copy/Xoa/Xuat Excel/Xuat Word/Attachment/Import thi chi
  * can truyen handler tuong ung - khong tu ve lai nut, dam bao UI dong nhat toan platform.
  * Import bat buoc di kem 1 nut Export lam "mau" - du lieu import phai dung dinh dang da xuat ra.
+ * Copy = mo lai form Them moi voi du lieu cua dong dang chon dien san (tru cac truong dinh danh
+ * duy nhat nhu "ma") - ho tro nguoi dung tao nhanh 1 dong moi gan giong 1 dong da co san.
  */
 export interface StandardToolbarProps {
   onAdd?: () => void;
   onEdit?: () => void;
+  onCopy?: () => void;
   onDelete?: () => void;
   onExportExcel?: () => void;
   onExportWord?: () => void;
   onAttachment?: () => void;
   onImport?: (file: File) => Promise<ImportResult>;
   editDisabled?: boolean;
+  copyDisabled?: boolean;
   deleteDisabled?: boolean;
   loading?: boolean;
 }
 
 export function StandardToolbar(props: StandardToolbarProps) {
-  const { onAdd, onEdit, onDelete, onExportExcel, onExportWord, onAttachment, onImport, editDisabled, deleteDisabled, loading } = props;
+  const {
+    onAdd,
+    onEdit,
+    onCopy,
+    onDelete,
+    onExportExcel,
+    onExportWord,
+    onAttachment,
+    onImport,
+    editDisabled,
+    copyDisabled,
+    deleteDisabled,
+    loading,
+  } = props;
   const { t } = useTranslation();
   const { message } = App.useApp();
   const [importing, setImporting] = useState(false);
@@ -69,6 +87,11 @@ export function StandardToolbar(props: StandardToolbarProps) {
         {onEdit && (
           <Button icon={<EditOutlined />} onClick={onEdit} disabled={editDisabled}>
             {t("common.edit")}
+          </Button>
+        )}
+        {onCopy && (
+          <Button icon={<CopyOutlined />} onClick={onCopy} disabled={copyDisabled}>
+            {t("common.copy")}
           </Button>
         )}
         {onDelete && (

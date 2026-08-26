@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Form, Input, Modal, Switch } from "antd";
+import { App, Col, Form, Input, Modal, Row, Switch } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
@@ -73,6 +73,24 @@ export function AuditObjectProcessTable() {
     form.setFieldsValue({
       segmentCode: target.segmentCode ?? undefined,
       code: target.code,
+      name: target.name,
+      referenceDocument: target.referenceDocument ?? undefined,
+      auditResult: target.auditResult ?? undefined,
+      eventNote: target.eventNote ?? undefined,
+      incidentNote: target.incidentNote ?? undefined,
+      reviewResult: target.reviewResult ?? undefined,
+      active: target.active,
+    });
+    setModalOpen(true);
+  };
+
+  const openCopy = () => {
+    const target = selected[0];
+    if (!target) return;
+    setEditing(null);
+    form.setFieldsValue({
+      segmentCode: target.segmentCode ?? undefined,
+      code: "",
       name: target.name,
       referenceDocument: target.referenceDocument ?? undefined,
       auditResult: target.auditResult ?? undefined,
@@ -171,6 +189,8 @@ export function AuditObjectProcessTable() {
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onCopy={canCreate ? openCopy : undefined}
+        copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
@@ -197,12 +217,18 @@ export function AuditObjectProcessTable() {
         width={680}
       >
         <Form<FormValues> form={form} layout="vertical">
-          <Form.Item name="segmentCode" label={t("riskScoring.columns.segmentCodeProcess")}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
-            <Input maxLength={20} placeholder="1.1.1" />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="segmentCode" label={t("riskScoring.columns.segmentCodeProcess")}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
+                <Input maxLength={20} placeholder="1.1.1" />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="name" label={t("riskScoring.columns.name")} rules={[{ required: true }]}>
             <Input.TextArea rows={2} />
           </Form.Item>

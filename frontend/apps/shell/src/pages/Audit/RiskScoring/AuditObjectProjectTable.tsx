@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Form, Input, InputNumber, Modal, Switch } from "antd";
+import { App, Col, Form, Input, InputNumber, Modal, Row, Switch } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
@@ -78,6 +78,30 @@ export function AuditObjectProjectTable() {
     setEditing(target);
     form.setFieldsValue({
       code: target.code,
+      name: target.name,
+      projectType: target.projectType ?? undefined,
+      approvalAuthority: target.approvalAuthority ?? undefined,
+      purpose: target.purpose ?? undefined,
+      investmentValue: target.investmentValue ?? undefined,
+      provider: target.provider ?? undefined,
+      relatedParties: target.relatedParties ?? undefined,
+      inspectionYear: target.inspectionYear ?? undefined,
+      inspectionResult: target.inspectionResult ?? undefined,
+      inspectionRecommendation: target.inspectionRecommendation ?? undefined,
+      auditYear: target.auditYear ?? undefined,
+      auditResult: target.auditResult ?? undefined,
+      auditRecommendation: target.auditRecommendation ?? undefined,
+      active: target.active,
+    });
+    setModalOpen(true);
+  };
+
+  const openCopy = () => {
+    const target = selected[0];
+    if (!target) return;
+    setEditing(null);
+    form.setFieldsValue({
+      code: "",
       name: target.name,
       projectType: target.projectType ?? undefined,
       approvalAuthority: target.approvalAuthority ?? undefined,
@@ -192,6 +216,8 @@ export function AuditObjectProjectTable() {
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onCopy={canCreate ? openCopy : undefined}
+        copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
@@ -218,41 +244,65 @@ export function AuditObjectProjectTable() {
         width={680}
       >
         <Form<FormValues> form={form} layout="vertical">
-          <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
-            <Input maxLength={10} />
-          </Form.Item>
-          <Form.Item name="name" label={t("riskScoring.columns.name")} rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="projectType" label={t("riskScoring.columns.projectType")}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="approvalAuthority" label={t("riskScoring.columns.approvalAuthority")}>
-            <Input />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
+                <Input maxLength={10} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="name" label={t("riskScoring.columns.name")} rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="projectType" label={t("riskScoring.columns.projectType")}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="approvalAuthority" label={t("riskScoring.columns.approvalAuthority")}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="investmentValue" label={t("riskScoring.columns.investmentValue")}>
+                <InputNumber style={{ width: "100%" }} min={0} step={0.01} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="provider" label={t("riskScoring.columns.provider")}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="purpose" label={t("riskScoring.columns.purpose")}>
             <Input.TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="investmentValue" label={t("riskScoring.columns.investmentValue")}>
-            <InputNumber style={{ width: "100%" }} min={0} step={0.01} />
-          </Form.Item>
-          <Form.Item name="provider" label={t("riskScoring.columns.provider")}>
-            <Input />
           </Form.Item>
           <Form.Item name="relatedParties" label={t("riskScoring.columns.relatedParties")}>
             <Input.TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="inspectionYear" label={t("riskScoring.columns.inspectionYear")}>
-            <InputNumber style={{ width: "100%" }} min={1900} max={2100} />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="inspectionYear" label={t("riskScoring.columns.inspectionYear")}>
+                <InputNumber style={{ width: "100%" }} min={1900} max={2100} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="auditYear" label={t("riskScoring.columns.auditYear")}>
+                <InputNumber style={{ width: "100%" }} min={1900} max={2100} />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="inspectionResult" label={t("riskScoring.columns.inspectionResult")}>
             <Input.TextArea rows={2} />
           </Form.Item>
           <Form.Item name="inspectionRecommendation" label={t("riskScoring.columns.inspectionRecommendation")}>
             <Input.TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="auditYear" label={t("riskScoring.columns.auditYear")}>
-            <InputNumber style={{ width: "100%" }} min={1900} max={2100} />
           </Form.Item>
           <Form.Item name="auditResult" label={t("riskScoring.columns.auditResult")}>
             <Input.TextArea rows={2} />

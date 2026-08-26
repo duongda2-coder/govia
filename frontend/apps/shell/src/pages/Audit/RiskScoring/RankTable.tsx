@@ -78,6 +78,21 @@ export function RankTable() {
     setModalOpen(true);
   };
 
+  const openCopy = () => {
+    const target = selected[0];
+    if (!target) return;
+    setEditing(null);
+    form.setFieldsValue({
+      scoreFrom: target.scoreFrom,
+      scoreTo: target.scoreTo,
+      rankLabel: target.rankLabel,
+      fromYear: target.fromYear,
+      toYear: target.toYear,
+      active: target.active,
+    });
+    setModalOpen(true);
+  };
+
   const handleSubmit = async () => {
     let values: FormValues;
     try {
@@ -162,6 +177,8 @@ export function RankTable() {
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onCopy={canCreate ? openCopy : undefined}
+        copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Form, Input, InputNumber, Modal, Select, Switch } from "antd";
+import { App, Col, Form, Input, InputNumber, Modal, Row, Select, Switch } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
@@ -97,6 +97,25 @@ export function CriteriaQualitativeTable() {
       group1Id: target.group1Id,
       group2Id: target.group2Id ?? undefined,
       code: target.code,
+      name: target.name,
+      weight: target.weight ?? undefined,
+      impactLevel: target.impactLevel ?? undefined,
+      likelihoodLevel: target.likelihoodLevel ?? undefined,
+      includeCurrentYear: target.includeCurrentYear,
+      active: target.active,
+    });
+    setModalOpen(true);
+  };
+
+  const openCopy = () => {
+    const target = selected[0];
+    if (!target) return;
+    setEditing(null);
+    form.setFieldsValue({
+      auditObjectCategoryId: target.auditObjectCategoryId,
+      group1Id: target.group1Id,
+      group2Id: target.group2Id ?? undefined,
+      code: "",
       name: target.name,
       weight: target.weight ?? undefined,
       impactLevel: target.impactLevel ?? undefined,
@@ -209,6 +228,8 @@ export function CriteriaQualitativeTable() {
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onCopy={canCreate ? openCopy : undefined}
+        copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
@@ -235,68 +256,94 @@ export function CriteriaQualitativeTable() {
         width={640}
       >
         <Form<FormValues> form={form} layout="vertical">
-          <Form.Item name="auditObjectCategoryId" label={t("riskScoring.columns.auditObjectCategory")} rules={[{ required: true }]}>
-            <Select
-              options={auditObjectCategoryOptions}
-              showSearch
-              optionFilterProp="label"
-              onChange={(value) => {
-                const currentGroup1 = form.getFieldValue("group1Id") as string | undefined;
-                if (!currentGroup1) return;
-                const stillValid = group1Options.some((g) => g.id === currentGroup1 && g.auditObjectCategoryId === value);
-                if (!stillValid) {
-                  form.setFieldValue("group1Id", undefined);
-                  form.setFieldValue("group2Id", undefined);
-                }
-              }}
-            />
-          </Form.Item>
-          <Form.Item name="group1Id" label={t("riskScoring.columns.group1")} rules={[{ required: true }]}>
-            <Select
-              disabled={!auditObjectCategoryIdWatch}
-              placeholder={!auditObjectCategoryIdWatch ? t("riskScoring.form.selectAuditObjectFirst") : undefined}
-              options={group1OptionsForAuditObject.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
-              showSearch
-              optionFilterProp="label"
-              onChange={(value) => {
-                const current = form.getFieldValue("group2Id") as string | undefined;
-                if (current && !group2Options.some((g) => g.id === current && g.group1Id === value)) {
-                  form.setFieldValue("group2Id", undefined);
-                }
-              }}
-            />
-          </Form.Item>
-          <Form.Item name="group2Id" label={t("riskScoring.columns.group2")}>
-            <Select
-              allowClear
-              disabled={!group1IdWatch}
-              placeholder={!group1IdWatch ? t("riskScoring.form.selectGroup1First") : undefined}
-              options={group2OptionsForGroup1.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
-              showSearch
-              optionFilterProp="label"
-            />
-          </Form.Item>
-          <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="auditObjectCategoryId" label={t("riskScoring.columns.auditObjectCategory")} rules={[{ required: true }]}>
+                <Select
+                  options={auditObjectCategoryOptions}
+                  showSearch
+                  optionFilterProp="label"
+                  onChange={(value) => {
+                    const currentGroup1 = form.getFieldValue("group1Id") as string | undefined;
+                    if (!currentGroup1) return;
+                    const stillValid = group1Options.some((g) => g.id === currentGroup1 && g.auditObjectCategoryId === value);
+                    if (!stillValid) {
+                      form.setFieldValue("group1Id", undefined);
+                      form.setFieldValue("group2Id", undefined);
+                    }
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="group1Id" label={t("riskScoring.columns.group1")} rules={[{ required: true }]}>
+                <Select
+                  disabled={!auditObjectCategoryIdWatch}
+                  placeholder={!auditObjectCategoryIdWatch ? t("riskScoring.form.selectAuditObjectFirst") : undefined}
+                  options={group1OptionsForAuditObject.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
+                  showSearch
+                  optionFilterProp="label"
+                  onChange={(value) => {
+                    const current = form.getFieldValue("group2Id") as string | undefined;
+                    if (current && !group2Options.some((g) => g.id === current && g.group1Id === value)) {
+                      form.setFieldValue("group2Id", undefined);
+                    }
+                  }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="group2Id" label={t("riskScoring.columns.group2")}>
+                <Select
+                  allowClear
+                  disabled={!group1IdWatch}
+                  placeholder={!group1IdWatch ? t("riskScoring.form.selectGroup1First") : undefined}
+                  options={group2OptionsForGroup1.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
+                  showSearch
+                  optionFilterProp="label"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="name" label={t("riskScoring.columns.name")} rules={[{ required: true }]}>
             <Input.TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="weight" label={t("riskScoring.columns.weight")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="impactLevel" label={t("riskScoring.columns.impactLevel")}>
-            <InputNumber style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item name="likelihoodLevel" label={t("riskScoring.columns.likelihoodLevel")}>
-            <InputNumber style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item name="includeCurrentYear" label={t("riskScoring.columns.includeCurrentYear")} valuePropName="checked">
-            <Switch />
-          </Form.Item>
-          <Form.Item name="active" label={t("common.active")} valuePropName="checked">
-            <Switch />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={8}>
+              <Form.Item name="weight" label={t("riskScoring.columns.weight")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item name="impactLevel" label={t("riskScoring.columns.impactLevel")}>
+                <InputNumber style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item name="likelihoodLevel" label={t("riskScoring.columns.likelihoodLevel")}>
+                <InputNumber style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="includeCurrentYear" label={t("riskScoring.columns.includeCurrentYear")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="active" label={t("common.active")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </div>

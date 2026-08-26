@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Form, Input, InputNumber, Modal, Switch } from "antd";
+import { App, Col, Form, Input, InputNumber, Modal, Row, Switch } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
@@ -73,6 +73,25 @@ export function FrequencyCoefficientTable() {
     setEditing(target);
     form.setFieldsValue({
       code: target.code,
+      fromYear: target.fromYear ?? undefined,
+      toYear: target.toYear ?? undefined,
+      label: target.label,
+      value: target.value ?? undefined,
+      bonusPoint: target.bonusPoint ?? undefined,
+      repeat: target.repeat,
+      repeatCount: target.repeatCount ?? undefined,
+      repeatRiskPoint: target.repeatRiskPoint ?? undefined,
+      active: target.active,
+    });
+    setModalOpen(true);
+  };
+
+  const openCopy = () => {
+    const target = selected[0];
+    if (!target) return;
+    setEditing(null);
+    form.setFieldsValue({
+      code: "",
       fromYear: target.fromYear ?? undefined,
       toYear: target.toYear ?? undefined,
       label: target.label,
@@ -178,6 +197,8 @@ export function FrequencyCoefficientTable() {
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onCopy={canCreate ? openCopy : undefined}
+        copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
@@ -201,38 +222,69 @@ export function FrequencyCoefficientTable() {
         onOk={handleSubmit}
         confirmLoading={submitting}
         destroyOnClose
+        width={640}
       >
         <Form<FormValues> form={form} layout="vertical">
-          <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="label" label={t("riskScoring.columns.label")} rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="fromYear" label={t("riskScoring.columns.fromYear")}>
-            <InputNumber style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item name="toYear" label={t("riskScoring.columns.toYear")}>
-            <InputNumber style={{ width: "100%" }} placeholder="9999" />
-          </Form.Item>
-          <Form.Item name="value" label={t("riskScoring.columns.value")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="bonusPoint" label={t("riskScoring.columns.bonusPoint")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="repeat" label={t("riskScoring.columns.repeat")} valuePropName="checked">
-            <Switch />
-          </Form.Item>
-          <Form.Item name="repeatCount" label={t("riskScoring.columns.repeatCount")}>
-            <Input placeholder=">=5" />
-          </Form.Item>
-          <Form.Item name="repeatRiskPoint" label={t("riskScoring.columns.repeatRiskPoint")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="active" label={t("common.active")} valuePropName="checked">
-            <Switch />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="label" label={t("riskScoring.columns.label")} rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="fromYear" label={t("riskScoring.columns.fromYear")}>
+                <InputNumber style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="toYear" label={t("riskScoring.columns.toYear")}>
+                <InputNumber style={{ width: "100%" }} placeholder="9999" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="value" label={t("riskScoring.columns.value")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="bonusPoint" label={t("riskScoring.columns.bonusPoint")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="repeat" label={t("riskScoring.columns.repeat")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="repeatCount" label={t("riskScoring.columns.repeatCount")}>
+                <Input placeholder=">=5" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="repeatRiskPoint" label={t("riskScoring.columns.repeatRiskPoint")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="active" label={t("common.active")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </div>

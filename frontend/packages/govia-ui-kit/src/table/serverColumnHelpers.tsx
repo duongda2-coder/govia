@@ -55,6 +55,7 @@ export function useSearchColumn<T>() {
       filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? "#2563eb" : undefined }} />,
       filteredValue: activeValue ? [activeValue] : null,
       onFilter: () => true,
+      ellipsis: true,
     };
   }
 
@@ -106,6 +107,7 @@ export function useClientSearchColumn<T extends object>() {
           .toLowerCase()
           .includes(String(value).toLowerCase()),
       sorter: (a, b) => String(getValue(a) ?? "").localeCompare(String(getValue(b) ?? "")),
+      ellipsis: true,
     };
   }
 

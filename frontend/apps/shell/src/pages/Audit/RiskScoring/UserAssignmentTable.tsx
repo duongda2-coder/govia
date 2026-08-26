@@ -81,6 +81,20 @@ export function UserAssignmentTable() {
     setModalOpen(true);
   };
 
+  const openCopy = () => {
+    const target = selected[0];
+    if (!target) return;
+    setEditing(null);
+    form.setFieldsValue({
+      username: "",
+      criteriaId: target.criteriaId,
+      branchCode: target.branchCode ?? undefined,
+      classification: target.classification ?? undefined,
+      active: target.active,
+    });
+    setModalOpen(true);
+  };
+
   const handleSubmit = async () => {
     let values: FormValues;
     try {
@@ -163,6 +177,8 @@ export function UserAssignmentTable() {
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onCopy={canCreate ? openCopy : undefined}
+        copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}

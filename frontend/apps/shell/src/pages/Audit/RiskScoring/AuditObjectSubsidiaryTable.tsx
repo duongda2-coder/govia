@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, DatePicker, Form, Input, InputNumber, Modal, Switch } from "antd";
+import { App, Col, DatePicker, Form, Input, InputNumber, Modal, Row, Switch } from "antd";
 import type { TableProps } from "antd";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
@@ -81,6 +81,32 @@ export function AuditObjectSubsidiaryTable() {
     setEditing(target);
     form.setFieldsValue({
       code: target.code,
+      name: target.name,
+      companyType: target.companyType ?? undefined,
+      establishedDate: target.establishedDate ? dayjs(target.establishedDate) : undefined,
+      staffCount: target.staffCount ?? undefined,
+      leaderCount: target.leaderCount ?? undefined,
+      inspectionYear: target.inspectionYear ?? undefined,
+      inspectionResult: target.inspectionResult ?? undefined,
+      inspectionRecommendation: target.inspectionRecommendation ?? undefined,
+      auditYear: target.auditYear ?? undefined,
+      auditResult: target.auditResult ?? undefined,
+      auditRecommendation: target.auditRecommendation ?? undefined,
+      revenue: target.revenue ?? undefined,
+      cost: target.cost ?? undefined,
+      profit: target.profit ?? undefined,
+      salaryFund: target.salaryFund ?? undefined,
+      active: target.active,
+    });
+    setModalOpen(true);
+  };
+
+  const openCopy = () => {
+    const target = selected[0];
+    if (!target) return;
+    setEditing(null);
+    form.setFieldsValue({
+      code: "",
       name: target.name,
       companyType: target.companyType ?? undefined,
       establishedDate: target.establishedDate ? dayjs(target.establishedDate) : undefined,
@@ -200,6 +226,8 @@ export function AuditObjectSubsidiaryTable() {
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onCopy={canCreate ? openCopy : undefined}
+        copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
@@ -226,35 +254,59 @@ export function AuditObjectSubsidiaryTable() {
         width={680}
       >
         <Form<FormValues> form={form} layout="vertical">
-          <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
-            <Input maxLength={10} />
-          </Form.Item>
-          <Form.Item name="name" label={t("riskScoring.columns.name")} rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="companyType" label={t("riskScoring.columns.companyType")}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="establishedDate" label={t("riskScoring.columns.establishedDate")}>
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item name="staffCount" label={t("riskScoring.columns.staffCount")}>
-            <InputNumber style={{ width: "100%" }} min={0} />
-          </Form.Item>
-          <Form.Item name="leaderCount" label={t("riskScoring.columns.leaderCount")}>
-            <InputNumber style={{ width: "100%" }} min={0} />
-          </Form.Item>
-          <Form.Item name="inspectionYear" label={t("riskScoring.columns.inspectionYear")}>
-            <InputNumber style={{ width: "100%" }} min={1900} max={2100} />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
+                <Input maxLength={10} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="name" label={t("riskScoring.columns.name")} rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="companyType" label={t("riskScoring.columns.companyType")}>
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="establishedDate" label={t("riskScoring.columns.establishedDate")}>
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="staffCount" label={t("riskScoring.columns.staffCount")}>
+                <InputNumber style={{ width: "100%" }} min={0} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="leaderCount" label={t("riskScoring.columns.leaderCount")}>
+                <InputNumber style={{ width: "100%" }} min={0} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="inspectionYear" label={t("riskScoring.columns.inspectionYear")}>
+                <InputNumber style={{ width: "100%" }} min={1900} max={2100} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="auditYear" label={t("riskScoring.columns.auditYear")}>
+                <InputNumber style={{ width: "100%" }} min={1900} max={2100} />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="inspectionResult" label={t("riskScoring.columns.inspectionResult")}>
             <Input.TextArea rows={2} />
           </Form.Item>
           <Form.Item name="inspectionRecommendation" label={t("riskScoring.columns.inspectionRecommendation")}>
             <Input.TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="auditYear" label={t("riskScoring.columns.auditYear")}>
-            <InputNumber style={{ width: "100%" }} min={1900} max={2100} />
           </Form.Item>
           <Form.Item name="auditResult" label={t("riskScoring.columns.auditResult")}>
             <Input.TextArea rows={2} />
@@ -262,18 +314,30 @@ export function AuditObjectSubsidiaryTable() {
           <Form.Item name="auditRecommendation" label={t("riskScoring.columns.auditRecommendation")}>
             <Input.TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="revenue" label={t("riskScoring.columns.revenue")}>
-            <InputNumber style={{ width: "100%" }} min={0} step={0.01} />
-          </Form.Item>
-          <Form.Item name="cost" label={t("riskScoring.columns.cost")}>
-            <InputNumber style={{ width: "100%" }} min={0} step={0.01} />
-          </Form.Item>
-          <Form.Item name="profit" label={t("riskScoring.columns.profit")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="salaryFund" label={t("riskScoring.columns.salaryFund")}>
-            <InputNumber style={{ width: "100%" }} min={0} step={0.01} />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="revenue" label={t("riskScoring.columns.revenue")}>
+                <InputNumber style={{ width: "100%" }} min={0} step={0.01} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="cost" label={t("riskScoring.columns.cost")}>
+                <InputNumber style={{ width: "100%" }} min={0} step={0.01} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="profit" label={t("riskScoring.columns.profit")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="salaryFund" label={t("riskScoring.columns.salaryFund")}>
+                <InputNumber style={{ width: "100%" }} min={0} step={0.01} />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="active" label={t("common.active")} valuePropName="checked">
             <Switch />
           </Form.Item>

@@ -60,6 +60,7 @@
     "resizeSidebar": "Drag to resize",
     "add": "Add",
     "edit": "Edit",
+    "copy": "Copy",
     "delete": "Delete",
     "exportExcel": "Export Excel",
     "exportWord": "Export Word",

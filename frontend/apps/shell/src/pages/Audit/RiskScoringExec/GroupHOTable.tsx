@@ -70,6 +70,19 @@ export function GroupHOTable() {
     setModalOpen(true);
   };
 
+  const openCopy = () => {
+    const target = selected[0];
+    if (!target) return;
+    setEditing(null);
+    form.setFieldsValue({
+      code: "",
+      name: target.name,
+      note: target.note ?? undefined,
+      active: target.active,
+    });
+    setModalOpen(true);
+  };
+
   const handleSubmit = async () => {
     let values: FormValues;
     try {
@@ -150,6 +163,8 @@ export function GroupHOTable() {
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onCopy={canCreate ? openCopy : undefined}
+        copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}

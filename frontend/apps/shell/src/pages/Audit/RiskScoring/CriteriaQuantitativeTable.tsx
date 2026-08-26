@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Form, Input, InputNumber, Modal, Select, Switch } from "antd";
+import { App, Col, Form, Input, InputNumber, Modal, Row, Select, Switch } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
@@ -103,6 +103,31 @@ export function CriteriaQuantitativeTable() {
       group1Id: target.group1Id,
       group2Id: target.group2Id ?? undefined,
       code: target.code,
+      name: target.name,
+      criteriaType: target.criteriaType ?? undefined,
+      businessThreshold: target.businessThreshold ?? undefined,
+      viewThreshold: target.viewThreshold ?? undefined,
+      score20: target.score20 ?? undefined,
+      score40: target.score40 ?? undefined,
+      score60: target.score60 ?? undefined,
+      score80: target.score80 ?? undefined,
+      score100: target.score100 ?? undefined,
+      scoringGuide: target.scoringGuide ?? undefined,
+      includeCurrentYear: target.includeCurrentYear,
+      active: target.active,
+    });
+    setModalOpen(true);
+  };
+
+  const openCopy = () => {
+    const target = selected[0];
+    if (!target) return;
+    setEditing(null);
+    form.setFieldsValue({
+      auditObjectCategoryId: target.auditObjectCategoryId,
+      group1Id: target.group1Id,
+      group2Id: target.group2Id ?? undefined,
+      code: "",
       name: target.name,
       criteriaType: target.criteriaType ?? undefined,
       businessThreshold: target.businessThreshold ?? undefined,
@@ -229,6 +254,8 @@ export function CriteriaQuantitativeTable() {
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onCopy={canCreate ? openCopy : undefined}
+        copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
@@ -255,89 +282,131 @@ export function CriteriaQuantitativeTable() {
         width={720}
       >
         <Form<FormValues> form={form} layout="vertical">
-          <Form.Item name="auditObjectCategoryId" label={t("riskScoring.columns.auditObjectCategory")} rules={[{ required: true }]}>
-            <Select
-              options={auditObjectCategoryOptions}
-              showSearch
-              optionFilterProp="label"
-              onChange={(value) => {
-                const currentGroup1 = form.getFieldValue("group1Id") as string | undefined;
-                if (!currentGroup1) return;
-                const stillValid = group1Options.some((g) => g.id === currentGroup1 && g.auditObjectCategoryId === value);
-                if (!stillValid) {
-                  form.setFieldValue("group1Id", undefined);
-                  form.setFieldValue("group2Id", undefined);
-                }
-              }}
-            />
-          </Form.Item>
-          <Form.Item name="group1Id" label={t("riskScoring.columns.group1")} rules={[{ required: true }]}>
-            <Select
-              disabled={!auditObjectCategoryIdWatch}
-              placeholder={!auditObjectCategoryIdWatch ? t("riskScoring.form.selectAuditObjectFirst") : undefined}
-              options={group1OptionsForAuditObject.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
-              showSearch
-              optionFilterProp="label"
-              onChange={(value) => {
-                const current = form.getFieldValue("group2Id") as string | undefined;
-                if (current && !group2Options.some((g) => g.id === current && g.group1Id === value)) {
-                  form.setFieldValue("group2Id", undefined);
-                }
-              }}
-            />
-          </Form.Item>
-          <Form.Item name="group2Id" label={t("riskScoring.columns.group2")}>
-            <Select
-              allowClear
-              disabled={!group1IdWatch}
-              placeholder={!group1IdWatch ? t("riskScoring.form.selectGroup1First") : undefined}
-              options={group2OptionsForGroup1.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
-              showSearch
-              optionFilterProp="label"
-            />
-          </Form.Item>
-          <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="auditObjectCategoryId" label={t("riskScoring.columns.auditObjectCategory")} rules={[{ required: true }]}>
+                <Select
+                  options={auditObjectCategoryOptions}
+                  showSearch
+                  optionFilterProp="label"
+                  onChange={(value) => {
+                    const currentGroup1 = form.getFieldValue("group1Id") as string | undefined;
+                    if (!currentGroup1) return;
+                    const stillValid = group1Options.some((g) => g.id === currentGroup1 && g.auditObjectCategoryId === value);
+                    if (!stillValid) {
+                      form.setFieldValue("group1Id", undefined);
+                      form.setFieldValue("group2Id", undefined);
+                    }
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="group1Id" label={t("riskScoring.columns.group1")} rules={[{ required: true }]}>
+                <Select
+                  disabled={!auditObjectCategoryIdWatch}
+                  placeholder={!auditObjectCategoryIdWatch ? t("riskScoring.form.selectAuditObjectFirst") : undefined}
+                  options={group1OptionsForAuditObject.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
+                  showSearch
+                  optionFilterProp="label"
+                  onChange={(value) => {
+                    const current = form.getFieldValue("group2Id") as string | undefined;
+                    if (current && !group2Options.some((g) => g.id === current && g.group1Id === value)) {
+                      form.setFieldValue("group2Id", undefined);
+                    }
+                  }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="group2Id" label={t("riskScoring.columns.group2")}>
+                <Select
+                  allowClear
+                  disabled={!group1IdWatch}
+                  placeholder={!group1IdWatch ? t("riskScoring.form.selectGroup1First") : undefined}
+                  options={group2OptionsForGroup1.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
+                  showSearch
+                  optionFilterProp="label"
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="name" label={t("riskScoring.columns.name")} rules={[{ required: true }]}>
             <Input.TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="criteriaType" label={t("riskScoring.columns.criteriaType")}>
-            <Select
-              allowClear
-              options={[1, 2, 3].map((value) => ({ value, label: t("riskScoring.criteriaTypeOptions." + value) }))}
-            />
-          </Form.Item>
-          <Form.Item name="businessThreshold" label={t("riskScoring.columns.businessThreshold")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="viewThreshold" label={t("riskScoring.columns.viewThreshold")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="score20" label={t("riskScoring.columns.score20")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="score40" label={t("riskScoring.columns.score40")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="score60" label={t("riskScoring.columns.score60")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="score80" label={t("riskScoring.columns.score80")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
-          <Form.Item name="score100" label={t("riskScoring.columns.score100")}>
-            <InputNumber style={{ width: "100%" }} step={0.01} />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="criteriaType" label={t("riskScoring.columns.criteriaType")}>
+                <Select
+                  allowClear
+                  options={[1, 2, 3].map((value) => ({ value, label: t("riskScoring.criteriaTypeOptions." + value) }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="businessThreshold" label={t("riskScoring.columns.businessThreshold")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="viewThreshold" label={t("riskScoring.columns.viewThreshold")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="score20" label={t("riskScoring.columns.score20")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="score40" label={t("riskScoring.columns.score40")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="score60" label={t("riskScoring.columns.score60")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="score80" label={t("riskScoring.columns.score80")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="score100" label={t("riskScoring.columns.score100")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="scoringGuide" label={t("riskScoring.columns.scoringGuide")}>
             <Input.TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="includeCurrentYear" label={t("riskScoring.columns.includeCurrentYear")} valuePropName="checked">
-            <Switch />
-          </Form.Item>
-          <Form.Item name="active" label={t("common.active")} valuePropName="checked">
-            <Switch />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="includeCurrentYear" label={t("riskScoring.columns.includeCurrentYear")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="active" label={t("common.active")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </div>

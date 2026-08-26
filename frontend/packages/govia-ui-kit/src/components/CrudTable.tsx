@@ -31,6 +31,10 @@ export function CrudTable<T extends object>(props: CrudTableProps<T>) {
         loading={loading}
         pagination={pagination ?? false}
         onChange={onChange}
+        // scroll.x="max-content" bat buoc phai co khi cot dung "ellipsis" (vd qua
+        // getSearchColumnProps) ma khong khai bao width rieng - thieu no, table-layout:fixed
+        // se co cot ellipsis do ve 0px (chu bien mat) thay vi chia het phan con lai.
+        scroll={{ x: "max-content" }}
         rowSelection={
           onSelectionChange
             ? {

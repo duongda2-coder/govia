@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, DatePicker, Form, Input, InputNumber, Modal, Select, Switch } from "antd";
+import { App, Col, DatePicker, Form, Input, InputNumber, Modal, Row, Select, Switch } from "antd";
 import type { TableProps } from "antd";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
@@ -88,6 +88,31 @@ export function AuditObjectUnitTable() {
     setEditing(target);
     form.setFieldsValue({
       code: target.code,
+      name: target.name,
+      unitType: target.unitType,
+      auditObjectCategoryId: target.auditObjectCategoryId ?? undefined,
+      establishedDate: target.establishedDate ? dayjs(target.establishedDate) : undefined,
+      restructureDate: target.restructureDate ? dayjs(target.restructureDate) : undefined,
+      restructureNote: target.restructureNote ?? undefined,
+      totalStaff: target.totalStaff ?? undefined,
+      leaderCount: target.leaderCount ?? undefined,
+      staffCount: target.staffCount ?? undefined,
+      rankValue: target.rankValue ?? undefined,
+      defenseLineGroupId: target.defenseLineGroupId ?? undefined,
+      operatingRegulation: target.operatingRegulation ?? undefined,
+      mainFunction: target.mainFunction ?? undefined,
+      keyFindings: target.keyFindings ?? undefined,
+      active: target.active,
+    });
+    setModalOpen(true);
+  };
+
+  const openCopy = () => {
+    const target = selected[0];
+    if (!target) return;
+    setEditing(null);
+    form.setFieldsValue({
+      code: "",
       name: target.name,
       unitType: target.unitType,
       auditObjectCategoryId: target.auditObjectCategoryId ?? undefined,
@@ -226,6 +251,8 @@ export function AuditObjectUnitTable() {
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onCopy={canCreate ? openCopy : undefined}
+        copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
@@ -252,39 +279,69 @@ export function AuditObjectUnitTable() {
         width={680}
       >
         <Form<FormValues> form={form} layout="vertical">
-          <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
-            <Input maxLength={10} />
-          </Form.Item>
-          <Form.Item name="name" label={t("riskScoring.columns.name")} rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="unitType" label={t("riskScoring.columns.unitType")} rules={[{ required: true }]}>
-            <Select options={AUDIT_UNIT_TYPE_OPTIONS} />
-          </Form.Item>
-          <Form.Item name="auditObjectCategoryId" label={t("riskScoring.columns.auditObjectCategory")}>
-            <Select allowClear showSearch optionFilterProp="label" options={auditObjectCategoryOptions} />
-          </Form.Item>
-          <Form.Item name="establishedDate" label={t("riskScoring.columns.establishedDate")}>
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
-          <Form.Item name="restructureDate" label={t("riskScoring.columns.restructureDate")}>
-            <DatePicker style={{ width: "100%" }} />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
+                <Input maxLength={10} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="name" label={t("riskScoring.columns.name")} rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="unitType" label={t("riskScoring.columns.unitType")} rules={[{ required: true }]}>
+                <Select options={AUDIT_UNIT_TYPE_OPTIONS} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="auditObjectCategoryId" label={t("riskScoring.columns.auditObjectCategory")}>
+                <Select allowClear showSearch optionFilterProp="label" options={auditObjectCategoryOptions} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="establishedDate" label={t("riskScoring.columns.establishedDate")}>
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="restructureDate" label={t("riskScoring.columns.restructureDate")}>
+                <DatePicker style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="restructureNote" label={t("riskScoring.columns.restructureNote")}>
             <Input.TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="totalStaff" label={t("riskScoring.columns.totalStaff")}>
-            <InputNumber style={{ width: "100%" }} min={0} />
-          </Form.Item>
-          <Form.Item name="leaderCount" label={t("riskScoring.columns.leaderCount")}>
-            <InputNumber style={{ width: "100%" }} min={0} />
-          </Form.Item>
-          <Form.Item name="staffCount" label={t("riskScoring.columns.staffCount")}>
-            <InputNumber style={{ width: "100%" }} min={0} />
-          </Form.Item>
-          <Form.Item name="rankValue" label={t("riskScoring.columns.rankValue")}>
-            <InputNumber style={{ width: "100%" }} />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="totalStaff" label={t("riskScoring.columns.totalStaff")}>
+                <InputNumber style={{ width: "100%" }} min={0} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="leaderCount" label={t("riskScoring.columns.leaderCount")}>
+                <InputNumber style={{ width: "100%" }} min={0} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="staffCount" label={t("riskScoring.columns.staffCount")}>
+                <InputNumber style={{ width: "100%" }} min={0} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="rankValue" label={t("riskScoring.columns.rankValue")}>
+                <InputNumber style={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="defenseLineGroupId" label={t("riskScoring.columns.defenseLineGroup")}>
             <Select
               allowClear

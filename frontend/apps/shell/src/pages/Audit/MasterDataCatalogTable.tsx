@@ -89,6 +89,22 @@ export function MasterDataCatalogTable({ category, label }: { category: string; 
     setModalOpen(true);
   };
 
+  const openCopy = () => {
+    const target = selected[0];
+    if (!target) return;
+    setEditing(null);
+    form.setFieldsValue({
+      code: "",
+      name: target.name,
+      description: target.description ?? undefined,
+      validFrom: target.validFrom ? dayjs(target.validFrom) : undefined,
+      validTo: target.validTo ? dayjs(target.validTo) : undefined,
+      sortOrder: target.sortOrder ?? undefined,
+      active: target.active,
+    });
+    setModalOpen(true);
+  };
+
   const handleSubmit = async () => {
     let values: FormValues;
     try {
@@ -173,6 +189,8 @@ export function MasterDataCatalogTable({ category, label }: { category: string; 
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onCopy={canCreate ? openCopy : undefined}
+        copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
