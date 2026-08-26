@@ -25,6 +25,10 @@
     "auditMdProcess": "Danh mục Quy trình",
     "auditMdCompliance": "Danh mục Tuân thủ",
     "auditMdGeneral": "Danh mục Chung",
+    "auditMdPosition": "Danh mục Chức vụ",
+    "auditMdDepartment": "Danh mục Bộ phận KT",
+    "auditMdYear": "Danh mục Năm",
+    "auditMdBusinessSegment": "Danh mục Mảng nghiệp vụ",
     "riskScoring": "Chấm điểm rủi ro",
     "riskScoringMasterData": "Master Data CDRR",
     "riskScoringGroups": "Nhóm chỉ tiêu",
@@ -443,7 +447,11 @@
       "CONTROL": "Danh mục Kiểm soát",
       "PROCESS": "Danh mục Quy trình",
       "COMPLIANCE": "Danh mục Tuân thủ",
-      "GENERAL": "Danh mục Chung"
+      "GENERAL": "Danh mục Chung",
+      "POSITION": "Danh mục Chức vụ",
+      "DEPARTMENT": "Danh mục Bộ phận KT",
+      "YEAR": "Danh mục Năm",
+      "BUSINESS_SEGMENT": "Danh mục Mảng nghiệp vụ"
     },
     "columns": {
       "code": "Mã",

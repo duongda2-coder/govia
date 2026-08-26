@@ -49,7 +49,19 @@ public enum AuditMasterDataCategory {
     // Chung
     CURRENCY("Tiền tệ", MasterDataGroup.GENERAL),
     COUNTRY("Quốc gia/Địa điểm", MasterDataGroup.GENERAL),
-    FISCAL_PERIOD("Kỳ tài chính", MasterDataGroup.GENERAL);
+    FISCAL_PERIOD("Kỳ tài chính", MasterDataGroup.GENERAL),
+
+    // Chuc vu (sheet ZTC_Chucvu)
+    POSITION("Chức vụ", MasterDataGroup.POSITION),
+
+    // Bo phan KT (sheet ZTC_BP)
+    DEPARTMENT("Bộ phận KT", MasterDataGroup.DEPARTMENT),
+
+    // Nam (sheet ZTC_Year)
+    YEAR("Năm", MasterDataGroup.YEAR),
+
+    // Mang nghiep vu (sheet ZTC_MANG_NV)
+    BUSINESS_SEGMENT("Mảng nghiệp vụ", MasterDataGroup.BUSINESS_SEGMENT);
 
     private final String label;
     private final MasterDataGroup group;

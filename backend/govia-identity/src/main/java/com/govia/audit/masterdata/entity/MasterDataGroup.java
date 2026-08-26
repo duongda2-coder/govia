@@ -8,7 +8,11 @@ public enum MasterDataGroup {
     CONTROL("Kiểm soát"),
     PROCESS("Quy trình"),
     COMPLIANCE("Tuân thủ"),
-    GENERAL("Chung");
+    GENERAL("Chung"),
+    POSITION("Chức vụ"),
+    DEPARTMENT("Bộ phận KT"),
+    YEAR("Năm"),
+    BUSINESS_SEGMENT("Mảng nghiệp vụ");
 
     private final String label;
 

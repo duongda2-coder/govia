@@ -25,6 +25,10 @@
     "auditMdProcess": "Process Catalog",
     "auditMdCompliance": "Compliance Catalog",
     "auditMdGeneral": "General Catalog",
+    "auditMdPosition": "Position Catalog",
+    "auditMdDepartment": "Audit Department Catalog",
+    "auditMdYear": "Year Catalog",
+    "auditMdBusinessSegment": "Business Segment Catalog",
     "riskScoring": "Risk Scoring",
     "riskScoringMasterData": "Master Data CDRR",
     "riskScoringGroups": "Criteria Groups",
@@ -443,7 +447,11 @@
       "CONTROL": "Control Catalog",
       "PROCESS": "Process Catalog",
       "COMPLIANCE": "Compliance Catalog",
-      "GENERAL": "General Catalog"
+      "GENERAL": "General Catalog",
+      "POSITION": "Position Catalog",
+      "DEPARTMENT": "Audit Department Catalog",
+      "YEAR": "Year Catalog",
+      "BUSINESS_SEGMENT": "Business Segment Catalog"
     },
     "columns": {
       "code": "Code",

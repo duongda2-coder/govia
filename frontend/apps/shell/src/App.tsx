@@ -55,6 +55,10 @@ function App() {
         <Route path="audit/master-data/process" element={<MasterDataGroupPage group="PROCESS" title={t("auditMasterData.groups.PROCESS")} />} />
         <Route path="audit/master-data/compliance" element={<MasterDataGroupPage group="COMPLIANCE" title={t("auditMasterData.groups.COMPLIANCE")} />} />
         <Route path="audit/master-data/general" element={<MasterDataGroupPage group="GENERAL" title={t("auditMasterData.groups.GENERAL")} />} />
+        <Route path="audit/master-data/position" element={<MasterDataGroupPage group="POSITION" title={t("auditMasterData.groups.POSITION")} />} />
+        <Route path="audit/master-data/department" element={<MasterDataGroupPage group="DEPARTMENT" title={t("auditMasterData.groups.DEPARTMENT")} />} />
+        <Route path="audit/master-data/year" element={<MasterDataGroupPage group="YEAR" title={t("auditMasterData.groups.YEAR")} />} />
+        <Route path="audit/master-data/business-segment" element={<MasterDataGroupPage group="BUSINESS_SEGMENT" title={t("auditMasterData.groups.BUSINESS_SEGMENT")} />} />
         <Route path="audit/risk-scoring/master-data/groups" element={<RiskScoringGroupsPage />} />
         <Route path="audit/risk-scoring/master-data/criteria" element={<RiskScoringCriteriaPage />} />
         <Route path="audit/risk-scoring/master-data/weight" element={<RiskScoringWeightPage />} />
