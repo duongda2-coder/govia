@@ -53,3 +53,12 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/021-risk-scoring-audit-object-category.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/022-audit-document-library-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/023-audit-document-library-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/024-employee-additional-profile-fields.yaml
+      relativeToChangelogFile: false

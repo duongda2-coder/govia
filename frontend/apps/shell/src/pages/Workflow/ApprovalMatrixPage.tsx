@@ -109,16 +109,15 @@ export function ApprovalMatrixPage() {
   };
 
   const handleDelete = () => {
-    const target = selected[0];
-    if (!target) return;
+    if (selected.length === 0) return;
     modal.confirm({
-      title: t("workflow.approvalMatrix.deleteConfirmTitle"),
+      title: selected.length > 1 ? t("common.deleteConfirmTitleCount", { count: selected.length }) : t("workflow.approvalMatrix.deleteConfirmTitle"),
       okText: t("common.yes"),
       cancelText: t("common.no"),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
-          await deleteApprovalMatrixRule(target.id);
+          await Promise.all(selected.map((item) => deleteApprovalMatrixRule(item.id)));
           message.success(t("workflow.approvalMatrix.messages.deleteSuccess"));
           setSelected([]);
           await load();
@@ -163,6 +162,7 @@ export function ApprovalMatrixPage() {
       <Typography.Paragraph type="secondary">{t("workflow.approvalMatrix.description")}</Typography.Paragraph>
 
       <CrudTable<ApprovalMatrixRule>
+        tableId="workflow.approvalMatrix"
         columns={columns}
         dataSource={rules}
         rowKey="id"
@@ -171,7 +171,7 @@ export function ApprovalMatrixPage() {
         onEdit={canManage ? openEdit : undefined}
         editDisabled={selected.length !== 1}
         onDelete={canManage ? handleDelete : undefined}
-        deleteDisabled={selected.length !== 1}
+        deleteDisabled={selected.length === 0}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
       />
 

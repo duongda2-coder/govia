@@ -4,6 +4,19 @@ import { httpClient } from "./client";
 export type EmployeeStatus = "ACTIVE" | "ON_LEAVE" | "TERMINATED" | "PENDING_APPROVAL" | "REJECTED";
 export type Gender = "MALE" | "FEMALE" | "OTHER";
 export type EmployeeRankLevel = "N1" | "N2" | "N3" | "N4" | "N5" | "N6";
+export type EmployeeEducationLevel =
+  | "DOCTOR_OF_SCIENCE"
+  | "DOCTORATE"
+  | "MASTER"
+  | "BACHELOR"
+  | "ENGINEER"
+  | "COLLEGE"
+  | "INTERMEDIATE"
+  | "ELEMENTARY"
+  | "HIGH_SCHOOL"
+  | "SECONDARY_SCHOOL";
+export type EmployeePoliticalLevel = "ELEMENTARY" | "INTERMEDIATE" | "ADVANCED";
+export type EmployeeAuditorClassification = "TYPE_1" | "TYPE_2" | "TYPE_3";
 
 export interface Employee {
   id: string;
@@ -27,6 +40,24 @@ export interface Employee {
   managerCode: string | null;
   managerName: string | null;
   rankLevel: EmployeeRankLevel | null;
+  ethnicity: string | null;
+  hometown: string | null;
+  partyJoinDate: string | null;
+  auditDeptJoinDate: string | null;
+  priorWorkHistory: string | null;
+  educationLevel: EmployeeEducationLevel | null;
+  politicalLevel: EmployeePoliticalLevel | null;
+  foreignLanguageLevel: string | null;
+  itSkillLevel: string | null;
+  auditorClassification: EmployeeAuditorClassification | null;
+  teamLeadCapable: boolean;
+  auditedBranches: string | null;
+  otherDuties: string | null;
+  relatedPersonBranches: string | null;
+  onLeave: boolean;
+  businessSegmentId: string | null;
+  businessSegmentCode: string | null;
+  businessSegmentName: string | null;
   /** Username tai khoan dang nhap gan voi nhan vien nay - null neu chua co tai khoan. */
   username: string | null;
   createdAt: string;
@@ -47,6 +78,22 @@ export interface EmployeeRequest {
   idNumber?: string | null;
   managerId?: string | null;
   rankLevel?: EmployeeRankLevel | null;
+  ethnicity?: string | null;
+  hometown?: string | null;
+  partyJoinDate?: string | null;
+  auditDeptJoinDate?: string | null;
+  priorWorkHistory?: string | null;
+  educationLevel?: EmployeeEducationLevel | null;
+  politicalLevel?: EmployeePoliticalLevel | null;
+  foreignLanguageLevel?: string | null;
+  itSkillLevel?: string | null;
+  auditorClassification?: EmployeeAuditorClassification | null;
+  teamLeadCapable: boolean;
+  auditedBranches?: string | null;
+  otherDuties?: string | null;
+  relatedPersonBranches?: string | null;
+  onLeave: boolean;
+  businessSegmentId?: string | null;
 }
 
 export interface CreateUserAccountRequest {

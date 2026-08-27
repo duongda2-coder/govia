@@ -13,7 +13,9 @@ import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -60,6 +62,18 @@ public class LocalFileAttachmentServiceImpl implements AttachmentService {
     @Override
     public List<Attachment> listByEntity(String entityName, UUID entityId) {
         return repository.findByEntityNameAndEntityId(entityName, entityId);
+    }
+
+    @Override
+    public Map<UUID, Long> countByEntity(String entityName, List<UUID> entityIds) {
+        if (entityIds.isEmpty()) {
+            return Map.of();
+        }
+        Map<UUID, Long> counts = new HashMap<>();
+        for (AttachmentRepository.EntityAttachmentCount row : repository.countByEntityNameAndEntityIdIn(entityName, entityIds)) {
+            counts.put(row.getEntityId(), row.getTotal());
+        }
+        return counts;
     }
 
     @Override

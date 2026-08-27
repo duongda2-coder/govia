@@ -9,6 +9,9 @@ import com.govia.core.export.ImportResult;
 import com.govia.core.export.WordExportService;
 import com.govia.core.tenant.TenantContext;
 import com.govia.core.web.BusinessException;
+import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
+import com.govia.audit.masterdata.entity.AuditMasterDataItem;
+import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import com.govia.identity.dto.EmployeeFilter;
 import com.govia.identity.dto.EmployeeRequest;
 import com.govia.identity.dto.EmployeeResponse;
@@ -49,6 +52,7 @@ public class EmployeeService {
     private final OrganizationUnitRepository orgUnitRepository;
     private final PositionRepository positionRepository;
     private final UserAccountRepository userAccountRepository;
+    private final AuditMasterDataItemRepository businessSegmentRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
@@ -59,6 +63,7 @@ public class EmployeeService {
                             OrganizationUnitRepository orgUnitRepository,
                             PositionRepository positionRepository,
                             UserAccountRepository userAccountRepository,
+                            AuditMasterDataItemRepository businessSegmentRepository,
                             AuditLogService auditLogService,
                             ExcelExportService excelExportService,
                             WordExportService wordExportService,
@@ -68,6 +73,7 @@ public class EmployeeService {
         this.orgUnitRepository = orgUnitRepository;
         this.positionRepository = positionRepository;
         this.userAccountRepository = userAccountRepository;
+        this.businessSegmentRepository = businessSegmentRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
@@ -98,6 +104,7 @@ public class EmployeeService {
         validateOrgUnit(tenantId, request.orgUnitId());
         validatePosition(tenantId, request.positionId());
         validateManagerExists(tenantId, request.managerId());
+        validateBusinessSegment(tenantId, request.businessSegmentId());
 
         Employee employee = new Employee();
         employee.setTenantId(tenantId);
@@ -133,6 +140,7 @@ public class EmployeeService {
         validateOrgUnit(tenantId, request.orgUnitId());
         validatePosition(tenantId, request.positionId());
         validateManager(tenantId, id, request.managerId());
+        validateBusinessSegment(tenantId, request.businessSegmentId());
 
         applyRequest(employee, request);
         employee = repository.save(employee);
@@ -227,7 +235,8 @@ public class EmployeeService {
                 EmployeeStatus status = resolveStatus(row.get("status"));
 
                 EmployeeRequest request = new EmployeeRequest(employeeCode.trim(), fullName.trim(), null, null,
-                        emptyToNull(row.get("phone")), orgUnitId, positionId, null, null, null, null, null, null);
+                        emptyToNull(row.get("phone")), orgUnitId, positionId, null, null, null, null, null, null,
+                        null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null);
                 EmployeeResponse created = create(request);
                 if (status != EmployeeStatus.ACTIVE) {
                     changeStatus(created.id(), status);
@@ -338,6 +347,16 @@ public class EmployeeService {
                 .orElseThrow(() -> new BusinessException("POSITION_NOT_FOUND", "Chuc danh khong ton tai"));
     }
 
+    /** "Linh vuc" phai la 1 dong danh muc BUSINESS_SEGMENT that su (khong duoc tro sang danh muc khac cung bang audit_master_data_item). */
+    private void validateBusinessSegment(UUID tenantId, UUID businessSegmentId) {
+        if (businessSegmentId == null) {
+            return;
+        }
+        businessSegmentRepository.findById(businessSegmentId)
+                .filter(item -> item.getTenantId().equals(tenantId) && item.getCategory() == AuditMasterDataCategory.BUSINESS_SEGMENT)
+                .orElseThrow(() -> new BusinessException("BUSINESS_SEGMENT_NOT_FOUND", "Khong tim thay linh vuc/mang nghiep vu"));
+    }
+
     private void validateManagerExists(UUID tenantId, UUID managerId) {
         if (managerId == null) {
             return;
@@ -388,6 +407,22 @@ public class EmployeeService {
         employee.setIdNumber(request.idNumber());
         employee.setManagerId(request.managerId());
         employee.setRankLevel(request.rankLevel());
+        employee.setEthnicity(request.ethnicity());
+        employee.setHometown(request.hometown());
+        employee.setPartyJoinDate(request.partyJoinDate());
+        employee.setAuditDeptJoinDate(request.auditDeptJoinDate());
+        employee.setPriorWorkHistory(request.priorWorkHistory());
+        employee.setEducationLevel(request.educationLevel());
+        employee.setPoliticalLevel(request.politicalLevel());
+        employee.setForeignLanguageLevel(request.foreignLanguageLevel());
+        employee.setItSkillLevel(request.itSkillLevel());
+        employee.setAuditorClassification(request.auditorClassification());
+        employee.setTeamLeadCapable(request.teamLeadCapable());
+        employee.setAuditedBranches(request.auditedBranches());
+        employee.setOtherDuties(request.otherDuties());
+        employee.setRelatedPersonBranches(request.relatedPersonBranches());
+        employee.setOnLeave(request.onLeave());
+        employee.setBusinessSegmentId(request.businessSegmentId());
     }
 
     private Employee getOwnedOrThrow(UUID tenantId, UUID id) {
@@ -402,6 +437,7 @@ public class EmployeeService {
         Set<UUID> positionIds = employees.stream().map(Employee::getPositionId).filter(Objects::nonNull).collect(Collectors.toSet());
         Set<UUID> managerIds = employees.stream().map(Employee::getManagerId).filter(Objects::nonNull).collect(Collectors.toSet());
         Set<UUID> employeeIds = employees.stream().map(Employee::getId).collect(Collectors.toSet());
+        Set<UUID> businessSegmentIds = employees.stream().map(Employee::getBusinessSegmentId).filter(Objects::nonNull).collect(Collectors.toSet());
 
         Map<UUID, OrganizationUnit> orgUnits = orgUnitIds.isEmpty() ? Map.of()
                 : orgUnitRepository.findAllById(orgUnitIds).stream().collect(Collectors.toMap(OrganizationUnit::getId, u -> u));
@@ -412,14 +448,18 @@ public class EmployeeService {
         Map<UUID, String> usernames = employeeIds.isEmpty() ? Map.of()
                 : userAccountRepository.findByEmployeeIdIn(employeeIds).stream()
                         .collect(Collectors.toMap(UserAccount::getEmployeeId, UserAccount::getUsername, (a, b) -> a));
+        Map<UUID, AuditMasterDataItem> businessSegments = businessSegmentIds.isEmpty() ? Map.of()
+                : businessSegmentRepository.findAllById(businessSegmentIds).stream()
+                        .collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i));
 
-        return new ResponseContext(orgUnits, positions, managers, usernames);
+        return new ResponseContext(orgUnits, positions, managers, usernames, businessSegments);
     }
 
     private EmployeeResponse toResponse(Employee e, ResponseContext ctx) {
         OrganizationUnit orgUnit = e.getOrgUnitId() == null ? null : ctx.orgUnits.get(e.getOrgUnitId());
         Position position = e.getPositionId() == null ? null : ctx.positions.get(e.getPositionId());
         Employee manager = e.getManagerId() == null ? null : ctx.managers.get(e.getManagerId());
+        AuditMasterDataItem businessSegment = e.getBusinessSegmentId() == null ? null : ctx.businessSegments.get(e.getBusinessSegmentId());
 
         return new EmployeeResponse(
                 e.getId(), e.getEmployeeCode(), e.getFullName(), e.getEmail(), e.getPersonalEmail(), e.getPhone(),
@@ -427,7 +467,13 @@ public class EmployeeService {
                 e.getPositionId(), position == null ? null : position.getCode(), position == null ? null : position.getName(),
                 e.getHireDate(), e.getStatus(), e.getDateOfBirth(), e.getGender(), e.getIdNumber(),
                 e.getManagerId(), manager == null ? null : manager.getEmployeeCode(), manager == null ? null : manager.getFullName(),
-                e.getRankLevel(), ctx.usernames.get(e.getId()),
+                e.getRankLevel(),
+                e.getEthnicity(), e.getHometown(), e.getPartyJoinDate(), e.getAuditDeptJoinDate(), e.getPriorWorkHistory(),
+                e.getEducationLevel(), e.getPoliticalLevel(), e.getForeignLanguageLevel(), e.getItSkillLevel(),
+                e.getAuditorClassification(), e.isTeamLeadCapable(), e.getAuditedBranches(), e.getOtherDuties(),
+                e.getRelatedPersonBranches(), e.isOnLeave(),
+                e.getBusinessSegmentId(), businessSegment == null ? null : businessSegment.getCode(), businessSegment == null ? null : businessSegment.getName(),
+                ctx.usernames.get(e.getId()),
                 e.getCreatedAt(), e.getUpdatedAt());
     }
 
@@ -443,7 +489,8 @@ public class EmployeeService {
             Map<UUID, OrganizationUnit> orgUnits,
             Map<UUID, Position> positions,
             Map<UUID, Employee> managers,
-            Map<UUID, String> usernames
+            Map<UUID, String> usernames,
+            Map<UUID, AuditMasterDataItem> businessSegments
     ) {
     }
 }

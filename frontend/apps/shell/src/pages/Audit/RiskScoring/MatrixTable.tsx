@@ -123,16 +123,15 @@ export function MatrixTable() {
   };
 
   const handleDelete = () => {
-    const target = selected[0];
-    if (!target) return;
+    if (selected.length === 0) return;
     modal.confirm({
-      title: t("riskScoring.deleteConfirmTitle"),
+      title: selected.length > 1 ? t("common.deleteConfirmTitleCount", { count: selected.length }) : t("riskScoring.deleteConfirmTitle"),
       okText: t("common.yes"),
       cancelText: t("common.no"),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
-          await matrixApi.remove(target.id);
+          await Promise.all(selected.map((item) => matrixApi.remove(item.id)));
           message.success(t("riskScoring.messages.deleteSuccess"));
           setSelected([]);
           await load();
@@ -165,6 +164,7 @@ export function MatrixTable() {
   return (
     <div>
       <CrudTable<MatrixItem>
+        tableId="riskScoring.matrix"
         columns={columns}
         dataSource={items}
         rowKey="id"
@@ -175,7 +175,7 @@ export function MatrixTable() {
         onCopy={canCreate ? openCopy : undefined}
         copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
-        deleteDisabled={selected.length !== 1}
+        deleteDisabled={selected.length === 0}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
         onExportExcel={canExport ? () => matrixApi.exportFile("excel") : undefined}
         onExportWord={canExport ? () => matrixApi.exportFile("word") : undefined}

@@ -287,6 +287,7 @@ export function ProcessInstances() {
     <div>
       <Typography.Title level={4}>{t("workflow.instance.title")}</Typography.Title>
       <CrudTable<ProcessInstanceSummary>
+        tableId="workflow.processInstances"
         columns={columns}
         dataSource={instances}
         rowKey="id"

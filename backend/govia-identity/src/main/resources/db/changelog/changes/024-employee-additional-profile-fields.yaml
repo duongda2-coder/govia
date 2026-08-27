@@ -1,0 +1,36 @@
+databaseChangeLog:
+
+  # ===================== EMPLOYEE: bo sung ho so KTV (sheet ZTC_NV) =====================
+  # Cac truong con thieu so voi bang mo ta ZTC_NV (Quan ly nang luc va theo doi cong viec KTV) -
+  # giu nguyen toan bo truong/luong quan ly hien co (employeeCode, fullName, positionId, orgUnitId,
+  # rankLevel, status, email, phone...), chi them cac truong chua co.
+  - changeSet:
+      id: 024-1-employee-additional-profile-fields
+      author: govia
+      comment: "Them cac truong ho so KTV con thieu vao bang employee"
+      changes:
+        - addColumn:
+            tableName: employee
+            columns:
+              - column: { name: ethnicity, type: VARCHAR(50) }
+              - column: { name: hometown, type: VARCHAR(255) }
+              - column: { name: party_join_date, type: DATE }
+              - column: { name: audit_dept_join_date, type: DATE }
+              - column: { name: prior_work_history, type: VARCHAR(1000) }
+              - column: { name: education_level, type: VARCHAR(20) }
+              - column: { name: political_level, type: VARCHAR(20) }
+              - column: { name: foreign_language_level, type: VARCHAR(20) }
+              - column: { name: it_skill_level, type: VARCHAR(20) }
+              - column: { name: auditor_classification, type: VARCHAR(20) }
+              - column: { name: team_lead_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: audited_branches, type: VARCHAR(500) }
+              - column: { name: other_duties, type: VARCHAR(255) }
+              - column: { name: related_person_branches, type: VARCHAR(500) }
+              - column: { name: on_leave, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: business_segment_id, type: UUID }
+        - addForeignKeyConstraint:
+            baseTableName: employee
+            baseColumnNames: business_segment_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_employee_business_segment

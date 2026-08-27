@@ -38,6 +38,7 @@ export interface StandardToolbarProps {
   editDisabled?: boolean;
   copyDisabled?: boolean;
   deleteDisabled?: boolean;
+  attachmentDisabled?: boolean;
   loading?: boolean;
 }
 
@@ -54,6 +55,7 @@ export function StandardToolbar(props: StandardToolbarProps) {
     editDisabled,
     copyDisabled,
     deleteDisabled,
+    attachmentDisabled,
     loading,
   } = props;
   const { t } = useTranslation();
@@ -117,7 +119,7 @@ export function StandardToolbar(props: StandardToolbarProps) {
           </Button>
         )}
         {onAttachment && (
-          <Button icon={<PaperClipOutlined />} onClick={onAttachment}>
+          <Button icon={<PaperClipOutlined />} onClick={onAttachment} disabled={attachmentDisabled}>
             {t("common.attachment")}
           </Button>
         )}

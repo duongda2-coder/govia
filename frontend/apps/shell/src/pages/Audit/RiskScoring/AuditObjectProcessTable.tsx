@@ -140,16 +140,15 @@ export function AuditObjectProcessTable() {
   };
 
   const handleDelete = () => {
-    const target = selected[0];
-    if (!target) return;
+    if (selected.length === 0) return;
     modal.confirm({
-      title: t("riskScoring.deleteConfirmTitle"),
+      title: selected.length > 1 ? t("common.deleteConfirmTitleCount", { count: selected.length }) : t("riskScoring.deleteConfirmTitle"),
       okText: t("common.yes"),
       cancelText: t("common.no"),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
-          await auditObjectProcessApi.remove(target.id);
+          await Promise.all(selected.map((item) => auditObjectProcessApi.remove(item.id)));
           message.success(t("riskScoring.messages.deleteSuccess"));
           setSelected([]);
           await load();
@@ -182,6 +181,7 @@ export function AuditObjectProcessTable() {
   return (
     <div>
       <CrudTable<AuditObjectProcessItem>
+        tableId="riskScoring.auditObjectProcess"
         columns={columns}
         dataSource={items}
         rowKey="id"
@@ -192,7 +192,7 @@ export function AuditObjectProcessTable() {
         onCopy={canCreate ? openCopy : undefined}
         copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
-        deleteDisabled={selected.length !== 1}
+        deleteDisabled={selected.length === 0}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
         onExportExcel={canExport ? () => auditObjectProcessApi.exportFile("excel") : undefined}
         onExportWord={canExport ? () => auditObjectProcessApi.exportFile("word") : undefined}

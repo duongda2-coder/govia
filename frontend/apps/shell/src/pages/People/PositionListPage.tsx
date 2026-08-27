@@ -73,6 +73,7 @@ export function PositionListPage() {
     <div>
       <Typography.Title level={4}>{t("position.title")}</Typography.Title>
       <CrudTable<Position>
+        tableId="people.positions"
         columns={columns}
         dataSource={positions}
         rowKey="id"

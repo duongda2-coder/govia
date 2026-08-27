@@ -1,0 +1,57 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Danh muc Thu vien tai lieu =====================
+  # 6 hanh dong chuan VIEW/CREATE/EDIT/DELETE/EXPORT/IMPORT de khop voi ma tran quyen cua man hinh
+  # "Vai tro & Phan quyen" (RolePermissionsDrawer), theo dung mau 016-risk-scoring-permission-catalog.yaml.
+  - changeSet:
+      id: 023-1-permission-catalog-audit-document-library
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a6000000-0000-0000-0000-000000000001" }
+              - column: { name: code, value: "AUDIT.DOCUMENT_LIBRARY.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc thu vien tai lieu" }
+              - column: { name: resource_label, value: "Thư viện tài liệu" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a6000000-0000-0000-0000-000000000002" }
+              - column: { name: code, value: "AUDIT.DOCUMENT_LIBRARY.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi danh muc thu vien tai lieu" }
+              - column: { name: resource_label, value: "Thư viện tài liệu" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a6000000-0000-0000-0000-000000000003" }
+              - column: { name: code, value: "AUDIT.DOCUMENT_LIBRARY.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua danh muc thu vien tai lieu" }
+              - column: { name: resource_label, value: "Thư viện tài liệu" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a6000000-0000-0000-0000-000000000004" }
+              - column: { name: code, value: "AUDIT.DOCUMENT_LIBRARY.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa danh muc thu vien tai lieu" }
+              - column: { name: resource_label, value: "Thư viện tài liệu" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a6000000-0000-0000-0000-000000000005" }
+              - column: { name: code, value: "AUDIT.DOCUMENT_LIBRARY.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu danh muc thu vien tai lieu" }
+              - column: { name: resource_label, value: "Thư viện tài liệu" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a6000000-0000-0000-0000-000000000006" }
+              - column: { name: code, value: "AUDIT.DOCUMENT_LIBRARY.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu danh muc thu vien tai lieu" }
+              - column: { name: resource_label, value: "Thư viện tài liệu" }

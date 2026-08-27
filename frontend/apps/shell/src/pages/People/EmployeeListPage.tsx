@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { App, Result, Select, Tag, Typography } from "antd";
-import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CodeWithTooltip, CrudTable, useSearchColumn, useSelectFilterColumn, useServerTable } from "@govia/ui-kit";
+import type { CrudColumn } from "@govia/ui-kit";
 import type {
   Employee,
   EmployeeListParams,
@@ -11,6 +11,8 @@ import type {
 import { changeEmployeeStatus, deleteEmployee, exportEmployees, importEmployees, listEmployees } from "../../api/employees";
 import { listOrgUnits, type OrganizationUnit } from "../../api/orgUnits";
 import { listPositions, type Position } from "../../api/positions";
+import { listMasterDataItems, type MasterDataItem } from "../../api/auditMasterData";
+import { auditObjectUnitApi, type AuditObjectUnitItem } from "../../api/riskScoring";
 import { EmployeeFormDrawer } from "./EmployeeFormDrawer";
 import { useAuth } from "../../auth/AuthContext";
 
@@ -53,6 +55,8 @@ export function EmployeeListPage() {
   const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
   const [orgUnits, setOrgUnits] = useState<OrganizationUnit[]>([]);
   const [positions, setPositions] = useState<Position[]>([]);
+  const [businessSegments, setBusinessSegments] = useState<MasterDataItem[]>([]);
+  const [branches, setBranches] = useState<AuditObjectUnitItem[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<Employee[]>([]);
@@ -67,14 +71,18 @@ export function EmployeeListPage() {
    * lam loi ca man hinh - chi dropdown tuong ung se rong.
    */
   const loadLookups = useCallback(async () => {
-    const [unitsResult, positionResult, employeeResult] = await Promise.allSettled([
+    const [unitsResult, positionResult, employeeResult, businessSegmentResult, branchResult] = await Promise.allSettled([
       listOrgUnits(),
       listPositions(),
       listEmployees({ page: 0, size: 500 }),
+      listMasterDataItems("BUSINESS_SEGMENT"),
+      auditObjectUnitApi.list(),
     ]);
     if (unitsResult.status === "fulfilled") setOrgUnits(unitsResult.value);
     if (positionResult.status === "fulfilled") setPositions(positionResult.value);
     if (employeeResult.status === "fulfilled") setAllEmployees(employeeResult.value.content);
+    if (businessSegmentResult.status === "fulfilled") setBusinessSegments(businessSegmentResult.value);
+    if (branchResult.status === "fulfilled") setBranches(branchResult.value.filter((b) => b.unitType === "CN"));
   }, []);
 
   const loadEmployees = useCallback(async () => {
@@ -110,17 +118,16 @@ export function EmployeeListPage() {
   };
 
   const handleDelete = () => {
-    const target = selected[0];
-    if (!target) return;
+    if (selected.length === 0) return;
     modal.confirm({
-      title: t("employee.form.deleteConfirmTitle"),
+      title: selected.length > 1 ? t("common.deleteConfirmTitleCount", { count: selected.length }) : t("employee.form.deleteConfirmTitle"),
       content: t("employee.form.deleteConfirmContent"),
       okText: t("common.yes"),
       cancelText: t("common.no"),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
-          await deleteEmployee(target.id);
+          await Promise.all(selected.map((item) => deleteEmployee(item.id)));
           message.success(t("employee.messages.deleteSuccess"));
           setSelected([]);
           await loadEmployees();
@@ -131,7 +138,7 @@ export function EmployeeListPage() {
     });
   };
 
-  const columns: TableProps<Employee>["columns"] = [
+  const columns: CrudColumn<Employee>[] = [
     {
       title: t("employee.columns.employeeCode"),
       dataIndex: "employeeCode",
@@ -183,6 +190,12 @@ export function EmployeeListPage() {
       ...getSearchColumnProps("email", filters.email, searchLabels),
     },
     {
+      title: t("employee.columns.username"),
+      dataIndex: "username",
+      width: 130,
+      render: (v: string | null) => v ?? "-",
+    },
+    {
       title: t("employee.columns.status"),
       dataIndex: "status",
       width: 150,
@@ -207,6 +220,89 @@ export function EmployeeListPage() {
         />
       ),
     },
+    // Cac cot con lai an mac dinh (defaultHidden) - du lieu chi tiet it dung thuong xuyen, nguoi
+    // dung tu bat len qua nut "Tuy chinh cot" khi can thay vi lam chat bang mac dinh.
+    { title: t("employee.columns.personalEmail"), dataIndex: "personalEmail", defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    { title: t("employee.columns.hireDate"), dataIndex: "hireDate", width: 120, defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    { title: t("employee.columns.dateOfBirth"), dataIndex: "dateOfBirth", width: 120, defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("employee.columns.gender"),
+      dataIndex: "gender",
+      width: 100,
+      defaultHidden: true,
+      render: (v: Employee["gender"]) => (v ? t(`employee.gender.${v}`) : "-"),
+    },
+    { title: t("employee.columns.idNumber"), dataIndex: "idNumber", width: 130, defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    { title: t("employee.columns.rankLevel"), dataIndex: "rankLevel", width: 90, defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    { title: t("employee.columns.ethnicity"), dataIndex: "ethnicity", width: 120, defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    { title: t("employee.columns.hometown"), dataIndex: "hometown", defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("employee.columns.businessSegment"),
+      dataIndex: "businessSegmentName",
+      width: 150,
+      defaultHidden: true,
+      render: (_: string | null, record) => <CodeWithTooltip code={record.businessSegmentCode} name={record.businessSegmentName} />,
+    },
+    { title: t("employee.columns.partyJoinDate"), dataIndex: "partyJoinDate", width: 130, defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("employee.columns.auditDeptJoinDate"),
+      dataIndex: "auditDeptJoinDate",
+      width: 150,
+      defaultHidden: true,
+      render: (v: string | null) => v ?? "-",
+    },
+    { title: t("employee.columns.priorWorkHistory"), dataIndex: "priorWorkHistory", defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("employee.columns.educationLevel"),
+      dataIndex: "educationLevel",
+      width: 150,
+      defaultHidden: true,
+      render: (v: Employee["educationLevel"]) => (v ? t(`employee.educationLevel.${v}`) : "-"),
+    },
+    {
+      title: t("employee.columns.politicalLevel"),
+      dataIndex: "politicalLevel",
+      width: 130,
+      defaultHidden: true,
+      render: (v: Employee["politicalLevel"]) => (v ? t(`employee.politicalLevel.${v}`) : "-"),
+    },
+    {
+      title: t("employee.columns.foreignLanguageLevel"),
+      dataIndex: "foreignLanguageLevel",
+      width: 130,
+      defaultHidden: true,
+      render: (v: string | null) => v ?? "-",
+    },
+    { title: t("employee.columns.itSkillLevel"), dataIndex: "itSkillLevel", width: 120, defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("employee.columns.auditorClassification"),
+      dataIndex: "auditorClassification",
+      width: 150,
+      defaultHidden: true,
+      render: (v: Employee["auditorClassification"]) => (v ? t(`employee.auditorClassification.${v}`) : "-"),
+    },
+    {
+      title: t("employee.columns.teamLeadCapable"),
+      dataIndex: "teamLeadCapable",
+      width: 130,
+      defaultHidden: true,
+      render: (v: boolean) => (v ? t("common.yes") : t("common.no")),
+    },
+    { title: t("employee.columns.auditedBranches"), dataIndex: "auditedBranches", defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    { title: t("employee.columns.otherDuties"), dataIndex: "otherDuties", defaultHidden: true, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("employee.columns.relatedPersonBranches"),
+      dataIndex: "relatedPersonBranches",
+      defaultHidden: true,
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("employee.columns.onLeave"),
+      dataIndex: "onLeave",
+      width: 130,
+      defaultHidden: true,
+      render: (v: boolean) => (v ? t("common.yes") : t("common.no")),
+    },
   ];
 
   if (!canView) {
@@ -218,6 +314,7 @@ export function EmployeeListPage() {
       <Typography.Title level={4}>{t("employee.title")}</Typography.Title>
 
       <CrudTable<Employee>
+        tableId="people.employees"
         columns={columns}
         dataSource={employees}
         rowKey="id"
@@ -240,7 +337,7 @@ export function EmployeeListPage() {
         }
         editDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
-        deleteDisabled={selected.length !== 1}
+        deleteDisabled={selected.length === 0}
         onExportExcel={canExport ? () => exportEmployees("excel", filters) : undefined}
         onExportWord={canExport ? () => exportEmployees("word", filters) : undefined}
         onImport={
@@ -264,6 +361,8 @@ export function EmployeeListPage() {
         orgUnits={orgUnits}
         positions={positions}
         employees={allEmployees}
+        businessSegments={businessSegments}
+        branches={branches}
         onClose={() => setDrawerOpen(false)}
         onSaved={() => {
           setDrawerOpen(false);

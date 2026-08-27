@@ -116,16 +116,15 @@ export function GroupHOTable() {
   };
 
   const handleDelete = () => {
-    const target = selected[0];
-    if (!target) return;
+    if (selected.length === 0) return;
     modal.confirm({
-      title: t("riskScoringExec.deleteConfirmTitle"),
+      title: selected.length > 1 ? t("common.deleteConfirmTitleCount", { count: selected.length }) : t("riskScoringExec.deleteConfirmTitle"),
       okText: t("common.yes"),
       cancelText: t("common.no"),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
-          await groupHOApi.remove(target.id);
+          await Promise.all(selected.map((item) => groupHOApi.remove(item.id)));
           message.success(t("riskScoringExec.messages.deleteSuccess"));
           setSelected([]);
           await load();
@@ -156,6 +155,7 @@ export function GroupHOTable() {
   return (
     <div>
       <CrudTable<GroupHOItem>
+        tableId="riskScoringExec.groupHO"
         columns={columns}
         dataSource={items}
         rowKey="id"
@@ -166,7 +166,7 @@ export function GroupHOTable() {
         onCopy={canCreate ? openCopy : undefined}
         copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
-        deleteDisabled={selected.length !== 1}
+        deleteDisabled={selected.length === 0}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
         onExportExcel={canExport ? () => groupHOApi.exportFile("excel") : undefined}
         onExportWord={canExport ? () => groupHOApi.exportFile("word") : undefined}

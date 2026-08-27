@@ -86,4 +86,62 @@ public class Employee extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id", insertable = false, updatable = false)
     private Employee manager;
+
+    // ===================== Bo sung ho so KTV (sheet ZTC_NV) =====================
+
+    @Column(name = "ethnicity", length = 50)
+    private String ethnicity;
+
+    @Column(name = "hometown", length = 255)
+    private String hometown;
+
+    @Column(name = "party_join_date")
+    private LocalDate partyJoinDate;
+
+    /** Ngay vao Ban Kiem Soat/Kiem toan noi bo - khac voi hireDate (ngay vao Agribank noi chung). */
+    @Column(name = "audit_dept_join_date")
+    private LocalDate auditDeptJoinDate;
+
+    @Column(name = "prior_work_history", length = 1000)
+    private String priorWorkHistory;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "education_level", length = 20)
+    private EmployeeEducationLevel educationLevel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "political_level", length = 20)
+    private EmployeePoliticalLevel politicalLevel;
+
+    @Column(name = "foreign_language_level", length = 20)
+    private String foreignLanguageLevel;
+
+    @Column(name = "it_skill_level", length = 20)
+    private String itSkillLevel;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "auditor_classification", length = 20)
+    private EmployeeAuditorClassification auditorClassification;
+
+    @Column(name = "team_lead_capable", nullable = false)
+    private boolean teamLeadCapable = false;
+
+    /** Danh sach ten chi nhanh da tham gia kiem toan nam truoc, phan cach bang "; " - chon nhieu tu danh muc
+     * Doi tuong kiem toan (AuditObjectUnit, unitType=CN) ben frontend, luu lai duoi dang text don gian. */
+    @Column(name = "audited_branches", length = 500)
+    private String auditedBranches;
+
+    @Column(name = "other_duties", length = 255)
+    private String otherDuties;
+
+    /** Danh sach ten chi nhanh co nguoi lien quan, phan cach bang "; " - cung quy uoc voi auditedBranches. */
+    @Column(name = "related_person_branches", length = 500)
+    private String relatedPersonBranches;
+
+    @Column(name = "on_leave", nullable = false)
+    private boolean onLeave = false;
+
+    /** "Linh vuc" - link toi AuditMasterDataItem danh muc BUSINESS_SEGMENT (sheet ZTC_Mang_NV). */
+    @Column(name = "business_segment_id", columnDefinition = "uuid")
+    private UUID businessSegmentId;
 }

@@ -25,6 +25,7 @@
     "auditMdProcess": "Process Catalog",
     "auditMdCompliance": "Compliance Catalog",
     "auditMdGeneral": "General Catalog",
+    "auditMdDocumentLibrary": "Document Library Catalog",
     "auditMdPosition": "Position Catalog",
     "auditMdDepartment": "Audit Department Catalog",
     "auditMdYear": "Year Catalog",
@@ -62,6 +63,8 @@
   },
   "common": {
     "resizeSidebar": "Drag to resize",
+    "columnSettings": "Column settings",
+    "resetColumns": "Reset to default",
     "add": "Add",
     "edit": "Edit",
     "copy": "Copy",
@@ -85,7 +88,8 @@
     "view": "View",
     "export": "Export",
     "module": "Module",
-    "noPermission": "You do not have permission to access this screen. Contact your administrator to be granted access."
+    "noPermission": "You do not have permission to access this screen. Contact your administrator to be granted access.",
+    "deleteConfirmTitleCount": "Delete {{count}} selected items?"
   },
   "attachment": {
     "upload": "Upload attachment",
@@ -175,7 +179,30 @@
       "manager": "Manager",
       "phone": "Phone",
       "email": "Email",
-      "status": "Status"
+      "username": "Username",
+      "status": "Status",
+      "personalEmail": "Personal Email",
+      "hireDate": "Hire Date",
+      "dateOfBirth": "Date of Birth",
+      "gender": "Gender",
+      "idNumber": "ID Number",
+      "rankLevel": "Rank Level",
+      "ethnicity": "Ethnicity",
+      "hometown": "Hometown",
+      "businessSegment": "Business Segment",
+      "partyJoinDate": "Party Join Date",
+      "auditDeptJoinDate": "Supervisory Board Join Date",
+      "priorWorkHistory": "Prior Work History",
+      "educationLevel": "Education Level",
+      "politicalLevel": "Political Theory Level",
+      "foreignLanguageLevel": "Foreign Language Level",
+      "itSkillLevel": "IT Skill Level",
+      "auditorClassification": "Auditor Classification",
+      "teamLeadCapable": "Team Lead Capable",
+      "auditedBranches": "Branches Audited Last Year",
+      "otherDuties": "Other Duties",
+      "relatedPersonBranches": "Branches with Related Persons",
+      "onLeave": "Currently on Leave"
     },
     "status": {
       "ACTIVE": "Active",
@@ -188,6 +215,28 @@
       "MALE": "Male",
       "FEMALE": "Female",
       "OTHER": "Other"
+    },
+    "educationLevel": {
+      "DOCTOR_OF_SCIENCE": "Doctor of Science",
+      "DOCTORATE": "Doctorate",
+      "MASTER": "Master's",
+      "BACHELOR": "Bachelor's",
+      "ENGINEER": "Engineer",
+      "COLLEGE": "College",
+      "INTERMEDIATE": "Intermediate",
+      "ELEMENTARY": "Elementary",
+      "HIGH_SCHOOL": "High School",
+      "SECONDARY_SCHOOL": "Secondary School"
+    },
+    "politicalLevel": {
+      "ELEMENTARY": "Elementary",
+      "INTERMEDIATE": "Intermediate",
+      "ADVANCED": "Advanced"
+    },
+    "auditorClassification": {
+      "TYPE_1": "Type 1",
+      "TYPE_2": "Type 2",
+      "TYPE_3": "Type 3"
     },
     "form": {
       "createTitle": "Add Employee",
@@ -207,6 +256,23 @@
       "noManager": "No manager",
       "rankLevel": "Rank Level (N1-N6)",
       "rankLevelHint": "Used as the stopping threshold for the dynamic approval chain - see Approval Matrix",
+      "ktvProfileSection": "Auditor Capability Profile",
+      "ethnicity": "Ethnicity",
+      "hometown": "Hometown",
+      "businessSegment": "Business Segment",
+      "partyJoinDate": "Party Join Date",
+      "auditDeptJoinDate": "Supervisory Board Join Date",
+      "priorWorkHistory": "Prior Work History (before Agribank)",
+      "educationLevel": "Education Level",
+      "politicalLevel": "Political Theory Level",
+      "foreignLanguageLevel": "Foreign Language Level",
+      "itSkillLevel": "IT Skill Level",
+      "auditorClassification": "Auditor Capability Classification",
+      "teamLeadCapable": "Capable of Team Lead Duties",
+      "auditedBranches": "Branches Audited Last Year",
+      "otherDuties": "Other Duties",
+      "relatedPersonBranches": "Branches with Related Persons",
+      "onLeave": "Currently on Leave",
       "save": "Save",
       "cancel": "Cancel",
       "employeeCodeRequired": "Please enter employee code",
@@ -477,6 +543,39 @@
       "deleteSuccess": "Deleted",
       "deleteError": "Failed to delete",
       "saveError": "Failed to save"
+    }
+  },
+  "documentLibrary": {
+    "title": "Document Library Catalog",
+    "columns": {
+      "documentNumber": "Document Number",
+      "documentName": "Document Name",
+      "attachments": "Attachments",
+      "issueDate": "Issue Date",
+      "effectiveDate": "Effective Date",
+      "issuerPosition": "Issued By",
+      "businessActivity": "Business Activity",
+      "topic": "Topic",
+      "replacedDocument": "Replaced Document",
+      "amendedDocument": "Amended Document",
+      "legalBasis": "Legal Basis",
+      "expired": "Expired",
+      "expiryDate": "Expiry Date",
+      "content": "Main Content"
+    },
+    "form": {
+      "createTitle": "Add Document",
+      "editTitle": "Edit Document"
+    },
+    "deleteConfirmTitle": "Delete this document?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save",
+      "selectRowFirst": "Please select a document to attach files"
     }
   },
   "riskScoring": {

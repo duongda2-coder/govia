@@ -25,6 +25,7 @@
     "auditMdProcess": "Danh mục Quy trình",
     "auditMdCompliance": "Danh mục Tuân thủ",
     "auditMdGeneral": "Danh mục Chung",
+    "auditMdDocumentLibrary": "Danh mục Thư viện tài liệu",
     "auditMdPosition": "Danh mục Chức vụ",
     "auditMdDepartment": "Danh mục Bộ phận KT",
     "auditMdYear": "Danh mục Năm",
@@ -62,6 +63,8 @@
   },
   "common": {
     "resizeSidebar": "Kéo để thay đổi độ rộng",
+    "columnSettings": "Tùy chỉnh cột",
+    "resetColumns": "Đặt lại mặc định",
     "add": "Thêm mới",
     "edit": "Chỉnh sửa",
     "copy": "Sao chép",
@@ -85,7 +88,8 @@
     "view": "Xem",
     "export": "Xuất dữ liệu",
     "module": "Module",
-    "noPermission": "Bạn không có quyền truy cập màn hình này. Liên hệ quản trị viên để được cấp quyền."
+    "noPermission": "Bạn không có quyền truy cập màn hình này. Liên hệ quản trị viên để được cấp quyền.",
+    "deleteConfirmTitleCount": "Xóa {{count}} mục đã chọn?"
   },
   "attachment": {
     "upload": "Tải lên tệp đính kèm",
@@ -175,7 +179,30 @@
       "manager": "Quản lý",
       "phone": "Điện thoại",
       "email": "Email",
-      "status": "Trạng thái"
+      "username": "Tên đăng nhập",
+      "status": "Trạng thái",
+      "personalEmail": "Email cá nhân",
+      "hireDate": "Ngày vào làm",
+      "dateOfBirth": "Ngày sinh",
+      "gender": "Giới tính",
+      "idNumber": "CCCD/CMND",
+      "rankLevel": "Cấp bậc",
+      "ethnicity": "Dân tộc",
+      "hometown": "Quê quán",
+      "businessSegment": "Lĩnh vực",
+      "partyJoinDate": "Ngày vào Đảng",
+      "auditDeptJoinDate": "Ngày vào Ban Kiểm soát",
+      "priorWorkHistory": "Quá trình công tác trước Agribank",
+      "educationLevel": "Trình độ chuyên môn",
+      "politicalLevel": "Trình độ chính trị",
+      "foreignLanguageLevel": "Trình độ ngoại ngữ",
+      "itSkillLevel": "Trình độ tin học",
+      "auditorClassification": "Phân loại năng lực KTV",
+      "teamLeadCapable": "Khả năng làm Trưởng đoàn",
+      "auditedBranches": "CN đã tham gia kiểm toán năm trước",
+      "otherDuties": "Công tác khác",
+      "relatedPersonBranches": "CN có người liên quan",
+      "onLeave": "Đang hưởng chế độ nghỉ"
     },
     "status": {
       "ACTIVE": "Đang làm việc",
@@ -188,6 +215,28 @@
       "MALE": "Nam",
       "FEMALE": "Nữ",
       "OTHER": "Khác"
+    },
+    "educationLevel": {
+      "DOCTOR_OF_SCIENCE": "Tiến sĩ khoa học",
+      "DOCTORATE": "Tiến sĩ",
+      "MASTER": "Thạc sĩ",
+      "BACHELOR": "Cử nhân",
+      "ENGINEER": "Kỹ sư",
+      "COLLEGE": "Cao đẳng",
+      "INTERMEDIATE": "Trung cấp",
+      "ELEMENTARY": "Sơ cấp",
+      "HIGH_SCHOOL": "THPT",
+      "SECONDARY_SCHOOL": "THCS"
+    },
+    "politicalLevel": {
+      "ELEMENTARY": "Sơ cấp",
+      "INTERMEDIATE": "Trung cấp",
+      "ADVANCED": "Cao cấp"
+    },
+    "auditorClassification": {
+      "TYPE_1": "Loại 1",
+      "TYPE_2": "Loại 2",
+      "TYPE_3": "Loại 3"
     },
     "form": {
       "createTitle": "Thêm nhân viên",
@@ -207,6 +256,23 @@
       "noManager": "Không có quản lý",
       "rankLevel": "Cấp bậc (N1-N6)",
       "rankLevelHint": "Dùng làm ngưỡng dừng cho dây phê duyệt động - xem cấu hình ở Ma trận phê duyệt",
+      "ktvProfileSection": "Hồ sơ năng lực KTV",
+      "ethnicity": "Dân tộc",
+      "hometown": "Quê quán",
+      "businessSegment": "Lĩnh vực",
+      "partyJoinDate": "Ngày vào Đảng",
+      "auditDeptJoinDate": "Ngày vào Ban Kiểm soát",
+      "priorWorkHistory": "Quá trình công tác trước Agribank",
+      "educationLevel": "Trình độ chuyên môn",
+      "politicalLevel": "Trình độ chính trị",
+      "foreignLanguageLevel": "Trình độ ngoại ngữ",
+      "itSkillLevel": "Trình độ tin học",
+      "auditorClassification": "Phân loại năng lực KTV",
+      "teamLeadCapable": "Khả năng đảm nhận công việc Trưởng đoàn",
+      "auditedBranches": "Các chi nhánh đã tham gia kiểm toán năm trước",
+      "otherDuties": "Công tác khác",
+      "relatedPersonBranches": "Chi nhánh có người liên quan",
+      "onLeave": "Đang hưởng chế độ nghỉ",
       "save": "Lưu",
       "cancel": "Hủy",
       "employeeCodeRequired": "Nhập mã nhân viên",
@@ -477,6 +543,39 @@
       "deleteSuccess": "Đã xóa",
       "deleteError": "Xóa thất bại",
       "saveError": "Lưu thất bại"
+    }
+  },
+  "documentLibrary": {
+    "title": "Danh mục Thư viện tài liệu",
+    "columns": {
+      "documentNumber": "Số văn bản",
+      "documentName": "Tên văn bản",
+      "attachments": "File đính kèm",
+      "issueDate": "Ngày ban hành VB",
+      "effectiveDate": "Ngày hiệu lực VB",
+      "issuerPosition": "Người ban hành",
+      "businessActivity": "Hoạt động nghiệp vụ",
+      "topic": "Chi tiết nghiệp vụ",
+      "replacedDocument": "Văn bản đã thay thế",
+      "amendedDocument": "Văn bản được sửa đổi bổ sung",
+      "legalBasis": "Căn cứ ban hành VB",
+      "expired": "Hết hiệu lực",
+      "expiryDate": "Ngày hết hiệu lực",
+      "content": "Nội dung chính VB"
+    },
+    "form": {
+      "createTitle": "Thêm văn bản tài liệu",
+      "editTitle": "Sửa văn bản tài liệu"
+    },
+    "deleteConfirmTitle": "Xóa văn bản tài liệu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại",
+      "selectRowFirst": "Vui lòng chọn 1 văn bản để đính kèm file"
     }
   },
   "riskScoring": {

@@ -1,0 +1,51 @@
+databaseChangeLog:
+
+  # ===================== Danh muc "Thu vien tai lieu" (sheet ZTC_TVTL, bang ZTB_TVTL) =====================
+  # Quan ly van ban/tai lieu noi bo - khac voi 23 danh muc code/name phang trong audit_master_data_item
+  # (013), day la 1 bang rieng vi co nhieu truong (ngay ban hanh/hieu luc, nguoi ban hanh link toi
+  # Position, van ban thay the/sua doi, noi dung...) va se gan File dinh kem (bang attachment dung chung).
+
+  - changeSet:
+      id: 022-1-audit-document-library-schema
+      author: govia
+      comment: "Tao bang audit_document_library"
+      changes:
+        - createTable:
+            tableName: audit_document_library
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: document_number, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: document_name, type: VARCHAR(500), constraints: { nullable: false } }
+              - column: { name: issue_date, type: DATE }
+              - column: { name: effective_date, type: DATE }
+              - column: { name: issuer_position_id, type: UUID }
+              - column: { name: business_activity, type: VARCHAR(500) }
+              - column: { name: topic, type: VARCHAR(500) }
+              - column: { name: replaced_document, type: VARCHAR(1000) }
+              - column: { name: amended_document, type: VARCHAR(1000) }
+              - column: { name: legal_basis, type: VARCHAR(1000) }
+              - column: { name: expired, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: expiry_date, type: DATE }
+              - column: { name: content, type: VARCHAR(4000) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_document_library
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_doc_lib_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_document_library
+            baseColumnNames: issuer_position_id
+            referencedTableName: position
+            referencedColumnNames: id
+            constraintName: fk_audit_doc_lib_issuer_position
+        - addUniqueConstraint:
+            tableName: audit_document_library
+            columnNames: tenant_id, document_number
+            constraintName: uk_audit_doc_lib_tenant_number

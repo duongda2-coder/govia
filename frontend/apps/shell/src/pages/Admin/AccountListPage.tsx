@@ -100,6 +100,7 @@ export function AccountListPage() {
     <div>
       <Typography.Title level={4}>{t("account.title")}</Typography.Title>
       <CrudTable<AccountSummary>
+        tableId="admin.accounts"
         columns={columns}
         dataSource={accounts}
         rowKey="id"

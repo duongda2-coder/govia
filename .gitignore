@@ -25,3 +25,6 @@ Thumbs.db
 
 # Local backups / scratch (not part of the project)
 .deleted-workflow-backup-*/
+
+# Local attachment storage (dev default, see application.yml GOVIA_ATTACHMENT_ROOT)
+backend/govia-identity/data/

@@ -1,11 +1,20 @@
 import { useEffect, useState } from "react";
-import { App, Drawer, Form, Input, Select, DatePicker, Button, Space, Row, Col, Divider, Typography } from "antd";
+import { App, Drawer, Form, Input, Select, DatePicker, Button, Space, Row, Col, Divider, Typography, Switch } from "antd";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
-import type { Employee, EmployeeRankLevel, EmployeeRequest } from "../../api/employees";
+import type {
+  Employee,
+  EmployeeAuditorClassification,
+  EmployeeEducationLevel,
+  EmployeePoliticalLevel,
+  EmployeeRankLevel,
+  EmployeeRequest,
+} from "../../api/employees";
 import { createEmployee, createEmployeeAccount, updateEmployee } from "../../api/employees";
 import type { OrganizationUnit } from "../../api/orgUnits";
 import type { Position } from "../../api/positions";
+import type { MasterDataItem } from "../../api/auditMasterData";
+import type { AuditObjectUnitItem } from "../../api/riskScoring";
 import { ResetPasswordModal } from "../../components/ResetPasswordModal";
 
 export interface EmployeeFormDrawerProps {
@@ -14,6 +23,8 @@ export interface EmployeeFormDrawerProps {
   orgUnits: OrganizationUnit[];
   positions: Position[];
   employees: Employee[];
+  businessSegments: MasterDataItem[];
+  branches: AuditObjectUnitItem[];
   onClose: () => void;
   onSaved: () => void;
 }
@@ -32,13 +43,65 @@ interface FormValues {
   idNumber?: string;
   managerId?: string;
   rankLevel?: EmployeeRankLevel;
+  ethnicity?: string;
+  hometown?: string;
+  businessSegmentId?: string;
+  partyJoinDate?: dayjs.Dayjs;
+  auditDeptJoinDate?: dayjs.Dayjs;
+  priorWorkHistory?: string;
+  educationLevel?: EmployeeEducationLevel;
+  politicalLevel?: EmployeePoliticalLevel;
+  foreignLanguageLevel?: string;
+  itSkillLevel?: string;
+  auditorClassification?: EmployeeAuditorClassification;
+  teamLeadCapable: boolean;
+  auditedBranchNames?: string[];
+  otherDuties?: string;
+  relatedPersonBranchNames?: string[];
+  onLeave: boolean;
   accountUsername?: string;
   accountPassword?: string;
 }
 
 const RANK_LEVELS: EmployeeRankLevel[] = ["N1", "N2", "N3", "N4", "N5", "N6"];
+const EDUCATION_LEVELS: EmployeeEducationLevel[] = [
+  "DOCTOR_OF_SCIENCE",
+  "DOCTORATE",
+  "MASTER",
+  "BACHELOR",
+  "ENGINEER",
+  "COLLEGE",
+  "INTERMEDIATE",
+  "ELEMENTARY",
+  "HIGH_SCHOOL",
+  "SECONDARY_SCHOOL",
+];
+const POLITICAL_LEVELS: EmployeePoliticalLevel[] = ["ELEMENTARY", "INTERMEDIATE", "ADVANCED"];
+const AUDITOR_CLASSIFICATIONS: EmployeeAuditorClassification[] = ["TYPE_1", "TYPE_2", "TYPE_3"];
 
-export function EmployeeFormDrawer({ open, employee, orgUnits, positions, employees, onClose, onSaved }: EmployeeFormDrawerProps) {
+/** "Cac CN da tham gia..."/"CN co nguoi lien quan" luu duoi dang text "Ten CN 1; Ten CN 2" (xem
+ * Employee.auditedBranches) - tach/gop o day de hien thi nhu 1 multi-select tren form. */
+function splitBranchNames(value: string | null | undefined): string[] {
+  if (!value) return [];
+  return value.split(/;\s*/).map((v) => v.trim()).filter(Boolean);
+}
+
+function joinBranchNames(values: string[] | undefined): string | null {
+  if (!values || values.length === 0) return null;
+  return values.join("; ");
+}
+
+export function EmployeeFormDrawer({
+  open,
+  employee,
+  orgUnits,
+  positions,
+  employees,
+  businessSegments,
+  branches,
+  onClose,
+  onSaved,
+}: EmployeeFormDrawerProps) {
   const [form] = Form.useForm<FormValues>();
   const { t } = useTranslation();
   const { message } = App.useApp();
@@ -61,9 +124,26 @@ export function EmployeeFormDrawer({ open, employee, orgUnits, positions, employ
         idNumber: employee.idNumber ?? undefined,
         managerId: employee.managerId ?? undefined,
         rankLevel: employee.rankLevel ?? undefined,
+        ethnicity: employee.ethnicity ?? undefined,
+        hometown: employee.hometown ?? undefined,
+        businessSegmentId: employee.businessSegmentId ?? undefined,
+        partyJoinDate: employee.partyJoinDate ? dayjs(employee.partyJoinDate) : undefined,
+        auditDeptJoinDate: employee.auditDeptJoinDate ? dayjs(employee.auditDeptJoinDate) : undefined,
+        priorWorkHistory: employee.priorWorkHistory ?? undefined,
+        educationLevel: employee.educationLevel ?? undefined,
+        politicalLevel: employee.politicalLevel ?? undefined,
+        foreignLanguageLevel: employee.foreignLanguageLevel ?? undefined,
+        itSkillLevel: employee.itSkillLevel ?? undefined,
+        auditorClassification: employee.auditorClassification ?? undefined,
+        teamLeadCapable: employee.teamLeadCapable,
+        auditedBranchNames: splitBranchNames(employee.auditedBranches),
+        otherDuties: employee.otherDuties ?? undefined,
+        relatedPersonBranchNames: splitBranchNames(employee.relatedPersonBranches),
+        onLeave: employee.onLeave,
       });
     } else {
       form.resetFields();
+      form.setFieldsValue({ teamLeadCapable: false, onLeave: false });
     }
   }, [open, employee, form]);
 
@@ -82,6 +162,22 @@ export function EmployeeFormDrawer({ open, employee, orgUnits, positions, employ
       idNumber: values.idNumber || null,
       managerId: values.managerId || null,
       rankLevel: values.rankLevel || null,
+      ethnicity: values.ethnicity || null,
+      hometown: values.hometown || null,
+      businessSegmentId: values.businessSegmentId || null,
+      partyJoinDate: values.partyJoinDate ? values.partyJoinDate.format("YYYY-MM-DD") : null,
+      auditDeptJoinDate: values.auditDeptJoinDate ? values.auditDeptJoinDate.format("YYYY-MM-DD") : null,
+      priorWorkHistory: values.priorWorkHistory || null,
+      educationLevel: values.educationLevel || null,
+      politicalLevel: values.politicalLevel || null,
+      foreignLanguageLevel: values.foreignLanguageLevel || null,
+      itSkillLevel: values.itSkillLevel || null,
+      auditorClassification: values.auditorClassification || null,
+      teamLeadCapable: values.teamLeadCapable ?? false,
+      auditedBranches: joinBranchNames(values.auditedBranchNames),
+      otherDuties: values.otherDuties || null,
+      relatedPersonBranches: joinBranchNames(values.relatedPersonBranchNames),
+      onLeave: values.onLeave ?? false,
     };
 
     try {
@@ -114,7 +210,7 @@ export function EmployeeFormDrawer({ open, employee, orgUnits, positions, employ
       title={employee ? t("employee.form.editTitle") : t("employee.form.createTitle")}
       open={open}
       onClose={onClose}
-      width={480}
+      width={560}
       destroyOnClose
       extra={
         <Space>
@@ -234,6 +330,125 @@ export function EmployeeFormDrawer({ open, employee, orgUnits, positions, employ
           tooltip={t("employee.form.rankLevelHint")}
         >
           <Select allowClear options={RANK_LEVELS.map((level) => ({ value: level, label: level }))} />
+        </Form.Item>
+
+        <Divider orientation="left" plain>
+          {t("employee.form.ktvProfileSection")}
+        </Divider>
+
+        <Row gutter={12}>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.ethnicity")} name="ethnicity">
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.businessSegment")} name="businessSegmentId">
+              <Select
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                options={businessSegments.map((s) => ({ value: s.id, label: `${s.code} - ${s.name}` }))}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item label={t("employee.form.hometown")} name="hometown">
+          <Input />
+        </Form.Item>
+
+        <Row gutter={12}>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.partyJoinDate")} name="partyJoinDate">
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.auditDeptJoinDate")} name="auditDeptJoinDate">
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item label={t("employee.form.priorWorkHistory")} name="priorWorkHistory">
+          <Input.TextArea rows={2} />
+        </Form.Item>
+
+        <Row gutter={12}>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.educationLevel")} name="educationLevel">
+              <Select
+                allowClear
+                options={EDUCATION_LEVELS.map((level) => ({ value: level, label: t(`employee.educationLevel.${level}`) }))}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.politicalLevel")} name="politicalLevel">
+              <Select
+                allowClear
+                options={POLITICAL_LEVELS.map((level) => ({ value: level, label: t(`employee.politicalLevel.${level}`) }))}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={12}>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.foreignLanguageLevel")} name="foreignLanguageLevel">
+              <Input />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.itSkillLevel")} name="itSkillLevel">
+              <Input />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={12}>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.auditorClassification")} name="auditorClassification">
+              <Select
+                allowClear
+                options={AUDITOR_CLASSIFICATIONS.map((v) => ({ value: v, label: t(`employee.auditorClassification.${v}`) }))}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.teamLeadCapable")} name="teamLeadCapable" valuePropName="checked">
+              <Switch />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item label={t("employee.form.auditedBranches")} name="auditedBranchNames">
+          <Select
+            mode="multiple"
+            allowClear
+            showSearch
+            optionFilterProp="label"
+            options={branches.map((b) => ({ value: b.name, label: `${b.code} - ${b.name}` }))}
+          />
+        </Form.Item>
+
+        <Form.Item label={t("employee.form.otherDuties")} name="otherDuties">
+          <Input />
+        </Form.Item>
+
+        <Form.Item label={t("employee.form.relatedPersonBranches")} name="relatedPersonBranchNames">
+          <Select
+            mode="multiple"
+            allowClear
+            showSearch
+            optionFilterProp="label"
+            options={branches.map((b) => ({ value: b.name, label: `${b.code} - ${b.name}` }))}
+          />
+        </Form.Item>
+
+        <Form.Item label={t("employee.form.onLeave")} name="onLeave" valuePropName="checked">
+          <Switch />
         </Form.Item>
 
         <Divider orientation="left" plain>

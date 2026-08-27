@@ -109,6 +109,7 @@ export function OrganizationUnitListPage() {
     <div>
       <Typography.Title level={4}>{t("orgUnit.title")}</Typography.Title>
       <CrudTable<OrganizationUnit>
+        tableId="people.orgUnits"
         columns={columns}
         dataSource={orgUnits}
         rowKey="id"

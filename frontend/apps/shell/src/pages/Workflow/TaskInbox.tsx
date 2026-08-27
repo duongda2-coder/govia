@@ -209,7 +209,7 @@ export function TaskInbox() {
   return (
     <div>
       <Typography.Title level={4}>{t("workflow.task.title")}</Typography.Title>
-      <CrudTable<TaskSummary> columns={columns} dataSource={tasks} rowKey="id" loading={loading} />
+      <CrudTable<TaskSummary> tableId="workflow.taskInbox" columns={columns} dataSource={tasks} rowKey="id" loading={loading} />
 
       <Modal
         title={transferMode === "reassign" ? t("workflow.task.transferModal.forwardTitle") : t("workflow.task.transferModal.delegateTitle")}

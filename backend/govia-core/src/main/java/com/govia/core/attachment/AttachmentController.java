@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -41,6 +42,12 @@ public class AttachmentController {
     @GetMapping
     public ApiResponse<List<Attachment>> list(@RequestParam String entityName, @RequestParam UUID entityId) {
         return ApiResponse.ok(attachmentService.listByEntity(entityName, entityId));
+    }
+
+    /** So luong file dinh kem theo tung entityId - man hinh danh sach goi 1 lan cho ca trang thay vi N+1 goi /api/attachments. */
+    @GetMapping("/counts")
+    public ApiResponse<Map<UUID, Long>> counts(@RequestParam String entityName, @RequestParam List<UUID> entityIds) {
+        return ApiResponse.ok(attachmentService.countByEntity(entityName, entityIds));
     }
 
     @GetMapping("/{id}/download")

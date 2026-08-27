@@ -37,16 +37,15 @@ export function RoleListPage() {
   }, [load]);
 
   const handleDelete = () => {
-    const target = selected[0];
-    if (!target) return;
+    if (selected.length === 0) return;
     modal.confirm({
-      title: t("role.form.deleteConfirmTitle"),
+      title: selected.length > 1 ? t("common.deleteConfirmTitleCount", { count: selected.length }) : t("role.form.deleteConfirmTitle"),
       okText: t("common.yes"),
       cancelText: t("common.no"),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
-          await deleteRole(target.id);
+          await Promise.all(selected.map((item) => deleteRole(item.id)));
           message.success(t("role.messages.deleteSuccess"));
           setSelected([]);
           await load();
@@ -83,6 +82,7 @@ export function RoleListPage() {
     <div>
       <Typography.Title level={4}>{t("role.title")}</Typography.Title>
       <CrudTable<Role>
+        tableId="admin.roles"
         columns={columns}
         dataSource={roles}
         rowKey="id"
@@ -97,7 +97,7 @@ export function RoleListPage() {
         }}
         editDisabled={selected.length !== 1 || selected[0]?.systemDefined}
         onDelete={handleDelete}
-        deleteDisabled={selected.length !== 1 || selected[0]?.systemDefined}
+        deleteDisabled={selected.length === 0 || selected.some((r) => r.systemDefined)}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
         onExportExcel={exportRoles}
       />

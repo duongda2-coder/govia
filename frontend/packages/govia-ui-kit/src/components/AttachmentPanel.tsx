@@ -18,6 +18,26 @@ export interface AttachmentPanelProps {
   http: AxiosInstance;
   entityName: string;
   entityId: string;
+  /** Bao lai cho man hinh cha so file hien tai moi lan danh sach thay doi (upload/xoa) - man hinh
+   * danh sach dung de cap nhat badge so file ngay lap tuc, khong doi dong Drawer/Modal dinh kem. */
+  onCountChange?: (count: number) => void;
+}
+
+/**
+ * So luong file dinh kem theo tung entityId, dung de hien badge "X file" tren cot cua man hinh
+ * danh sach (vd DocumentLibraryPage) - 1 request cho ca trang thay vi goi /api/attachments rieng
+ * cho tung dong (N+1).
+ */
+export async function fetchAttachmentCounts(
+  http: AxiosInstance,
+  entityName: string,
+  entityIds: string[],
+): Promise<Record<string, number>> {
+  if (entityIds.length === 0) return {};
+  const res = await http.get<ApiResponse<Record<string, number>>>("/api/attachments/counts", {
+    params: { entityName, entityIds: entityIds.join(",") },
+  });
+  return res.data.data;
 }
 
 /**
@@ -25,7 +45,7 @@ export interface AttachmentPanelProps {
  * Chi can truyen entityName ("AUDIT_FINDING", "EMPLOYEE"...) va entityId,
  * goi thang API /api/attachments ben govia-core - khong man hinh nao tu viet upload rieng.
  */
-export function AttachmentPanel({ http, entityName, entityId }: AttachmentPanelProps) {
+export function AttachmentPanel({ http, entityName, entityId, onCountChange }: AttachmentPanelProps) {
   const [items, setItems] = useState<Attachment[]>([]);
   const [loading, setLoading] = useState(false);
   const { message } = App.useApp();
@@ -38,10 +58,11 @@ export function AttachmentPanel({ http, entityName, entityId }: AttachmentPanelP
         params: { entityName, entityId },
       });
       setItems(res.data.data);
+      onCountChange?.(res.data.data.length);
     } finally {
       setLoading(false);
     }
-  }, [http, entityName, entityId]);
+  }, [http, entityName, entityId, onCountChange]);
 
   useEffect(() => {
     load();
@@ -82,7 +103,7 @@ export function AttachmentPanel({ http, entityName, entityId }: AttachmentPanelP
 
   return (
     <div>
-      <Upload beforeUpload={handleUpload} showUploadList={false}>
+      <Upload multiple beforeUpload={handleUpload} showUploadList={false}>
         <Button icon={<UploadOutlined />}>{t("attachment.upload")}</Button>
       </Upload>
       <List

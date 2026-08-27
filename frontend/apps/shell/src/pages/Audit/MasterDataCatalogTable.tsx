@@ -141,16 +141,15 @@ export function MasterDataCatalogTable({ category, label }: { category: string; 
   };
 
   const handleDelete = () => {
-    const target = selected[0];
-    if (!target) return;
+    if (selected.length === 0) return;
     modal.confirm({
-      title: t("auditMasterData.deleteConfirmTitle"),
+      title: selected.length > 1 ? t("common.deleteConfirmTitleCount", { count: selected.length }) : t("auditMasterData.deleteConfirmTitle"),
       okText: t("common.yes"),
       cancelText: t("common.no"),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
-          await deleteMasterDataItem(category, target.id);
+          await Promise.all(selected.map((item) => deleteMasterDataItem(category, item.id)));
           message.success(t("auditMasterData.messages.deleteSuccess"));
           setSelected([]);
           await load();
@@ -182,6 +181,7 @@ export function MasterDataCatalogTable({ category, label }: { category: string; 
   return (
     <div>
       <CrudTable<MasterDataItem>
+        tableId={`auditMasterData.${category}`}
         columns={columns}
         dataSource={items}
         rowKey="id"
@@ -192,7 +192,7 @@ export function MasterDataCatalogTable({ category, label }: { category: string; 
         onCopy={canCreate ? openCopy : undefined}
         copyDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
-        deleteDisabled={selected.length !== 1}
+        deleteDisabled={selected.length === 0}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
         onExportExcel={canExport ? () => exportMasterDataItems(category, "excel") : undefined}
         onExportWord={canExport ? () => exportMasterDataItems(category, "word") : undefined}
