@@ -183,7 +183,8 @@ class EmployeeApprovalWorkflowTest extends AbstractApiTest {
 
     private UUID createEmployeeWithRank(String code, String fullName, UUID managerId, String rankLevel) throws Exception {
         EmployeeRequest request = new EmployeeRequest(code, fullName, null, null, null, null, null, null, null, null,
-                null, managerId, EmployeeRankLevel.valueOf(rankLevel));
+                null, managerId, EmployeeRankLevel.valueOf(rankLevel),
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null);
         String body = mockMvc.perform(post("/api/employees")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -279,6 +280,7 @@ class EmployeeApprovalWorkflowTest extends AbstractApiTest {
     }
 
     private EmployeeRequest employeeRequest(String code, String fullName, UUID managerId) {
-        return new EmployeeRequest(code, fullName, null, null, null, null, null, null, null, null, null, managerId, null);
+        return new EmployeeRequest(code, fullName, null, null, null, null, null, null, null, null, null, managerId, null,
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null);
     }
 }

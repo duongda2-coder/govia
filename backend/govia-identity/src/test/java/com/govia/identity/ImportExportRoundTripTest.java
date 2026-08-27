@@ -91,7 +91,8 @@ class ImportExportRoundTripTest {
     @Test
     void exportThenImportEmployees_recreatesRowFromTemplate() throws Exception {
         employeeService.create(new EmployeeRequest("RT-EMP-01", "Nguyen Van RoundTrip", null, null,
-                null, null, null, null, null, null, null, null, null));
+                null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null));
 
         byte[] excel = employeeService.exportExcel(
                 new EmployeeFilter(null, null, "RT-EMP-01", null, null, null, null, null, null, null));
@@ -144,7 +145,8 @@ class ImportExportRoundTripTest {
     @Test
     void exportAccountsExcel_containsCreatedAccount() throws Exception {
         EmployeeResponse emp = employeeService.create(new EmployeeRequest("RT-ACC-01", "Nguyen Van Export",
-                null, null, null, null, null, null, null, null, null, null, null));
+                null, null, null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null));
         userAccountService.createForEmployee(emp.id(), new CreateUserAccountRequest("rt.acc.01", "Password123"));
 
         byte[] excel = userAccountService.exportAccountsExcel();

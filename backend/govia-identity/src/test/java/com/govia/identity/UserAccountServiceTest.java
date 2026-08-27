@@ -66,7 +66,8 @@ class UserAccountServiceTest {
     }
 
     private EmployeeResponse createEmployee(String code) {
-        EmployeeRequest request = new EmployeeRequest(code, "Nguyen Van " + code, null, null, null, null, null, null, null, null, null, null, null);
+        EmployeeRequest request = new EmployeeRequest(code, "Nguyen Van " + code, null, null, null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null);
         return employeeService.create(request);
     }
 

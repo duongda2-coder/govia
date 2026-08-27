@@ -54,7 +54,8 @@ class EmployeeServiceTest {
 
     private EmployeeRequest sampleRequest(String code, UUID managerId) {
         return new EmployeeRequest(code, "Nguyen Van " + code, code.toLowerCase() + "@govia.local", null,
-                "0900000000", null, null, null, null, null, null, managerId, null);
+                "0900000000", null, null, null, null, null, null, managerId, null,
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null);
     }
 
     private EmployeeFilter keywordFilter(String keyword) {
