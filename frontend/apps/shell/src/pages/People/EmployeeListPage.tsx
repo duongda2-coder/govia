@@ -10,7 +10,7 @@ import type {
 } from "../../api/employees";
 import { changeEmployeeStatus, deleteEmployee, exportEmployees, importEmployees, listEmployees } from "../../api/employees";
 import { listOrgUnits, type OrganizationUnit } from "../../api/orgUnits";
-import { listPositions, type Position } from "../../api/positions";
+import { listPositionCatalog, type MasterDataItem as PositionItem } from "../../api/positionCatalog";
 import { listMasterDataItems, type MasterDataItem } from "../../api/auditMasterData";
 import { auditObjectUnitApi, type AuditObjectUnitItem } from "../../api/riskScoring";
 import { EmployeeFormDrawer } from "./EmployeeFormDrawer";
@@ -26,10 +26,11 @@ const STATUS_COLORS: Record<EmployeeStatus, string> = {
 
 const STATUSES: EmployeeStatus[] = ["ACTIVE", "ON_LEAVE", "TERMINATED", "PENDING_APPROVAL", "REJECTED"];
 
-/** dataIndex cua cot -> duong dan sort ma backend hieu (cot tham chieu can join sang bang khac). */
+/** dataIndex cua cot -> duong dan sort ma backend hieu (cot tham chieu can join sang bang khac).
+ * positionName KHONG co trong map nay - Employee.positionId tro toi AuditMasterDataItem (khac module,
+ * khong co quan he JPA de backend sort qua join), nen cot Chuc vu chi ho tro loc, khong sort. */
 const SORT_FIELD_MAP: Record<string, string> = {
   orgUnitName: "orgUnit.name",
-  positionName: "position.name",
   managerName: "manager.fullName",
 };
 
@@ -54,7 +55,7 @@ export function EmployeeListPage() {
    * `employees` o tren (chi 1 trang) dung de hien thi bang. */
   const [allEmployees, setAllEmployees] = useState<Employee[]>([]);
   const [orgUnits, setOrgUnits] = useState<OrganizationUnit[]>([]);
-  const [positions, setPositions] = useState<Position[]>([]);
+  const [positions, setPositions] = useState<PositionItem[]>([]);
   const [businessSegments, setBusinessSegments] = useState<MasterDataItem[]>([]);
   const [branches, setBranches] = useState<AuditObjectUnitItem[]>([]);
   const [total, setTotal] = useState(0);
@@ -73,7 +74,7 @@ export function EmployeeListPage() {
   const loadLookups = useCallback(async () => {
     const [unitsResult, positionResult, employeeResult, businessSegmentResult, branchResult] = await Promise.allSettled([
       listOrgUnits(),
-      listPositions(),
+      listPositionCatalog(),
       listEmployees({ page: 0, size: 500 }),
       listMasterDataItems("BUSINESS_SEGMENT"),
       auditObjectUnitApi.list(),
@@ -156,7 +157,6 @@ export function EmployeeListPage() {
       title: t("employee.columns.position"),
       dataIndex: "positionName",
       width: 120,
-      sorter: true,
       ...getSearchColumnProps("positionName", filters.positionName, searchLabels),
       render: (_: string | null, record) => <CodeWithTooltip code={record.positionCode} name={record.positionName} />,
     },

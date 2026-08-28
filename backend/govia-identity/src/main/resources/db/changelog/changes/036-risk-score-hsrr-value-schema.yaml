@@ -1,0 +1,76 @@
+databaseChangeLog:
+
+  # ===================== "Ho so rui ro" (sheet ZTC_HSRR) - gia tri dinh luong/dinh tinh da upload =====================
+  - changeSet:
+      id: 036-1-risk-score-criteria-quantitative-value-schema
+      author: govia
+      comment: "Tao bang risk_score_criteria_quantitative_value"
+      changes:
+        - createTable:
+            tableName: risk_score_criteria_quantitative_value
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: criteria_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: branch_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: assessment_year, type: INT, constraints: { nullable: false } }
+              - column: { name: entry_date, type: DATE }
+              - column: { name: value, type: "DECIMAL(18,4)" }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_quantitative_value
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dl_value_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_quantitative_value
+            baseColumnNames: criteria_id
+            referencedTableName: risk_score_criteria_quantitative
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dl_value_criteria
+        - addUniqueConstraint:
+            tableName: risk_score_criteria_quantitative_value
+            columnNames: tenant_id, criteria_id, branch_code, assessment_year
+            constraintName: uk_risk_score_crit_dl_value_tenant_criteria_branch_year
+
+  - changeSet:
+      id: 036-2-risk-score-criteria-qualitative-value-schema
+      author: govia
+      comment: "Tao bang risk_score_criteria_qualitative_value"
+      changes:
+        - createTable:
+            tableName: risk_score_criteria_qualitative_value
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: criteria_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: branch_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: assessment_year, type: INT, constraints: { nullable: false } }
+              - column: { name: violation, type: VARCHAR(20) }
+              - column: { name: note, type: VARCHAR(200) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_qualitative_value
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dt_value_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_qualitative_value
+            baseColumnNames: criteria_id
+            referencedTableName: risk_score_criteria_qualitative
+            referencedColumnNames: id
+            constraintName: fk_risk_score_crit_dt_value_criteria
+        - addUniqueConstraint:
+            tableName: risk_score_criteria_qualitative_value
+            columnNames: tenant_id, criteria_id, branch_code, assessment_year
+            constraintName: uk_risk_score_crit_dt_value_tenant_criteria_branch_year

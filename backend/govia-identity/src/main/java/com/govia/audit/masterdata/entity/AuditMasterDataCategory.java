@@ -13,38 +13,10 @@ package com.govia.audit.masterdata.entity;
  * - risk_kri (gan voi 1 Risk cu the + chuoi gia tri theo thoi gian, khong phai danh muc tinh)
  */
 public enum AuditMasterDataCategory {
-    // Kiem toan
-    AUDIT_TYPE("Loại hình kiểm toán", MasterDataGroup.AUDIT),
-    AUDIT_CATEGORY("Phân loại cuộc kiểm toán", MasterDataGroup.AUDIT),
-    AUDIT_METHODOLOGY("Phương pháp kiểm toán", MasterDataGroup.AUDIT),
-
-    // Phat hien & khac phuc
-    AUDIT_RATING("Xếp hạng phát hiện", MasterDataGroup.FINDING),
-    AUDIT_OPINION("Kết luận chung cuộc kiểm toán", MasterDataGroup.FINDING),
-    FINDING_CATEGORY("Phân loại phát hiện", MasterDataGroup.FINDING),
-    RECOMMENDATION_TYPE("Loại kiến nghị", MasterDataGroup.FINDING),
-    ACTION_TYPE("Loại hành động khắc phục", MasterDataGroup.FINDING),
-    PRIORITY("Mức độ ưu tiên", MasterDataGroup.FINDING),
-
     // Rui ro
     RISK_CATEGORY("Nhóm rủi ro", MasterDataGroup.RISK),
     RISK_TYPE("Loại rủi ro", MasterDataGroup.RISK),
     RISK_LEVEL("Mức độ rủi ro", MasterDataGroup.RISK),
-
-    // Kiem soat
-    CONTROL_CATEGORY("Nhóm kiểm soát", MasterDataGroup.CONTROL),
-    CONTROL_TYPE("Loại kiểm soát", MasterDataGroup.CONTROL),
-    CONTROL_FREQUENCY("Tần suất kiểm soát", MasterDataGroup.CONTROL),
-    CONTROL_EFFECTIVENESS_RATING("Đánh giá hiệu quả kiểm soát", MasterDataGroup.CONTROL),
-
-    // Quy trinh
-    BUSINESS_PROCESS("Quy trình nghiệp vụ", MasterDataGroup.PROCESS),
-    BUSINESS_PROCESS_STEP("Bước quy trình", MasterDataGroup.PROCESS),
-
-    // Tuan thu
-    REGULATION("Luật/quy định", MasterDataGroup.COMPLIANCE),
-    POLICY("Chính sách nội bộ", MasterDataGroup.COMPLIANCE),
-    STANDARD("Chuẩn áp dụng", MasterDataGroup.COMPLIANCE),
 
     // Chung
     CURRENCY("Tiền tệ", MasterDataGroup.GENERAL),

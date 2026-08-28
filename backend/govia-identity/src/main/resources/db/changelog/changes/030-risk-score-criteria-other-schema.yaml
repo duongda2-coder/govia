@@ -1,0 +1,54 @@
+databaseChangeLog:
+
+  # Sheet ZTC_CTDGRR_KHAC - danh muc chi tieu danh gia rui ro HO, CNTT, Du an, Dich vu thue ngoai...
+  # Phu thuoc risk_score_audit_object_category (021), risk_score_group_ho (017), risk_score_type_ho (029).
+  - changeSet:
+      id: 030-1-risk-score-criteria-other
+      author: govia
+      comment: "Sheet ZTC_CTDGRR_KHAC - danh muc chi tieu danh gia rui ro HO, CNTT, Du an, Dich vu thue ngoai"
+      changes:
+        - createTable:
+            tableName: risk_score_criteria_other
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_category_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: weight, type: "NUMERIC(9,4)" }
+              - column: { name: group_ho_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: risk_type_ho_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_other
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_criteria_other_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_other
+            baseColumnNames: audit_object_category_id
+            referencedTableName: risk_score_audit_object_category
+            referencedColumnNames: id
+            constraintName: fk_risk_score_criteria_other_category
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_other
+            baseColumnNames: group_ho_id
+            referencedTableName: risk_score_group_ho
+            referencedColumnNames: id
+            constraintName: fk_risk_score_criteria_other_group_ho
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_other
+            baseColumnNames: risk_type_ho_id
+            referencedTableName: risk_score_type_ho
+            referencedColumnNames: id
+            constraintName: fk_risk_score_criteria_other_type_ho
+        - addUniqueConstraint:
+            tableName: risk_score_criteria_other
+            columnNames: tenant_id, audit_object_category_id, code
+            constraintName: uk_risk_score_criteria_other_tenant_category_code

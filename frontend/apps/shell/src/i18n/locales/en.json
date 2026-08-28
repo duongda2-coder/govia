@@ -7,7 +7,7 @@
     "dashboard": "Dashboard",
     "people": "People",
     "employees": "Employees",
-    "positions": "Positions",
+    "positions": "Position Catalog",
     "orgUnits": "Organization Units",
     "admin": "System Administration",
     "roles": "Roles & Permissions",
@@ -18,15 +18,10 @@
     "workflowApprovalMatrix": "Approval Matrix",
     "audit": "Internal Audit",
     "auditMasterData": "Master Data",
-    "auditMdAudit": "Audit Catalog",
-    "auditMdFinding": "Finding & Remediation Catalog",
     "auditMdRisk": "Risk Catalog",
-    "auditMdControl": "Control Catalog",
-    "auditMdProcess": "Process Catalog",
-    "auditMdCompliance": "Compliance Catalog",
     "auditMdGeneral": "General Catalog",
     "auditMdDocumentLibrary": "Document Library Catalog",
-    "auditMdPosition": "Position Catalog",
+    "auditMdControlPoint": "Control Point Catalog",
     "auditMdDepartment": "Audit Department Catalog",
     "auditMdYear": "Year Catalog",
     "auditMdBusinessSegment": "Business Segment Catalog",
@@ -38,7 +33,15 @@
     "riskScoringCoefficientMatrix": "Coefficients & Score Matrix",
     "riskScoringUserAssignment": "Criteria User Assignment",
     "riskScoringAuditObjects": "Audit Objects",
-    "riskScoringExec": "Scoring"
+    "riskScoringExec": "Scoring",
+    "riskScoringExecGroupHO": "HO Risk Group",
+    "riskScoringExecRiskTypeHO": "HO Risk Type",
+    "riskScoringExecCriteriaOther": "Other Risk Criteria",
+    "riskScoringExecCriteriaOtherScale": "Other Risk Criteria Scale",
+    "riskScoringExecAssessmentOther": "Other Risk Assessment",
+    "riskScoringExecAssessmentOtherRanking": "Other Risk Ranking",
+    "riskScoringExecAssessmentOtherExpertRank": "Other Risk Expert Ranking",
+    "riskScoringExecHsrr": "Risk Profile"
   },
   "header": {
     "logout": "Log out"
@@ -302,10 +305,12 @@
     }
   },
   "position": {
-    "title": "Position Management",
+    "title": "Position Catalog",
     "columns": {
       "code": "Code",
       "name": "Name",
+      "description": "Description",
+      "sortOrder": "Sort Order",
       "active": "Status"
     },
     "form": {
@@ -313,15 +318,17 @@
       "editTitle": "Edit Position",
       "code": "Code",
       "name": "Name",
-      "codeRequired": "Please enter code",
-      "nameRequired": "Please enter name",
-      "save": "Save",
-      "cancel": "Cancel"
+      "description": "Description",
+      "validFrom": "Valid From",
+      "validTo": "Valid To",
+      "sortOrder": "Sort Order"
     },
+    "deleteConfirmTitle": "Delete this position?",
     "messages": {
       "createSuccess": "Position created",
       "updateSuccess": "Position updated",
-      "activeUpdateSuccess": "Status updated",
+      "deleteSuccess": "Position deleted",
+      "deleteError": "Failed to delete position",
       "loadError": "Failed to load data",
       "saveError": "Failed to save position"
     }
@@ -357,10 +364,13 @@
       "save": "Save",
       "cancel": "Cancel"
     },
+    "deleteConfirmTitle": "Delete this organization unit?",
     "messages": {
       "createSuccess": "Organization unit created",
       "updateSuccess": "Organization unit updated",
       "activeUpdateSuccess": "Status updated",
+      "deleteSuccess": "Organization unit deleted",
+      "deleteError": "Failed to delete organization unit",
       "loadError": "Failed to load data",
       "saveError": "Failed to save organization unit"
     }
@@ -507,14 +517,8 @@
   },
   "auditMasterData": {
     "groups": {
-      "AUDIT": "Audit Catalog",
-      "FINDING": "Finding & Remediation Catalog",
       "RISK": "Risk Catalog",
-      "CONTROL": "Control Catalog",
-      "PROCESS": "Process Catalog",
-      "COMPLIANCE": "Compliance Catalog",
       "GENERAL": "General Catalog",
-      "POSITION": "Position Catalog",
       "DEPARTMENT": "Audit Department Catalog",
       "YEAR": "Year Catalog",
       "BUSINESS_SEGMENT": "Business Segment Catalog"
@@ -576,6 +580,48 @@
       "deleteError": "Failed to delete",
       "saveError": "Failed to save",
       "selectRowFirst": "Please select a document to attach files"
+    }
+  },
+  "auditControlPoint": {
+    "title": "Control Point Catalog",
+    "columns": {
+      "code": "Control Point Code",
+      "name": "Control Point Name",
+      "businessSegment": "Business Segment",
+      "possibleRisk": "Possible Risk",
+      "controlPointByStep": "Control Point by Process Step",
+      "actualControl": "Actual Control at Unit",
+      "controlType": "Control Type",
+      "controlFrequency": "Control Frequency",
+      "auditProcedure": "Audit Procedure",
+      "residualRiskAssessment": "Residual Risk Assessment",
+      "processRegulation": "Process/Regulation Used",
+      "referenceClause": "Reference Clause",
+      "processEffectiveness": "Process Effectiveness",
+      "controlEffectivenessAssessment": "Control Effectiveness Assessment",
+      "controlEfficiencyAssessment": "Control Efficiency Assessment"
+    },
+    "controlType": {
+      "MANUAL": "Manual",
+      "AUTOMATIC": "Automatic"
+    },
+    "level": {
+      "HIGH": "High",
+      "MEDIUM": "Medium",
+      "LOW": "Low"
+    },
+    "form": {
+      "createTitle": "Add Control Point",
+      "editTitle": "Edit Control Point"
+    },
+    "deleteConfirmTitle": "Delete this control point?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
     }
   },
   "riskScoring": {
@@ -707,12 +753,57 @@
     "columns": {
       "code": "Group Code",
       "name": "Group Name",
-      "note": "Note"
+      "note": "Note",
+      "groupHo": "Risk Group (HO)",
+      "riskType": "Risk Type (HO)",
+      "riskTypeCode": "Risk Type Code",
+      "riskTypeName": "Risk Type Name",
+      "criteriaCode": "Criteria Code",
+      "criteriaName": "Criteria Name",
+      "scaleScore": "Scale Score",
+      "ratingLevel": "Rating Level",
+      "description": "Description"
     },
     "form": {
       "createTitle": "Add",
       "editTitle": "Edit",
-      "codeMaxLength": "Group code is at most 2 characters"
+      "codeMaxLength": "Group code is at most 2 characters",
+      "riskTypeCodeMaxLength": "Risk type code is at most 2 characters",
+      "criteriaCodeMaxLength": "Criteria code is at most 2 characters"
+    },
+    "assessmentOther": {
+      "auditObjectCode": "Audit Object Code",
+      "auditObjectName": "Audit Object Name",
+      "year": "Year",
+      "scoreLines": "Score",
+      "selectScore": "Select score"
+    },
+    "ranking": {
+      "riskScore": "Risk Score",
+      "rankLabel": "Rating",
+      "selectYear": "Select a year"
+    },
+    "expertRank": {
+      "syncFromSource": "Sync from Source",
+      "viewResults": "View Results",
+      "syncSuccess": "Synced from source",
+      "editTitle": "Update Expert Ranking",
+      "reRankLabel": "Re-rank (Expert Opinion)",
+      "reason": "Expert Reason",
+      "assessedDate": "Assessment Date",
+      "expertName": "Expert",
+      "finalRankLabel": "Final Rating",
+      "updatedBy": "Updated By"
+    },
+    "hsrr": {
+      "tabQuantitative": "Quantitative Risk Profile",
+      "tabQualitative": "Qualitative Risk Profile",
+      "branchCode": "Branch Code",
+      "branchName": "Branch Name",
+      "value": "Value",
+      "entryDate": "Entry Date",
+      "violation": "Violation",
+      "note": "Note"
     },
     "deleteConfirmTitle": "Delete this item?",
     "messages": {

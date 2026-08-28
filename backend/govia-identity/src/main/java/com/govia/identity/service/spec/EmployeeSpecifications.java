@@ -1,9 +1,13 @@
 package com.govia.identity.service.spec;
 
+import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
+import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.identity.entity.Employee;
 import com.govia.identity.entity.EmployeeStatus;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.UUID;
@@ -59,14 +63,20 @@ public final class EmployeeSpecifications {
         };
     }
 
+    /** Employee.positionId tro toi AuditMasterDataItem (category=POSITION) - khac module nen khong co
+     * quan he JPA @ManyToOne de join truc tiep, phai loc qua subquery theo id. */
     public static Specification<Employee> positionNameContains(String value) {
         if (isBlank(value)) {
             return null;
         }
         String like = likePattern(value);
         return (root, query, cb) -> {
-            Join<Object, Object> position = root.join("position", JoinType.LEFT);
-            return cb.like(cb.lower(position.get("name")), like);
+            Subquery<UUID> sub = query.subquery(UUID.class);
+            Root<AuditMasterDataItem> item = sub.from(AuditMasterDataItem.class);
+            sub.select(item.get("id"))
+                    .where(cb.equal(item.get("category"), AuditMasterDataCategory.POSITION),
+                            cb.like(cb.lower(item.get("name")), like));
+            return root.get("positionId").in(sub);
         };
     }
 

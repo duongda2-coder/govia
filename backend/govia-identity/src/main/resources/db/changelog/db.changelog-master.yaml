@@ -62,3 +62,33 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/024-employee-additional-profile-fields.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/027-audit-control-point-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/028-audit-control-point-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/029-risk-score-type-ho-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/030-risk-score-criteria-other-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/031-risk-score-criteria-other-scale-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/032-risk-score-assessment-other-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/033-migrate-position-to-master-data.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/034-risk-score-audit-object-category-seed-ctc-ktqt.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/035-risk-score-assessment-other-expert-rank-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/036-risk-score-hsrr-value-schema.yaml
+      relativeToChangelogFile: false

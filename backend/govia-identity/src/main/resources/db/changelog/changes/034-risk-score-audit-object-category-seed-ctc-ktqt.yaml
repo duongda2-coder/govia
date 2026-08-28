@@ -1,0 +1,23 @@
+databaseChangeLog:
+
+  # ===================== Bo sung 2 ma "Loai doi tuong kiem toan" con thieu (sheet ZTC_Loai_Dtkt) =====================
+  # Man hinh "Cham diem rui ro khac" (ZTC_CDRR_KHAC/ZTC_CTDGRR_KHAC) can 2 ma nay de dinh tuyen dung
+  # sang danh muc doi tuong kiem toan tuong ung: CTC -> AuditObjectSubsidiary (ZTC_DTKT2 - Cong ty
+  # con), KTQT -> AuditObjectProcess (ZTC_DTKT4 - Quy trinh) - xem RiskAssessmentOtherHeaderService.
+  - changeSet:
+      id: 034-1-risk-score-audit-object-category-seed-ctc-ktqt
+      author: govia
+      comment: "Seed them 2 loai doi tuong kiem toan CTC, KTQT moi tenant"
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO risk_score_audit_object_category (id, tenant_id, code, name, active, created_at, row_version)
+              SELECT gen_random_uuid(), t.id, v.code, v.name, true, now(), 0
+              FROM tenant t
+              CROSS JOIN (VALUES
+                ('CTC', 'Công ty con'),
+                ('KTQT', 'Kiểm toán quy trình')
+              ) AS v(code, name)
+              WHERE NOT EXISTS (
+                SELECT 1 FROM risk_score_audit_object_category c WHERE c.tenant_id = t.id AND c.code = v.code
+              );

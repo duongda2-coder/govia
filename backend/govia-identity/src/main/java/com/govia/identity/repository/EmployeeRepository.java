@@ -11,4 +11,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID>, JpaSp
     Optional<Employee> findByTenantIdAndEmployeeCode(UUID tenantId, String employeeCode);
 
     boolean existsByManagerId(UUID managerId);
+
+    boolean existsByOrgUnitId(UUID orgUnitId);
 }

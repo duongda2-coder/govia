@@ -29,7 +29,7 @@ public class AuditDocumentLibrary extends BaseEntity {
     @Column(name = "effective_date")
     private LocalDate effectiveDate;
 
-    /** "Nguoi ban hanh" - link toi Position (chuc vu), xem PositionRepository. */
+    /** "Nguoi ban hanh" - link toi AuditMasterDataItem danh muc POSITION (Danh muc Chuc vu). */
     @Column(name = "issuer_position_id", columnDefinition = "uuid")
     private UUID issuerPositionId;
 

@@ -12,4 +12,6 @@ public interface AuditMasterDataItemRepository extends JpaRepository<AuditMaster
     List<AuditMasterDataItem> findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(UUID tenantId, AuditMasterDataCategory category);
 
     Optional<AuditMasterDataItem> findByTenantIdAndCategoryAndCode(UUID tenantId, AuditMasterDataCategory category, String code);
+
+    Optional<AuditMasterDataItem> findByTenantIdAndCategoryAndNameIgnoreCase(UUID tenantId, AuditMasterDataCategory category, String name);
 }

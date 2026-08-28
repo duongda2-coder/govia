@@ -1,0 +1,89 @@
+databaseChangeLog:
+
+  # Sheet ZTC_CDRR_KHAC - "Cham diem rui ro HO, CNTT, Du an, Dich vu thue ngoai...": header (1 ky
+  # cham diem cho 1 doi tuong + 1 nam) + line (diem tung chi tieu, he thong tu sinh theo danh muc
+  # chi tieu). Phu thuoc risk_score_audit_object_category (021), risk_score_criteria_other (030),
+  # risk_score_criteria_other_scale (031).
+  - changeSet:
+      id: 032-1-risk-score-assessment-other-header
+      author: govia
+      comment: "Sheet ZTC_CDRR_KHAC - header cham diem rui ro HO, CNTT, Du an, Dich vu thue ngoai"
+      changes:
+        - createTable:
+            tableName: risk_score_assessment_other_header
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_category_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_code, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: assessment_year, type: INT, constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_assessment_other_header
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_assessment_other_header_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_assessment_other_header
+            baseColumnNames: audit_object_category_id
+            referencedTableName: risk_score_audit_object_category
+            referencedColumnNames: id
+            constraintName: fk_risk_score_assessment_other_header_category
+        - addUniqueConstraint:
+            tableName: risk_score_assessment_other_header
+            columnNames: tenant_id, audit_object_category_id, audit_object_code, assessment_year
+            constraintName: uk_risk_score_assessment_other_header_object_year
+
+  - changeSet:
+      id: 032-2-risk-score-assessment-other-line
+      author: govia
+      comment: "Sheet ZTC_CDRR_KHAC - line cham diem tung chi tieu"
+      changes:
+        - createTable:
+            tableName: risk_score_assessment_other_line
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: header_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: criteria_other_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: scale_id, type: UUID }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_assessment_other_line
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_assessment_other_line_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_assessment_other_line
+            baseColumnNames: header_id
+            referencedTableName: risk_score_assessment_other_header
+            referencedColumnNames: id
+            constraintName: fk_risk_score_assessment_other_line_header
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_assessment_other_line
+            baseColumnNames: criteria_other_id
+            referencedTableName: risk_score_criteria_other
+            referencedColumnNames: id
+            constraintName: fk_risk_score_assessment_other_line_criteria
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_assessment_other_line
+            baseColumnNames: scale_id
+            referencedTableName: risk_score_criteria_other_scale
+            referencedColumnNames: id
+            constraintName: fk_risk_score_assessment_other_line_scale
+        - addUniqueConstraint:
+            tableName: risk_score_assessment_other_line
+            columnNames: header_id, criteria_other_id
+            constraintName: uk_risk_score_assessment_other_line_header_criteria

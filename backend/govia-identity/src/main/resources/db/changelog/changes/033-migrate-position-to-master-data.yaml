@@ -1,0 +1,60 @@
+databaseChangeLog:
+
+  # ===================== "Chuc danh" (bang position rieng) -> "Danh muc Chuc vu" =====================
+  # Gop danh muc Chuc danh (bang position, module Nhan su) vao audit_master_data_item (category=POSITION,
+  # dung chung voi cac danh muc khac cua module Kiem toan noi bo) - giu nguyen UUID cu de employee.position_id
+  # va audit_document_library.issuer_position_id KHONG bi dut lien ket, khong can UPDATE lai 2 bang do.
+  - changeSet:
+      id: 033-1-migrate-position-to-master-data-item
+      author: govia
+      comment: "Copy du lieu position -> audit_master_data_item (category=POSITION)"
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO audit_master_data_item
+                (id, tenant_id, category, parent_id, code, name, description, valid_from, valid_to, sort_order,
+                 active, created_at, created_by, updated_at, updated_by, row_version)
+              SELECT id, tenant_id, 'POSITION', NULL, code, name, NULL, NULL, NULL, NULL,
+                     active, created_at, created_by, updated_at, updated_by, row_version
+              FROM position;
+
+  - changeSet:
+      id: 033-2-repoint-position-fk
+      author: govia
+      comment: "Chuyen FK employee.position_id / audit_document_library.issuer_position_id sang audit_master_data_item"
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: employee
+            constraintName: fk_employee_position
+        - addForeignKeyConstraint:
+            baseTableName: employee
+            baseColumnNames: position_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_employee_position_master_data
+        - dropForeignKeyConstraint:
+            baseTableName: audit_document_library
+            constraintName: fk_audit_doc_lib_issuer_position
+        - addForeignKeyConstraint:
+            baseTableName: audit_document_library
+            baseColumnNames: issuer_position_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_doc_lib_issuer_position_master_data
+
+  - changeSet:
+      id: 033-3-drop-position-table
+      author: govia
+      comment: "Xoa bang position - da thay the boi Danh muc Chuc vu (audit_master_data_item, category=POSITION)"
+      changes:
+        - dropTable:
+            tableName: position
+
+  - changeSet:
+      id: 033-4-position-permission-resource-label
+      author: govia
+      comment: "Doi nhan hien thi permission PEOPLE.POSITION.* trong man Phan quyen (Chuc danh -> Danh muc Chuc vu)"
+      changes:
+        - sql:
+            sql: >
+              UPDATE permission SET resource_label = 'Danh muc Chuc vu' WHERE code LIKE 'PEOPLE.POSITION.%';

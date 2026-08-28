@@ -1,19 +1,20 @@
 package com.govia.identity;
 
+import com.govia.audit.masterdata.dto.MasterDataItemRequest;
+import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
+import com.govia.audit.masterdata.service.MasterDataItemService;
 import com.govia.core.export.ImportResult;
 import com.govia.core.tenant.TenantContext;
 import com.govia.identity.dto.CreateUserAccountRequest;
 import com.govia.identity.dto.EmployeeFilter;
 import com.govia.identity.dto.EmployeeRequest;
 import com.govia.identity.dto.EmployeeResponse;
-import com.govia.identity.dto.PositionRequest;
 import com.govia.identity.dto.RolePermissionsRequest;
 import com.govia.identity.dto.RoleRequest;
 import com.govia.identity.dto.RoleResponse;
 import com.govia.identity.entity.Tenant;
 import com.govia.identity.repository.TenantRepository;
 import com.govia.identity.service.EmployeeService;
-import com.govia.identity.service.PositionService;
 import com.govia.identity.service.RoleService;
 import com.govia.identity.service.UserAccountService;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -36,7 +37,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Kiem chung ca vong Xuat Excel -> Nhap lai Excel dung mau cho Position va Employee -
+ * Kiem chung ca vong Xuat Excel -> Nhap lai Excel dung mau cho Danh muc Chuc vu va Employee -
  * dam bao ExcelImportService khop dung header voi ExportColumn va tao lai du lieu chinh xac.
  */
 @SpringBootTest
@@ -45,7 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ImportExportRoundTripTest {
 
     @Autowired
-    private PositionService positionService;
+    private MasterDataItemService masterDataItemService;
 
     @Autowired
     private EmployeeService employeeService;
@@ -73,15 +74,16 @@ class ImportExportRoundTripTest {
 
     @Test
     void exportThenImportPositions_recreatesRowsFromTemplate() {
-        positionService.create(new PositionRequest("RT-POS-01", "Ky su RoundTrip"));
-        int totalBeforeReimport = positionService.list().size();
-        byte[] excel = positionService.exportExcel();
+        masterDataItemService.create(AuditMasterDataCategory.POSITION,
+                new MasterDataItemRequest("RT-POS-01", "Ky su RoundTrip", null, null, null, null, null, true));
+        int totalBeforeReimport = masterDataItemService.list(AuditMasterDataCategory.POSITION).size();
+        byte[] excel = masterDataItemService.exportExcel(AuditMasterDataCategory.POSITION);
 
         MockMultipartFile file = new MockMultipartFile("file", "positions.xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excel);
 
         // Import lai CHINH file vua xuat (chua ma da co san) -> moi dong deu trung ma, khong dong nao duoc tao moi.
-        ImportResult result = positionService.importFromExcel(file);
+        ImportResult result = masterDataItemService.importFromExcel(AuditMasterDataCategory.POSITION, file);
 
         assertThat(result.successCount()).isZero();
         assertThat(result.failureCount()).isEqualTo(totalBeforeReimport);

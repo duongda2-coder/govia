@@ -5,7 +5,7 @@ import { LoginPage } from "./pages/Login/LoginPage";
 import { AppLayout } from "./layout/AppLayout";
 import { Dashboard } from "./pages/Dashboard";
 import { EmployeeListPage } from "./pages/People/EmployeeListPage";
-import { PositionListPage } from "./pages/People/PositionListPage";
+import { PositionCatalogPage } from "./pages/People/PositionCatalogPage";
 import { OrganizationUnitListPage } from "./pages/People/OrganizationUnitListPage";
 import { RoleListPage } from "./pages/Admin/RoleListPage";
 import { AccountListPage } from "./pages/Admin/AccountListPage";
@@ -14,13 +14,21 @@ import { ProcessInstances } from "./pages/Workflow/ProcessInstances";
 import { ApprovalMatrixPage } from "./pages/Workflow/ApprovalMatrixPage";
 import { MasterDataGroupPage } from "./pages/Audit/MasterDataGroupPage";
 import { DocumentLibraryPage } from "./pages/Audit/DocumentLibrary/DocumentLibraryPage";
+import { ControlPointPage } from "./pages/Audit/ControlPoint/ControlPointPage";
 import { RiskScoringGroupsPage } from "./pages/Audit/RiskScoring/RiskScoringGroupsPage";
 import { RiskScoringCriteriaPage } from "./pages/Audit/RiskScoring/RiskScoringCriteriaPage";
 import { RiskScoringWeightPage } from "./pages/Audit/RiskScoring/RiskScoringWeightPage";
 import { RiskScoringCoefficientMatrixPage } from "./pages/Audit/RiskScoring/RiskScoringCoefficientMatrixPage";
 import { RiskScoringUserAssignmentPage } from "./pages/Audit/RiskScoring/RiskScoringUserAssignmentPage";
 import { RiskScoringAuditObjectsPage } from "./pages/Audit/RiskScoring/RiskScoringAuditObjectsPage";
-import { RiskScoringExecPage } from "./pages/Audit/RiskScoringExec/RiskScoringExecPage";
+import { GroupHOPage } from "./pages/Audit/RiskScoringExec/GroupHOPage";
+import { RiskTypeHOPage } from "./pages/Audit/RiskScoringExec/RiskTypeHOPage";
+import { RiskCriteriaOtherPage } from "./pages/Audit/RiskScoringExec/RiskCriteriaOtherPage";
+import { RiskCriteriaOtherScalePage } from "./pages/Audit/RiskScoringExec/RiskCriteriaOtherScalePage";
+import { RiskAssessmentOtherPage } from "./pages/Audit/RiskScoringExec/RiskAssessmentOtherPage";
+import { RiskAssessmentOtherRankingPage } from "./pages/Audit/RiskScoringExec/RiskAssessmentOtherRankingPage";
+import { RiskAssessmentOtherExpertRankPage } from "./pages/Audit/RiskScoringExec/RiskAssessmentOtherExpertRankPage";
+import { RiskCriteriaHsrrPage } from "./pages/Audit/RiskScoringExec/RiskCriteriaHsrrPage";
 import { GlobalModalKeyboardShortcuts } from "./components/GlobalModalKeyboardShortcuts";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -45,22 +53,17 @@ function App() {
         >
           <Route index element={<Dashboard />} />
           <Route path="people/employees" element={<EmployeeListPage />} />
-          <Route path="people/positions" element={<PositionListPage />} />
+          <Route path="people/positions" element={<PositionCatalogPage />} />
           <Route path="people/org-units" element={<OrganizationUnitListPage />} />
           <Route path="admin/roles" element={<RoleListPage />} />
           <Route path="admin/accounts" element={<AccountListPage />} />
           <Route path="workflow/tasks" element={<TaskInbox />} />
           <Route path="workflow/instances" element={<ProcessInstances />} />
           <Route path="workflow/approval-matrix" element={<ApprovalMatrixPage />} />
-          <Route path="audit/master-data/audit" element={<MasterDataGroupPage group="AUDIT" title={t("auditMasterData.groups.AUDIT")} />} />
-          <Route path="audit/master-data/finding" element={<MasterDataGroupPage group="FINDING" title={t("auditMasterData.groups.FINDING")} />} />
           <Route path="audit/master-data/risk" element={<MasterDataGroupPage group="RISK" title={t("auditMasterData.groups.RISK")} />} />
-          <Route path="audit/master-data/control" element={<MasterDataGroupPage group="CONTROL" title={t("auditMasterData.groups.CONTROL")} />} />
-          <Route path="audit/master-data/process" element={<MasterDataGroupPage group="PROCESS" title={t("auditMasterData.groups.PROCESS")} />} />
-          <Route path="audit/master-data/compliance" element={<MasterDataGroupPage group="COMPLIANCE" title={t("auditMasterData.groups.COMPLIANCE")} />} />
           <Route path="audit/master-data/general" element={<MasterDataGroupPage group="GENERAL" title={t("auditMasterData.groups.GENERAL")} />} />
           <Route path="audit/master-data/document-library" element={<DocumentLibraryPage />} />
-          <Route path="audit/master-data/position" element={<MasterDataGroupPage group="POSITION" title={t("auditMasterData.groups.POSITION")} />} />
+          <Route path="audit/master-data/control-point" element={<ControlPointPage />} />
           <Route path="audit/master-data/department" element={<MasterDataGroupPage group="DEPARTMENT" title={t("auditMasterData.groups.DEPARTMENT")} />} />
           <Route path="audit/master-data/year" element={<MasterDataGroupPage group="YEAR" title={t("auditMasterData.groups.YEAR")} />} />
           <Route path="audit/master-data/business-segment" element={<MasterDataGroupPage group="BUSINESS_SEGMENT" title={t("auditMasterData.groups.BUSINESS_SEGMENT")} />} />
@@ -70,8 +73,15 @@ function App() {
           <Route path="audit/risk-scoring/master-data/coefficient-matrix" element={<RiskScoringCoefficientMatrixPage />} />
           <Route path="audit/risk-scoring/master-data/user-assignment" element={<RiskScoringUserAssignmentPage />} />
           <Route path="audit/risk-scoring/master-data/audit-objects" element={<RiskScoringAuditObjectsPage />} />
-          <Route path="audit/risk-scoring/scoring" element={<RiskScoringExecPage />} />
-          {/* Cac sheet tiep theo cua "2. Cham diem.xlsx" se them tab moi vao RiskScoringExecPage, khong can them route moi. */}
+          <Route path="audit/risk-scoring/scoring/group-ho" element={<GroupHOPage />} />
+          <Route path="audit/risk-scoring/scoring/risk-type-ho" element={<RiskTypeHOPage />} />
+          <Route path="audit/risk-scoring/scoring/criteria-other" element={<RiskCriteriaOtherPage />} />
+          <Route path="audit/risk-scoring/scoring/criteria-other-scale" element={<RiskCriteriaOtherScalePage />} />
+          <Route path="audit/risk-scoring/scoring/assessment-other" element={<RiskAssessmentOtherPage />} />
+          <Route path="audit/risk-scoring/scoring/assessment-other-ranking" element={<RiskAssessmentOtherRankingPage />} />
+          <Route path="audit/risk-scoring/scoring/assessment-other-expert-rank" element={<RiskAssessmentOtherExpertRankPage />} />
+          <Route path="audit/risk-scoring/scoring/hsrr" element={<RiskCriteriaHsrrPage />} />
+          {/* Cac sheet tiep theo cua "2. Cham diem.xlsx" se them 1 route/menu rieng nhu tren, khong phai tab. */}
         </Route>
       </Routes>
     </>

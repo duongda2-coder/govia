@@ -15,7 +15,7 @@ import {
   type DocumentLibraryItem,
   type DocumentLibraryRequest,
 } from "../../../api/documentLibrary";
-import { listPositions, type Position } from "../../../api/positions";
+import { listPositionCatalog, type MasterDataItem as PositionItem } from "../../../api/positionCatalog";
 import { httpClient } from "../../../api/client";
 import { useAuth } from "../../../auth/AuthContext";
 import { DocumentAttachmentDrawer } from "./DocumentAttachmentDrawer";
@@ -53,7 +53,7 @@ export function DocumentLibraryPage() {
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
   const [items, setItems] = useState<DocumentLibraryItem[]>([]);
-  const [positions, setPositions] = useState<Position[]>([]);
+  const [positions, setPositions] = useState<PositionItem[]>([]);
   const [attachmentCounts, setAttachmentCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<DocumentLibraryItem[]>([]);
@@ -66,7 +66,7 @@ export function DocumentLibraryPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [list, positionList] = await Promise.all([listDocumentLibrary(), listPositions()]);
+      const [list, positionList] = await Promise.all([listDocumentLibrary(), listPositionCatalog()]);
       setItems(list);
       setPositions(positionList);
       // So file dinh kem la thong tin bo sung (hien badge tren cot) - loi o day khong duoc lam

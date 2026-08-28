@@ -18,11 +18,9 @@ import com.govia.identity.dto.EmployeeResponse;
 import com.govia.identity.entity.Employee;
 import com.govia.identity.entity.EmployeeStatus;
 import com.govia.identity.entity.OrganizationUnit;
-import com.govia.identity.entity.Position;
 import com.govia.identity.entity.UserAccount;
 import com.govia.identity.repository.EmployeeRepository;
 import com.govia.identity.repository.OrganizationUnitRepository;
-import com.govia.identity.repository.PositionRepository;
 import com.govia.identity.repository.UserAccountRepository;
 import com.govia.identity.service.spec.EmployeeSpecifications;
 import org.springframework.data.domain.Page;
@@ -50,9 +48,8 @@ public class EmployeeService {
 
     private final EmployeeRepository repository;
     private final OrganizationUnitRepository orgUnitRepository;
-    private final PositionRepository positionRepository;
     private final UserAccountRepository userAccountRepository;
-    private final AuditMasterDataItemRepository businessSegmentRepository;
+    private final AuditMasterDataItemRepository masterDataItemRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
@@ -61,9 +58,8 @@ public class EmployeeService {
 
     public EmployeeService(EmployeeRepository repository,
                             OrganizationUnitRepository orgUnitRepository,
-                            PositionRepository positionRepository,
                             UserAccountRepository userAccountRepository,
-                            AuditMasterDataItemRepository businessSegmentRepository,
+                            AuditMasterDataItemRepository masterDataItemRepository,
                             AuditLogService auditLogService,
                             ExcelExportService excelExportService,
                             WordExportService wordExportService,
@@ -71,9 +67,8 @@ public class EmployeeService {
                             EmployeeApprovalService employeeApprovalService) {
         this.repository = repository;
         this.orgUnitRepository = orgUnitRepository;
-        this.positionRepository = positionRepository;
         this.userAccountRepository = userAccountRepository;
-        this.businessSegmentRepository = businessSegmentRepository;
+        this.masterDataItemRepository = masterDataItemRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
@@ -265,8 +260,8 @@ public class EmployeeService {
         if (isBlank(name)) {
             return null;
         }
-        return positionRepository.findByTenantIdAndNameIgnoreCase(tenantId, name.trim())
-                .orElseThrow(() -> new BusinessException("IMPORT_POSITION_NOT_FOUND", "Khong tim thay chuc danh ten: " + name))
+        return masterDataItemRepository.findByTenantIdAndCategoryAndNameIgnoreCase(tenantId, AuditMasterDataCategory.POSITION, name.trim())
+                .orElseThrow(() -> new BusinessException("IMPORT_POSITION_NOT_FOUND", "Khong tim thay chuc vu ten: " + name))
                 .getId();
     }
 
@@ -338,13 +333,14 @@ public class EmployeeService {
                 .orElseThrow(() -> new BusinessException("ORG_UNIT_NOT_FOUND", "Don vi to chuc khong ton tai"));
     }
 
+    /** "Chuc vu" phai la 1 dong danh muc POSITION that su (khong duoc tro sang danh muc khac cung bang audit_master_data_item). */
     private void validatePosition(UUID tenantId, UUID positionId) {
         if (positionId == null) {
             return;
         }
-        positionRepository.findById(positionId)
-                .filter(p -> p.getTenantId().equals(tenantId))
-                .orElseThrow(() -> new BusinessException("POSITION_NOT_FOUND", "Chuc danh khong ton tai"));
+        masterDataItemRepository.findById(positionId)
+                .filter(item -> item.getTenantId().equals(tenantId) && item.getCategory() == AuditMasterDataCategory.POSITION)
+                .orElseThrow(() -> new BusinessException("POSITION_NOT_FOUND", "Chuc vu khong ton tai"));
     }
 
     /** "Linh vuc" phai la 1 dong danh muc BUSINESS_SEGMENT that su (khong duoc tro sang danh muc khac cung bang audit_master_data_item). */
@@ -352,7 +348,7 @@ public class EmployeeService {
         if (businessSegmentId == null) {
             return;
         }
-        businessSegmentRepository.findById(businessSegmentId)
+        masterDataItemRepository.findById(businessSegmentId)
                 .filter(item -> item.getTenantId().equals(tenantId) && item.getCategory() == AuditMasterDataCategory.BUSINESS_SEGMENT)
                 .orElseThrow(() -> new BusinessException("BUSINESS_SEGMENT_NOT_FOUND", "Khong tim thay linh vuc/mang nghiep vu"));
     }
@@ -441,15 +437,15 @@ public class EmployeeService {
 
         Map<UUID, OrganizationUnit> orgUnits = orgUnitIds.isEmpty() ? Map.of()
                 : orgUnitRepository.findAllById(orgUnitIds).stream().collect(Collectors.toMap(OrganizationUnit::getId, u -> u));
-        Map<UUID, Position> positions = positionIds.isEmpty() ? Map.of()
-                : positionRepository.findAllById(positionIds).stream().collect(Collectors.toMap(Position::getId, p -> p));
+        Map<UUID, AuditMasterDataItem> positions = positionIds.isEmpty() ? Map.of()
+                : masterDataItemRepository.findAllById(positionIds).stream().collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i));
         Map<UUID, Employee> managers = managerIds.isEmpty() ? Map.of()
                 : repository.findAllById(managerIds).stream().collect(Collectors.toMap(Employee::getId, m -> m));
         Map<UUID, String> usernames = employeeIds.isEmpty() ? Map.of()
                 : userAccountRepository.findByEmployeeIdIn(employeeIds).stream()
                         .collect(Collectors.toMap(UserAccount::getEmployeeId, UserAccount::getUsername, (a, b) -> a));
         Map<UUID, AuditMasterDataItem> businessSegments = businessSegmentIds.isEmpty() ? Map.of()
-                : businessSegmentRepository.findAllById(businessSegmentIds).stream()
+                : masterDataItemRepository.findAllById(businessSegmentIds).stream()
                         .collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i));
 
         return new ResponseContext(orgUnits, positions, managers, usernames, businessSegments);
@@ -457,7 +453,7 @@ public class EmployeeService {
 
     private EmployeeResponse toResponse(Employee e, ResponseContext ctx) {
         OrganizationUnit orgUnit = e.getOrgUnitId() == null ? null : ctx.orgUnits.get(e.getOrgUnitId());
-        Position position = e.getPositionId() == null ? null : ctx.positions.get(e.getPositionId());
+        AuditMasterDataItem position = e.getPositionId() == null ? null : ctx.positions.get(e.getPositionId());
         Employee manager = e.getManagerId() == null ? null : ctx.managers.get(e.getManagerId());
         AuditMasterDataItem businessSegment = e.getBusinessSegmentId() == null ? null : ctx.businessSegments.get(e.getBusinessSegmentId());
 
@@ -481,13 +477,13 @@ public class EmployeeService {
         return unit == null ? "" : unit.getName();
     }
 
-    private static String nameOf(Position position) {
-        return position == null ? "" : position.getName();
+    private static String nameOf(AuditMasterDataItem item) {
+        return item == null ? "" : item.getName();
     }
 
     private record ResponseContext(
             Map<UUID, OrganizationUnit> orgUnits,
-            Map<UUID, Position> positions,
+            Map<UUID, AuditMasterDataItem> positions,
             Map<UUID, Employee> managers,
             Map<UUID, String> usernames,
             Map<UUID, AuditMasterDataItem> businessSegments

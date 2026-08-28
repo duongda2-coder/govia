@@ -1,0 +1,39 @@
+databaseChangeLog:
+
+  # Sheet ZTC_RR_HO - danh muc loai rui ro cua HO, con cua risk_score_group_ho (xem 017).
+  - changeSet:
+      id: 029-1-risk-score-type-ho
+      author: govia
+      comment: "Sheet ZTC_RR_HO - danh muc loai rui ro cua HO"
+      changes:
+        - createTable:
+            tableName: risk_score_type_ho
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: group_ho_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: weight, type: "NUMERIC(9,4)" }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_type_ho
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_type_ho_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_type_ho
+            baseColumnNames: group_ho_id
+            referencedTableName: risk_score_group_ho
+            referencedColumnNames: id
+            constraintName: fk_risk_score_type_ho_group_ho
+        - addUniqueConstraint:
+            tableName: risk_score_type_ho
+            columnNames: tenant_id, group_ho_id, code
+            constraintName: uk_risk_score_type_ho_tenant_group_code

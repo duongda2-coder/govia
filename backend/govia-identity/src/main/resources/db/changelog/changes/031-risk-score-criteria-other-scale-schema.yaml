@@ -1,0 +1,43 @@
+databaseChangeLog:
+
+  # Sheet ZTC_CTRR_KHAC_TD - danh muc thang diem cua chi tieu danh gia rui ro HO, CNTT, Du an,
+  # Dich vu thue ngoai... Phu thuoc risk_score_audit_object_category (021), risk_score_criteria_other (030).
+  - changeSet:
+      id: 031-1-risk-score-criteria-other-scale
+      author: govia
+      comment: "Sheet ZTC_CTRR_KHAC_TD - danh muc thang diem cua chi tieu danh gia rui ro khac"
+      changes:
+        - createTable:
+            tableName: risk_score_criteria_other_scale
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_category_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: criteria_other_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: scale_score, type: INT, constraints: { nullable: false } }
+              - column: { name: rating_level, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: description, type: VARCHAR(1000) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_other_scale
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_criteria_other_scale_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_other_scale
+            baseColumnNames: audit_object_category_id
+            referencedTableName: risk_score_audit_object_category
+            referencedColumnNames: id
+            constraintName: fk_risk_score_criteria_other_scale_category
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_criteria_other_scale
+            baseColumnNames: criteria_other_id
+            referencedTableName: risk_score_criteria_other
+            referencedColumnNames: id
+            constraintName: fk_risk_score_criteria_other_scale_criteria

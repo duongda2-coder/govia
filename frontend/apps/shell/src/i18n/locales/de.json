@@ -7,7 +7,7 @@
     "dashboard": "Übersicht",
     "people": "Personal",
     "employees": "Mitarbeiter",
-    "positions": "Positionen",
+    "positions": "Positionskatalog",
     "orgUnits": "Organisationseinheiten",
     "admin": "Systemverwaltung",
     "roles": "Rollen & Berechtigungen",
@@ -18,12 +18,7 @@
     "workflowApprovalMatrix": "Genehmigungsmatrix",
     "audit": "Interne Revision",
     "auditMasterData": "Stammdaten",
-    "auditMdAudit": "Prüfungskatalog",
-    "auditMdFinding": "Feststellungs- und Abhilfekatalog",
     "auditMdRisk": "Risikokatalog",
-    "auditMdControl": "Kontrollkatalog",
-    "auditMdProcess": "Prozesskatalog",
-    "auditMdCompliance": "Compliance-Katalog",
     "auditMdGeneral": "Allgemeiner Katalog"
   },
   "header": {
@@ -222,10 +217,12 @@
     }
   },
   "position": {
-    "title": "Positionsverwaltung",
+    "title": "Positionskatalog",
     "columns": {
       "code": "Code",
       "name": "Name",
+      "description": "Beschreibung",
+      "sortOrder": "Reihenfolge",
       "active": "Status"
     },
     "form": {
@@ -233,15 +230,17 @@
       "editTitle": "Position bearbeiten",
       "code": "Code",
       "name": "Name",
-      "codeRequired": "Bitte Code eingeben",
-      "nameRequired": "Bitte Namen eingeben",
-      "save": "Speichern",
-      "cancel": "Abbrechen"
+      "description": "Beschreibung",
+      "validFrom": "Gültig ab",
+      "validTo": "Gültig bis",
+      "sortOrder": "Reihenfolge"
     },
+    "deleteConfirmTitle": "Diese Position löschen?",
     "messages": {
       "createSuccess": "Position erstellt",
       "updateSuccess": "Position aktualisiert",
-      "activeUpdateSuccess": "Status aktualisiert",
+      "deleteSuccess": "Position gelöscht",
+      "deleteError": "Position konnte nicht gelöscht werden",
       "loadError": "Daten konnten nicht geladen werden",
       "saveError": "Position konnte nicht gespeichert werden"
     }
@@ -277,10 +276,13 @@
       "save": "Speichern",
       "cancel": "Abbrechen"
     },
+    "deleteConfirmTitle": "Diese Organisationseinheit löschen?",
     "messages": {
       "createSuccess": "Einheit erstellt",
       "updateSuccess": "Einheit aktualisiert",
       "activeUpdateSuccess": "Status aktualisiert",
+      "deleteSuccess": "Einheit gelöscht",
+      "deleteError": "Einheit konnte nicht gelöscht werden",
       "loadError": "Daten konnten nicht geladen werden",
       "saveError": "Einheit konnte nicht gespeichert werden"
     }
@@ -427,12 +429,7 @@
   },
   "auditMasterData": {
     "groups": {
-      "AUDIT": "Prüfungskatalog",
-      "FINDING": "Feststellungs- und Abhilfekatalog",
       "RISK": "Risikokatalog",
-      "CONTROL": "Kontrollkatalog",
-      "PROCESS": "Prozesskatalog",
-      "COMPLIANCE": "Compliance-Katalog",
       "GENERAL": "Allgemeiner Katalog"
     },
     "columns": {

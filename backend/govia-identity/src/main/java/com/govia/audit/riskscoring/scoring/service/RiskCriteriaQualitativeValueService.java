@@ -1,0 +1,175 @@
+package com.govia.audit.riskscoring.scoring.service;
+
+import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
+import com.govia.audit.riskscoring.masterdata.entity.RiskCriteriaQualitative;
+import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
+import com.govia.audit.riskscoring.masterdata.repository.RiskCriteriaQualitativeRepository;
+import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQualitativeValueResponse;
+import com.govia.audit.riskscoring.scoring.entity.RiskCriteriaQualitativeValue;
+import com.govia.audit.riskscoring.scoring.repository.RiskCriteriaQualitativeValueRepository;
+import com.govia.core.audit.AuditAction;
+import com.govia.core.audit.AuditLogService;
+import com.govia.core.export.ExcelImportService;
+import com.govia.core.export.ExportColumn;
+import com.govia.core.export.ImportResult;
+import com.govia.core.tenant.TenantContext;
+import com.govia.core.web.BusinessException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+/**
+ * "Ho so rui ro dinh tinh" (sheet ZTC_HSRR, upload theo mau DT_HSRR_Upload) - dang bang dai
+ * (long-format, 1 dong = 1 chi tieu/chi nhanh/nam) nen dung duoc ExcelImportService dung chung.
+ * Khac voi ho so dinh luong, khong co co che phan quyen theo user/chi tieu (ZTC_HSRR_DL_User chi
+ * ap dung cho "DL" = dinh luong theo dung ten goi va mo ta trong tai lieu goc).
+ */
+@Service
+public class RiskCriteriaQualitativeValueService {
+
+    private final RiskCriteriaQualitativeValueRepository repository;
+    private final RiskCriteriaQualitativeRepository criteriaRepository;
+    private final AuditObjectUnitRepository auditObjectUnitRepository;
+    private final AuditLogService auditLogService;
+    private final ExcelImportService excelImportService;
+
+    public RiskCriteriaQualitativeValueService(RiskCriteriaQualitativeValueRepository repository,
+                                                RiskCriteriaQualitativeRepository criteriaRepository,
+                                                AuditObjectUnitRepository auditObjectUnitRepository,
+                                                AuditLogService auditLogService,
+                                                ExcelImportService excelImportService) {
+        this.repository = repository;
+        this.criteriaRepository = criteriaRepository;
+        this.auditObjectUnitRepository = auditObjectUnitRepository;
+        this.auditLogService = auditLogService;
+        this.excelImportService = excelImportService;
+    }
+
+    @Transactional(readOnly = true)
+    public List<RiskCriteriaQualitativeValueResponse> list(Integer year) {
+        UUID tenantId = TenantContext.getTenantId();
+        Map<UUID, RiskCriteriaQualitative> criteria = criteriaById(tenantId);
+        Map<String, AuditObjectUnit> units = unitsByCode(tenantId);
+        return repository.findByTenantIdAndYearOrderByBranchCodeAsc(tenantId, year).stream()
+                .map(item -> toResponse(item, criteria, units))
+                .toList();
+    }
+
+    @Transactional
+    public ImportResult importFromExcel(MultipartFile file) {
+        List<Map<String, String>> rows;
+        try {
+            rows = excelImportService.parse(file.getInputStream(), templateColumns());
+        } catch (IOException e) {
+            throw new UncheckedIOException("Khong doc duoc file", e);
+        }
+
+        UUID tenantId = TenantContext.getTenantId();
+        Map<String, UUID> criteriaIdsByCode = new HashMap<>();
+        criteriaRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> criteriaIdsByCode.put(c.getCode(), c.getId()));
+
+        int success = 0;
+        List<ImportResult.ImportRowError> errors = new ArrayList<>();
+        for (int i = 0; i < rows.size(); i++) {
+            int rowNumber = i + 2;
+            Map<String, String> row = rows.get(i);
+            try {
+                String criteriaCode = row.get("criteriaCode");
+                String branchCode = row.get("branchCode");
+                Integer year = parseInt(row.get("year"));
+                if (isBlank(criteriaCode) || isBlank(branchCode) || year == null) {
+                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Ma chi tieu, Ma chi nhanh hoac Nam");
+                }
+                UUID criteriaId = criteriaIdsByCode.get(criteriaCode.trim());
+                if (criteriaId == null) {
+                    throw new BusinessException("RISK_CRITERIA_DT_NOT_FOUND", "Khong tim thay chi tieu dinh tinh: " + criteriaCode);
+                }
+                if (auditObjectUnitRepository.findByTenantIdAndCode(tenantId, branchCode.trim()).isEmpty()) {
+                    throw new BusinessException("AUDIT_OBJECT_CODE_NOT_FOUND", "Khong tim thay chi nhanh: " + branchCode);
+                }
+
+                RiskCriteriaQualitativeValue item = repository
+                        .findByTenantIdAndCriteriaIdAndBranchCodeAndYear(tenantId, criteriaId, branchCode.trim(), year)
+                        .orElseGet(() -> {
+                            RiskCriteriaQualitativeValue created = new RiskCriteriaQualitativeValue();
+                            created.setTenantId(tenantId);
+                            created.setCriteriaId(criteriaId);
+                            created.setBranchCode(branchCode.trim());
+                            created.setYear(year);
+                            return created;
+                        });
+                item.setViolation(emptyToNull(row.get("violation")));
+                item.setNote(emptyToNull(row.get("note")));
+                repository.save(item);
+                success++;
+            } catch (BusinessException e) {
+                errors.add(new ImportResult.ImportRowError(rowNumber, e.getMessage()));
+            }
+        }
+
+        auditLogService.record("RiskCriteriaQualitativeValue", null, AuditAction.CREATE,
+                "Upload HSRR dinh tinh: " + success + " thanh cong, " + errors.size() + " loi");
+        return new ImportResult(success, errors.size(), errors);
+    }
+
+    /** Khop dung tieu de cot cua mau DT_HSRR_Upload - "Ma nhom"/"Ma nhom cap 2"/"Ten chi tieu" khong
+     * doc vi tu suy ra duoc tu chi tieu (RiskCriteriaQualitative), khong can nhap lai. */
+    private List<ExportColumn> templateColumns() {
+        return List.of(
+                new ExportColumn("criteriaCode", "Mã chỉ tiêu"),
+                new ExportColumn("branchCode", "Mã chi nhánh"),
+                new ExportColumn("year", "Năm"),
+                new ExportColumn("violation", "Sai phạm"),
+                new ExportColumn("note", "Ghi chú"));
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
+    }
+
+    private String emptyToNull(String value) {
+        return isBlank(value) ? null : value.trim();
+    }
+
+    private Integer parseInt(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private Map<UUID, RiskCriteriaQualitative> criteriaById(UUID tenantId) {
+        Map<UUID, RiskCriteriaQualitative> map = new HashMap<>();
+        criteriaRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> map.put(c.getId(), c));
+        return map;
+    }
+
+    private Map<String, AuditObjectUnit> unitsByCode(UUID tenantId) {
+        Map<String, AuditObjectUnit> map = new HashMap<>();
+        auditObjectUnitRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(u -> map.put(u.getCode(), u));
+        return map;
+    }
+
+    private RiskCriteriaQualitativeValueResponse toResponse(RiskCriteriaQualitativeValue item,
+                                                              Map<UUID, RiskCriteriaQualitative> criteria,
+                                                              Map<String, AuditObjectUnit> units) {
+        RiskCriteriaQualitative criterion = criteria.get(item.getCriteriaId());
+        AuditObjectUnit unit = units.get(item.getBranchCode());
+        return new RiskCriteriaQualitativeValueResponse(item.getId(), item.getYear(), item.getBranchCode(),
+                unit != null ? unit.getName() : null,
+                item.getCriteriaId(), criterion != null ? criterion.getCode() : null, criterion != null ? criterion.getName() : null,
+                item.getViolation(), item.getNote());
+    }
+}

@@ -7,7 +7,7 @@
     "dashboard": "概览",
     "people": "人事",
     "employees": "员工",
-    "positions": "职位",
+    "positions": "职位类别",
     "orgUnits": "组织单位",
     "admin": "系统管理",
     "roles": "角色与权限",
@@ -18,12 +18,7 @@
     "workflowApprovalMatrix": "审批矩阵",
     "audit": "内部审计",
     "auditMasterData": "主数据",
-    "auditMdAudit": "审计类别",
-    "auditMdFinding": "发现与整改类别",
     "auditMdRisk": "风险类别",
-    "auditMdControl": "控制类别",
-    "auditMdProcess": "流程类别",
-    "auditMdCompliance": "合规类别",
     "auditMdGeneral": "通用类别"
   },
   "header": {
@@ -222,26 +217,30 @@
     }
   },
   "position": {
-    "title": "职位管理",
+    "title": "职位类别",
     "columns": {
       "code": "编号",
-      "name": "职位名称",
+      "name": "名称",
+      "description": "描述",
+      "sortOrder": "排序",
       "active": "状态"
     },
     "form": {
       "createTitle": "新增职位",
       "editTitle": "编辑职位",
       "code": "编号",
-      "name": "职位名称",
-      "codeRequired": "请输入编号",
-      "nameRequired": "请输入职位名称",
-      "save": "保存",
-      "cancel": "取消"
+      "name": "名称",
+      "description": "描述",
+      "validFrom": "生效日期",
+      "validTo": "失效日期",
+      "sortOrder": "排序"
     },
+    "deleteConfirmTitle": "删除该职位？",
     "messages": {
       "createSuccess": "职位已创建",
       "updateSuccess": "职位已更新",
-      "activeUpdateSuccess": "状态已更新",
+      "deleteSuccess": "职位已删除",
+      "deleteError": "删除职位失败",
       "loadError": "数据加载失败",
       "saveError": "保存职位失败"
     }
@@ -277,10 +276,13 @@
       "save": "保存",
       "cancel": "取消"
     },
+    "deleteConfirmTitle": "删除该组织单位？",
     "messages": {
       "createSuccess": "单位已创建",
       "updateSuccess": "单位已更新",
       "activeUpdateSuccess": "状态已更新",
+      "deleteSuccess": "单位已删除",
+      "deleteError": "删除单位失败",
       "loadError": "数据加载失败",
       "saveError": "保存单位失败"
     }
@@ -427,12 +429,7 @@
   },
   "auditMasterData": {
     "groups": {
-      "AUDIT": "审计类别",
-      "FINDING": "发现与整改类别",
       "RISK": "风险类别",
-      "CONTROL": "控制类别",
-      "PROCESS": "流程类别",
-      "COMPLIANCE": "合规类别",
       "GENERAL": "通用类别"
     },
     "columns": {

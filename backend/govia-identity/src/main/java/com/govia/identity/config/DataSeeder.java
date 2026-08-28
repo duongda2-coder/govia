@@ -1,10 +1,12 @@
 package com.govia.identity.config;
 
+import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
+import com.govia.audit.masterdata.entity.AuditMasterDataItem;
+import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import com.govia.identity.entity.Employee;
 import com.govia.identity.entity.EmployeeStatus;
 import com.govia.identity.entity.OrganizationUnit;
 import com.govia.identity.entity.Permission;
-import com.govia.identity.entity.Position;
 import com.govia.identity.entity.Role;
 import com.govia.identity.entity.RolePermission;
 import com.govia.identity.entity.Tenant;
@@ -15,7 +17,6 @@ import com.govia.identity.entity.UserStatus;
 import com.govia.identity.repository.EmployeeRepository;
 import com.govia.identity.repository.OrganizationUnitRepository;
 import com.govia.identity.repository.PermissionRepository;
-import com.govia.identity.repository.PositionRepository;
 import com.govia.identity.repository.RolePermissionRepository;
 import com.govia.identity.repository.RoleRepository;
 import com.govia.identity.repository.TenantRepository;
@@ -41,7 +42,7 @@ public class DataSeeder implements ApplicationRunner {
 
     private final TenantRepository tenantRepository;
     private final OrganizationUnitRepository orgUnitRepository;
-    private final PositionRepository positionRepository;
+    private final AuditMasterDataItemRepository masterDataItemRepository;
     private final EmployeeRepository employeeRepository;
     private final UserAccountRepository userAccountRepository;
     private final RoleRepository roleRepository;
@@ -52,7 +53,7 @@ public class DataSeeder implements ApplicationRunner {
 
     public DataSeeder(TenantRepository tenantRepository,
                        OrganizationUnitRepository orgUnitRepository,
-                       PositionRepository positionRepository,
+                       AuditMasterDataItemRepository masterDataItemRepository,
                        EmployeeRepository employeeRepository,
                        UserAccountRepository userAccountRepository,
                        RoleRepository roleRepository,
@@ -62,7 +63,7 @@ public class DataSeeder implements ApplicationRunner {
                        PasswordEncoder passwordEncoder) {
         this.tenantRepository = tenantRepository;
         this.orgUnitRepository = orgUnitRepository;
-        this.positionRepository = positionRepository;
+        this.masterDataItemRepository = masterDataItemRepository;
         this.employeeRepository = employeeRepository;
         this.userAccountRepository = userAccountRepository;
         this.roleRepository = roleRepository;
@@ -92,11 +93,13 @@ public class DataSeeder implements ApplicationRunner {
         headOffice.setType("COMPANY");
         headOffice = orgUnitRepository.save(headOffice);
 
-        Position adminPosition = new Position();
+        AuditMasterDataItem adminPosition = new AuditMasterDataItem();
         adminPosition.setTenantId(tenant.getId());
+        adminPosition.setCategory(AuditMasterDataCategory.POSITION);
         adminPosition.setCode("PLATFORM_ADMIN");
         adminPosition.setName("Platform Administrator");
-        adminPosition = positionRepository.save(adminPosition);
+        adminPosition.setActive(true);
+        adminPosition = masterDataItemRepository.save(adminPosition);
 
         Employee admin = new Employee();
         admin.setTenantId(tenant.getId());

@@ -49,13 +49,9 @@ public class Employee extends BaseEntity {
     @JoinColumn(name = "org_unit_id", insertable = false, updatable = false)
     private OrganizationUnit orgUnit;
 
+    /** "Chuc vu" - link toi AuditMasterDataItem danh muc POSITION (Danh muc Chuc vu trong Nhan su). */
     @Column(name = "position_id", columnDefinition = "uuid")
     private UUID positionId;
-
-    /** Chi doc, dung de join khi loc/sort theo ten chuc danh (vd "position.name") - ghi du lieu van qua positionId o tren. */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "position_id", insertable = false, updatable = false)
-    private Position position;
 
     @Column(name = "hire_date")
     private LocalDate hireDate;

@@ -7,7 +7,7 @@
     "dashboard": "Tổng quan",
     "people": "Nhân sự",
     "employees": "Nhân viên",
-    "positions": "Chức danh",
+    "positions": "Danh mục Chức vụ",
     "orgUnits": "Đơn vị tổ chức",
     "admin": "Quản trị hệ thống",
     "roles": "Vai trò & Phân quyền",
@@ -18,15 +18,10 @@
     "workflowApprovalMatrix": "Ma trận phê duyệt",
     "audit": "Kiểm toán nội bộ",
     "auditMasterData": "Danh mục",
-    "auditMdAudit": "Danh mục Kiểm toán",
-    "auditMdFinding": "Danh mục Phát hiện & Khắc phục",
     "auditMdRisk": "Danh mục Rủi ro",
-    "auditMdControl": "Danh mục Kiểm soát",
-    "auditMdProcess": "Danh mục Quy trình",
-    "auditMdCompliance": "Danh mục Tuân thủ",
     "auditMdGeneral": "Danh mục Chung",
     "auditMdDocumentLibrary": "Danh mục Thư viện tài liệu",
-    "auditMdPosition": "Danh mục Chức vụ",
+    "auditMdControlPoint": "Danh mục Chốt kiểm soát",
     "auditMdDepartment": "Danh mục Bộ phận KT",
     "auditMdYear": "Danh mục Năm",
     "auditMdBusinessSegment": "Danh mục Mảng nghiệp vụ",
@@ -38,7 +33,15 @@
     "riskScoringCoefficientMatrix": "Hệ số & Ma trận điểm",
     "riskScoringUserAssignment": "Phân quyền chỉ tiêu",
     "riskScoringAuditObjects": "Đối tượng kiểm toán",
-    "riskScoringExec": "Chấm Điểm"
+    "riskScoringExec": "Chấm Điểm",
+    "riskScoringExecGroupHO": "Nhóm rủi ro HO",
+    "riskScoringExecRiskTypeHO": "Loại rủi ro HO",
+    "riskScoringExecCriteriaOther": "Chỉ tiêu ĐGRR khác",
+    "riskScoringExecCriteriaOtherScale": "Thang điểm chỉ tiêu ĐGRR khác",
+    "riskScoringExecAssessmentOther": "Chấm điểm rủi ro khác",
+    "riskScoringExecAssessmentOtherRanking": "Bảng xếp hạng rủi ro khác",
+    "riskScoringExecAssessmentOtherExpertRank": "Xếp hạng rủi ro khác theo YKCG",
+    "riskScoringExecHsrr": "Hồ sơ rủi ro"
   },
   "header": {
     "logout": "Đăng xuất"
@@ -302,28 +305,32 @@
     }
   },
   "position": {
-    "title": "Quản lý chức danh",
+    "title": "Danh mục Chức vụ",
     "columns": {
       "code": "Mã",
-      "name": "Tên chức danh",
+      "name": "Tên",
+      "description": "Mô tả",
+      "sortOrder": "Thứ tự",
       "active": "Trạng thái"
     },
     "form": {
-      "createTitle": "Thêm chức danh",
-      "editTitle": "Sửa chức danh",
+      "createTitle": "Thêm chức vụ",
+      "editTitle": "Sửa chức vụ",
       "code": "Mã",
-      "name": "Tên chức danh",
-      "codeRequired": "Nhập mã chức danh",
-      "nameRequired": "Nhập tên chức danh",
-      "save": "Lưu",
-      "cancel": "Hủy"
+      "name": "Tên",
+      "description": "Mô tả",
+      "validFrom": "Hiệu lực từ",
+      "validTo": "Hiệu lực đến",
+      "sortOrder": "Thứ tự"
     },
+    "deleteConfirmTitle": "Xóa chức vụ này?",
     "messages": {
-      "createSuccess": "Đã tạo chức danh",
-      "updateSuccess": "Đã cập nhật chức danh",
-      "activeUpdateSuccess": "Đã cập nhật trạng thái",
+      "createSuccess": "Đã tạo chức vụ",
+      "updateSuccess": "Đã cập nhật chức vụ",
+      "deleteSuccess": "Đã xóa chức vụ",
+      "deleteError": "Xóa chức vụ thất bại",
       "loadError": "Không tải được dữ liệu",
-      "saveError": "Lưu chức danh thất bại"
+      "saveError": "Lưu chức vụ thất bại"
     }
   },
   "orgUnit": {
@@ -357,10 +364,13 @@
       "save": "Lưu",
       "cancel": "Hủy"
     },
+    "deleteConfirmTitle": "Xóa đơn vị tổ chức này?",
     "messages": {
       "createSuccess": "Đã tạo đơn vị",
       "updateSuccess": "Đã cập nhật đơn vị",
       "activeUpdateSuccess": "Đã cập nhật trạng thái",
+      "deleteSuccess": "Đã xóa đơn vị",
+      "deleteError": "Xóa đơn vị thất bại",
       "loadError": "Không tải được dữ liệu",
       "saveError": "Lưu đơn vị thất bại"
     }
@@ -507,14 +517,8 @@
   },
   "auditMasterData": {
     "groups": {
-      "AUDIT": "Danh mục Kiểm toán",
-      "FINDING": "Danh mục Phát hiện & Khắc phục",
       "RISK": "Danh mục Rủi ro",
-      "CONTROL": "Danh mục Kiểm soát",
-      "PROCESS": "Danh mục Quy trình",
-      "COMPLIANCE": "Danh mục Tuân thủ",
       "GENERAL": "Danh mục Chung",
-      "POSITION": "Danh mục Chức vụ",
       "DEPARTMENT": "Danh mục Bộ phận KT",
       "YEAR": "Danh mục Năm",
       "BUSINESS_SEGMENT": "Danh mục Mảng nghiệp vụ"
@@ -576,6 +580,48 @@
       "deleteError": "Xóa thất bại",
       "saveError": "Lưu thất bại",
       "selectRowFirst": "Vui lòng chọn 1 văn bản để đính kèm file"
+    }
+  },
+  "auditControlPoint": {
+    "title": "Danh mục Chốt kiểm soát",
+    "columns": {
+      "code": "Mã CKS",
+      "name": "Tên CKS",
+      "businessSegment": "Mảng nghiệp vụ",
+      "possibleRisk": "Rủi ro có thể xảy ra",
+      "controlPointByStep": "Chốt kiểm soát theo bước quy trình",
+      "actualControl": "Kiểm soát thực tế tại đơn vị",
+      "controlType": "Loại hình KS",
+      "controlFrequency": "Tần suất kiểm soát",
+      "auditProcedure": "Thủ tục kiểm toán",
+      "residualRiskAssessment": "Đánh giá rủi ro còn lại",
+      "processRegulation": "Quy trình, Quy định sử dụng",
+      "referenceClause": "Điều khoản tham chiếu",
+      "processEffectiveness": "Hiệu lực quy trình",
+      "controlEffectivenessAssessment": "Đánh giá hiệu lực chốt KS",
+      "controlEfficiencyAssessment": "Đánh giá hiệu quả chốt KS"
+    },
+    "controlType": {
+      "MANUAL": "Thủ công",
+      "AUTOMATIC": "Tự động"
+    },
+    "level": {
+      "HIGH": "Cao",
+      "MEDIUM": "Trung bình",
+      "LOW": "Thấp"
+    },
+    "form": {
+      "createTitle": "Thêm chốt kiểm soát",
+      "editTitle": "Sửa chốt kiểm soát"
+    },
+    "deleteConfirmTitle": "Xóa chốt kiểm soát này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
     }
   },
   "riskScoring": {
@@ -707,12 +753,57 @@
     "columns": {
       "code": "Mã nhóm",
       "name": "Tên nhóm",
-      "note": "Ghi chú"
+      "note": "Ghi chú",
+      "groupHo": "Nhóm rủi ro (HO)",
+      "riskType": "Loại rủi ro (HO)",
+      "riskTypeCode": "Mã loại rủi ro",
+      "riskTypeName": "Tên loại rủi ro",
+      "criteriaCode": "Mã chỉ tiêu",
+      "criteriaName": "Tên chỉ tiêu",
+      "scaleScore": "Thang điểm",
+      "ratingLevel": "Mức độ đánh giá",
+      "description": "Diễn giải"
     },
     "form": {
       "createTitle": "Thêm mới",
       "editTitle": "Sửa",
-      "codeMaxLength": "Mã nhóm tối đa 2 ký tự"
+      "codeMaxLength": "Mã nhóm tối đa 2 ký tự",
+      "riskTypeCodeMaxLength": "Mã loại rủi ro tối đa 2 ký tự",
+      "criteriaCodeMaxLength": "Mã chỉ tiêu tối đa 2 ký tự"
+    },
+    "assessmentOther": {
+      "auditObjectCode": "Mã đối tượng KT",
+      "auditObjectName": "Tên đối tượng KT",
+      "year": "Năm",
+      "scoreLines": "Chấm điểm",
+      "selectScore": "Chọn điểm"
+    },
+    "ranking": {
+      "riskScore": "Điểm rủi ro",
+      "rankLabel": "Xếp loại",
+      "selectYear": "Chọn năm"
+    },
+    "expertRank": {
+      "syncFromSource": "Cập nhật dữ liệu từ nguồn",
+      "viewResults": "Xem kết quả",
+      "syncSuccess": "Đã cập nhật dữ liệu từ nguồn",
+      "editTitle": "Cập nhật xếp hạng theo YKCG",
+      "reRankLabel": "Xếp hạng lại theo YKCG",
+      "reason": "Lý do của chuyên gia",
+      "assessedDate": "Ngày đánh giá của chuyên gia",
+      "expertName": "Chuyên gia",
+      "finalRankLabel": "Kết quả xếp loại",
+      "updatedBy": "Người cập nhật"
+    },
+    "hsrr": {
+      "tabQuantitative": "Hồ sơ rủi ro định lượng",
+      "tabQualitative": "Hồ sơ rủi ro định tính",
+      "branchCode": "Mã chi nhánh",
+      "branchName": "Tên chi nhánh",
+      "value": "Giá trị",
+      "entryDate": "Ngày",
+      "violation": "Sai phạm",
+      "note": "Ghi chú"
     },
     "deleteConfirmTitle": "Xóa mục này?",
     "messages": {

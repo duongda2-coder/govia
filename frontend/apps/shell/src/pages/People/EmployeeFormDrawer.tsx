@@ -12,7 +12,7 @@ import type {
 } from "../../api/employees";
 import { createEmployee, createEmployeeAccount, updateEmployee } from "../../api/employees";
 import type { OrganizationUnit } from "../../api/orgUnits";
-import type { Position } from "../../api/positions";
+import type { MasterDataItem as PositionItem } from "../../api/positionCatalog";
 import type { MasterDataItem } from "../../api/auditMasterData";
 import type { AuditObjectUnitItem } from "../../api/riskScoring";
 import { ResetPasswordModal } from "../../components/ResetPasswordModal";
@@ -21,7 +21,7 @@ export interface EmployeeFormDrawerProps {
   open: boolean;
   employee: Employee | null;
   orgUnits: OrganizationUnit[];
-  positions: Position[];
+  positions: PositionItem[];
   employees: Employee[];
   businessSegments: MasterDataItem[];
   branches: AuditObjectUnitItem[];

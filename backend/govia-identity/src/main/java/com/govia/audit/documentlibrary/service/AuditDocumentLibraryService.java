@@ -13,8 +13,9 @@ import com.govia.core.export.ImportResult;
 import com.govia.core.export.WordExportService;
 import com.govia.core.tenant.TenantContext;
 import com.govia.core.web.BusinessException;
-import com.govia.identity.entity.Position;
-import com.govia.identity.repository.PositionRepository;
+import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
+import com.govia.audit.masterdata.entity.AuditMasterDataItem;
+import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,23 +32,23 @@ import java.util.UUID;
 
 /**
  * CRUD + Import/Export cho danh muc "Thu vien tai lieu" (sheet ZTC_TVTL). "Nguoi ban hanh" link
- * sang danh muc Position (Chuc vu) da co san thay vi nhap tay tu do.
+ * sang danh muc Chuc vu (AuditMasterDataItem, category=POSITION) da co san thay vi nhap tay tu do.
  */
 @Service
 public class AuditDocumentLibraryService {
 
     private final AuditDocumentLibraryRepository repository;
-    private final PositionRepository positionRepository;
+    private final AuditMasterDataItemRepository masterDataItemRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
     private final ExcelImportService excelImportService;
 
-    public AuditDocumentLibraryService(AuditDocumentLibraryRepository repository, PositionRepository positionRepository,
+    public AuditDocumentLibraryService(AuditDocumentLibraryRepository repository, AuditMasterDataItemRepository masterDataItemRepository,
                                         AuditLogService auditLogService, ExcelExportService excelExportService,
                                         WordExportService wordExportService, ExcelImportService excelImportService) {
         this.repository = repository;
-        this.positionRepository = positionRepository;
+        this.masterDataItemRepository = masterDataItemRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
@@ -120,7 +121,8 @@ public class AuditDocumentLibraryService {
 
         UUID tenantId = TenantContext.getTenantId();
         Map<String, UUID> positionIdsByName = new HashMap<>();
-        positionRepository.findByTenantId(tenantId).forEach(p -> positionIdsByName.put(p.getName(), p.getId()));
+        masterDataItemRepository.findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, AuditMasterDataCategory.POSITION)
+                .forEach(p -> positionIdsByName.put(p.getName(), p.getId()));
 
         int success = 0;
         List<ImportResult.ImportRowError> errors = new ArrayList<>();
@@ -180,8 +182,8 @@ public class AuditDocumentLibraryService {
         if (issuerPositionId == null) {
             return;
         }
-        positionRepository.findById(issuerPositionId)
-                .filter(p -> p.getTenantId().equals(tenantId))
+        masterDataItemRepository.findById(issuerPositionId)
+                .filter(item -> item.getTenantId().equals(tenantId) && item.getCategory() == AuditMasterDataCategory.POSITION)
                 .orElseThrow(() -> new BusinessException("POSITION_NOT_FOUND", "Khong tim thay chuc vu nguoi ban hanh"));
     }
 
@@ -193,7 +195,7 @@ public class AuditDocumentLibraryService {
 
     private Map<UUID, String> positionNamesById(UUID tenantId) {
         Map<UUID, String> map = new HashMap<>();
-        for (Position p : positionRepository.findByTenantId(tenantId)) {
+        for (AuditMasterDataItem p : masterDataItemRepository.findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, AuditMasterDataCategory.POSITION)) {
             map.put(p.getId(), p.getName());
         }
         return map;

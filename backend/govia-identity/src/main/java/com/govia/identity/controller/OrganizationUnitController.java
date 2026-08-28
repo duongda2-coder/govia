@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,6 +73,13 @@ public class OrganizationUnitController {
     public ApiResponse<OrganizationUnitResponse> setActive(@PathVariable UUID id,
                                                              @Valid @RequestBody OrgUnitActiveRequest request) {
         return ApiResponse.ok(organizationUnitService.setActive(id, request.active()));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_PEOPLE.ORGUNIT.DELETE')")
+    public ApiResponse<Void> delete(@PathVariable UUID id) {
+        organizationUnitService.delete(id);
+        return ApiResponse.ok(null);
     }
 
     @GetMapping("/export/excel")

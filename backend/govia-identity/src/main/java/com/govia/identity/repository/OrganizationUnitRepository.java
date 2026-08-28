@@ -15,4 +15,6 @@ public interface OrganizationUnitRepository extends JpaRepository<OrganizationUn
     Optional<OrganizationUnit> findByTenantIdAndNameIgnoreCase(UUID tenantId, String name);
 
     boolean existsByManagerEmployeeId(UUID managerEmployeeId);
+
+    boolean existsByParentId(UUID parentId);
 }

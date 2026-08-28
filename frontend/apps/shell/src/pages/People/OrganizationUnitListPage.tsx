@@ -4,18 +4,19 @@ import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CodeWithTooltip, CrudTable, useClientSearchColumn } from "@govia/ui-kit";
 import type { OrganizationUnit } from "../../api/orgUnits";
-import { exportOrgUnits, importOrgUnits, listOrgUnits, setOrgUnitActive } from "../../api/orgUnits";
+import { deleteOrgUnit, exportOrgUnits, importOrgUnits, listOrgUnits, setOrgUnitActive } from "../../api/orgUnits";
 import { listEmployees, type Employee } from "../../api/employees";
 import { OrganizationUnitFormModal } from "./OrganizationUnitFormModal";
 import { useAuth } from "../../auth/AuthContext";
 
 export function OrganizationUnitListPage() {
   const { t } = useTranslation();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const { hasPermission } = useAuth();
   const canView = hasPermission("PEOPLE.ORGUNIT.VIEW");
   const canCreate = hasPermission("PEOPLE.ORGUNIT.CREATE");
   const canEdit = hasPermission("PEOPLE.ORGUNIT.EDIT");
+  const canDelete = hasPermission("PEOPLE.ORGUNIT.DELETE");
   const canExport = hasPermission("PEOPLE.ORGUNIT.EXPORT");
   const canImport = hasPermission("PEOPLE.ORGUNIT.IMPORT");
   const { getSearchColumnProps } = useClientSearchColumn<OrganizationUnit>();
@@ -53,6 +54,26 @@ export function OrganizationUnitListPage() {
     } catch {
       message.error(t("orgUnit.messages.saveError"));
     }
+  };
+
+  const handleDelete = () => {
+    if (selected.length === 0) return;
+    modal.confirm({
+      title: selected.length > 1 ? t("common.deleteConfirmTitleCount", { count: selected.length }) : t("orgUnit.deleteConfirmTitle"),
+      okText: t("common.yes"),
+      cancelText: t("common.no"),
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await Promise.all(selected.map((unit) => deleteOrgUnit(unit.id)));
+          message.success(t("orgUnit.messages.deleteSuccess"));
+          setSelected([]);
+          await load();
+        } catch {
+          message.error(t("orgUnit.messages.deleteError"));
+        }
+      },
+    });
   };
 
   const unitById = new Map(orgUnits.map((u) => [u.id, u]));
@@ -131,6 +152,8 @@ export function OrganizationUnitListPage() {
             : undefined
         }
         editDisabled={selected.length !== 1}
+        onDelete={canDelete ? handleDelete : undefined}
+        deleteDisabled={selected.length === 0}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
         onExportExcel={canExport ? () => exportOrgUnits("excel") : undefined}
         onExportWord={canExport ? () => exportOrgUnits("word") : undefined}

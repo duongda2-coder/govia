@@ -143,6 +143,28 @@ public class OrganizationUnitService {
         return toResponse(unit, employeeNameMap(List.of(unit)));
     }
 
+    /**
+     * Xoa cung: chi cho phep khi khong con don vi con nao (parentId tro toi don vi nay) va khong con
+     * nhan vien nao truc thuoc - tranh du lieu mo coi/vo hieu ca 1 nhanh cay to chuc.
+     */
+    @Transactional
+    public void delete(UUID id) {
+        UUID tenantId = TenantContext.getTenantId();
+        OrganizationUnit unit = getOwnedOrThrow(tenantId, id);
+
+        if (repository.existsByParentId(id)) {
+            throw new BusinessException("ORG_UNIT_HAS_CHILDREN",
+                    "Khong the xoa: don vi nay dang la don vi cha cua 1 don vi khac");
+        }
+        if (employeeRepository.existsByOrgUnitId(id)) {
+            throw new BusinessException("ORG_UNIT_HAS_EMPLOYEES",
+                    "Khong the xoa: don vi nay dang co nhan vien truc thuoc");
+        }
+
+        repository.delete(unit);
+        auditLogService.record("OrganizationUnit", id, AuditAction.DELETE, "Xoa don vi " + unit.getCode());
+    }
+
     @Transactional(readOnly = true)
     public byte[] exportExcel() {
         return excelExportService.export("OrgUnits", exportColumns(), exportRows());

@@ -16,7 +16,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Kiem chung co che danh muc DUNG CHUNG cua module Kiem toan noi bo (xem MasterDataItemService):
- * 1 bang/1 API cho toan bo 23 loai danh muc, phan biet qua {category} tren URL.
+ * 1 bang/1 API cho toan bo danh muc con lai (sau khi bo Kiem toan/Phat hien/Kiem soat/Quy trinh/
+ * Tuan thu), phan biet qua {category} tren URL.
  */
 class AuditMasterDataApiTest extends AbstractApiTest {
 
@@ -24,7 +25,7 @@ class AuditMasterDataApiTest extends AbstractApiTest {
     void listCategoriesReturnsAllConfiguredTypes() throws Exception {
         mockMvc.perform(get("/api/audit/master-data/categories").header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data", org.hamcrest.Matchers.hasSize(greaterThanOrEqualTo(20))))
+                .andExpect(jsonPath("$.data", org.hamcrest.Matchers.hasSize(greaterThanOrEqualTo(10))))
                 .andExpect(jsonPath("$.data[?(@.code=='RISK_LEVEL')].group", org.hamcrest.Matchers.hasItem("RISK")));
     }
 
@@ -64,57 +65,60 @@ class AuditMasterDataApiTest extends AbstractApiTest {
 
     @Test
     void duplicateCodeInSameCategoryIsRejected() throws Exception {
-        mockMvc.perform(post("/api/audit/master-data/PRIORITY")
+        mockMvc.perform(post("/api/audit/master-data/RISK_LEVEL")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new MasterDataItemRequest("HIGH", "Cao", null, null, null, null, null, true))))
+                                new MasterDataItemRequest("DUP", "Trung ma", null, null, null, null, null, true))))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/audit/master-data/PRIORITY")
+        mockMvc.perform(post("/api/audit/master-data/RISK_LEVEL")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new MasterDataItemRequest("HIGH", "Cao 2", null, null, null, null, null, true))))
+                                new MasterDataItemRequest("DUP", "Trung ma 2", null, null, null, null, null, true))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("MASTER_DATA_CODE_DUPLICATE"));
     }
 
     @Test
     void sameCodeAllowedAcrossDifferentCategories() throws Exception {
-        // Ma "HIGH" da dung cho PRIORITY o test khac (rollback rieng transaction) - dam bao khac
-        // category thi khong dung code check chung, dung 1 category rieng chua dung ("REGULATION").
-        mockMvc.perform(post("/api/audit/master-data/PRIORITY")
+        // Dam bao khac category thi khong dung chung 1 rang buoc unique code - dung 2 category rieng
+        // biet, khac voi cac ma da dung o cac test khac (rollback rieng transaction moi test).
+        mockMvc.perform(post("/api/audit/master-data/RISK_LEVEL")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new MasterDataItemRequest("SAME-CODE", "Uu tien cao", null, null, null, null, null, true))))
+                                new MasterDataItemRequest("SAME-CODE", "Muc do rui ro", null, null, null, null, null, true))))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(post("/api/audit/master-data/REGULATION")
+        mockMvc.perform(post("/api/audit/master-data/CURRENCY")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new MasterDataItemRequest("SAME-CODE", "Luat khac", null, null, null, null, null, true))))
+                                new MasterDataItemRequest("SAME-CODE", "Tien te khac", null, null, null, null, null, true))))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void parentChildRelationshipForBusinessProcessStep() throws Exception {
-        String parentBody = mockMvc.perform(post("/api/audit/master-data/BUSINESS_PROCESS")
+    void parentChildRelationshipIsSupportedGenerically() throws Exception {
+        // parentId la co che chung tren AuditMasterDataItem (khong rieng 1 category nao) - dung
+        // CURRENCY de kiem chung co che nay van hoat dong dung sau khi bo cac danh muc co phan cap
+        // rieng (BUSINESS_PROCESS/BUSINESS_PROCESS_STEP da bi go bo).
+        String parentBody = mockMvc.perform(post("/api/audit/master-data/CURRENCY")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new MasterDataItemRequest("PROC-01", "Quy trinh mua hang", null, null, null, null, null, true))))
+                                new MasterDataItemRequest("PARENT-CCY", "Nhom tien te", null, null, null, null, null, true))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         String parentId = objectMapper.readTree(parentBody).get("data").get("id").asText();
 
-        mockMvc.perform(post("/api/audit/master-data/BUSINESS_PROCESS_STEP")
+        mockMvc.perform(post("/api/audit/master-data/CURRENCY")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new MasterDataItemRequest("STEP-01", "De nghi mua", null,
+                                new MasterDataItemRequest("CHILD-CCY", "Tien te con", null,
                                         java.util.UUID.fromString(parentId), null, null, null, true))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.parentId").value(parentId));

@@ -42,6 +42,10 @@ export async function setOrgUnitActive(id: string, active: boolean): Promise<Org
   return res.data.data;
 }
 
+export async function deleteOrgUnit(id: string): Promise<void> {
+  await httpClient.delete(`/api/org-units/${id}`);
+}
+
 export async function importOrgUnits(file: File): Promise<ImportResult> {
   const formData = new FormData();
   formData.append("file", file);

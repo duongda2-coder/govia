@@ -1,0 +1,44 @@
+databaseChangeLog:
+
+  # ===================== "Xep hang rui ro theo y kien chuyen gia cua DTKT khac" (sheet ZTC_XHRR_KHAC_CG) =====================
+  - changeSet:
+      id: 035-1-risk-score-assessment-other-expert-rank-schema
+      author: govia
+      comment: "Tao bang risk_score_assessment_other_expert_rank"
+      changes:
+        - createTable:
+            tableName: risk_score_assessment_other_expert_rank
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_category_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_code, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: assessment_year, type: INT, constraints: { nullable: false } }
+              - column: { name: risk_score, type: "DECIMAL(10,2)" }
+              - column: { name: base_rank_label, type: VARCHAR(50) }
+              - column: { name: re_rank_label, type: VARCHAR(50) }
+              - column: { name: reason, type: VARCHAR(125) }
+              - column: { name: assessed_date, type: DATE }
+              - column: { name: expert_name, type: VARCHAR(125) }
+              - column: { name: final_rank_label, type: VARCHAR(50) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_assessment_other_expert_rank
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_risk_score_ao_expert_rank_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_assessment_other_expert_rank
+            baseColumnNames: audit_object_category_id
+            referencedTableName: risk_score_audit_object_category
+            referencedColumnNames: id
+            constraintName: fk_risk_score_ao_expert_rank_category
+        - addUniqueConstraint:
+            tableName: risk_score_assessment_other_expert_rank
+            columnNames: tenant_id, audit_object_category_id, audit_object_code, assessment_year
+            constraintName: uk_risk_score_ao_expert_rank_tenant_category_code_year

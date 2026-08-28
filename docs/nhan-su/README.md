@@ -1,6 +1,8 @@
 # Module Nhân sự
 
-Tài liệu mô tả logic nghiệp vụ của module Nhân sự trong GOVIA — Nhân viên (Employee), Chức danh (Position), Đơn vị tổ chức (OrganizationUnit). Toàn bộ nội dung được rút trực tiếp từ code hiện có tại `backend/govia-identity/src/main/java/com/govia/identity/{service,controller,entity}` (không suy diễn).
+Tài liệu mô tả logic nghiệp vụ của module Nhân sự trong GOVIA — Nhân viên (Employee), Danh mục Chức vụ, Đơn vị tổ chức (OrganizationUnit). Toàn bộ nội dung được rút trực tiếp từ code hiện có tại `backend/govia-identity/src/main/java/com/govia/identity/{service,controller,entity}` (không suy diễn).
+
+> **Lưu ý:** bảng `position` riêng (module Chức danh cũ) đã bị **gỡ bỏ hoàn toàn**. "Chức vụ" của Employee giờ tham chiếu tới `AuditMasterDataItem` (category `POSITION`, bảng dùng chung `audit_master_data_item` với các danh mục khác của module Kiểm toán nội bộ), quản lý qua `PositionCatalogController` (`/api/people/positions`, quyền `PEOPLE.POSITION.*` riêng — không dùng chung `AUDIT.MASTER_DATA.*`). Dữ liệu cũ trong bảng `position` đã được migrate sang `audit_master_data_item` giữ nguyên UUID (xem changelog `033-migrate-position-to-master-data.yaml`).
 
 ## 1. Mô hình tổng quan
 
@@ -11,12 +13,13 @@ OrganizationUnit (cây 4 cấp, tự tham chiếu qua parentId)
     ▲  quản lý bởi (managerEmployeeId)
     │
 Employee ──▶ orgUnitId (đơn vị đang thuộc về)
-    │    ──▶ positionId (chức danh)
+    │    ──▶ positionId (chức vụ — trỏ tới AuditMasterDataItem, category=POSITION)
     │    ──▶ managerId (quản lý trực tiếp — tự tham chiếu tới Employee khác)
     ▼
 UserAccount (0 hoặc 1 tài khoản đăng nhập — xem tài liệu module Quản trị hệ thống)
 
-Position (chức danh, master-data phẳng, không phân cấp)
+AuditMasterDataItem (category=POSITION) — "Danh mục Chức vụ", master-data phẳng, không phân cấp,
+    dùng chung bảng audit_master_data_item với các danh mục khác của module Kiểm toán nội bộ
 ```
 
 `Employee` là **"danh tính gốc"** mà mọi module khác trong platform tham chiếu tới qua `employeeCode` (theo comment trong `Employee.java`).
@@ -56,7 +59,7 @@ Thứ tự kiểm tra, dừng ở lỗi đầu tiên:
 
 1. `employeeCode` duy nhất **trong tenant** (`EMPLOYEE_CODE_DUPLICATE`) — khi sửa, chỉ kiểm tra nếu mã thực sự đổi.
 2. `orgUnitId` (nếu có) phải tồn tại và cùng tenant (`ORG_UNIT_NOT_FOUND`).
-3. `positionId` (nếu có) phải tồn tại và cùng tenant (`POSITION_NOT_FOUND`).
+3. `positionId` (nếu có) phải tồn tại, cùng tenant, và đúng category `POSITION` trong `audit_master_data_item` (`POSITION_NOT_FOUND`).
 4. `managerId` (nếu có):
    - Phải tồn tại và cùng tenant (`EMPLOYEE_MANAGER_NOT_FOUND`).
    - **Chỉ khi sửa** (không áp dụng lúc tạo mới, vì nhân viên mới chưa có ai là cấp dưới): không được tự chọn chính mình làm quản lý (`EMPLOYEE_INVALID_MANAGER`), và không được tạo **vòng lặp báo cáo** — đi ngược chuỗi quản lý của người được chọn, nếu gặp lại chính nhân viên đang sửa thì chặn (`EMPLOYEE_MANAGER_CIRCULAR`). Ví dụ: A đang quản lý B, không thể sửa A để B trở thành quản lý của A.
@@ -79,7 +82,7 @@ Hỗ trợ lọc kết hợp (AND) theo: `orgUnitId`, `status`, từ khoá tự 
 
 Đọc đúng mẫu đã xuất (`exportColumns`). Với mỗi dòng:
 - Bắt buộc có `employeeCode` và `fullName`, thiếu 1 trong 2 → lỗi dòng đó (`IMPORT_MISSING_REQUIRED`), **không làm hỏng cả file** — các dòng hợp lệ khác vẫn được tạo.
-- Đơn vị/chức danh tham chiếu theo **tên** (không phân biệt hoa/thường), không tìm thấy → lỗi dòng (`IMPORT_ORG_UNIT_NOT_FOUND` / `IMPORT_POSITION_NOT_FOUND`).
+- Đơn vị/chức vụ tham chiếu theo **tên** (không phân biệt hoa/thường), không tìm thấy → lỗi dòng (`IMPORT_ORG_UNIT_NOT_FOUND` / `IMPORT_POSITION_NOT_FOUND`).
 - Cột trạng thái nhận đúng tên enum (`ACTIVE`/`ON_LEAVE`/`TERMINATED`), để trống mặc định `ACTIVE`, giá trị lạ → `IMPORT_INVALID_STATUS`.
 - Mỗi dòng tạo qua đúng `create()` (đi qua đầy đủ validate ở mục 2.2), rồi đổi trạng thái riêng nếu khác `ACTIVE` — nghĩa là nhân viên nhập từ Excel **luôn được tạo `ACTIVE` trước**, sau đó mới chuyển trạng thái theo cột trong file (không tạo thẳng ở trạng thái khác).
 - Kết quả trả về đếm số dòng thành công + danh sách lỗi theo từng số dòng cụ thể.
@@ -96,6 +99,7 @@ Hỗ trợ lọc kết hợp (AND) theo: `orgUnitId`, `status`, từ khoá tự 
 | `/api/org-units` | POST | `CREATE` | Tạo mới |
 | `/api/org-units/{id}` | PUT | `EDIT` | Cập nhật |
 | `/api/org-units/{id}/active` | PATCH | `EDIT` | Bật/tắt hoạt động |
+| `/api/org-units/{id}` | DELETE | `DELETE` | Xoá cứng |
 | `/api/org-units/import` | POST | `IMPORT` | Nhập hàng loạt từ Excel |
 | `/api/org-units/export/excel`, `/export/word` | GET | `EXPORT` | Xuất danh sách |
 
@@ -124,25 +128,33 @@ Quy ước cố định trong code (`OrganizationUnitService.ALLOWED_LEVEL_CODES
 
 Đơn giản chỉ đổi cờ `active` — **không cascade** xuống đơn vị con hay nhân viên thuộc đơn vị (tắt 1 đơn vị cha không tự động tắt các đơn vị con). Audit log ghi nhận hành động là `DELETE` khi tắt, `UPDATE` khi bật (không phải xoá thật, chỉ mượn action code để phân biệt trên nhật ký).
 
-### 3.4. Nhập Excel (`importFromExcel`)
+### 3.4. Xoá (xoá cứng, có ràng buộc tham chiếu)
+
+`delete()` xoá cứng khỏi DB, chặn nếu:
+
+1. Đang là đơn vị cha của 1 đơn vị khác (`parentId` của đơn vị khác trỏ tới nó) → `ORG_UNIT_HAS_CHILDREN`.
+2. Đang có nhân viên trực thuộc (`Employee.orgUnitId` trỏ tới nó) → `ORG_UNIT_HAS_EMPLOYEES`.
+
+Không kiểm tra tham chiếu từ `ApprovalMatrixRule.orgUnitId` (ma trận phê duyệt) — nếu đơn vị bị xoá đang gắn 1 quy tắc phê duyệt riêng, quy tắc đó sẽ mồ côi (không lỗi, chỉ không còn khớp đơn vị nào khi tra cứu).
+
+### 3.5. Nhập Excel (`importFromExcel`)
 
 Khác với Employee, đơn vị cha và trưởng đơn vị tham chiếu theo **mã** (`parentCode`, `managerEmployeeCode`), không phải theo tên — dễ đối chiếu/sửa tay trên Excel. **Lưu ý quan trọng ghi rõ trong code:** đơn vị cha phải nằm ở dòng **trước** đơn vị con trong cùng file (import xử lý tuần tự từng dòng, chưa hỗ trợ sắp xếp lại theo quan hệ cha-con hay 2-pass). Không tìm thấy mã cha/mã quản lý tương ứng → lỗi riêng từng dòng (`IMPORT_PARENT_NOT_FOUND`, `IMPORT_MANAGER_NOT_FOUND`), không hỏng cả file.
 
-## 4. Chức danh (Position)
+## 4. Danh mục Chức vụ
 
-**Controller:** `PositionController` (`/api/positions`), quyền catalog `PEOPLE.POSITION.*`. Đây là master-data **phẳng, không phân cấp** — mô hình đơn giản hơn OrganizationUnit đúng như comment trong code ("cùng mô hình nhưng đơn giản hơn, không có cây").
+**Controller:** `PositionCatalogController` (`/api/people/positions`), quyền catalog `PEOPLE.POSITION.*`. Dữ liệu là 1 category (`POSITION`) trong bảng `audit_master_data_item` dùng chung với các danh mục khác của module Kiểm toán nội bộ (`MasterDataItemService`/`AuditMasterDataItemRepository`) — controller chỉ cố định `category=POSITION` và gate bằng permission riêng `PEOPLE.POSITION.*` (khác `AUDIT.MASTER_DATA.*` mà các danh mục Kiểm toán khác dùng), vì đây là danh mục thuộc module Nhân sự.
 
 | Endpoint | Method | Quyền | Mô tả |
 |---|---|---|---|
-| `/api/positions` | GET | `VIEW` | Danh sách |
-| `/api/positions/{id}` | GET | `VIEW` | Chi tiết |
-| `/api/positions` | POST | `CREATE` | Tạo mới |
-| `/api/positions/{id}` | PUT | `EDIT` | Cập nhật |
-| `/api/positions/{id}/active` | PATCH | `EDIT` | Bật/tắt hoạt động |
-| `/api/positions/import` | POST | `IMPORT` | Nhập từ Excel |
-| `/api/positions/export/excel`, `/export/word` | GET | `EXPORT` | Xuất danh sách |
+| `/api/people/positions` | GET | `VIEW` | Danh sách |
+| `/api/people/positions` | POST | `CREATE` | Tạo mới |
+| `/api/people/positions/{id}` | PUT | `EDIT` | Cập nhật |
+| `/api/people/positions/{id}` | DELETE | `DELETE` | Xoá cứng |
+| `/api/people/positions/import` | POST | `IMPORT` | Nhập từ Excel |
+| `/api/people/positions/export/excel`, `/export/word` | GET | `EXPORT` | Xuất danh sách |
 
-Ràng buộc duy nhất: `code` duy nhất trong tenant (`POSITION_CODE_DUPLICATE`), kiểm tra cả lúc tạo và sửa (chỉ so khi mã thực sự đổi). Không có ràng buộc chặn xoá/tắt theo tham chiếu như Employee — vì Position không có API xoá cứng, chỉ có bật/tắt (`setActive`), và việc tắt không kiểm tra còn nhân viên nào đang giữ chức danh đó hay không.
+So với "Chức danh" (bảng `position`) cũ: có thêm các trường `description`, `validFrom`, `validTo`, `sortOrder` (giống các danh mục Kiểm toán khác); xoá là **xoá cứng** (không còn kiểu bật/tắt qua `PATCH /active` như trước) và **không kiểm tra** còn Employee/AuditDocumentLibrary nào đang tham chiếu tới bản ghi bị xoá hay không (xoá xong các bản ghi liên quan sẽ có `positionId`/`issuerPositionId` trỏ tới ID không còn tồn tại — tên hiển thị trả về `null`, không lỗi). Ràng buộc duy nhất khi tạo/sửa: `code` duy nhất **trong cùng category `POSITION`** của tenant (`MASTER_DATA_CODE_DUPLICATE`).
 
 ## 5. Enum liên quan
 
@@ -174,9 +186,11 @@ Ràng buộc duy nhất: `code` duy nhất trong tenant (`POSITION_CODE_DUPLICAT
 | `ORG_UNIT_CIRCULAR` | 400 | Chọn cha tạo thành vòng lặp cây tổ chức |
 | `ORG_UNIT_MANAGER_NOT_FOUND` | 400 | Trưởng đơn vị chỉ định không tồn tại/khác tenant |
 | `ORG_UNIT_NOT_FOUND` | 404 | Đơn vị không tồn tại/khác tenant (khi thao tác trực tiếp trên đơn vị) |
+| `ORG_UNIT_HAS_CHILDREN` | 400 | Xoá đơn vị đang là cha của 1 đơn vị khác |
+| `ORG_UNIT_HAS_EMPLOYEES` | 400 | Xoá đơn vị đang có nhân viên trực thuộc |
 | `IMPORT_PARENT_NOT_FOUND` / `IMPORT_MANAGER_NOT_FOUND` | — | Mã cha/mã quản lý trong Excel không khớp dữ liệu có sẵn |
-| `POSITION_CODE_DUPLICATE` | 400 | Trùng mã chức danh trong tenant |
-| `POSITION_NOT_FOUND` | 404 | Chức danh không tồn tại/khác tenant (khi thao tác trực tiếp) |
+| `MASTER_DATA_CODE_DUPLICATE` | 400 | Trùng mã trong cùng category (kể cả `POSITION`) của tenant |
+| `MASTER_DATA_ITEM_NOT_FOUND` | 404 | Bản ghi danh mục không tồn tại/khác tenant/khác category (khi sửa/xoá trực tiếp qua `PositionCatalogController` hoặc `MasterDataItemController`) |
 
 ## 7. Ghi chú: workflow duyệt đã bị gỡ bỏ
 

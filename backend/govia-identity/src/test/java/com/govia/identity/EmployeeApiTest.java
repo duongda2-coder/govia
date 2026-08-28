@@ -1,9 +1,9 @@
 package com.govia.identity;
 
+import com.govia.audit.masterdata.dto.MasterDataItemRequest;
 import com.govia.identity.dto.EmployeeRequest;
 import com.govia.identity.dto.EmployeeStatusRequest;
 import com.govia.identity.dto.OrganizationUnitRequest;
-import com.govia.identity.dto.PositionRequest;
 import com.govia.identity.entity.EmployeeStatus;
 import com.govia.identity.entity.Gender;
 import org.junit.jupiter.api.Test;
@@ -180,8 +180,8 @@ class EmployeeApiTest extends AbstractApiTest {
     }
 
     private UUID createPosition(String code, String name) throws Exception {
-        PositionRequest request = new PositionRequest(code, name);
-        String body = mockMvc.perform(post("/api/positions")
+        MasterDataItemRequest request = new MasterDataItemRequest(code, name, null, null, null, null, null, true);
+        String body = mockMvc.perform(post("/api/people/positions")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
