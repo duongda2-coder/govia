@@ -5,6 +5,12 @@
 html, body, #root {
   margin: 0;
   padding: 0;
-  min-height: 100vh;
+  height: 100%;
   font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Khoa scroll o document - AppLayout tu quan ly vung cuon rieng (Content) de thanh cuon doc nam
+   ben trong khung man hinh (canh Content), khong bi day ra ngoai cung trinh duyet. */
+html, body {
+  overflow: hidden;
 }

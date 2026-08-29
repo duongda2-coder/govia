@@ -89,14 +89,14 @@ export function AppLayout() {
   ];
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
+    <Layout style={{ height: "100vh", overflow: "hidden" }}>
       <Sider
         ref={siderRef}
         breakpoint="lg"
         collapsedWidth="0"
         theme="light"
         width={siderWidth}
-        style={{ background: "#dbeafe", borderRight: "1px solid #bfdbfe", position: "relative" }}
+        style={{ background: "#dbeafe", borderRight: "1px solid #bfdbfe", position: "relative", overflowY: "auto" }}
       >
         <div
           onMouseDown={startResizing}
@@ -121,7 +121,7 @@ export function AppLayout() {
           style={{ background: "transparent", borderInlineEnd: "none" }}
         />
       </Sider>
-      <Layout>
+      <Layout style={{ overflow: "hidden" }}>
         <Header style={{ background: "#fff", borderBottom: "1px solid #dbeafe", display: "flex", justifyContent: "flex-end", alignItems: "center", paddingInline: 24 }}>
           <Space size={16}>
             <LanguageSwitcher />
@@ -133,7 +133,7 @@ export function AppLayout() {
             </Dropdown>
           </Space>
         </Header>
-        <Content style={{ margin: 24 }}>
+        <Content style={{ margin: 24, overflowY: "auto" }}>
           <Outlet context={{ searchableScreens } satisfies AppLayoutOutletContext} />
         </Content>
       </Layout>

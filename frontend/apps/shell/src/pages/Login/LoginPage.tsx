@@ -61,6 +61,7 @@ export function LoginPage() {
         justifyContent: "center",
         alignItems: "center",
         minHeight: "100vh",
+        overflowY: "auto",
         background: "linear-gradient(135deg, #dbeafe 0%, #eff6ff 60%, #ffffff 100%)",
       }}
     >
