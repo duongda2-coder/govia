@@ -17,6 +17,7 @@ import com.govia.core.export.ImportResult;
 import com.govia.core.export.WordExportService;
 import com.govia.core.tenant.TenantContext;
 import com.govia.core.web.BusinessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,6 +74,7 @@ public class RiskCriteriaOtherScaleService {
         UUID tenantId = TenantContext.getTenantId();
         validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
         validateCriteriaOther(tenantId, request.criteriaOtherId());
+        validateNoDuplicateScale(tenantId, request.criteriaOtherId(), request.scaleScore(), null);
 
         RiskCriteriaOtherScale item = new RiskCriteriaOtherScale();
         item.setTenantId(tenantId);
@@ -89,6 +91,7 @@ public class RiskCriteriaOtherScaleService {
         RiskCriteriaOtherScale item = getOwnedOrThrow(tenantId, id);
         validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
         validateCriteriaOther(tenantId, request.criteriaOtherId());
+        validateNoDuplicateScale(tenantId, request.criteriaOtherId(), request.scaleScore(), id);
 
         applyRequest(item, request);
         item = repository.save(item);
@@ -127,8 +130,6 @@ public class RiskCriteriaOtherScaleService {
         UUID tenantId = TenantContext.getTenantId();
         Map<String, UUID> categoryIdsByCode = new HashMap<>();
         auditObjectCategoryRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> categoryIdsByCode.put(c.getCode(), c.getId()));
-        Map<String, UUID> criteriaIdsByCode = new HashMap<>();
-        criteriaOtherRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> criteriaIdsByCode.put(c.getCode(), c.getId()));
 
         int success = 0;
         List<ImportResult.ImportRowError> errors = new ArrayList<>();
@@ -147,12 +148,34 @@ public class RiskCriteriaOtherScaleService {
                 if (auditObjectCategoryId == null) {
                     throw new BusinessException("AUDIT_OBJECT_CATEGORY_NOT_FOUND", "Khong tim thay loai doi tuong kiem toan: " + auditObjectCategoryCode);
                 }
-                UUID criteriaOtherId = criteriaIdsByCode.get(criteriaOtherCode.trim());
-                if (criteriaOtherId == null) {
-                    throw new BusinessException("RISK_CRITERIA_OTHER_NOT_FOUND", "Khong tim thay chi tieu: " + criteriaOtherCode);
+                // Ma chi tieu (RiskCriteriaOther.code) chi la duy nhat trong pham vi 1 category, khong phai
+                // toan tenant - phai tra cuu theo dung category cua dong dang import, khong duoc gom chung
+                // vao 1 map tenant-wide (truoc day lam vay se bi ghi de, lay nham ten chi tieu cua category khac).
+                RiskCriteriaOther criterion;
+                try {
+                    criterion = criteriaOtherRepository
+                            .findByTenantIdAndAuditObjectCategoryIdAndCode(tenantId, auditObjectCategoryId, criteriaOtherCode.trim())
+                            .orElseThrow(() -> new BusinessException("RISK_CRITERIA_OTHER_NOT_FOUND", "Khong tim thay chi tieu: " + criteriaOtherCode));
+                } catch (IncorrectResultSizeDataAccessException e) {
+                    throw new BusinessException("RISK_CRITERIA_OTHER_DUPLICATE",
+                            "Danh muc chi tieu dang co nhieu hon 1 dong trung ma: " + criteriaOtherCode
+                                    + " - vui long kiem tra va xoa/gop dong trung trong danh muc Chi tieu rui ro khac");
                 }
-                create(new RiskCriteriaOtherScaleRequest(auditObjectCategoryId, criteriaOtherId, scaleScore,
+
+                // Import lai (vi du cap nhat lai thang diem hang nam) se cap nhat dong da co thay vi tao
+                // moi, tranh sinh dong trung (criteriaOtherId, scaleScore) lam dropdown "Chon diem" bi lap.
+                RiskCriteriaOtherScale item = repository
+                        .findByTenantIdAndCriteriaOtherIdAndScaleScore(tenantId, criterion.getId(), scaleScore)
+                        .orElseGet(RiskCriteriaOtherScale::new);
+                boolean isNew = item.getId() == null;
+                if (isNew) {
+                    item.setTenantId(tenantId);
+                }
+                applyRequest(item, new RiskCriteriaOtherScaleRequest(auditObjectCategoryId, criterion.getId(), scaleScore,
                         ratingLevel.trim(), emptyToNull(row.get("description")), true));
+                item = repository.save(item);
+                auditLogService.record("RiskCriteriaOtherScale", item.getId(), isNew ? AuditAction.CREATE : AuditAction.UPDATE,
+                        "Import Excel thang diem chi tieu DGRR khac");
                 success++;
             } catch (Exception e) {
                 errors.add(new ImportResult.ImportRowError(rowNumber, e.getMessage()));
@@ -183,6 +206,15 @@ public class RiskCriteriaOtherScaleService {
         criteriaOtherRepository.findById(criteriaOtherId)
                 .filter(c -> c.getTenantId().equals(tenantId))
                 .orElseThrow(() -> new BusinessException("RISK_CRITERIA_OTHER_NOT_FOUND", "Khong tim thay chi tieu danh gia rui ro khac"));
+    }
+
+    private void validateNoDuplicateScale(UUID tenantId, UUID criteriaOtherId, Integer scaleScore, UUID excludingId) {
+        repository.findByTenantIdAndCriteriaOtherIdAndScaleScore(tenantId, criteriaOtherId, scaleScore)
+                .filter(existing -> !existing.getId().equals(excludingId))
+                .ifPresent(existing -> {
+                    throw new BusinessException("RISK_CRITERIA_OTHER_SCALE_DUPLICATE",
+                            "Da ton tai thang diem " + scaleScore + " cho chi tieu nay");
+                });
     }
 
     private RiskCriteriaOtherScale getOwnedOrThrow(UUID tenantId, UUID id) {

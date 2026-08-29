@@ -104,3 +104,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/040-audit-object-category-guess-object-source.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/041-risk-score-criteria-other-scale-dedupe.yaml
+      relativeToChangelogFile: false

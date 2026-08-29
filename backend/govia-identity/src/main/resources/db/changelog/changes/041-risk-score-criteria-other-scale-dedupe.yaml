@@ -1,0 +1,33 @@
+databaseChangeLog:
+
+  # Bug: import Excel (031) khong kiem tra trung, tao nhieu dong cung (tenant_id, criteria_other_id,
+  # scale_score) -> dropdown "Chon diem" o man Cham diem rui ro khac hien thi lap. Xoa cac dong trung
+  # (giu lai dong tao som nhat) roi them rang buoc unique de ngan tai dien.
+  - changeSet:
+      id: 041-1-risk-score-criteria-other-scale-dedupe
+      author: govia
+      comment: "Xoa cac dong thang diem chi tieu DGRR khac bi trung (tenant_id, criteria_other_id, scale_score)"
+      changes:
+        - sql:
+            sql: >
+              DELETE FROM risk_score_criteria_other_scale
+              WHERE id IN (
+                SELECT id FROM (
+                  SELECT id, ROW_NUMBER() OVER (
+                    PARTITION BY tenant_id, criteria_other_id, scale_score
+                    ORDER BY created_at ASC, id ASC
+                  ) AS rn
+                  FROM risk_score_criteria_other_scale
+                ) ranked
+                WHERE rn > 1
+              );
+      rollback: []
+  - changeSet:
+      id: 041-2-risk-score-criteria-other-scale-unique
+      author: govia
+      comment: "Rang buoc unique (tenant_id, criteria_other_id, scale_score) cho thang diem chi tieu DGRR khac"
+      changes:
+        - addUniqueConstraint:
+            tableName: risk_score_criteria_other_scale
+            columnNames: tenant_id, criteria_other_id, scale_score
+            constraintName: uk_risk_score_criteria_other_scale_tenant_criteria_score
