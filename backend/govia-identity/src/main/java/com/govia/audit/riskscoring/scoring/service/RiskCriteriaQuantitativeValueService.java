@@ -8,6 +8,8 @@ import com.govia.audit.riskscoring.masterdata.repository.RiskCriteriaQuantitativ
 import com.govia.audit.riskscoring.masterdata.repository.RiskUserAssignmentRepository;
 import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQuantitativeValueRequest;
 import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQuantitativeValueResponse;
+import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQuantitativeWideRowRequest;
+import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQuantitativeWideRowResponse;
 import com.govia.audit.riskscoring.scoring.entity.RiskCriteriaQuantitativeValue;
 import com.govia.audit.riskscoring.scoring.repository.RiskCriteriaQuantitativeValueRepository;
 import com.govia.core.audit.AuditAction;
@@ -39,6 +41,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,6 +93,74 @@ public class RiskCriteriaQuantitativeValueService {
         return repository.findByTenantIdAndYearOrderByBranchCodeAsc(tenantId, year).stream()
                 .map(item -> toResponse(item, criteria, units))
                 .toList();
+    }
+
+    /** Ban "wide" cua list() (1 dong = 1 chi nhanh/nam, tung chi tieu la 1 entry trong map) - dung
+     * dinh dang voi sheet DL_Nhaptructiep / mau DL_HSRR_Upload thay vi 1 dong/1 chi tieu. */
+    @Transactional(readOnly = true)
+    public List<RiskCriteriaQuantitativeWideRowResponse> listWide(Integer year) {
+        UUID tenantId = TenantContext.getTenantId();
+        Map<UUID, RiskCriteriaQuantitative> criteria = criteriaById(tenantId);
+        Map<String, AuditObjectUnit> units = unitsByCode(tenantId);
+
+        Map<String, List<RiskCriteriaQuantitativeValue>> byBranch = new LinkedHashMap<>();
+        for (RiskCriteriaQuantitativeValue item : repository.findByTenantIdAndYearOrderByBranchCodeAsc(tenantId, year)) {
+            byBranch.computeIfAbsent(item.getBranchCode(), k -> new ArrayList<>()).add(item);
+        }
+
+        List<RiskCriteriaQuantitativeWideRowResponse> result = new ArrayList<>();
+        for (Map.Entry<String, List<RiskCriteriaQuantitativeValue>> entry : byBranch.entrySet()) {
+            result.add(toWideRow(entry.getKey(), year, entry.getValue(), criteria, units));
+        }
+        return result;
+    }
+
+    /** Luu tat ca gia tri cua 1 chi nhanh/nam cung luc (dong wide-format tren man hinh). Gia tri
+     * null trong map xoa dong chi tieu do neu da co, khac null thi tao/cap nhat - giong het logic
+     * "unpivot" cua importFromExcel nhung ap dung cho 1 dong duy nhat thay vi ca file. */
+    @Transactional
+    public RiskCriteriaQuantitativeWideRowResponse saveWideRow(RiskCriteriaQuantitativeWideRowRequest request) {
+        UUID tenantId = TenantContext.getTenantId();
+        validateBranch(tenantId, request.branchCode());
+        Map<String, UUID> criteriaIdsByCode = new HashMap<>();
+        criteriaRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> criteriaIdsByCode.put(c.getCode(), c.getId()));
+
+        Map<String, BigDecimal> values = request.valuesByCriteriaCode() != null ? request.valuesByCriteriaCode() : Map.of();
+        for (Map.Entry<String, BigDecimal> entry : values.entrySet()) {
+            UUID criteriaId = criteriaIdsByCode.get(entry.getKey());
+            if (criteriaId == null) {
+                throw new BusinessException("RISK_CRITERIA_DL_NOT_FOUND", "Khong tim thay chi tieu dinh luong: " + entry.getKey());
+            }
+            if (entry.getValue() == null) {
+                repository.findByTenantIdAndCriteriaIdAndBranchCodeAndYear(tenantId, criteriaId, request.branchCode(), request.year())
+                        .ifPresent(repository::delete);
+            } else {
+                saveValue(tenantId, criteriaId, request.branchCode(), request.year(), request.entryDate(), entry.getValue());
+            }
+        }
+
+        auditLogService.record("RiskCriteriaQuantitativeValue", null, AuditAction.UPDATE,
+                "Cap nhat HSRR dinh luong (dang bang tong hop): " + request.branchCode() + "/" + request.year());
+
+        List<RiskCriteriaQuantitativeValue> items = repository.findByTenantIdAndBranchCodeAndYear(tenantId, request.branchCode(), request.year());
+        return toWideRow(request.branchCode(), request.year(), items, criteriaById(tenantId), unitsByCode(tenantId));
+    }
+
+    private RiskCriteriaQuantitativeWideRowResponse toWideRow(String branchCode, Integer year, List<RiskCriteriaQuantitativeValue> items,
+                                                                Map<UUID, RiskCriteriaQuantitative> criteria, Map<String, AuditObjectUnit> units) {
+        AuditObjectUnit unit = units.get(branchCode);
+        Map<String, BigDecimal> values = new HashMap<>();
+        LocalDate entryDate = null;
+        for (RiskCriteriaQuantitativeValue item : items) {
+            RiskCriteriaQuantitative criterion = criteria.get(item.getCriteriaId());
+            if (criterion != null && item.getValue() != null) {
+                values.put(criterion.getCode(), item.getValue());
+            }
+            if (item.getEntryDate() != null) {
+                entryDate = item.getEntryDate();
+            }
+        }
+        return new RiskCriteriaQuantitativeWideRowResponse(branchCode, unit != null ? unit.getName() : null, year, entryDate, values);
     }
 
     @Transactional

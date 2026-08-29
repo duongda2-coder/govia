@@ -808,6 +808,8 @@
     "hsrr": {
       "tabQuantitative": "Hồ sơ rủi ro định lượng",
       "tabQualitative": "Hồ sơ rủi ro định tính",
+      "viewWide": "Bảng tổng hợp",
+      "viewList": "Danh sách chi tiết",
       "group1Code": "Mã nhóm",
       "group2Code": "Mã nhóm cấp 2",
       "branchCode": "Mã chi nhánh",

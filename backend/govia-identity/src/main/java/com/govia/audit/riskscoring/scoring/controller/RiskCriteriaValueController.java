@@ -4,6 +4,8 @@ import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQualitativeValueReque
 import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQualitativeValueResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQuantitativeValueRequest;
 import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQuantitativeValueResponse;
+import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQuantitativeWideRowRequest;
+import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQuantitativeWideRowResponse;
 import com.govia.audit.riskscoring.scoring.service.RiskCriteriaQualitativeValueService;
 import com.govia.audit.riskscoring.scoring.service.RiskCriteriaQuantitativeValueService;
 import com.govia.core.export.ImportResult;
@@ -91,6 +93,21 @@ public class RiskCriteriaValueController {
     @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.IMPORT')")
     public ApiResponse<ImportResult> importQuantitative(@RequestParam("file") MultipartFile file) {
         return ApiResponse.ok(quantitativeService.importFromExcel(file));
+    }
+
+    /** Ban "wide" cua man hinh dinh luong (1 dong = 1 chi nhanh/nam, tung chi tieu 1 cot) - dung
+     * dinh dang voi sheet DL_Nhaptructiep / mau DL_HSRR_Upload. */
+    @GetMapping("/quantitative/wide")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.VIEW')")
+    public ApiResponse<List<RiskCriteriaQuantitativeWideRowResponse>> listQuantitativeWide(@RequestParam Integer year) {
+        return ApiResponse.ok(quantitativeService.listWide(year));
+    }
+
+    @PutMapping("/quantitative/wide")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.EDIT')")
+    public ApiResponse<RiskCriteriaQuantitativeWideRowResponse> saveQuantitativeWideRow(
+            @Valid @RequestBody RiskCriteriaQuantitativeWideRowRequest request) {
+        return ApiResponse.ok(quantitativeService.saveWideRow(request));
     }
 
     @GetMapping("/qualitative")

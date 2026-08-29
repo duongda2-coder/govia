@@ -164,6 +164,22 @@ export interface RiskCriteriaQuantitativeValueRequest {
   value?: number | null;
 }
 
+/** Ban "wide" cua RiskCriteriaQuantitativeValueItem - 1 item ung voi 1 chi nhanh/nam, dung dinh
+ * dang voi sheet DL_Nhaptructiep / mau DL_HSRR_Upload (tung chi tieu la 1 cot thay vi 1 dong). */
+export interface RiskCriteriaQuantitativeWideRowItem {
+  branchCode: string;
+  branchName: string | null;
+  year: number;
+  entryDate: string | null;
+  valuesByCriteriaCode: Record<string, number | null>;
+}
+export interface RiskCriteriaQuantitativeWideRowRequest {
+  branchCode: string;
+  year: number;
+  entryDate?: string | null;
+  valuesByCriteriaCode: Record<string, number | null>;
+}
+
 export interface RiskCriteriaQualitativeValueItem {
   id: string;
   year: number;
@@ -349,6 +365,14 @@ export const riskCriteriaQuantitativeValueApi = {
     return res.data.data;
   },
   exportFile: (year: number, kind: "excel" | "word") => downloadHsrrFile("quantitative", year, kind, "risk_score_criteria_quantitative_value"),
+  async listWide(year: number): Promise<RiskCriteriaQuantitativeWideRowItem[]> {
+    const res = await httpClient.get<ApiResponse<RiskCriteriaQuantitativeWideRowItem[]>>(`${BASE}/hsrr/quantitative/wide`, { params: { year } });
+    return res.data.data;
+  },
+  async saveWideRow(request: RiskCriteriaQuantitativeWideRowRequest): Promise<RiskCriteriaQuantitativeWideRowItem> {
+    const res = await httpClient.put<ApiResponse<RiskCriteriaQuantitativeWideRowItem>>(`${BASE}/hsrr/quantitative/wide`, request);
+    return res.data.data;
+  },
 };
 
 /** "Ho so rui ro dinh tinh" (sheet ZTC_HSRR, mau DT_HSRR_Upload) - long-format. */
