@@ -1,6 +1,8 @@
 package com.govia.audit.riskscoring.scoring.controller;
 
+import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreQualitativeRowResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreQuantitativeRowResponse;
+import com.govia.audit.riskscoring.scoring.service.RiskBranchScoreQualitativeService;
 import com.govia.audit.riskscoring.scoring.service.RiskBranchScoreQuantitativeService;
 import com.govia.core.web.ApiResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,14 +20,23 @@ import java.util.List;
 public class RiskBranchScoreController {
 
     private final RiskBranchScoreQuantitativeService quantitativeService;
+    private final RiskBranchScoreQualitativeService qualitativeService;
 
-    public RiskBranchScoreController(RiskBranchScoreQuantitativeService quantitativeService) {
+    public RiskBranchScoreController(RiskBranchScoreQuantitativeService quantitativeService,
+                                      RiskBranchScoreQualitativeService qualitativeService) {
         this.quantitativeService = quantitativeService;
+        this.qualitativeService = qualitativeService;
     }
 
     @GetMapping("/quantitative")
     @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.VIEW')")
     public ApiResponse<List<RiskBranchScoreQuantitativeRowResponse>> listQuantitative(@RequestParam Integer year) {
         return ApiResponse.ok(quantitativeService.list(year));
+    }
+
+    @GetMapping("/qualitative")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.VIEW')")
+    public ApiResponse<List<RiskBranchScoreQualitativeRowResponse>> listQualitative(@RequestParam Integer year) {
+        return ApiResponse.ok(qualitativeService.list(year));
     }
 }

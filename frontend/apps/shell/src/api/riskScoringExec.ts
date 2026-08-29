@@ -212,6 +212,17 @@ export interface RiskBranchScoreQuantitativeRowItem {
   scoresByCriteriaCode: Record<string, number | null>;
 }
 
+/** 1 dong = 1 chi nhanh/nam (sheet CT_Diem_DT) - moi nhom cap 2 la 1 entry trong scoresByGroup2Code
+ * (da la tong diem dong gop cua cac chi tieu thuoc nhom do, khong phai gia tri HSRR tho). */
+export interface RiskBranchScoreQualitativeRowItem {
+  branchCode: string;
+  branchName: string | null;
+  year: number;
+  totalScore: number;
+  rankLabel: string | null;
+  scoresByGroup2Code: Record<string, number | null>;
+}
+
 export interface RiskCriteriaOtherScaleItem {
   id: string;
   auditObjectCategoryId: string;
@@ -325,6 +336,10 @@ export const riskAssessmentOtherRankingApi = {
 export const riskBranchScoreApi = {
   async listQuantitative(year: number): Promise<RiskBranchScoreQuantitativeRowItem[]> {
     const res = await httpClient.get<ApiResponse<RiskBranchScoreQuantitativeRowItem[]>>(`${BASE}/branch-score/quantitative`, { params: { year } });
+    return res.data.data;
+  },
+  async listQualitative(year: number): Promise<RiskBranchScoreQualitativeRowItem[]> {
+    const res = await httpClient.get<ApiResponse<RiskBranchScoreQualitativeRowItem[]>>(`${BASE}/branch-score/qualitative`, { params: { year } });
     return res.data.data;
   },
 };

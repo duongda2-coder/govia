@@ -10,6 +10,8 @@ import java.util.UUID;
 public interface RiskCriteriaQualitativeValueRepository extends JpaRepository<RiskCriteriaQualitativeValue, UUID> {
     List<RiskCriteriaQualitativeValue> findByTenantIdAndYearOrderByBranchCodeAsc(UUID tenantId, Integer year);
 
+    List<RiskCriteriaQualitativeValue> findByTenantIdAndYearBetween(UUID tenantId, Integer fromYear, Integer toYear);
+
     Optional<RiskCriteriaQualitativeValue> findByTenantIdAndCriteriaIdAndBranchCodeAndYear(
             UUID tenantId, UUID criteriaId, String branchCode, Integer year);
 }
