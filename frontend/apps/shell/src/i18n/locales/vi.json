@@ -812,7 +812,8 @@
       "value": "Giá trị",
       "entryDate": "Ngày",
       "violation": "Sai phạm",
-      "note": "Ghi chú"
+      "note": "Ghi chú",
+      "selectYearFirst": "Vui lòng chọn năm trước"
     },
     "deleteConfirmTitle": "Xóa mục này?",
     "messages": {

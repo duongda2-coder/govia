@@ -90,6 +90,10 @@ export function RiskCriteriaQualitativeValueTable() {
   }, [canView, year, load]);
 
   const openCreate = () => {
+    if (year == null) {
+      message.warning(t("riskScoringExec.hsrr.selectYearFirst"));
+      return;
+    }
     setEditing(null);
     form.resetFields();
     form.setFieldsValue({ year });
@@ -141,6 +145,14 @@ export function RiskCriteriaQualitativeValueTable() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleExport = (kind: "excel" | "word") => {
+    if (year == null) {
+      message.warning(t("riskScoringExec.hsrr.selectYearFirst"));
+      return Promise.resolve();
+    }
+    return riskCriteriaQualitativeValueApi.exportFile(year, kind);
   };
 
   const handleDelete = () => {
@@ -214,14 +226,14 @@ export function RiskCriteriaQualitativeValueTable() {
         dataSource={items}
         rowKey="id"
         loading={loading}
-        onAdd={canCreate && year != null ? openCreate : undefined}
+        onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length === 0}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
-        onExportExcel={canExport && year != null ? () => riskCriteriaQualitativeValueApi.exportFile(year, "excel") : undefined}
-        onExportWord={canExport && year != null ? () => riskCriteriaQualitativeValueApi.exportFile(year, "word") : undefined}
+        onExportExcel={canExport ? () => handleExport("excel") : undefined}
+        onExportWord={canExport ? () => handleExport("word") : undefined}
         onImport={
           canImport
             ? async (file) => {

@@ -812,7 +812,8 @@
       "value": "Value",
       "entryDate": "Entry Date",
       "violation": "Violation",
-      "note": "Note"
+      "note": "Note",
+      "selectYearFirst": "Please select a year first"
     },
     "deleteConfirmTitle": "Delete this item?",
     "messages": {
