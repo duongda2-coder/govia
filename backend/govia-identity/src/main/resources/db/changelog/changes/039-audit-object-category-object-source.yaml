@@ -1,0 +1,25 @@
+databaseChangeLog:
+
+  # "Loai doi tuong kiem toan" (risk_score_audit_object_category) truoc day dinh tuyen "Ma doi tuong
+  # KT" toi 1 trong 4 danh muc cu the (Unit/Subsidiary/Process/Project) bang cach hard-code THEO MA
+  # (HO/CTC/KTQT) trong code Java - sai ngay khi NSD tu tao 1 category moi khong dung 3 ma nay (vd
+  # "QT" cho "Quy trinh"), vi moi ma khac deu roi vao Project mac dinh. Them cot object_source de NSD
+  # tu chon ro rang khi tao/sua danh muc, khong con phu thuoc ten/ma chinh xac.
+  - changeSet:
+      id: 039-1-audit-object-category-object-source
+      author: govia
+      comment: "Them cot object_source (UNIT/SUBSIDIARY/PROCESS/PROJECT) cho risk_score_audit_object_category"
+      changes:
+        - addColumn:
+            tableName: risk_score_audit_object_category
+            columns:
+              - column: { name: object_source, type: VARCHAR(20), defaultValue: PROJECT, constraints: { nullable: false } }
+        - sql:
+            sql: >
+              UPDATE risk_score_audit_object_category SET object_source = 'UNIT' WHERE code = 'HO';
+        - sql:
+            sql: >
+              UPDATE risk_score_audit_object_category SET object_source = 'SUBSIDIARY' WHERE code = 'CTC';
+        - sql:
+            sql: >
+              UPDATE risk_score_audit_object_category SET object_source = 'PROCESS' WHERE code = 'KTQT';

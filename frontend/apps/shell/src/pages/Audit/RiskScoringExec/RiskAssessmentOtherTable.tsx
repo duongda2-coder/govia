@@ -16,6 +16,7 @@ import {
   auditObjectSubsidiaryApi,
   auditObjectUnitApi,
   type AuditObjectCategoryItem,
+  type AuditObjectSource,
 } from "../../../api/riskScoring";
 import { listMasterDataItems, type MasterDataItem } from "../../../api/auditMasterData";
 import { useAuth } from "../../../auth/AuthContext";
@@ -81,9 +82,9 @@ export function RiskAssessmentOtherTable() {
     if (canView) load();
   }, [canView, load]);
 
-  // "Ma doi tuong KT" tro toi 1 trong 4 danh muc tuy theo ma cua Loai doi tuong KT - dung logic
-  // mo ta trong sheet ZTC_CDRR_KHAC: HO -> AuditObjectUnit, CTC -> AuditObjectSubsidiary,
-  // KTQT -> AuditObjectProcess, con lai -> AuditObjectProject.
+  // "Ma doi tuong KT" tro toi 1 trong 4 danh muc tuy theo objectSource cua Loai doi tuong KT da chon
+  // (NSD tu khai bao o man hinh danh muc goc, xem AuditObjectCategoryTable) - KHONG con hard-code
+  // theo dung ma "HO"/"CTC"/"KTQT" nhu truoc, vi NSD co the tao category moi voi ma bat ky.
   useEffect(() => {
     const category = categories.find((c) => c.id === selectedCategoryId);
     if (!category) {
@@ -91,9 +92,13 @@ export function RiskAssessmentOtherTable() {
       return;
     }
     setObjectCodeLoading(true);
-    const apiByCategory =
-      category.code === "HO" ? auditObjectUnitApi : category.code === "CTC" ? auditObjectSubsidiaryApi : category.code === "KTQT" ? auditObjectProcessApi : auditObjectProjectApi;
-    apiByCategory
+    const apiByObjectSource: Record<AuditObjectSource, { list(): Promise<{ code: string; name: string }[]> }> = {
+      UNIT: auditObjectUnitApi,
+      SUBSIDIARY: auditObjectSubsidiaryApi,
+      PROCESS: auditObjectProcessApi,
+      PROJECT: auditObjectProjectApi,
+    };
+    apiByObjectSource[category.objectSource]
       .list()
       .then((list) => setObjectCodeOptions(list.map((o) => ({ value: o.code, label: `${o.code} - ${o.name}` }))))
       .catch(() => setObjectCodeOptions([]))

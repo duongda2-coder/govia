@@ -1,17 +1,11 @@
 package com.govia.audit.riskscoring.scoring.service;
 
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectCategory;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectProcess;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectProject;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectSubsidiary;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.riskscoring.masterdata.entity.RiskScoreRank;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepository;
-import com.govia.audit.riskscoring.masterdata.repository.AuditObjectProcessRepository;
-import com.govia.audit.riskscoring.masterdata.repository.AuditObjectProjectRepository;
-import com.govia.audit.riskscoring.masterdata.repository.AuditObjectSubsidiaryRepository;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
 import com.govia.audit.riskscoring.masterdata.repository.RiskScoreRankRepository;
+import com.govia.audit.riskscoring.masterdata.service.AuditObjectResolverService;
 import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherRankingResponse;
 import com.govia.audit.riskscoring.scoring.entity.RiskAssessmentOtherHeader;
 import com.govia.audit.riskscoring.scoring.entity.RiskAssessmentOtherLine;
@@ -57,9 +51,7 @@ public class RiskAssessmentOtherRankingService {
     private final RiskTypeHORepository riskTypeHoRepository;
     private final AuditObjectCategoryRepository auditObjectCategoryRepository;
     private final AuditObjectUnitRepository auditObjectUnitRepository;
-    private final AuditObjectSubsidiaryRepository auditObjectSubsidiaryRepository;
-    private final AuditObjectProjectRepository auditObjectProjectRepository;
-    private final AuditObjectProcessRepository auditObjectProcessRepository;
+    private final AuditObjectResolverService objectResolver;
     private final RiskScoreRankRepository rankRepository;
 
     public RiskAssessmentOtherRankingService(RiskAssessmentOtherHeaderRepository headerRepository,
@@ -69,9 +61,7 @@ public class RiskAssessmentOtherRankingService {
                                               RiskTypeHORepository riskTypeHoRepository,
                                               AuditObjectCategoryRepository auditObjectCategoryRepository,
                                               AuditObjectUnitRepository auditObjectUnitRepository,
-                                              AuditObjectSubsidiaryRepository auditObjectSubsidiaryRepository,
-                                              AuditObjectProjectRepository auditObjectProjectRepository,
-                                              AuditObjectProcessRepository auditObjectProcessRepository,
+                                              AuditObjectResolverService objectResolver,
                                               RiskScoreRankRepository rankRepository) {
         this.headerRepository = headerRepository;
         this.lineRepository = lineRepository;
@@ -80,9 +70,7 @@ public class RiskAssessmentOtherRankingService {
         this.riskTypeHoRepository = riskTypeHoRepository;
         this.auditObjectCategoryRepository = auditObjectCategoryRepository;
         this.auditObjectUnitRepository = auditObjectUnitRepository;
-        this.auditObjectSubsidiaryRepository = auditObjectSubsidiaryRepository;
-        this.auditObjectProjectRepository = auditObjectProjectRepository;
-        this.auditObjectProcessRepository = auditObjectProcessRepository;
+        this.objectResolver = objectResolver;
         this.rankRepository = rankRepository;
     }
 
@@ -102,7 +90,7 @@ public class RiskAssessmentOtherRankingService {
             }
             AuditObjectCategory category = categories.get(header.getAuditObjectCategoryId());
             String categoryCode = category != null ? category.getCode() : null;
-            String objectName = resolveAuditObjectName(tenantId, categoryCode, header.getAuditObjectCode());
+            String objectName = objectResolver.resolveName(tenantId, category, header.getAuditObjectCode());
 
             BigDecimal score = computeScore(tenantId, header, categoryCode, criteria, scales, riskTypes);
             String rankLabel = resolveRankLabel(ranks, score, year);
@@ -154,18 +142,6 @@ public class RiskAssessmentOtherRankingService {
                 .map(RiskScoreRank::getRankLabel)
                 .findFirst()
                 .orElse(null);
-    }
-
-    private String resolveAuditObjectName(UUID tenantId, String categoryCode, String auditObjectCode) {
-        if (categoryCode == null) {
-            return null;
-        }
-        return switch (categoryCode) {
-            case "HO" -> auditObjectUnitRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectUnit::getName).orElse(null);
-            case "CTC" -> auditObjectSubsidiaryRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectSubsidiary::getName).orElse(null);
-            case "KTQT" -> auditObjectProcessRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectProcess::getName).orElse(null);
-            default -> auditObjectProjectRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectProject::getName).orElse(null);
-        };
     }
 
     private Map<UUID, AuditObjectCategory> categoriesById(UUID tenantId) {

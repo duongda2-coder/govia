@@ -1,15 +1,8 @@
 package com.govia.audit.riskscoring.scoring.service;
 
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectCategory;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectProcess;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectProject;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectSubsidiary;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepository;
-import com.govia.audit.riskscoring.masterdata.repository.AuditObjectProcessRepository;
-import com.govia.audit.riskscoring.masterdata.repository.AuditObjectProjectRepository;
-import com.govia.audit.riskscoring.masterdata.repository.AuditObjectSubsidiaryRepository;
-import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
+import com.govia.audit.riskscoring.masterdata.service.AuditObjectResolverService;
 import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherExpertRankRequest;
 import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherExpertRankResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherRankingResponse;
@@ -40,27 +33,18 @@ public class RiskAssessmentOtherExpertRankService {
     private final RiskAssessmentOtherExpertRankRepository repository;
     private final RiskAssessmentOtherRankingService rankingService;
     private final AuditObjectCategoryRepository auditObjectCategoryRepository;
-    private final AuditObjectUnitRepository auditObjectUnitRepository;
-    private final AuditObjectSubsidiaryRepository auditObjectSubsidiaryRepository;
-    private final AuditObjectProjectRepository auditObjectProjectRepository;
-    private final AuditObjectProcessRepository auditObjectProcessRepository;
+    private final AuditObjectResolverService objectResolver;
     private final AuditLogService auditLogService;
 
     public RiskAssessmentOtherExpertRankService(RiskAssessmentOtherExpertRankRepository repository,
                                                  RiskAssessmentOtherRankingService rankingService,
                                                  AuditObjectCategoryRepository auditObjectCategoryRepository,
-                                                 AuditObjectUnitRepository auditObjectUnitRepository,
-                                                 AuditObjectSubsidiaryRepository auditObjectSubsidiaryRepository,
-                                                 AuditObjectProjectRepository auditObjectProjectRepository,
-                                                 AuditObjectProcessRepository auditObjectProcessRepository,
+                                                 AuditObjectResolverService objectResolver,
                                                  AuditLogService auditLogService) {
         this.repository = repository;
         this.rankingService = rankingService;
         this.auditObjectCategoryRepository = auditObjectCategoryRepository;
-        this.auditObjectUnitRepository = auditObjectUnitRepository;
-        this.auditObjectSubsidiaryRepository = auditObjectSubsidiaryRepository;
-        this.auditObjectProjectRepository = auditObjectProjectRepository;
-        this.auditObjectProcessRepository = auditObjectProcessRepository;
+        this.objectResolver = objectResolver;
         this.auditLogService = auditLogService;
     }
 
@@ -135,18 +119,6 @@ public class RiskAssessmentOtherExpertRankService {
                         "Khong tim thay dong xep hang theo YKCG", HttpStatus.NOT_FOUND));
     }
 
-    private String resolveAuditObjectName(UUID tenantId, String categoryCode, String auditObjectCode) {
-        if (categoryCode == null) {
-            return null;
-        }
-        return switch (categoryCode) {
-            case "HO" -> auditObjectUnitRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectUnit::getName).orElse(null);
-            case "CTC" -> auditObjectSubsidiaryRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectSubsidiary::getName).orElse(null);
-            case "KTQT" -> auditObjectProcessRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectProcess::getName).orElse(null);
-            default -> auditObjectProjectRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectProject::getName).orElse(null);
-        };
-    }
-
     private Map<UUID, AuditObjectCategory> categoriesById(UUID tenantId) {
         Map<UUID, AuditObjectCategory> map = new HashMap<>();
         for (AuditObjectCategory c : auditObjectCategoryRepository.findByTenantIdOrderByCodeAsc(tenantId)) {
@@ -158,7 +130,7 @@ public class RiskAssessmentOtherExpertRankService {
     private RiskAssessmentOtherExpertRankResponse toResponse(RiskAssessmentOtherExpertRank item, Map<UUID, AuditObjectCategory> categories) {
         AuditObjectCategory category = categories.get(item.getAuditObjectCategoryId());
         String categoryCode = category != null ? category.getCode() : null;
-        String objectName = resolveAuditObjectName(item.getTenantId(), categoryCode, item.getAuditObjectCode());
+        String objectName = objectResolver.resolveName(item.getTenantId(), category, item.getAuditObjectCode());
         return new RiskAssessmentOtherExpertRankResponse(item.getId(), item.getYear(),
                 categoryCode, category != null ? category.getName() : null,
                 item.getAuditObjectCode(), objectName,

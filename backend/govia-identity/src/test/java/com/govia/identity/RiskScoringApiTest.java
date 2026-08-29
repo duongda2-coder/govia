@@ -338,7 +338,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new AuditObjectCategoryRequest(code, "Loai test " + code, null, true))))
+                                new AuditObjectCategoryRequest(code, "Loai test " + code, null, null, true))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         return UUID.fromString(objectMapper.readTree(body).get("data").get("id").asText());

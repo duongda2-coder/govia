@@ -1,15 +1,8 @@
 package com.govia.audit.riskscoring.scoring.service;
 
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectCategory;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectProcess;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectProject;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectSubsidiary;
-import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepository;
-import com.govia.audit.riskscoring.masterdata.repository.AuditObjectProcessRepository;
-import com.govia.audit.riskscoring.masterdata.repository.AuditObjectProjectRepository;
-import com.govia.audit.riskscoring.masterdata.repository.AuditObjectSubsidiaryRepository;
-import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
+import com.govia.audit.riskscoring.masterdata.service.AuditObjectResolverService;
 import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherHeaderRequest;
 import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherHeaderResponse;
 import com.govia.audit.riskscoring.scoring.entity.RiskAssessmentOtherHeader;
@@ -38,20 +31,15 @@ import java.util.UUID;
 
 /**
  * CRUD cho header cua man hinh "Cham diem rui ro HO, CNTT, Du an, Dich vu thue ngoai..." (sheet
- * ZTC_CDRR_KHAC). "Ma doi tuong KT" tro toi 1 trong 4 danh muc doi tuong kiem toan tuy theo ma
- * cua Loai doi tuong KT (category): HO -> AuditObjectUnit, CTC -> AuditObjectSubsidiary,
- * KTQT -> AuditObjectProcess, con lai -> AuditObjectProject - dung theo dung logic mo ta trong
- * tai lieu goc.
+ * ZTC_CDRR_KHAC). "Ma doi tuong KT" tro toi 1 trong 4 danh muc doi tuong kiem toan cu the, tuy theo
+ * objectSource cua Loai doi tuong KT (category) - xem AuditObjectResolverService.
  */
 @Service
 public class RiskAssessmentOtherHeaderService {
 
     private final RiskAssessmentOtherHeaderRepository repository;
     private final AuditObjectCategoryRepository auditObjectCategoryRepository;
-    private final AuditObjectUnitRepository auditObjectUnitRepository;
-    private final AuditObjectSubsidiaryRepository auditObjectSubsidiaryRepository;
-    private final AuditObjectProjectRepository auditObjectProjectRepository;
-    private final AuditObjectProcessRepository auditObjectProcessRepository;
+    private final AuditObjectResolverService objectResolver;
     private final RiskAssessmentOtherLineService lineService;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
@@ -60,10 +48,7 @@ public class RiskAssessmentOtherHeaderService {
 
     public RiskAssessmentOtherHeaderService(RiskAssessmentOtherHeaderRepository repository,
                                              AuditObjectCategoryRepository auditObjectCategoryRepository,
-                                             AuditObjectUnitRepository auditObjectUnitRepository,
-                                             AuditObjectSubsidiaryRepository auditObjectSubsidiaryRepository,
-                                             AuditObjectProjectRepository auditObjectProjectRepository,
-                                             AuditObjectProcessRepository auditObjectProcessRepository,
+                                             AuditObjectResolverService objectResolver,
                                              RiskAssessmentOtherLineService lineService,
                                              AuditLogService auditLogService,
                                              ExcelExportService excelExportService,
@@ -71,10 +56,7 @@ public class RiskAssessmentOtherHeaderService {
                                              ExcelImportService excelImportService) {
         this.repository = repository;
         this.auditObjectCategoryRepository = auditObjectCategoryRepository;
-        this.auditObjectUnitRepository = auditObjectUnitRepository;
-        this.auditObjectSubsidiaryRepository = auditObjectSubsidiaryRepository;
-        this.auditObjectProjectRepository = auditObjectProjectRepository;
-        this.auditObjectProcessRepository = auditObjectProcessRepository;
+        this.objectResolver = objectResolver;
         this.lineService = lineService;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
@@ -95,7 +77,7 @@ public class RiskAssessmentOtherHeaderService {
     public RiskAssessmentOtherHeaderResponse create(RiskAssessmentOtherHeaderRequest request) {
         UUID tenantId = TenantContext.getTenantId();
         AuditObjectCategory category = validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
-        validateAuditObjectCode(tenantId, category.getCode(), request.auditObjectCode());
+        validateAuditObjectCode(tenantId, category, request.auditObjectCode());
         checkNoDuplicate(tenantId, request.auditObjectCategoryId(), request.auditObjectCode(), request.year(), null);
 
         RiskAssessmentOtherHeader item = new RiskAssessmentOtherHeader();
@@ -115,7 +97,7 @@ public class RiskAssessmentOtherHeaderService {
         UUID tenantId = TenantContext.getTenantId();
         RiskAssessmentOtherHeader item = getOwnedOrThrow(tenantId, id);
         AuditObjectCategory category = validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
-        validateAuditObjectCode(tenantId, category.getCode(), request.auditObjectCode());
+        validateAuditObjectCode(tenantId, category, request.auditObjectCode());
         checkNoDuplicate(tenantId, request.auditObjectCategoryId(), request.auditObjectCode(), request.year(), id);
 
         applyRequest(item, request);
@@ -189,7 +171,7 @@ public class RiskAssessmentOtherHeaderService {
                 if (year == null) {
                     throw new BusinessException("IMPORT_INVALID_YEAR", "Nam khong hop le: " + yearStr);
                 }
-                validateAuditObjectCode(tenantId, category.getCode(), objectCode.trim());
+                validateAuditObjectCode(tenantId, category, objectCode.trim());
 
                 String headerKey = category.getId() + "/" + objectCode.trim() + "/" + year;
                 RiskAssessmentOtherHeader header = headerCache.computeIfAbsent(headerKey, k ->
@@ -295,25 +277,10 @@ public class RiskAssessmentOtherHeaderService {
                 .orElseThrow(() -> new BusinessException("AUDIT_OBJECT_CATEGORY_NOT_FOUND", "Khong tim thay loai doi tuong kiem toan"));
     }
 
-    private void validateAuditObjectCode(UUID tenantId, String categoryCode, String auditObjectCode) {
-        boolean exists = switch (categoryCode) {
-            case "HO" -> auditObjectUnitRepository.findByTenantIdAndCode(tenantId, auditObjectCode).isPresent();
-            case "CTC" -> auditObjectSubsidiaryRepository.findByTenantIdAndCode(tenantId, auditObjectCode).isPresent();
-            case "KTQT" -> auditObjectProcessRepository.findByTenantIdAndCode(tenantId, auditObjectCode).isPresent();
-            default -> auditObjectProjectRepository.findByTenantIdAndCode(tenantId, auditObjectCode).isPresent();
-        };
-        if (!exists) {
+    private void validateAuditObjectCode(UUID tenantId, AuditObjectCategory category, String auditObjectCode) {
+        if (!objectResolver.exists(tenantId, category, auditObjectCode)) {
             throw new BusinessException("AUDIT_OBJECT_CODE_NOT_FOUND", "Khong tim thay ma doi tuong kiem toan: " + auditObjectCode);
         }
-    }
-
-    private String resolveAuditObjectName(UUID tenantId, String categoryCode, String auditObjectCode) {
-        return switch (categoryCode) {
-            case "HO" -> auditObjectUnitRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectUnit::getName).orElse(null);
-            case "CTC" -> auditObjectSubsidiaryRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectSubsidiary::getName).orElse(null);
-            case "KTQT" -> auditObjectProcessRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectProcess::getName).orElse(null);
-            default -> auditObjectProjectRepository.findByTenantIdAndCode(tenantId, auditObjectCode).map(AuditObjectProject::getName).orElse(null);
-        };
     }
 
     private Map<UUID, AuditObjectCategory> categoriesById(UUID tenantId) {
@@ -326,7 +293,7 @@ public class RiskAssessmentOtherHeaderService {
 
     private RiskAssessmentOtherHeaderResponse toResponse(RiskAssessmentOtherHeader item, Map<UUID, AuditObjectCategory> categories) {
         AuditObjectCategory category = categories.get(item.getAuditObjectCategoryId());
-        String auditObjectName = category != null ? resolveAuditObjectName(item.getTenantId(), category.getCode(), item.getAuditObjectCode()) : null;
+        String auditObjectName = category != null ? objectResolver.resolveName(item.getTenantId(), category, item.getAuditObjectCode()) : null;
         return new RiskAssessmentOtherHeaderResponse(item.getId(),
                 item.getAuditObjectCategoryId(), category != null ? category.getCode() : null, category != null ? category.getName() : null,
                 item.getAuditObjectCode(), auditObjectName, item.getYear(), item.isActive());

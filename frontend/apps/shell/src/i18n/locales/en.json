@@ -728,7 +728,8 @@
       "referenceDocument": "Reference Document",
       "eventNote": "Event Note",
       "incidentNote": "Incident Note",
-      "reviewResult": "Review Result"
+      "reviewResult": "Review Result",
+      "objectSource": "Lookup Target"
     },
     "criteriaTypeOptions": {
       "1": "Type 1",
@@ -739,7 +740,8 @@
       "createTitle": "Add",
       "editTitle": "Edit",
       "selectGroup1First": "Select Level-1 Group first",
-      "selectAuditObjectFirst": "Select Audit Object Category first"
+      "selectAuditObjectFirst": "Select Audit Object Category first",
+      "objectSourceHint": "Decides which catalog the \"Audit Object Code\" column looks up in Other Risk Assessment"
     },
     "deleteConfirmTitle": "Delete this item?",
     "messages": {

@@ -728,7 +728,8 @@
       "referenceDocument": "Văn bản tham chiếu",
       "eventNote": "Ghi nhận sự kiện",
       "incidentNote": "Ghi nhận sự cố",
-      "reviewResult": "Kết quả rà soát"
+      "reviewResult": "Kết quả rà soát",
+      "objectSource": "Đối tượng tra cứu"
     },
     "criteriaTypeOptions": {
       "1": "Loại 1",
@@ -739,7 +740,8 @@
       "createTitle": "Thêm mới",
       "editTitle": "Sửa",
       "selectGroup1First": "Chọn Nhóm cấp 1 trước",
-      "selectAuditObjectFirst": "Chọn Loại đối tượng kiểm toán trước"
+      "selectAuditObjectFirst": "Chọn Loại đối tượng kiểm toán trước",
+      "objectSourceHint": "Quyết định danh mục mà cột \"Mã đối tượng KT\" sẽ tra cứu tới khi Chấm điểm rủi ro khác"
     },
     "deleteConfirmTitle": "Xóa mục này?",
     "messages": {

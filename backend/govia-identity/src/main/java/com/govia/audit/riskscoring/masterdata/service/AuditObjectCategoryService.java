@@ -3,6 +3,7 @@ package com.govia.audit.riskscoring.masterdata.service;
 import com.govia.audit.riskscoring.masterdata.dto.AuditObjectCategoryRequest;
 import com.govia.audit.riskscoring.masterdata.dto.AuditObjectCategoryResponse;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectCategory;
+import com.govia.audit.riskscoring.masterdata.entity.AuditObjectSource;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepository;
 import com.govia.core.audit.AuditAction;
 import com.govia.core.audit.AuditLogService;
@@ -119,7 +120,8 @@ public class AuditObjectCategoryService {
                 if (isBlank(code) || isBlank(name)) {
                     throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Ma hoac Ten loai doi tuong");
                 }
-                create(new AuditObjectCategoryRequest(code.trim(), name.trim(), emptyToNull(row.get("note")), true));
+                AuditObjectSource objectSource = parseObjectSource(row.get("objectSource"));
+                create(new AuditObjectCategoryRequest(code.trim(), name.trim(), emptyToNull(row.get("note")), objectSource, true));
                 success++;
             } catch (BusinessException e) {
                 errors.add(new ImportResult.ImportRowError(rowNumber, e.getMessage()));
@@ -135,6 +137,7 @@ public class AuditObjectCategoryService {
         item.setCode(request.code());
         item.setName(request.name());
         item.setNote(request.note());
+        item.setObjectSource(request.objectSource() != null ? request.objectSource() : AuditObjectSource.PROJECT);
         item.setActive(request.active());
     }
 
@@ -156,7 +159,8 @@ public class AuditObjectCategoryService {
         return List.of(
                 new ExportColumn("code", "Ma loai doi tuong"),
                 new ExportColumn("name", "Ten loai doi tuong"),
-                new ExportColumn("note", "Ghi chu"));
+                new ExportColumn("note", "Ghi chu"),
+                new ExportColumn("objectSource", "Doi tuong tra cuu (UNIT/SUBSIDIARY/PROCESS/PROJECT)"));
     }
 
     private List<Map<String, Object>> exportRows() {
@@ -166,6 +170,7 @@ public class AuditObjectCategoryService {
                     row.put("code", item.getCode());
                     row.put("name", item.getName());
                     row.put("note", item.getNote());
+                    row.put("objectSource", item.getObjectSource().name());
                     return row;
                 }).toList();
     }
@@ -178,7 +183,19 @@ public class AuditObjectCategoryService {
         return isBlank(value) ? null : value.trim();
     }
 
+    private AuditObjectSource parseObjectSource(String value) {
+        if (isBlank(value)) {
+            return AuditObjectSource.PROJECT;
+        }
+        try {
+            return AuditObjectSource.valueOf(value.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return AuditObjectSource.PROJECT;
+        }
+    }
+
     private AuditObjectCategoryResponse toResponse(AuditObjectCategory item) {
-        return new AuditObjectCategoryResponse(item.getId(), item.getCode(), item.getName(), item.getNote(), item.isActive());
+        return new AuditObjectCategoryResponse(item.getId(), item.getCode(), item.getName(), item.getNote(),
+                item.getObjectSource().name(), item.isActive());
     }
 }

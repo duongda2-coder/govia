@@ -1,15 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Form, Input, Modal, Switch } from "antd";
+import { App, Form, Input, Modal, Select, Switch } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
-import { auditObjectCategoryApi, type AuditObjectCategoryItem, type AuditObjectCategoryRequest } from "../../../api/riskScoring";
+import {
+  auditObjectCategoryApi,
+  AUDIT_OBJECT_SOURCE_OPTIONS,
+  type AuditObjectCategoryItem,
+  type AuditObjectCategoryRequest,
+  type AuditObjectSource,
+} from "../../../api/riskScoring";
 import { useAuth } from "../../../auth/AuthContext";
 
 interface FormValues {
   code: string;
   name: string;
   note?: string;
+  objectSource: AuditObjectSource;
   active: boolean;
 }
 
@@ -56,7 +63,7 @@ export function AuditObjectCategoryTable() {
   const openCreate = () => {
     setEditing(null);
     form.resetFields();
-    form.setFieldsValue({ active: true });
+    form.setFieldsValue({ active: true, objectSource: "PROJECT" });
     setModalOpen(true);
   };
 
@@ -68,6 +75,7 @@ export function AuditObjectCategoryTable() {
       code: target.code,
       name: target.name,
       note: target.note ?? undefined,
+      objectSource: target.objectSource,
       active: target.active,
     });
     setModalOpen(true);
@@ -81,6 +89,7 @@ export function AuditObjectCategoryTable() {
       code: "",
       name: target.name,
       note: target.note ?? undefined,
+      objectSource: target.objectSource,
       active: target.active,
     });
     setModalOpen(true);
@@ -99,6 +108,7 @@ export function AuditObjectCategoryTable() {
         code: values.code,
         name: values.name,
         note: values.note || null,
+        objectSource: values.objectSource,
         active: values.active,
       };
       if (editing) {
@@ -142,6 +152,12 @@ export function AuditObjectCategoryTable() {
     { title: t("riskScoring.columns.code"), width: 100, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("riskScoring.columns.note"), dataIndex: "note", render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.objectSource"),
+      dataIndex: "objectSource",
+      width: 180,
+      render: (v: AuditObjectSource) => AUDIT_OBJECT_SOURCE_OPTIONS.find((o) => o.value === v)?.label ?? v,
+    },
     {
       title: t("common.active"),
       dataIndex: "active",
@@ -201,6 +217,14 @@ export function AuditObjectCategoryTable() {
           </Form.Item>
           <Form.Item name="note" label={t("riskScoring.columns.note")}>
             <Input.TextArea rows={2} maxLength={200} />
+          </Form.Item>
+          <Form.Item
+            name="objectSource"
+            label={t("riskScoring.columns.objectSource")}
+            rules={[{ required: true }]}
+            extra={t("riskScoring.form.objectSourceHint")}
+          >
+            <Select options={AUDIT_OBJECT_SOURCE_OPTIONS} />
           </Form.Item>
           <Form.Item name="active" label={t("common.active")} valuePropName="checked">
             <Switch />

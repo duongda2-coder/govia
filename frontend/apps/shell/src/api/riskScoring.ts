@@ -6,17 +6,29 @@ import { httpClient } from "./client";
  * cua Group2). Khac voi 4 danh muc "Doi tuong kiem toan" cu the (Unit/Subsidiary/Project/Process)
  * von la cac ban ghi doi tuong duoc kiem toan - danh muc nay chi la PHAN LOAI (CNDT/CNDL/HO/IT/DA).
  */
+/** Danh muc "Doi tuong kiem toan" cu the ma "Ma doi tuong KT" tra cuu toi - xem AuditObjectCategoryItem.objectSource. */
+export type AuditObjectSource = "UNIT" | "SUBSIDIARY" | "PROCESS" | "PROJECT";
+
+export const AUDIT_OBJECT_SOURCE_OPTIONS: { value: AuditObjectSource; label: string }[] = [
+  { value: "UNIT", label: "Đơn vị (HO/GSCC/CN)" },
+  { value: "SUBSIDIARY", label: "Công ty con" },
+  { value: "PROCESS", label: "Quy trình" },
+  { value: "PROJECT", label: "Dự án/DVTN" },
+];
+
 export interface AuditObjectCategoryItem {
   id: string;
   code: string;
   name: string;
   note: string | null;
+  objectSource: AuditObjectSource;
   active: boolean;
 }
 export interface AuditObjectCategoryRequest {
   code: string;
   name: string;
   note?: string | null;
+  objectSource?: AuditObjectSource | null;
   active: boolean;
 }
 

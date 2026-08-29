@@ -7,6 +7,7 @@ public record AuditObjectCategoryResponse(
         String code,
         String name,
         String note,
+        String objectSource,
         boolean active
 ) {
 }
