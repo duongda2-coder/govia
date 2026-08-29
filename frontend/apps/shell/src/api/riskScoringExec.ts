@@ -136,6 +136,13 @@ export interface RiskCriteriaQuantitativeValueItem {
   entryDate: string | null;
   value: number | null;
 }
+export interface RiskCriteriaQuantitativeValueRequest {
+  criteriaId: string;
+  branchCode: string;
+  year: number;
+  entryDate?: string | null;
+  value?: number | null;
+}
 
 export interface RiskCriteriaQualitativeValueItem {
   id: string;
@@ -147,6 +154,13 @@ export interface RiskCriteriaQualitativeValueItem {
   criteriaName: string | null;
   violation: string | null;
   note: string | null;
+}
+export interface RiskCriteriaQualitativeValueRequest {
+  criteriaId: string;
+  branchCode: string;
+  year: number;
+  violation?: string | null;
+  note?: string | null;
 }
 
 export interface RiskCriteriaOtherScaleItem {
@@ -269,11 +283,33 @@ export const riskAssessmentOtherExpertRankApi = {
   },
 };
 
+/** Tai file Excel/Word ve may - dung axios (khong phai <a href>) de header Authorization duoc dinh kem tu dong. */
+async function downloadHsrrFile(path: string, year: number, kind: "excel" | "word", fileBaseName: string): Promise<void> {
+  const res = await httpClient.get(`${BASE}/${path}/export/${kind}`, { params: { year }, responseType: "blob" });
+  const blobUrl = window.URL.createObjectURL(res.data as Blob);
+  const link = document.createElement("a");
+  link.href = blobUrl;
+  link.download = kind === "excel" ? `${fileBaseName}.xlsx` : `${fileBaseName}.docx`;
+  link.click();
+  window.URL.revokeObjectURL(blobUrl);
+}
+
 /** "Ho so rui ro dinh luong" (sheet ZTC_HSRR, mau DL_HSRR_Upload) - wide-format, co phan quyen theo user/chi tieu. */
 export const riskCriteriaQuantitativeValueApi = {
   async list(year: number): Promise<RiskCriteriaQuantitativeValueItem[]> {
     const res = await httpClient.get<ApiResponse<RiskCriteriaQuantitativeValueItem[]>>(`${BASE}/hsrr/quantitative`, { params: { year } });
     return res.data.data;
+  },
+  async create(request: RiskCriteriaQuantitativeValueRequest): Promise<RiskCriteriaQuantitativeValueItem> {
+    const res = await httpClient.post<ApiResponse<RiskCriteriaQuantitativeValueItem>>(`${BASE}/hsrr/quantitative`, request);
+    return res.data.data;
+  },
+  async update(id: string, request: RiskCriteriaQuantitativeValueRequest): Promise<RiskCriteriaQuantitativeValueItem> {
+    const res = await httpClient.put<ApiResponse<RiskCriteriaQuantitativeValueItem>>(`${BASE}/hsrr/quantitative/${id}`, request);
+    return res.data.data;
+  },
+  async remove(id: string): Promise<void> {
+    await httpClient.delete(`${BASE}/hsrr/quantitative/${id}`);
   },
   async importExcel(file: File): Promise<ImportResult> {
     const formData = new FormData();
@@ -283,6 +319,7 @@ export const riskCriteriaQuantitativeValueApi = {
     });
     return res.data.data;
   },
+  exportFile: (year: number, kind: "excel" | "word") => downloadHsrrFile("quantitative", year, kind, "risk_score_criteria_quantitative_value"),
 };
 
 /** "Ho so rui ro dinh tinh" (sheet ZTC_HSRR, mau DT_HSRR_Upload) - long-format. */
@@ -290,6 +327,17 @@ export const riskCriteriaQualitativeValueApi = {
   async list(year: number): Promise<RiskCriteriaQualitativeValueItem[]> {
     const res = await httpClient.get<ApiResponse<RiskCriteriaQualitativeValueItem[]>>(`${BASE}/hsrr/qualitative`, { params: { year } });
     return res.data.data;
+  },
+  async create(request: RiskCriteriaQualitativeValueRequest): Promise<RiskCriteriaQualitativeValueItem> {
+    const res = await httpClient.post<ApiResponse<RiskCriteriaQualitativeValueItem>>(`${BASE}/hsrr/qualitative`, request);
+    return res.data.data;
+  },
+  async update(id: string, request: RiskCriteriaQualitativeValueRequest): Promise<RiskCriteriaQualitativeValueItem> {
+    const res = await httpClient.put<ApiResponse<RiskCriteriaQualitativeValueItem>>(`${BASE}/hsrr/qualitative/${id}`, request);
+    return res.data.data;
+  },
+  async remove(id: string): Promise<void> {
+    await httpClient.delete(`${BASE}/hsrr/qualitative/${id}`);
   },
   async importExcel(file: File): Promise<ImportResult> {
     const formData = new FormData();
@@ -299,4 +347,5 @@ export const riskCriteriaQualitativeValueApi = {
     });
     return res.data.data;
   },
+  exportFile: (year: number, kind: "excel" | "word") => downloadHsrrFile("qualitative", year, kind, "risk_score_criteria_qualitative_value"),
 };

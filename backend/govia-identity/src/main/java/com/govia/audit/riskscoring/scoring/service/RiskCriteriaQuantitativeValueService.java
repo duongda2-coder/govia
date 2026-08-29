@@ -6,12 +6,16 @@ import com.govia.audit.riskscoring.masterdata.entity.RiskUserAssignment;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
 import com.govia.audit.riskscoring.masterdata.repository.RiskCriteriaQuantitativeRepository;
 import com.govia.audit.riskscoring.masterdata.repository.RiskUserAssignmentRepository;
+import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQuantitativeValueRequest;
 import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQuantitativeValueResponse;
 import com.govia.audit.riskscoring.scoring.entity.RiskCriteriaQuantitativeValue;
 import com.govia.audit.riskscoring.scoring.repository.RiskCriteriaQuantitativeValueRepository;
 import com.govia.core.audit.AuditAction;
 import com.govia.core.audit.AuditLogService;
+import com.govia.core.export.ExcelExportService;
+import com.govia.core.export.ExportColumn;
 import com.govia.core.export.ImportResult;
+import com.govia.core.export.WordExportService;
 import com.govia.core.tenant.TenantContext;
 import com.govia.core.web.BusinessException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -22,6 +26,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,17 +63,23 @@ public class RiskCriteriaQuantitativeValueService {
     private final AuditObjectUnitRepository auditObjectUnitRepository;
     private final RiskUserAssignmentRepository userAssignmentRepository;
     private final AuditLogService auditLogService;
+    private final ExcelExportService excelExportService;
+    private final WordExportService wordExportService;
 
     public RiskCriteriaQuantitativeValueService(RiskCriteriaQuantitativeValueRepository repository,
                                                  RiskCriteriaQuantitativeRepository criteriaRepository,
                                                  AuditObjectUnitRepository auditObjectUnitRepository,
                                                  RiskUserAssignmentRepository userAssignmentRepository,
-                                                 AuditLogService auditLogService) {
+                                                 AuditLogService auditLogService,
+                                                 ExcelExportService excelExportService,
+                                                 WordExportService wordExportService) {
         this.repository = repository;
         this.criteriaRepository = criteriaRepository;
         this.auditObjectUnitRepository = auditObjectUnitRepository;
         this.userAssignmentRepository = userAssignmentRepository;
         this.auditLogService = auditLogService;
+        this.excelExportService = excelExportService;
+        this.wordExportService = wordExportService;
     }
 
     @Transactional(readOnly = true)
@@ -79,6 +90,58 @@ public class RiskCriteriaQuantitativeValueService {
         return repository.findByTenantIdAndYearOrderByBranchCodeAsc(tenantId, year).stream()
                 .map(item -> toResponse(item, criteria, units))
                 .toList();
+    }
+
+    @Transactional
+    public RiskCriteriaQuantitativeValueResponse create(RiskCriteriaQuantitativeValueRequest request) {
+        UUID tenantId = TenantContext.getTenantId();
+        validateCriteria(tenantId, request.criteriaId());
+        validateBranch(tenantId, request.branchCode());
+        checkNoDuplicate(tenantId, request.criteriaId(), request.branchCode(), request.year(), null);
+
+        RiskCriteriaQuantitativeValue item = new RiskCriteriaQuantitativeValue();
+        item.setTenantId(tenantId);
+        applyRequest(item, request);
+        item = repository.save(item);
+
+        auditLogService.record("RiskCriteriaQuantitativeValue", item.getId(), AuditAction.CREATE,
+                "Tao HSRR dinh luong: " + item.getBranchCode() + "/" + item.getYear());
+        return toResponse(item, criteriaById(tenantId), unitsByCode(tenantId));
+    }
+
+    @Transactional
+    public RiskCriteriaQuantitativeValueResponse update(UUID id, RiskCriteriaQuantitativeValueRequest request) {
+        UUID tenantId = TenantContext.getTenantId();
+        RiskCriteriaQuantitativeValue item = getOwnedOrThrow(tenantId, id);
+        validateCriteria(tenantId, request.criteriaId());
+        validateBranch(tenantId, request.branchCode());
+        checkNoDuplicate(tenantId, request.criteriaId(), request.branchCode(), request.year(), id);
+
+        applyRequest(item, request);
+        item = repository.save(item);
+
+        auditLogService.record("RiskCriteriaQuantitativeValue", item.getId(), AuditAction.UPDATE,
+                "Cap nhat HSRR dinh luong: " + item.getBranchCode() + "/" + item.getYear());
+        return toResponse(item, criteriaById(tenantId), unitsByCode(tenantId));
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        UUID tenantId = TenantContext.getTenantId();
+        RiskCriteriaQuantitativeValue item = getOwnedOrThrow(tenantId, id);
+        repository.delete(item);
+        auditLogService.record("RiskCriteriaQuantitativeValue", id, AuditAction.DELETE,
+                "Xoa HSRR dinh luong: " + item.getBranchCode() + "/" + item.getYear());
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportExcel(Integer year) {
+        return excelExportService.export("risk_score_criteria_quantitative_value", exportColumns(), exportRows(year));
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportWord(Integer year) {
+        return wordExportService.export("Hồ sơ rủi ro định lượng", exportColumns(), exportRows(year));
     }
 
     @Transactional
@@ -205,6 +268,66 @@ public class RiskCriteriaQuantitativeValueService {
         item.setEntryDate(entryDate);
         item.setValue(value);
         repository.save(item);
+    }
+
+    private List<ExportColumn> exportColumns() {
+        return List.of(
+                new ExportColumn("criteriaCode", "Mã chỉ tiêu"),
+                new ExportColumn("branchCode", "Mã chi nhánh"),
+                new ExportColumn("year", "Năm"),
+                new ExportColumn("entryDate", "Ngày nhập"),
+                new ExportColumn("value", "Giá trị"));
+    }
+
+    private List<Map<String, Object>> exportRows(Integer year) {
+        UUID tenantId = TenantContext.getTenantId();
+        Map<UUID, RiskCriteriaQuantitative> criteria = criteriaById(tenantId);
+        return repository.findByTenantIdAndYearOrderByBranchCodeAsc(tenantId, year).stream()
+                .map(item -> {
+                    RiskCriteriaQuantitative criterion = criteria.get(item.getCriteriaId());
+                    Map<String, Object> row = new HashMap<>();
+                    row.put("criteriaCode", criterion != null ? criterion.getCode() : null);
+                    row.put("branchCode", item.getBranchCode());
+                    row.put("year", item.getYear());
+                    row.put("entryDate", item.getEntryDate());
+                    row.put("value", item.getValue());
+                    return row;
+                }).toList();
+    }
+
+    private void applyRequest(RiskCriteriaQuantitativeValue item, RiskCriteriaQuantitativeValueRequest request) {
+        item.setCriteriaId(request.criteriaId());
+        item.setBranchCode(request.branchCode());
+        item.setYear(request.year());
+        item.setEntryDate(request.entryDate());
+        item.setValue(request.value());
+    }
+
+    private void checkNoDuplicate(UUID tenantId, UUID criteriaId, String branchCode, Integer year, UUID excludingId) {
+        repository.findByTenantIdAndCriteriaIdAndBranchCodeAndYear(tenantId, criteriaId, branchCode, year)
+                .filter(existing -> excludingId == null || !existing.getId().equals(excludingId))
+                .ifPresent(existing -> {
+                    throw new BusinessException("RISK_CRITERIA_QUANTITATIVE_VALUE_DUPLICATE",
+                            "Da ton tai gia tri cho chi nhanh " + branchCode + " nam " + year + " voi chi tieu nay");
+                });
+    }
+
+    private void validateCriteria(UUID tenantId, UUID criteriaId) {
+        criteriaRepository.findById(criteriaId)
+                .filter(c -> c.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("RISK_CRITERIA_DL_NOT_FOUND", "Khong tim thay chi tieu dinh luong"));
+    }
+
+    private void validateBranch(UUID tenantId, String branchCode) {
+        if (auditObjectUnitRepository.findByTenantIdAndCode(tenantId, branchCode).isEmpty()) {
+            throw new BusinessException("AUDIT_OBJECT_CODE_NOT_FOUND", "Khong tim thay chi nhanh: " + branchCode);
+        }
+    }
+
+    private RiskCriteriaQuantitativeValue getOwnedOrThrow(UUID tenantId, UUID id) {
+        return repository.findById(id)
+                .filter(item -> item.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("RISK_CRITERIA_QUANTITATIVE_VALUE_NOT_FOUND", "Khong tim thay gia tri HSRR", HttpStatus.NOT_FOUND));
     }
 
     private LocalDate parseDate(Cell cell, DataFormatter formatter) {
