@@ -19,12 +19,13 @@ interface FormValues {
 }
 
 /**
- * Ban "bang tong hop" (wide-format) cua Ho so rui ro dinh luong - 1 dong = 1 chi nhanh/nam, tung
- * chi tieu dinh luong la 1 cot rieng (dung dinh dang voi sheet DL_Nhaptructiep / mau DL_HSRR_Upload
- * cua file "2. Cham diem (1).xlsx"), khac voi RiskCriteriaQuantitativeValueTable (long-format, 1
- * dong/1 chi tieu) - man do van giu song song de sua nhanh 1-2 gia tri, Import/Export/Xoa tung dong.
- * Sua 1 dong o day mo modal voi tat ca chi tieu (nhom theo Ma nhom) roi luu 1 lan qua
- * PUT .../hsrr/quantitative/wide (upsert tung chi tieu, gia tri de trong = xoa neu da co).
+ * Man hinh duy nhat cua "Ho so rui ro dinh luong" - dang "bang tong hop" (wide-format), 1 dong =
+ * 1 chi nhanh/nam, tung chi tieu dinh luong la 1 cot rieng (dung dinh dang voi sheet DL_Nhaptructiep
+ * / mau DL_HSRR_Upload cua file "2. Cham diem (1).xlsx"). Import/Export Excel dung chung API va
+ * template voi truoc day (RiskCriteriaQuantitativeValueService: import da tu "unpivot" wide-format
+ * thanh cac dong gia tri, export/them/sua tung gia tri van la long-format). Sua 1 dong o day mo
+ * modal voi tat ca chi tieu (nhom theo Ma nhom) roi luu 1 lan qua PUT .../hsrr/quantitative/wide
+ * (upsert tung chi tieu, gia tri de trong = xoa neu da co).
  */
 export function RiskCriteriaQuantitativeWideTable() {
   const { t } = useTranslation();
@@ -33,6 +34,8 @@ export function RiskCriteriaQuantitativeWideTable() {
   const canView = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
   const canCreate = hasPermission("AUDIT.RISK_SCORING_EXEC.CREATE");
   const canEdit = hasPermission("AUDIT.RISK_SCORING_EXEC.EDIT");
+  const canExport = hasPermission("AUDIT.RISK_SCORING_EXEC.EXPORT");
+  const canImport = hasPermission("AUDIT.RISK_SCORING_EXEC.IMPORT");
   const { getSearchColumnProps } = useClientSearchColumn<RiskCriteriaQuantitativeWideRowItem>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
@@ -92,6 +95,14 @@ export function RiskCriteriaQuantitativeWideTable() {
     }
     return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b));
   }, [criteriaList]);
+
+  const handleExport = (kind: "excel" | "word") => {
+    if (year == null) {
+      message.warning(t("riskScoringExec.hsrr.selectYearFirst"));
+      return Promise.resolve();
+    }
+    return riskCriteriaQuantitativeValueApi.exportFile(year, kind);
+  };
 
   const openCreate = () => {
     if (year == null) {
@@ -191,6 +202,17 @@ export function RiskCriteriaQuantitativeWideTable() {
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
         onSelectionChange={(_keys, selectedRows) => setSelected(selectedRows)}
+        onExportExcel={canExport ? () => handleExport("excel") : undefined}
+        onExportWord={canExport ? () => handleExport("word") : undefined}
+        onImport={
+          canImport
+            ? async (file) => {
+                const result = await riskCriteriaQuantitativeValueApi.importExcel(file);
+                if (year != null) await load(year);
+                return result;
+              }
+            : undefined
+        }
       />
 
       <Modal
