@@ -196,19 +196,21 @@ export function RiskAssessmentOtherTable() {
     }
   };
 
-  // Dong (line) luon ton tai san cho moi chi tieu phu hop (ensureLines o backend tu sinh) - "Xoa" o
-  // day nghia la bo diem da cham ve chua cham, khong xoa han dong khoi danh sach.
+  // Dong (line) luon ton tai san cho moi chi tieu phu hop (ensureLines o backend tu sinh), nen "Xoa"
+  // o day chi bo diem da cham ve chua cham chu khong xoa han dong khoi danh sach - dung rieng cau chu
+  // "bo diem" (khong dung cac key "riskScoringExec.deleteConfirmTitle"/"deleteSuccess" dung chung cho
+  // cac man hinh xoa that su khac trong cung namespace) de tranh gay hieu lam da xoa dong.
   const handleDelete = () => {
     if (selected.length === 0) return;
     modal.confirm({
-      title: selected.length > 1 ? t("common.deleteConfirmTitleCount", { count: selected.length }) : t("riskScoringExec.deleteConfirmTitle"),
+      title: t("riskScoringExec.assessmentOther.clearScoreConfirmTitle"),
       okText: t("common.yes"),
       cancelText: t("common.no"),
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
           await Promise.all(selected.map((row) => riskAssessmentOtherApi.updateLine(row.headerId, row.lineId, { scaleId: null })));
-          message.success(t("riskScoringExec.messages.deleteSuccess"));
+          message.success(t("riskScoringExec.assessmentOther.clearScoreSuccess"));
           setSelected([]);
           await load();
         } catch {
