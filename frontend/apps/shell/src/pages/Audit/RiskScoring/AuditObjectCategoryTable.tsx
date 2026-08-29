@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { App, Form, Input, Modal, Select, Switch } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
@@ -6,6 +6,7 @@ import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
 import {
   auditObjectCategoryApi,
   AUDIT_OBJECT_SOURCE_OPTIONS,
+  guessObjectSource,
   type AuditObjectCategoryItem,
   type AuditObjectCategoryRequest,
   type AuditObjectSource,
@@ -44,6 +45,8 @@ export function AuditObjectCategoryTable() {
   const [editing, setEditing] = useState<AuditObjectCategoryItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm<FormValues>();
+  /** True ngay khi NSD tu tay doi "Doi tuong tra cuu" - luc do ngung tu doan lai theo Ma/Ten nua. */
+  const objectSourceTouchedRef = useRef(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -62,6 +65,7 @@ export function AuditObjectCategoryTable() {
 
   const openCreate = () => {
     setEditing(null);
+    objectSourceTouchedRef.current = false;
     form.resetFields();
     form.setFieldsValue({ active: true, objectSource: "PROJECT" });
     setModalOpen(true);
@@ -71,6 +75,7 @@ export function AuditObjectCategoryTable() {
     const target = selected[0];
     if (!target) return;
     setEditing(target);
+    objectSourceTouchedRef.current = true;
     form.setFieldsValue({
       code: target.code,
       name: target.name,
@@ -85,6 +90,7 @@ export function AuditObjectCategoryTable() {
     const target = selected[0];
     if (!target) return;
     setEditing(null);
+    objectSourceTouchedRef.current = true;
     form.setFieldsValue({
       code: "",
       name: target.name,
@@ -208,7 +214,19 @@ export function AuditObjectCategoryTable() {
         confirmLoading={submitting}
         destroyOnClose
       >
-        <Form<FormValues> form={form} layout="vertical">
+        <Form<FormValues>
+          form={form}
+          layout="vertical"
+          onValuesChange={(changed, all) => {
+            if ("objectSource" in changed) {
+              objectSourceTouchedRef.current = true;
+              return;
+            }
+            if (!objectSourceTouchedRef.current && ("code" in changed || "name" in changed)) {
+              form.setFieldValue("objectSource", guessObjectSource(all.code ?? "", all.name ?? ""));
+            }
+          }}
+        >
           <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }, { max: 4 }]}>
             <Input maxLength={4} />
           </Form.Item>

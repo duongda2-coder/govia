@@ -16,6 +16,29 @@ export const AUDIT_OBJECT_SOURCE_OPTIONS: { value: AuditObjectSource; label: str
   { value: "PROJECT", label: "Dự án/DVTN" },
 ];
 
+function stripDiacritics(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/đ/g, "d");
+}
+
+/** Doan objectSource tu ma/ten - cung logic voi AuditObjectSource.guess() ben backend, dung de tu
+ * dien san "Doi tuong tra cuu" khi NSD go Ma/Ten, tranh bi ket o mac dinh "Du an/DVTN" ma khong biet. */
+export function guessObjectSource(code: string, name: string): AuditObjectSource {
+  const normalizedCode = stripDiacritics(code.trim());
+  const text = stripDiacritics(`${code} ${name}`);
+  if (text.includes("quy trinh")) return "PROCESS";
+  if (text.includes("cong ty con")) return "SUBSIDIARY";
+  // "ho" chi khop khi la CA MA (khong xet trong ten, vi nhieu tu khac cung rut gon ve "ho" sau khi
+  // bo dau - "ho so", "ho tro"... - de gay nham lan).
+  if (normalizedCode === "ho" || text.includes("don vi") || text.includes("hoi so") || text.includes("tru so") || text.includes("chi nhanh")) {
+    return "UNIT";
+  }
+  return "PROJECT";
+}
+
 export interface AuditObjectCategoryItem {
   id: string;
   code: string;

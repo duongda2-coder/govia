@@ -101,3 +101,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/039-audit-object-category-object-source.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/040-audit-object-category-guess-object-source.yaml
+      relativeToChangelogFile: false

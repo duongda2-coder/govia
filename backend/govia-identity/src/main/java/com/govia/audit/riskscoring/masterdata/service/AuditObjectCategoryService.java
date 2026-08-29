@@ -137,7 +137,7 @@ public class AuditObjectCategoryService {
         item.setCode(request.code());
         item.setName(request.name());
         item.setNote(request.note());
-        item.setObjectSource(request.objectSource() != null ? request.objectSource() : AuditObjectSource.PROJECT);
+        item.setObjectSource(request.objectSource() != null ? request.objectSource() : AuditObjectSource.guess(request.code(), request.name()));
         item.setActive(request.active());
     }
 
@@ -183,14 +183,15 @@ public class AuditObjectCategoryService {
         return isBlank(value) ? null : value.trim();
     }
 
+    /** Null neu cot bo trong/khong hop le - applyRequest() se tu doan theo ten/ma thay vi ep ve PROJECT. */
     private AuditObjectSource parseObjectSource(String value) {
         if (isBlank(value)) {
-            return AuditObjectSource.PROJECT;
+            return null;
         }
         try {
             return AuditObjectSource.valueOf(value.trim().toUpperCase());
         } catch (IllegalArgumentException e) {
-            return AuditObjectSource.PROJECT;
+            return null;
         }
     }
 

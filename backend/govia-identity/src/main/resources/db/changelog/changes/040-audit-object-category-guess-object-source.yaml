@@ -1,0 +1,32 @@
+databaseChangeLog:
+
+  # Migration 039 chi backfill dung 3 ma co dinh cu (HO/CTC/KTQT). Bat ky category nao khac NSD da
+  # tu tao TRUOC KHI co truong object_source (vd "QT" - "Quy trinh") deu bi ket o mac dinh PROJECT,
+  # va vi form luon gui gia tri tuong minh nen sua lai qua man hinh cung khong tu doan lai duoc. Doan
+  # lai 1 lan cho MOI category dang o PROJECT dua theo tu khoa trong ten (CUNG dung logic voi
+  # AuditObjectSource.guess() ben Java, dung cho lan tao moi sau nay - xem class do de biet vi sao
+  # "ho" chi khop khi la ca ma, khong xet trong ten) - chi nang cap PROJECT len loai dung hon khi
+  # khop tu khoa, khong dung vao category da duoc chon objectSource khac PROJECT.
+  - changeSet:
+      id: 040-1-audit-object-category-guess-object-source
+      author: govia
+      comment: "Tu dong sua object_source cho category cu bi mac dinh sai (vd QT - Quy trinh)"
+      changes:
+        - sql:
+            sql: >
+              UPDATE risk_score_audit_object_category
+              SET object_source = 'PROCESS'
+              WHERE object_source = 'PROJECT' AND name ILIKE '%quy trình%';
+        - sql:
+            sql: >
+              UPDATE risk_score_audit_object_category
+              SET object_source = 'SUBSIDIARY'
+              WHERE object_source = 'PROJECT' AND name ILIKE '%công ty con%';
+        - sql:
+            sql: >
+              UPDATE risk_score_audit_object_category
+              SET object_source = 'UNIT'
+              WHERE object_source = 'PROJECT' AND (
+                name ILIKE '%đơn vị%' OR name ILIKE '%hội sở%' OR name ILIKE '%trụ sở%'
+                OR name ILIKE '%chi nhánh%' OR code ILIKE 'HO'
+              );
