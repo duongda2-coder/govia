@@ -133,8 +133,13 @@ public class RiskAssessmentOtherHeaderService {
      * Import Excel theo mau da xuat: moi dong ung voi 1 "Line" (chi tieu + diem) cua 1 header (Loai
      * doi tuong KT + Ma doi tuong KT + Nam) - header duoc tao tu dong (kem sinh du cac dong chi
      * tieu phu hop) neu chua ton tai, cac dong sau cung header chi cap nhat diem tung chi tieu.
+     *
+     * <p>KHONG duoc danh dau @Transactional o day: moi dong goi sang cac method @Transactional
+     * rieng cua headerRepository/lineService (ensureLines, setScoreByCriteriaCode). Neu ham nay
+     * cung mo 1 transaction bao ngoai, exception nem ra tu cac method con do se danh dau ca
+     * transaction bao ngoai la rollback-only ngay ca khi bi catch lai o day - khien toan bo import
+     * bi rollback am tham va nem UnexpectedRollbackException thay vi tra ve loi cu the tung dong.
      */
-    @Transactional
     public ImportResult importFromExcel(MultipartFile file) {
         List<Map<String, String>> rows;
         try {
