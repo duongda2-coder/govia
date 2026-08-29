@@ -25,6 +25,7 @@
     "auditMdDepartment": "Danh mục Bộ phận KT",
     "auditMdYear": "Danh mục Năm",
     "auditMdBusinessSegment": "Danh mục Mảng nghiệp vụ",
+    "auditMdUnitType": "Danh mục Loại đơn vị",
     "riskScoring": "Chấm điểm rủi ro",
     "riskScoringMasterData": "Master Data CDRR",
     "riskScoringGroups": "Nhóm chỉ tiêu",
@@ -521,7 +522,8 @@
       "GENERAL": "Danh mục Chung",
       "DEPARTMENT": "Danh mục Bộ phận KT",
       "YEAR": "Danh mục Năm",
-      "BUSINESS_SEGMENT": "Danh mục Mảng nghiệp vụ"
+      "BUSINESS_SEGMENT": "Danh mục Mảng nghiệp vụ",
+      "UNIT_TYPE": "Danh mục Loại đơn vị"
     },
     "columns": {
       "code": "Mã",

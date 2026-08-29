@@ -25,6 +25,7 @@
     "auditMdDepartment": "Audit Department Catalog",
     "auditMdYear": "Year Catalog",
     "auditMdBusinessSegment": "Business Segment Catalog",
+    "auditMdUnitType": "Unit Type Catalog",
     "riskScoring": "Risk Scoring",
     "riskScoringMasterData": "Master Data CDRR",
     "riskScoringGroups": "Criteria Groups",
@@ -521,7 +522,8 @@
       "GENERAL": "General Catalog",
       "DEPARTMENT": "Audit Department Catalog",
       "YEAR": "Year Catalog",
-      "BUSINESS_SEGMENT": "Business Segment Catalog"
+      "BUSINESS_SEGMENT": "Business Segment Catalog",
+      "UNIT_TYPE": "Unit Type Catalog"
     },
     "columns": {
       "code": "Code",

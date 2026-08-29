@@ -33,6 +33,7 @@ const MENU_ROUTES: Record<string, string> = {
   "audit-md-department": "/audit/master-data/department",
   "audit-md-year": "/audit/master-data/year",
   "audit-md-business-segment": "/audit/master-data/business-segment",
+  "audit-md-unit-type": "/audit/master-data/unit-type",
   "audit-rs-groups": "/audit/risk-scoring/master-data/groups",
   "audit-rs-criteria": "/audit/risk-scoring/master-data/criteria",
   "audit-rs-weight": "/audit/risk-scoring/master-data/weight",
@@ -159,6 +160,7 @@ export function AppLayout() {
         { key: "audit-md-department", label: menuLabel(t("menu.auditMdDepartment")) },
         { key: "audit-md-year", label: menuLabel(t("menu.auditMdYear")) },
         { key: "audit-md-business-segment", label: menuLabel(t("menu.auditMdBusinessSegment")) },
+        { key: "audit-md-unit-type", label: menuLabel(t("menu.auditMdUnitType")) },
       ],
     },
     (canViewRiskScoring || canViewRiskScoringExec) && {

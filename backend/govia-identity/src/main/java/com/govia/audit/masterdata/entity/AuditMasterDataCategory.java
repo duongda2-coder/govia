@@ -33,7 +33,10 @@ public enum AuditMasterDataCategory {
     YEAR("Năm", MasterDataGroup.YEAR),
 
     // Mang nghiep vu (sheet ZTC_MANG_NV)
-    BUSINESS_SEGMENT("Mảng nghiệp vụ", MasterDataGroup.BUSINESS_SEGMENT);
+    BUSINESS_SEGMENT("Mảng nghiệp vụ", MasterDataGroup.BUSINESS_SEGMENT),
+
+    // Loai don vi (tcode ZTC_LOAI_DTKT_CN)
+    UNIT_TYPE("Loại đơn vị", MasterDataGroup.UNIT_TYPE);
 
     private final String label;
     private final MasterDataGroup group;

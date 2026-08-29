@@ -67,6 +67,7 @@ function App() {
           <Route path="audit/master-data/department" element={<MasterDataGroupPage group="DEPARTMENT" title={t("auditMasterData.groups.DEPARTMENT")} />} />
           <Route path="audit/master-data/year" element={<MasterDataGroupPage group="YEAR" title={t("auditMasterData.groups.YEAR")} />} />
           <Route path="audit/master-data/business-segment" element={<MasterDataGroupPage group="BUSINESS_SEGMENT" title={t("auditMasterData.groups.BUSINESS_SEGMENT")} />} />
+          <Route path="audit/master-data/unit-type" element={<MasterDataGroupPage group="UNIT_TYPE" title={t("auditMasterData.groups.UNIT_TYPE")} />} />
           <Route path="audit/risk-scoring/master-data/groups" element={<RiskScoringGroupsPage />} />
           <Route path="audit/risk-scoring/master-data/criteria" element={<RiskScoringCriteriaPage />} />
           <Route path="audit/risk-scoring/master-data/weight" element={<RiskScoringWeightPage />} />
