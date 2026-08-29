@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { App, Button, List, Modal, Space, Typography, Upload } from "antd";
+import { isAxiosError } from "axios";
 import {
   PlusOutlined,
   EditOutlined,
@@ -73,7 +74,10 @@ export function StandardToolbar(props: StandardToolbarProps) {
           message.success(t("common.importSuccess", { count: res.successCount }));
         }
       })
-      .catch(() => message.error(t("common.importError")))
+      .catch((err) => {
+        const backendMessage = isAxiosError<{ message?: string }>(err) ? err.response?.data?.message : undefined;
+        message.error(backendMessage ? `${t("common.importError")}: ${backendMessage}` : t("common.importError"));
+      })
       .finally(() => setImporting(false));
     return false; // ngan Upload tu dong submit file theo co che mac dinh
   };
