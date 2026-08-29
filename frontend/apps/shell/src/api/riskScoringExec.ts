@@ -278,6 +278,9 @@ export const riskAssessmentOtherApi = {
     const res = await httpClient.put<ApiResponse<RiskAssessmentOtherLineItem>>(`${BASE}/assessment-other/${headerId}/lines/${lineId}`, request);
     return res.data.data;
   },
+  async deleteLine(headerId: string, lineId: string): Promise<void> {
+    await httpClient.delete(`${BASE}/assessment-other/${headerId}/lines/${lineId}`);
+  },
 };
 
 /** "Bang xep hang cham diem rui ro khac" (sheet ZTC_BXHRR_KHAC) - man hinh CHI XEM, tinh dong theo 1 nam. */

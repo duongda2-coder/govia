@@ -786,9 +786,7 @@
       "year": "Năm",
       "scoreLines": "Chấm điểm",
       "selectScore": "Chọn điểm",
-      "selectCategoryFirst": "Chọn Loại đối tượng KT để hiện danh sách chỉ tiêu cần chấm điểm",
-      "clearScoreConfirmTitle": "Bỏ điểm đã chấm cho chỉ tiêu đã chọn? Dòng chỉ tiêu vẫn giữ nguyên trong danh sách, chỉ điểm được đưa về chưa chấm.",
-      "clearScoreSuccess": "Đã bỏ điểm đã chấm"
+      "selectCategoryFirst": "Chọn Loại đối tượng KT để hiện danh sách chỉ tiêu cần chấm điểm"
     },
     "ranking": {
       "riskScore": "Điểm rủi ro",

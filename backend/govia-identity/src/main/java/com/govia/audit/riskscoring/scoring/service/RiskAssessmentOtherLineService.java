@@ -91,6 +91,17 @@ public class RiskAssessmentOtherLineService {
                 .toList();
     }
 
+    /** Xoa han 1 dong chi tieu khoi header. Luu y: neu header duoc update() lai sau do, ensureLines()
+     * se tao lai dong cho chi tieu nay neu chi tieu van con phu hop voi category cua header. */
+    @Transactional
+    public void delete(RiskAssessmentOtherHeader header, UUID lineId) {
+        RiskAssessmentOtherLine line = repository.findById(lineId)
+                .filter(l -> l.getHeaderId().equals(header.getId()))
+                .orElseThrow(() -> new BusinessException("RISK_ASSESSMENT_OTHER_LINE_NOT_FOUND", "Khong tim thay dong cham diem", HttpStatus.NOT_FOUND));
+        repository.delete(line);
+        auditLogService.record("RiskAssessmentOtherLine", lineId, AuditAction.DELETE, "Xoa dong chi tieu DGRR khac");
+    }
+
     @Transactional
     public RiskAssessmentOtherLineResponse updateScore(RiskAssessmentOtherHeader header, UUID lineId, RiskAssessmentOtherLineRequest request) {
         RiskAssessmentOtherLine line = repository.findById(lineId)

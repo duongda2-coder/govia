@@ -786,9 +786,7 @@
       "year": "Year",
       "scoreLines": "Score",
       "selectScore": "Select score",
-      "selectCategoryFirst": "Select an Audit Object Category to show the criteria to score",
-      "clearScoreConfirmTitle": "Clear the score for the selected criteria? The criteria row stays in the list, only its score is reset to not scored.",
-      "clearScoreSuccess": "Score cleared"
+      "selectCategoryFirst": "Select an Audit Object Category to show the criteria to score"
     },
     "ranking": {
       "riskScore": "Risk Score",

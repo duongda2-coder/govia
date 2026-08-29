@@ -94,6 +94,14 @@ public class RiskAssessmentOtherController {
         return ApiResponse.ok(lineService.updateScore(header, lineId, request));
     }
 
+    @DeleteMapping("/{id}/lines/{lineId}")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.DELETE')")
+    public ApiResponse<Void> deleteLine(@PathVariable UUID id, @PathVariable UUID lineId) {
+        RiskAssessmentOtherHeader header = headerService.getOwnedOrThrow(TenantContext.getTenantId(), id);
+        lineService.delete(header, lineId);
+        return ApiResponse.ok(null);
+    }
+
     @GetMapping("/export/excel")
     @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.EXPORT')")
     public ResponseEntity<byte[]> exportExcel() {
