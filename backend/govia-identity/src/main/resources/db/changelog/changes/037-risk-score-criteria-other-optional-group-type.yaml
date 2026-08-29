@@ -1,0 +1,16 @@
+databaseChangeLog:
+
+  # "Chi tieu DGRR khac": Nhom rui ro (HO) va Loai rui ro (HO) khong con bat buoc khi them moi.
+  - changeSet:
+      id: 037-1-risk-score-criteria-other-optional-group-type
+      author: govia
+      comment: "risk_score_criteria_other.group_ho_id / risk_type_ho_id cho phep NULL"
+      changes:
+        - dropNotNullConstraint:
+            tableName: risk_score_criteria_other
+            columnName: group_ho_id
+            columnDataType: UUID
+        - dropNotNullConstraint:
+            tableName: risk_score_criteria_other
+            columnName: risk_type_ho_id
+            columnDataType: UUID

@@ -20,8 +20,8 @@ interface FormValues {
   code: string;
   name: string;
   weight?: number;
-  groupHoId: string;
-  riskTypeHoId: string;
+  groupHoId?: string;
+  riskTypeHoId?: string;
   active: boolean;
 }
 
@@ -249,11 +249,11 @@ export function RiskCriteriaOtherTable() {
           <Form.Item name="weight" label={t("riskScoring.columns.weight")}>
             <InputNumber style={{ width: "100%" }} step={0.01} />
           </Form.Item>
-          <Form.Item name="groupHoId" label={t("riskScoringExec.columns.groupHo")} rules={[{ required: true }]}>
-            <Select options={groupOptions.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))} showSearch optionFilterProp="label" />
+          <Form.Item name="groupHoId" label={t("riskScoringExec.columns.groupHo")}>
+            <Select options={groupOptions.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))} showSearch optionFilterProp="label" allowClear />
           </Form.Item>
-          <Form.Item name="riskTypeHoId" label={t("riskScoringExec.columns.riskType")} rules={[{ required: true }]}>
-            <Select options={filteredTypeOptions} showSearch optionFilterProp="label" />
+          <Form.Item name="riskTypeHoId" label={t("riskScoringExec.columns.riskType")}>
+            <Select options={filteredTypeOptions} showSearch optionFilterProp="label" allowClear />
           </Form.Item>
           <Form.Item name="active" label={t("common.active")} valuePropName="checked">
             <Switch />

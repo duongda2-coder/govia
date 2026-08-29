@@ -205,12 +205,18 @@ public class RiskCriteriaOtherService {
     }
 
     private void validateGroupHo(UUID tenantId, UUID groupHoId) {
+        if (groupHoId == null) {
+            return;
+        }
         groupHoRepository.findById(groupHoId)
                 .filter(g -> g.getTenantId().equals(tenantId))
                 .orElseThrow(() -> new BusinessException("RISK_GROUP_HO_NOT_FOUND", "Khong tim thay nhom rui ro HO"));
     }
 
     private void validateRiskTypeHo(UUID tenantId, UUID riskTypeHoId) {
+        if (riskTypeHoId == null) {
+            return;
+        }
         riskTypeHoRepository.findById(riskTypeHoId)
                 .filter(rt -> rt.getTenantId().equals(tenantId))
                 .orElseThrow(() -> new BusinessException("RISK_TYPE_HO_NOT_FOUND", "Khong tim thay loai rui ro HO"));

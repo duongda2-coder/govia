@@ -11,8 +11,8 @@ public record RiskCriteriaOtherRequest(
         @NotBlank String code,
         @NotBlank String name,
         BigDecimal weight,
-        @NotNull UUID groupHoId,
-        @NotNull UUID riskTypeHoId,
+        UUID groupHoId,
+        UUID riskTypeHoId,
         boolean active
 ) {
 }

@@ -34,10 +34,10 @@ public class RiskCriteriaOther extends BaseEntity {
     @Column(name = "weight", precision = 9, scale = 4)
     private BigDecimal weight;
 
-    @Column(name = "group_ho_id", nullable = false, columnDefinition = "uuid")
+    @Column(name = "group_ho_id", columnDefinition = "uuid")
     private UUID groupHoId;
 
-    @Column(name = "risk_type_ho_id", nullable = false, columnDefinition = "uuid")
+    @Column(name = "risk_type_ho_id", columnDefinition = "uuid")
     private UUID riskTypeHoId;
 
     @Column(name = "active", nullable = false)

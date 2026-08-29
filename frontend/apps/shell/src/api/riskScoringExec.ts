@@ -41,10 +41,10 @@ export interface RiskCriteriaOtherItem {
   code: string;
   name: string;
   weight: number | null;
-  groupHoId: string;
+  groupHoId: string | null;
   groupHoCode: string | null;
   groupHoName: string | null;
-  riskTypeHoId: string;
+  riskTypeHoId: string | null;
   riskTypeHoCode: string | null;
   riskTypeHoName: string | null;
   active: boolean;
@@ -54,8 +54,8 @@ export interface RiskCriteriaOtherRequest {
   code: string;
   name: string;
   weight?: number | null;
-  groupHoId: string;
-  riskTypeHoId: string;
+  groupHoId?: string | null;
+  riskTypeHoId?: string | null;
   active: boolean;
 }
 
