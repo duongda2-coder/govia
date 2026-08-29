@@ -14,6 +14,7 @@ public record CriteriaQuantitativeResponse(
         String group2Code,
         String code,
         String name,
+        BigDecimal weight,
         Integer criteriaType,
         BigDecimal businessThreshold,
         BigDecimal viewThreshold,

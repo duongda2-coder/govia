@@ -34,6 +34,12 @@ public class RiskGroup1 extends BaseEntity {
     @Column(name = "weight", precision = 9, scale = 4)
     private BigDecimal weight;
 
+    /** Ma nghiep vu (khop domain cua RiskWeightByBusiness.businessCode) - chi dung o man "Ket qua
+     * cham diem tong hop" (sheet CT_Diem_All) de gop nhieu nhom cap 1 dinh luong (vi du TDQM/TDCL/
+     * TDAT) ve chung 1 nghiep vu ("Tin dung"/LN) khi quy doi theo ti trong dinh tinh/dinh luong. */
+    @Column(name = "business_line_code", length = 10)
+    private String businessLineCode;
+
     @Column(name = "valid_from")
     private LocalDate validFrom;
 

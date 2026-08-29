@@ -42,7 +42,8 @@
     "riskScoringExecAssessmentOther": "Chấm điểm rủi ro khác",
     "riskScoringExecAssessmentOtherRanking": "Bảng xếp hạng rủi ro khác",
     "riskScoringExecAssessmentOtherExpertRank": "Xếp hạng rủi ro khác theo YKCG",
-    "riskScoringExecHsrr": "Hồ sơ rủi ro"
+    "riskScoringExecHsrr": "Hồ sơ rủi ro",
+    "riskScoringExecBranchScoreQuantitative": "Kết quả chấm điểm rủi ro định lượng"
   },
   "header": {
     "logout": "Đăng xuất"
@@ -654,6 +655,7 @@
       "code": "Mã",
       "name": "Tên",
       "weight": "Trọng số",
+      "businessLineCode": "Mã nghiệp vụ",
       "validFrom": "Hiệu lực từ",
       "validTo": "Hiệu lực đến",
       "group1": "Nhóm cấp 1",
@@ -741,7 +743,8 @@
       "editTitle": "Sửa",
       "selectGroup1First": "Chọn Nhóm cấp 1 trước",
       "selectAuditObjectFirst": "Chọn Loại đối tượng kiểm toán trước",
-      "objectSourceHint": "Quyết định danh mục mà cột \"Mã đối tượng KT\" sẽ tra cứu tới khi Chấm điểm rủi ro khác"
+      "objectSourceHint": "Quyết định danh mục mà cột \"Mã đối tượng KT\" sẽ tra cứu tới khi Chấm điểm rủi ro khác",
+      "businessLineCodeHint": "Khớp với Mã nghiệp vụ ở Theo nghiệp vụ - dùng để gộp các nhóm chỉ tiêu định lượng cùng 1 nghiệp vụ khi tính Kết quả chấm điểm tổng hợp. Để trống nếu nhóm này không cần gộp (VD: nhóm đã ứng với đúng 1 nghiệp vụ, hoặc dùng cho chỉ tiêu định tính)."
     },
     "deleteConfirmTitle": "Xóa mục này?",
     "messages": {

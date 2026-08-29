@@ -21,6 +21,7 @@ interface FormValues {
   group2Id?: string;
   code: string;
   name: string;
+  weight?: number;
   criteriaType?: number;
   businessThreshold?: number;
   viewThreshold?: number;
@@ -104,6 +105,7 @@ export function CriteriaQuantitativeTable() {
       group2Id: target.group2Id ?? undefined,
       code: target.code,
       name: target.name,
+      weight: target.weight ?? undefined,
       criteriaType: target.criteriaType ?? undefined,
       businessThreshold: target.businessThreshold ?? undefined,
       viewThreshold: target.viewThreshold ?? undefined,
@@ -129,6 +131,7 @@ export function CriteriaQuantitativeTable() {
       group2Id: target.group2Id ?? undefined,
       code: "",
       name: target.name,
+      weight: target.weight ?? undefined,
       criteriaType: target.criteriaType ?? undefined,
       businessThreshold: target.businessThreshold ?? undefined,
       viewThreshold: target.viewThreshold ?? undefined,
@@ -159,6 +162,7 @@ export function CriteriaQuantitativeTable() {
         group2Id: values.group2Id ?? null,
         code: values.code,
         name: values.name,
+        weight: values.weight ?? null,
         criteriaType: values.criteriaType ?? null,
         businessThreshold: values.businessThreshold ?? null,
         viewThreshold: values.viewThreshold ?? null,
@@ -230,6 +234,7 @@ export function CriteriaQuantitativeTable() {
     },
     { title: t("riskScoring.columns.code"), width: 110, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
+    { title: t("riskScoring.columns.weight"), dataIndex: "weight", width: 90, render: (v: number | null) => v ?? "-" },
     {
       title: t("riskScoring.columns.criteriaType"),
       dataIndex: "criteriaType",
@@ -354,6 +359,11 @@ export function CriteriaQuantitativeTable() {
           </Form.Item>
           <Row gutter={16}>
             <Col span={12}>
+              <Form.Item name="weight" label={t("riskScoring.columns.weight")}>
+                <InputNumber style={{ width: "100%" }} step={0.01} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
               <Form.Item name="criteriaType" label={t("riskScoring.columns.criteriaType")}>
                 <Select
                   allowClear
@@ -361,6 +371,8 @@ export function CriteriaQuantitativeTable() {
                 />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="businessThreshold" label={t("riskScoring.columns.businessThreshold")}>
                 <InputNumber style={{ width: "100%" }} step={0.01} />

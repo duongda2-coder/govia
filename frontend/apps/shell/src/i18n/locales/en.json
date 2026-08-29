@@ -42,7 +42,8 @@
     "riskScoringExecAssessmentOther": "Other Risk Assessment",
     "riskScoringExecAssessmentOtherRanking": "Other Risk Ranking",
     "riskScoringExecAssessmentOtherExpertRank": "Other Risk Expert Ranking",
-    "riskScoringExecHsrr": "Risk Profile"
+    "riskScoringExecHsrr": "Risk Profile",
+    "riskScoringExecBranchScoreQuantitative": "Quantitative Risk Score Results"
   },
   "header": {
     "logout": "Log out"
@@ -654,6 +655,7 @@
       "code": "Code",
       "name": "Name",
       "weight": "Weight",
+      "businessLineCode": "Business Line Code",
       "validFrom": "Valid From",
       "validTo": "Valid To",
       "group1": "Level-1 Group",
@@ -741,7 +743,8 @@
       "editTitle": "Edit",
       "selectGroup1First": "Select Level-1 Group first",
       "selectAuditObjectFirst": "Select Audit Object Category first",
-      "objectSourceHint": "Decides which catalog the \"Audit Object Code\" column looks up in Other Risk Assessment"
+      "objectSourceHint": "Decides which catalog the \"Audit Object Code\" column looks up in Other Risk Assessment",
+      "businessLineCodeHint": "Must match a Business Code under Weight by Business - used to roll several quantitative criteria groups up into one business line when computing the Combined Score. Leave blank if this group doesn't need rolling up (e.g. it already maps 1:1 to a business line, or it's used by qualitative criteria)."
     },
     "deleteConfirmTitle": "Delete this item?",
     "messages": {

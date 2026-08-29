@@ -29,6 +29,7 @@ import { RiskAssessmentOtherPage } from "./pages/Audit/RiskScoringExec/RiskAsses
 import { RiskAssessmentOtherRankingPage } from "./pages/Audit/RiskScoringExec/RiskAssessmentOtherRankingPage";
 import { RiskAssessmentOtherExpertRankPage } from "./pages/Audit/RiskScoringExec/RiskAssessmentOtherExpertRankPage";
 import { RiskCriteriaHsrrPage } from "./pages/Audit/RiskScoringExec/RiskCriteriaHsrrPage";
+import { RiskBranchScoreQuantitativePage } from "./pages/Audit/RiskScoringExec/RiskBranchScoreQuantitativePage";
 import { GlobalModalKeyboardShortcuts } from "./components/GlobalModalKeyboardShortcuts";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -82,6 +83,7 @@ function App() {
           <Route path="audit/risk-scoring/scoring/assessment-other-ranking" element={<RiskAssessmentOtherRankingPage />} />
           <Route path="audit/risk-scoring/scoring/assessment-other-expert-rank" element={<RiskAssessmentOtherExpertRankPage />} />
           <Route path="audit/risk-scoring/scoring/hsrr" element={<RiskCriteriaHsrrPage />} />
+          <Route path="audit/risk-scoring/scoring/branch-score-dl" element={<RiskBranchScoreQuantitativePage />} />
           {/* Cac sheet tiep theo cua "2. Cham diem.xlsx" se them 1 route/menu rieng nhu tren, khong phai tab. */}
         </Route>
       </Routes>

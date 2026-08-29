@@ -63,6 +63,7 @@ export interface Group1Item {
   code: string;
   name: string;
   weight: number | null;
+  businessLineCode: string | null;
   validFrom: string | null;
   validTo: string | null;
   active: boolean;
@@ -72,6 +73,7 @@ export interface Group1Request {
   code: string;
   name: string;
   weight?: number | null;
+  businessLineCode?: string | null;
   validFrom?: string | null;
   validTo?: string | null;
   active: boolean;
@@ -139,6 +141,7 @@ export interface CriteriaQuantitativeItem {
   group2Code: string | null;
   code: string;
   name: string;
+  weight: number | null;
   criteriaType: number | null;
   businessThreshold: number | null;
   viewThreshold: number | null;
@@ -157,6 +160,7 @@ export interface CriteriaQuantitativeRequest {
   group2Id?: string | null;
   code: string;
   name: string;
+  weight?: number | null;
   criteriaType?: number | null;
   businessThreshold?: number | null;
   viewThreshold?: number | null;

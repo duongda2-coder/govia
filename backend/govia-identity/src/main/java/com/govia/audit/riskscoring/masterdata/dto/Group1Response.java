@@ -12,6 +12,7 @@ public record Group1Response(
         String code,
         String name,
         BigDecimal weight,
+        String businessLineCode,
         LocalDate validFrom,
         LocalDate validTo,
         boolean active

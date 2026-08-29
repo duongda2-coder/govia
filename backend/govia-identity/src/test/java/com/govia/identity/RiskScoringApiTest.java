@@ -58,7 +58,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new Group1Request(categoryId, "CM", "MÔI TRƯỜNG KIỂM SOÁT (ĐL)",
-                                        new BigDecimal("0.1"), null, null, true))))
+                                        new BigDecimal("0.1"), null, null, null, true))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.code").value("CM"))
                 .andExpect(jsonPath("$.data.auditObjectCategoryCode").value("AU1"))
@@ -74,7 +74,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new Group1Request(categoryId, "CM", "MÔI TRƯỜNG KIỂM SOÁT (sửa)",
-                                        new BigDecimal("0.2"), null, null, true))))
+                                        new BigDecimal("0.2"), null, null, null, true))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.name").value("MÔI TRƯỜNG KIỂM SOÁT (sửa)"));
 
@@ -95,7 +95,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new CriteriaQuantitativeRequest(categoryId, java.util.UUID.fromString(randomGroup1Id), null,
-                                        "CEAT01", "Đã được kiểm tra toàn diện", 1, new BigDecimal("0.05"), null,
+                                        "CEAT01", "Đã được kiểm tra toàn diện", new BigDecimal("0.05"), 1, new BigDecimal("0.05"), null,
                                         new BigDecimal("2"), new BigDecimal("3"), new BigDecimal("4"), new BigDecimal("5"),
                                         new BigDecimal("100"), null, true, true))))
                 .andExpect(status().isBadRequest())
@@ -105,7 +105,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(categoryId, "CM", "Nhóm CM", new BigDecimal("0.1"), null, null, true))))
+                                new Group1Request(categoryId, "CM", "Nhóm CM", new BigDecimal("0.1"), null, null, null, true))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         String group1Id = objectMapper.readTree(group1Body).get("data").get("id").asText();
@@ -115,7 +115,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new CriteriaQuantitativeRequest(categoryId, java.util.UUID.fromString(group1Id), null,
-                                        "CEAT01", "Đã được kiểm tra toàn diện", 1, new BigDecimal("0.05"), null,
+                                        "CEAT01", "Đã được kiểm tra toàn diện", new BigDecimal("0.05"), 1, new BigDecimal("0.05"), null,
                                         new BigDecimal("2"), new BigDecimal("3"), new BigDecimal("4"), new BigDecimal("5"),
                                         new BigDecimal("100"), null, true, true))))
                 .andExpect(status().isOk())
@@ -172,7 +172,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(categoryId, "CE", "Nhóm CE", null, null, null, true))))
+                                new Group1Request(categoryId, "CE", "Nhóm CE", null, null, null, null, true))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         UUID group1Id = UUID.fromString(objectMapper.readTree(group1Body).get("data").get("id").asText());
@@ -181,7 +181,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(categoryId, "LN", "Nhóm LN", null, null, null, true))))
+                                new Group1Request(categoryId, "LN", "Nhóm LN", null, null, null, null, true))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         UUID otherGroup1Id = UUID.fromString(objectMapper.readTree(otherGroup1Body).get("data").get("id").asText());
@@ -200,7 +200,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new CriteriaQuantitativeRequest(categoryId, group1Id, null, "CEAT99", "Test", 5,
+                                new CriteriaQuantitativeRequest(categoryId, group1Id, null, "CEAT99", "Test", null, 5,
                                         null, null, null, null, null, null, null, null, true, true))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("RISK_CRITERIA_DL_TYPE_INVALID"));
@@ -210,7 +210,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new CriteriaQuantitativeRequest(categoryId, group1Id, group2IdUnderOtherGroup1, "CEAT99", "Test", 1,
+                                new CriteriaQuantitativeRequest(categoryId, group1Id, group2IdUnderOtherGroup1, "CEAT99", "Test", null, 1,
                                         null, null, null, null, null, null, null, null, true, true))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("RISK_GROUP2_NOT_IN_GROUP1"));
@@ -311,7 +311,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(categoryId, "IMP", "Nhom da ton tai", null, null, null, true))))
+                                new Group1Request(categoryId, "IMP", "Nhom da ton tai", null, null, null, null, true))))
                 .andExpect(status().isOk());
 
         byte[] excel = mockMvc.perform(get("/api/audit/risk-scoring/master-data/group1/export/excel")
@@ -379,7 +379,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + plainUserToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new Group1Request(UUID.randomUUID(), "XX", "Khong duoc phep", null, null, null, true))))
+                                new Group1Request(UUID.randomUUID(), "XX", "Khong duoc phep", null, null, null, null, true))))
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(get("/api/audit/risk-scoring/master-data/group1").header("Authorization", "Bearer " + adminToken))

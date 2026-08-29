@@ -136,7 +136,7 @@ public class Group1Service {
                     throw new BusinessException("AUDIT_OBJECT_CATEGORY_NOT_FOUND", "Khong tim thay loai doi tuong kiem toan: " + auditObjectCategoryCode);
                 }
                 create(new Group1Request(auditObjectCategoryId,
-                        code.trim(), name.trim(), parseDecimal(row.get("weight")),
+                        code.trim(), name.trim(), parseDecimal(row.get("weight")), emptyToNull(row.get("businessLineCode")),
                         parseDate(row.get("validFrom")), parseDate(row.get("validTo")), true));
                 success++;
             } catch (Exception e) {
@@ -154,6 +154,7 @@ public class Group1Service {
         item.setCode(request.code());
         item.setName(request.name());
         item.setWeight(request.weight());
+        item.setBusinessLineCode(request.businessLineCode());
         item.setValidFrom(request.validFrom());
         item.setValidTo(request.validTo());
         item.setActive(request.active());
@@ -193,6 +194,7 @@ public class Group1Service {
                 new ExportColumn("code", "Ma nhom"),
                 new ExportColumn("name", "Ten nhom"),
                 new ExportColumn("weight", "Trong so"),
+                new ExportColumn("businessLineCode", "Ma nghiep vu"),
                 new ExportColumn("validFrom", "Hieu luc tu"),
                 new ExportColumn("validTo", "Hieu luc den"));
     }
@@ -208,6 +210,7 @@ public class Group1Service {
                     row.put("code", item.getCode());
                     row.put("name", item.getName());
                     row.put("weight", item.getWeight());
+                    row.put("businessLineCode", item.getBusinessLineCode());
                     row.put("validFrom", item.getValidFrom());
                     row.put("validTo", item.getValidTo());
                     return row;
@@ -216,6 +219,10 @@ public class Group1Service {
 
     private boolean isBlank(String value) {
         return value == null || value.isBlank();
+    }
+
+    private String emptyToNull(String value) {
+        return isBlank(value) ? null : value.trim();
     }
 
     private LocalDate parseDate(String value) {
@@ -244,6 +251,7 @@ public class Group1Service {
         AuditObjectCategory category = categories.get(item.getAuditObjectCategoryId());
         return new Group1Response(item.getId(), item.getAuditObjectCategoryId(),
                 category != null ? category.getCode() : null, category != null ? category.getName() : null,
-                item.getCode(), item.getName(), item.getWeight(), item.getValidFrom(), item.getValidTo(), item.isActive());
+                item.getCode(), item.getName(), item.getWeight(), item.getBusinessLineCode(),
+                item.getValidFrom(), item.getValidTo(), item.isActive());
     }
 }

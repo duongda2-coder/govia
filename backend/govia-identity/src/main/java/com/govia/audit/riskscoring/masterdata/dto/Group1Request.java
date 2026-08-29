@@ -12,6 +12,7 @@ public record Group1Request(
         @NotBlank String code,
         @NotBlank String name,
         BigDecimal weight,
+        String businessLineCode,
         LocalDate validFrom,
         LocalDate validTo,
         boolean active

@@ -17,6 +17,7 @@ interface FormValues {
   code: string;
   name: string;
   weight?: number;
+  businessLineCode?: string;
   validFrom?: dayjs.Dayjs;
   validTo?: dayjs.Dayjs;
   active: boolean;
@@ -76,6 +77,7 @@ export function Group1Table() {
       code: target.code,
       name: target.name,
       weight: target.weight ?? undefined,
+      businessLineCode: target.businessLineCode ?? undefined,
       validFrom: target.validFrom ? dayjs(target.validFrom) : undefined,
       validTo: target.validTo ? dayjs(target.validTo) : undefined,
       active: target.active,
@@ -92,6 +94,7 @@ export function Group1Table() {
       code: "",
       name: target.name,
       weight: target.weight ?? undefined,
+      businessLineCode: target.businessLineCode ?? undefined,
       validFrom: target.validFrom ? dayjs(target.validFrom) : undefined,
       validTo: target.validTo ? dayjs(target.validTo) : undefined,
       active: target.active,
@@ -113,6 +116,7 @@ export function Group1Table() {
         code: values.code,
         name: values.name,
         weight: values.weight ?? null,
+        businessLineCode: values.businessLineCode ?? null,
         validFrom: values.validFrom ? values.validFrom.format("YYYY-MM-DD") : null,
         validTo: values.validTo ? values.validTo.format("YYYY-MM-DD") : null,
         active: values.active,
@@ -165,6 +169,12 @@ export function Group1Table() {
     { title: t("riskScoring.columns.code"), width: 120, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("riskScoring.columns.weight"), dataIndex: "weight", width: 100, render: (v: number | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.businessLineCode"),
+      dataIndex: "businessLineCode",
+      width: 110,
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoring.columns.validFrom"), dataIndex: "validFrom", width: 120, render: (v: string | null) => v ?? "-" },
     { title: t("riskScoring.columns.validTo"), dataIndex: "validTo", width: 120, render: (v: string | null) => v ?? "-" },
     {
@@ -229,6 +239,13 @@ export function Group1Table() {
           </Form.Item>
           <Form.Item name="weight" label={t("riskScoring.columns.weight")}>
             <InputNumber style={{ width: "100%" }} step={0.01} />
+          </Form.Item>
+          <Form.Item
+            name="businessLineCode"
+            label={t("riskScoring.columns.businessLineCode")}
+            tooltip={t("riskScoring.form.businessLineCodeHint")}
+          >
+            <Input />
           </Form.Item>
           <Form.Item name="validFrom" label={t("riskScoring.columns.validFrom")}>
             <DatePicker style={{ width: "100%" }} />

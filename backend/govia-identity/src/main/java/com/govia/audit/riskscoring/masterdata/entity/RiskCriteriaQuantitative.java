@@ -32,6 +32,11 @@ public class RiskCriteriaQuantitative extends BaseEntity {
     @Column(name = "name", nullable = false, length = 1000)
     private String name;
 
+    /** "Tỉ trọng chỉ tiêu" (cột TS_NV trong ZTB_CTDGRR_DL) - dung khi tinh diem cham diem rui ro
+     * theo chi nhanh (sheet CT_Diem_DL), tuong tu weight tren RiskCriteriaQualitative. */
+    @Column(name = "weight", precision = 9, scale = 4)
+    private BigDecimal weight;
+
     @Column(name = "criteria_type")
     private Integer criteriaType;
 

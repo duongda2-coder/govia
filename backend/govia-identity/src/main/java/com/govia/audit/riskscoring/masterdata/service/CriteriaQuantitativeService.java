@@ -162,7 +162,7 @@ public class CriteriaQuantitativeService {
                 String group2Code = row.get("group2Code");
                 UUID group2Id = isBlank(group2Code) ? null : group2IdsByCode.get(group2Code.trim());
                 create(new CriteriaQuantitativeRequest(auditObjectCategoryId, group1Id, group2Id,
-                        code.trim(), name.trim(), parseInt(row.get("criteriaType")), parseDecimal(row.get("businessThreshold")),
+                        code.trim(), name.trim(), parseDecimal(row.get("weight")), parseInt(row.get("criteriaType")), parseDecimal(row.get("businessThreshold")),
                         parseDecimal(row.get("viewThreshold")), parseDecimal(row.get("score20")), parseDecimal(row.get("score40")),
                         parseDecimal(row.get("score60")), parseDecimal(row.get("score80")), parseDecimal(row.get("score100")),
                         row.get("scoringGuide"), true, true));
@@ -183,6 +183,7 @@ public class CriteriaQuantitativeService {
         item.setGroup2Id(request.group2Id());
         item.setCode(request.code());
         item.setName(request.name());
+        item.setWeight(request.weight());
         item.setCriteriaType(request.criteriaType());
         item.setBusinessThreshold(request.businessThreshold());
         item.setViewThreshold(request.viewThreshold());
@@ -268,6 +269,7 @@ public class CriteriaQuantitativeService {
                 new ExportColumn("group2Code", "Nhom cap 2"),
                 new ExportColumn("code", "Ma chi tieu"),
                 new ExportColumn("name", "Ten chi tieu"),
+                new ExportColumn("weight", "Ti trong"),
                 new ExportColumn("criteriaType", "Loai CT"),
                 new ExportColumn("businessThreshold", "Nguong NV"),
                 new ExportColumn("viewThreshold", "Nguong hien thi"),
@@ -293,6 +295,7 @@ public class CriteriaQuantitativeService {
                     row.put("group2Code", group2Codes.get(item.getGroup2Id()));
                     row.put("code", item.getCode());
                     row.put("name", item.getName());
+                    row.put("weight", item.getWeight());
                     row.put("criteriaType", item.getCriteriaType());
                     row.put("businessThreshold", item.getBusinessThreshold());
                     row.put("viewThreshold", item.getViewThreshold());
@@ -338,7 +341,7 @@ public class CriteriaQuantitativeService {
         return new CriteriaQuantitativeResponse(item.getId(), item.getAuditObjectCategoryId(),
                 category != null ? category.getCode() : null, category != null ? category.getName() : null,
                 item.getGroup1Id(), group1Codes.get(item.getGroup1Id()), item.getGroup2Id(), group2Codes.get(item.getGroup2Id()),
-                item.getCode(), item.getName(), item.getCriteriaType(), item.getBusinessThreshold(), item.getViewThreshold(),
+                item.getCode(), item.getName(), item.getWeight(), item.getCriteriaType(), item.getBusinessThreshold(), item.getViewThreshold(),
                 item.getScore20(), item.getScore40(), item.getScore60(), item.getScore80(), item.getScore100(),
                 item.getScoringGuide(), item.isIncludeCurrentYear(), item.isActive());
     }

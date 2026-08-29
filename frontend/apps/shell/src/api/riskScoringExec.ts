@@ -201,6 +201,17 @@ export interface RiskCriteriaQualitativeValueRequest {
   note?: string | null;
 }
 
+/** 1 dong = 1 chi nhanh/nam (sheet CT_Diem_DL) - moi chi tieu dinh luong la 1 entry trong
+ * scoresByCriteriaCode (da la diem dong gop, khong phai gia tri HSRR tho). */
+export interface RiskBranchScoreQuantitativeRowItem {
+  branchCode: string;
+  branchName: string | null;
+  year: number;
+  totalScore: number;
+  rankLabel: string | null;
+  scoresByCriteriaCode: Record<string, number | null>;
+}
+
 export interface RiskCriteriaOtherScaleItem {
   id: string;
   auditObjectCategoryId: string;
@@ -305,6 +316,15 @@ export const riskAssessmentOtherApi = {
 export const riskAssessmentOtherRankingApi = {
   async list(year: number): Promise<RiskAssessmentOtherRankingItem[]> {
     const res = await httpClient.get<ApiResponse<RiskAssessmentOtherRankingItem[]>>(`${BASE}/assessment-other-ranking`, { params: { year } });
+    return res.data.data;
+  },
+};
+
+/** "Ket qua cham diem rui ro theo chi nhanh" (sheet CT_Diem_DL/DT/All) - man hinh CHI XEM, tinh
+ * dong theo 1 nam tu du lieu Ho so rui ro. */
+export const riskBranchScoreApi = {
+  async listQuantitative(year: number): Promise<RiskBranchScoreQuantitativeRowItem[]> {
+    const res = await httpClient.get<ApiResponse<RiskBranchScoreQuantitativeRowItem[]>>(`${BASE}/branch-score/quantitative`, { params: { year } });
     return res.data.data;
   },
 };

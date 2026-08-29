@@ -1,0 +1,25 @@
+databaseChangeLog:
+
+  # Chuan bi danh muc cho man "Ket qua cham diem rui ro theo chi nhanh" (sheet CT_Diem_DL/DT/All):
+  # 2 field con thieu de tinh duoc cong thuc mo ta trong tai lieu goc, phan con lai da co san
+  # (RiskCriteriaQualitative.weight, RiskGroup2.weight, RiskMatrix, RiskFrequencyCoefficient,
+  # RiskWeightByBusiness).
+  - changeSet:
+      id: 043-1-risk-criteria-quantitative-weight
+      author: govia
+      comment: "Ti trong chi tieu dinh luong (cot TS_NV trong ZTB_CTDGRR_DL) - dung khi tinh CT_Diem_DL"
+      changes:
+        - addColumn:
+            tableName: risk_score_criteria_quantitative
+            columns:
+              - column: { name: weight, type: "NUMERIC(9,4)" }
+
+  - changeSet:
+      id: 043-2-risk-group1-business-line-code
+      author: govia
+      comment: "Ma nghiep vu cua nhom chi tieu cap 1 - dung de gop ve nghiep vu khi tinh CT_Diem_All"
+      changes:
+        - addColumn:
+            tableName: risk_score_group1
+            columns:
+              - column: { name: business_line_code, type: VARCHAR(10) }

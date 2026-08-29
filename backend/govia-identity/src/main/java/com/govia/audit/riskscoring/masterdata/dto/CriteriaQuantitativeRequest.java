@@ -12,6 +12,7 @@ public record CriteriaQuantitativeRequest(
         UUID group2Id,
         @NotBlank String code,
         @NotBlank String name,
+        BigDecimal weight,
         Integer criteriaType,
         BigDecimal businessThreshold,
         BigDecimal viewThreshold,
