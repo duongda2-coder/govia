@@ -152,20 +152,26 @@ public class RiskCriteriaOtherService {
                 String name = row.get("name");
                 String groupHoCode = row.get("groupHoCode");
                 String riskTypeHoCode = row.get("riskTypeHoCode");
-                if (isBlank(auditObjectCategoryCode) || isBlank(code) || isBlank(name) || isBlank(groupHoCode) || isBlank(riskTypeHoCode)) {
-                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Loai doi tuong KT, Ma, Ten, Nhom hoac Loai rui ro HO");
+                if (isBlank(auditObjectCategoryCode) || isBlank(code) || isBlank(name)) {
+                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Loai doi tuong KT, Ma hoac Ten chi tieu");
                 }
                 UUID auditObjectCategoryId = categoryIdsByCode.get(auditObjectCategoryCode.trim());
                 if (auditObjectCategoryId == null) {
                     throw new BusinessException("AUDIT_OBJECT_CATEGORY_NOT_FOUND", "Khong tim thay loai doi tuong kiem toan: " + auditObjectCategoryCode);
                 }
-                UUID groupHoId = groupIdsByCode.get(groupHoCode.trim());
-                if (groupHoId == null) {
-                    throw new BusinessException("RISK_GROUP_HO_NOT_FOUND", "Khong tim thay nhom rui ro HO: " + groupHoCode);
+                UUID groupHoId = null;
+                if (!isBlank(groupHoCode)) {
+                    groupHoId = groupIdsByCode.get(groupHoCode.trim());
+                    if (groupHoId == null) {
+                        throw new BusinessException("RISK_GROUP_HO_NOT_FOUND", "Khong tim thay nhom rui ro HO: " + groupHoCode);
+                    }
                 }
-                UUID riskTypeHoId = typeIdsByCode.get(riskTypeHoCode.trim());
-                if (riskTypeHoId == null) {
-                    throw new BusinessException("RISK_TYPE_HO_NOT_FOUND", "Khong tim thay loai rui ro HO: " + riskTypeHoCode);
+                UUID riskTypeHoId = null;
+                if (!isBlank(riskTypeHoCode)) {
+                    riskTypeHoId = typeIdsByCode.get(riskTypeHoCode.trim());
+                    if (riskTypeHoId == null) {
+                        throw new BusinessException("RISK_TYPE_HO_NOT_FOUND", "Khong tim thay loai rui ro HO: " + riskTypeHoCode);
+                    }
                 }
                 create(new RiskCriteriaOtherRequest(auditObjectCategoryId, code.trim(), name.trim(),
                         parseDecimal(row.get("weight")), groupHoId, riskTypeHoId, true));
