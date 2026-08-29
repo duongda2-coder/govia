@@ -13,6 +13,7 @@ import com.govia.core.audit.AuditAction;
 import com.govia.core.audit.AuditLogService;
 import com.govia.core.tenant.TenantContext;
 import com.govia.core.web.BusinessException;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,9 +119,16 @@ public class RiskAssessmentOtherLineService {
      * theo diem so, roi gan vao dong tuong ung (tao dong neu chua co). */
     @Transactional
     public void setScoreByCriteriaCode(UUID tenantId, RiskAssessmentOtherHeader header, String criteriaCode, Integer score) {
-        RiskCriteriaOther criterion = criteriaOtherRepository
-                .findByTenantIdAndAuditObjectCategoryIdAndCode(tenantId, header.getAuditObjectCategoryId(), criteriaCode)
-                .orElseThrow(() -> new BusinessException("RISK_CRITERIA_OTHER_NOT_FOUND", "Khong tim thay chi tieu: " + criteriaCode));
+        RiskCriteriaOther criterion;
+        try {
+            criterion = criteriaOtherRepository
+                    .findByTenantIdAndAuditObjectCategoryIdAndCode(tenantId, header.getAuditObjectCategoryId(), criteriaCode)
+                    .orElseThrow(() -> new BusinessException("RISK_CRITERIA_OTHER_NOT_FOUND", "Khong tim thay chi tieu: " + criteriaCode));
+        } catch (IncorrectResultSizeDataAccessException e) {
+            throw new BusinessException("RISK_CRITERIA_OTHER_DUPLICATE",
+                    "Danh muc chi tieu dang co nhieu hon 1 dong trung ma: " + criteriaCode
+                            + " - vui long kiem tra va xoa/gop dong trung trong danh muc Chi tieu rui ro khac");
+        }
         RiskCriteriaOtherScale scale = scaleRepository
                 .findByTenantIdAndCriteriaOtherIdAndScaleScore(tenantId, criterion.getId(), score)
                 .orElseThrow(() -> new BusinessException("RISK_CRITERIA_OTHER_SCALE_NOT_FOUND",
