@@ -250,19 +250,11 @@ export interface ScoreRankRequest {
   active: boolean;
 }
 
-export type AuditUnitType = "HO" | "GSCC" | "CN";
-
-export const AUDIT_UNIT_TYPE_OPTIONS: { value: AuditUnitType; label: string }[] = [
-  { value: "HO", label: "Hội sở" },
-  { value: "GSCC", label: "Giám sát chi nhánh" },
-  { value: "CN", label: "Chi nhánh" },
-];
-
 export interface AuditObjectUnitItem {
   id: string;
   code: string;
   name: string;
-  unitType: AuditUnitType;
+  unitType: string;
   auditObjectCategoryId: string | null;
   auditObjectCategoryCode: string | null;
   establishedDate: string | null;
@@ -283,7 +275,7 @@ export interface AuditObjectUnitItem {
 export interface AuditObjectUnitRequest {
   code: string;
   name: string;
-  unitType: AuditUnitType;
+  unitType: string;
   auditObjectCategoryId?: string | null;
   establishedDate?: string | null;
   restructureDate?: string | null;

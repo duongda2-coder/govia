@@ -1,0 +1,24 @@
+databaseChangeLog:
+
+  # Seed danh muc UNIT_TYPE (tcode ZTC_LOAI_DTKT_CN) voi 3 ma dang duoc du lieu AuditObjectUnit hien
+  # huu tham chieu (HO/GSCC/CN) - can co truoc khi doi cot risk_score_audit_object_unit.unit_type tu
+  # enum cung sang tham chieu tu do "code" cua danh muc nay (xem AuditObjectUnitService.validateUnitType).
+  - changeSet:
+      id: 038-1-audit-master-data-seed-unit-type
+      author: govia
+      comment: "Seed danh muc Loai don vi (HO/GSCC/CN) moi tenant"
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO audit_master_data_item (id, tenant_id, category, code, name, sort_order, active, created_at, row_version)
+              SELECT gen_random_uuid(), t.id, 'UNIT_TYPE', v.code, v.name, v.sort_order, true, now(), 0
+              FROM tenant t
+              CROSS JOIN (VALUES
+                ('HO', 'Hội sở', 1),
+                ('GSCC', 'Giám sát chi nhánh', 2),
+                ('CN', 'Chi nhánh', 3)
+              ) AS v(code, name, sort_order)
+              WHERE NOT EXISTS (
+                SELECT 1 FROM audit_master_data_item i
+                WHERE i.tenant_id = t.id AND i.category = 'UNIT_TYPE' AND i.code = v.code
+              );

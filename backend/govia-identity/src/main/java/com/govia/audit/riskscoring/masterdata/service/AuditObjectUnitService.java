@@ -1,10 +1,11 @@
 package com.govia.audit.riskscoring.masterdata.service;
 
+import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
+import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import com.govia.audit.riskscoring.masterdata.dto.AuditObjectUnitRequest;
 import com.govia.audit.riskscoring.masterdata.dto.AuditObjectUnitResponse;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectCategory;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
-import com.govia.audit.riskscoring.masterdata.entity.AuditUnitType;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepository;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
 import com.govia.audit.riskscoring.scoring.entity.RiskGroupHO;
@@ -43,18 +44,21 @@ public class AuditObjectUnitService {
     private final AuditObjectUnitRepository repository;
     private final RiskGroupHORepository groupHORepository;
     private final AuditObjectCategoryRepository auditObjectCategoryRepository;
+    private final AuditMasterDataItemRepository masterDataItemRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
     private final ExcelImportService excelImportService;
 
     public AuditObjectUnitService(AuditObjectUnitRepository repository, RiskGroupHORepository groupHORepository,
-                                   AuditObjectCategoryRepository auditObjectCategoryRepository, AuditLogService auditLogService,
+                                   AuditObjectCategoryRepository auditObjectCategoryRepository,
+                                   AuditMasterDataItemRepository masterDataItemRepository, AuditLogService auditLogService,
                                    ExcelExportService excelExportService, WordExportService wordExportService,
                                    ExcelImportService excelImportService) {
         this.repository = repository;
         this.groupHORepository = groupHORepository;
         this.auditObjectCategoryRepository = auditObjectCategoryRepository;
+        this.masterDataItemRepository = masterDataItemRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
@@ -75,6 +79,7 @@ public class AuditObjectUnitService {
         checkNoDuplicateCode(tenantId, request.code(), null);
         validateDefenseLineGroup(tenantId, request.defenseLineGroupId());
         validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
+        validateUnitType(tenantId, request.unitType());
 
         AuditObjectUnit item = new AuditObjectUnit();
         item.setTenantId(tenantId);
@@ -93,6 +98,7 @@ public class AuditObjectUnitService {
         checkNoDuplicateCode(tenantId, request.code(), id);
         validateDefenseLineGroup(tenantId, request.defenseLineGroupId());
         validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
+        validateUnitType(tenantId, request.unitType());
 
         applyRequest(item, request);
         item.setInfoUpdatedDate(LocalDate.now());
@@ -151,7 +157,7 @@ public class AuditObjectUnitService {
                 UUID defenseLineGroupId = isBlank(defenseLineGroupCode) ? null : groupIdsByCode.get(defenseLineGroupCode.trim());
                 String auditObjectCategoryCode = row.get("auditObjectCategoryCode");
                 UUID auditObjectCategoryId = isBlank(auditObjectCategoryCode) ? null : categoryIdsByCode.get(auditObjectCategoryCode.trim());
-                create(new AuditObjectUnitRequest(code.trim(), name.trim(), AuditUnitType.valueOf(unitType.trim()), auditObjectCategoryId,
+                create(new AuditObjectUnitRequest(code.trim(), name.trim(), unitType.trim(), auditObjectCategoryId,
                         parseDate(row.get("establishedDate")), parseDate(row.get("restructureDate")),
                         emptyToNull(row.get("restructureNote")), parseInt(row.get("totalStaff")), parseInt(row.get("leaderCount")),
                         parseInt(row.get("staffCount")), parseInt(row.get("rankValue")), defenseLineGroupId,
@@ -202,6 +208,11 @@ public class AuditObjectUnitService {
         groupHORepository.findById(defenseLineGroupId)
                 .filter(g -> g.getTenantId().equals(tenantId))
                 .orElseThrow(() -> new BusinessException("RISK_GROUP_HO_NOT_FOUND", "Khong tim thay nhom rui ro HO (tuyen bao ve)"));
+    }
+
+    private void validateUnitType(UUID tenantId, String unitType) {
+        masterDataItemRepository.findByTenantIdAndCategoryAndCode(tenantId, AuditMasterDataCategory.UNIT_TYPE, unitType)
+                .orElseThrow(() -> new BusinessException("UNIT_TYPE_NOT_FOUND", "Khong tim thay loai don vi: " + unitType));
     }
 
     private void validateAuditObjectCategory(UUID tenantId, UUID auditObjectCategoryId) {
@@ -311,7 +322,7 @@ public class AuditObjectUnitService {
     }
 
     private AuditObjectUnitResponse toResponse(AuditObjectUnit item, Map<UUID, String> groupCodes, Map<UUID, String> categoryCodes) {
-        return new AuditObjectUnitResponse(item.getId(), item.getCode(), item.getName(), item.getUnitType().name(),
+        return new AuditObjectUnitResponse(item.getId(), item.getCode(), item.getName(), item.getUnitType(),
                 item.getAuditObjectCategoryId(), categoryCodes.get(item.getAuditObjectCategoryId()),
                 item.getEstablishedDate(), item.getRestructureDate(), item.getRestructureNote(), item.getTotalStaff(),
                 item.getLeaderCount(), item.getStaffCount(), item.getRankValue(), item.getDefenseLineGroupId(),

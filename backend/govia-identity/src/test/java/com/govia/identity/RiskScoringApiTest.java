@@ -8,7 +8,7 @@ import com.govia.audit.riskscoring.masterdata.dto.Group1Request;
 import com.govia.audit.riskscoring.masterdata.dto.Group2Request;
 import com.govia.audit.riskscoring.masterdata.dto.ScoreRankRequest;
 import com.govia.audit.riskscoring.masterdata.dto.WeightByBusinessRequest;
-import com.govia.audit.riskscoring.masterdata.entity.AuditUnitType;
+import com.govia.audit.masterdata.dto.MasterDataItemRequest;
 import com.govia.audit.riskscoring.scoring.dto.GroupHORequest;
 import com.govia.identity.dto.AssignRolesRequest;
 import com.govia.identity.dto.CreateUserAccountRequest;
@@ -239,11 +239,18 @@ class RiskScoringApiTest extends AbstractApiTest {
                 .andReturn().getResponse().getContentAsString();
         String groupId = objectMapper.readTree(groupBody).get("data").get("id").asText();
 
+        mockMvc.perform(post("/api/audit/master-data/UNIT_TYPE")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new MasterDataItemRequest("CN", "Chi nhánh", null, null, null, null, null, true))))
+                .andExpect(status().isOk());
+
         String unitBody = mockMvc.perform(post("/api/audit/risk-scoring/master-data/audit-object-unit")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new AuditObjectUnitRequest("1234", "Chi nhánh Thăng Long", AuditUnitType.CN, null, null, null, null,
+                                new AuditObjectUnitRequest("1234", "Chi nhánh Thăng Long", "CN", null, null, null, null,
                                         100, 10, 500, 1, UUID.fromString(groupId), null, null, null, true))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.code").value("1234"))
@@ -260,7 +267,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                new AuditObjectUnitRequest("1234", "Trung", AuditUnitType.CN, null, null, null, null,
+                                new AuditObjectUnitRequest("1234", "Trung", "CN", null, null, null, null,
                                         null, null, null, null, null, null, null, null, true))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("AUDIT_OBJECT_UNIT_CODE_DUPLICATE"));

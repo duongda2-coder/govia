@@ -5,7 +5,6 @@ import com.govia.audit.riskscoring.masterdata.entity.AuditObjectProcess;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectProject;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectSubsidiary;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
-import com.govia.audit.riskscoring.masterdata.entity.AuditUnitType;
 import com.govia.audit.riskscoring.masterdata.entity.RiskScoreRank;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepository;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectProcessRepository;
@@ -121,7 +120,7 @@ public class RiskAssessmentOtherRankingService {
                                      Map<UUID, RiskTypeHO> riskTypes) {
         boolean useGroupWeight = "HO".equals(categoryCode)
                 && auditObjectUnitRepository.findByTenantIdAndCode(tenantId, header.getAuditObjectCode())
-                        .map(u -> u.getUnitType() == AuditUnitType.HO)
+                        .map(u -> "HO".equals(u.getUnitType()))
                         .orElse(false);
 
         BigDecimal total = BigDecimal.ZERO;

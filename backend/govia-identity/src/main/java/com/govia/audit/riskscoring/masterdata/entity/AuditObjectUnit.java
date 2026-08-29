@@ -3,8 +3,6 @@ package com.govia.audit.riskscoring.masterdata.entity;
 import com.govia.core.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,9 +23,9 @@ public class AuditObjectUnit extends BaseEntity {
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 
-    @Enumerated(EnumType.STRING)
+    /** Ma tham chieu toi AuditMasterDataItem (category UNIT_TYPE) - khong con la enum cung 3 gia tri. */
     @Column(name = "unit_type", nullable = false, length = 10)
-    private AuditUnitType unitType;
+    private String unitType;
 
     /** "Loai doi tuong kiem toan" - link toi danh muc goc AuditObjectCategory (sheet ZTC_Loai_Dtkt). */
     @Column(name = "audit_object_category_id", columnDefinition = "uuid")

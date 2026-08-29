@@ -1,8 +1,6 @@
 package com.govia.audit.riskscoring.masterdata.dto;
 
-import com.govia.audit.riskscoring.masterdata.entity.AuditUnitType;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -10,7 +8,7 @@ import java.util.UUID;
 public record AuditObjectUnitRequest(
         @NotBlank String code,
         @NotBlank String name,
-        @NotNull AuditUnitType unitType,
+        @NotBlank String unitType,
         UUID auditObjectCategoryId,
         LocalDate establishedDate,
         LocalDate restructureDate,

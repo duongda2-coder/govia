@@ -6,11 +6,10 @@ import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
 import {
   auditObjectUnitApi,
-  AUDIT_UNIT_TYPE_OPTIONS,
   type AuditObjectUnitItem,
   type AuditObjectUnitRequest,
-  type AuditUnitType,
 } from "../../../api/riskScoring";
+import { listMasterDataItems, type MasterDataItem } from "../../../api/auditMasterData";
 import { groupHOApi, type GroupHOItem } from "../../../api/riskScoringExec";
 import { useAuth } from "../../../auth/AuthContext";
 import { useAuditObjectOptions } from "./useAuditObjectOptions";
@@ -18,7 +17,7 @@ import { useAuditObjectOptions } from "./useAuditObjectOptions";
 interface FormValues {
   code: string;
   name: string;
-  unitType: AuditUnitType;
+  unitType: string;
   auditObjectCategoryId?: string;
   establishedDate?: dayjs.Dayjs;
   restructureDate?: dayjs.Dayjs;
@@ -51,6 +50,7 @@ export function AuditObjectUnitTable() {
 
   const [items, setItems] = useState<AuditObjectUnitItem[]>([]);
   const [groupHOOptions, setGroupHOOptions] = useState<GroupHOItem[]>([]);
+  const [unitTypeOptions, setUnitTypeOptions] = useState<MasterDataItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<AuditObjectUnitItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -61,9 +61,14 @@ export function AuditObjectUnitTable() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [list, groupHOList] = await Promise.all([auditObjectUnitApi.list(), groupHOApi.list()]);
+      const [list, groupHOList, unitTypeList] = await Promise.all([
+        auditObjectUnitApi.list(),
+        groupHOApi.list(),
+        listMasterDataItems("UNIT_TYPE"),
+      ]);
       setItems(list);
       setGroupHOOptions(groupHOList);
+      setUnitTypeOptions(unitTypeList);
     } catch {
       message.error(t("riskScoring.messages.loadError"));
     } finally {
@@ -203,7 +208,7 @@ export function AuditObjectUnitTable() {
       title: t("riskScoring.columns.unitType"),
       dataIndex: "unitType",
       width: 140,
-      render: (v: AuditUnitType) => AUDIT_UNIT_TYPE_OPTIONS.find((o) => o.value === v)?.label ?? v,
+      render: (v: string) => unitTypeOptions.find((o) => o.code === v)?.name ?? v,
     },
     {
       title: t("riskScoring.columns.auditObjectCategory"),
@@ -294,7 +299,11 @@ export function AuditObjectUnitTable() {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="unitType" label={t("riskScoring.columns.unitType")} rules={[{ required: true }]}>
-                <Select options={AUDIT_UNIT_TYPE_OPTIONS} />
+                <Select
+                  showSearch
+                  optionFilterProp="label"
+                  options={unitTypeOptions.map((o) => ({ value: o.code, label: `${o.code} - ${o.name}` }))}
+                />
               </Form.Item>
             </Col>
             <Col span={12}>
