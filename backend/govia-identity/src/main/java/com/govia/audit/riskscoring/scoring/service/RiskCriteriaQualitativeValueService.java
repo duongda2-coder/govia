@@ -2,8 +2,12 @@ package com.govia.audit.riskscoring.scoring.service;
 
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.riskscoring.masterdata.entity.RiskCriteriaQualitative;
+import com.govia.audit.riskscoring.masterdata.entity.RiskGroup1;
+import com.govia.audit.riskscoring.masterdata.entity.RiskGroup2;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
 import com.govia.audit.riskscoring.masterdata.repository.RiskCriteriaQualitativeRepository;
+import com.govia.audit.riskscoring.masterdata.repository.RiskGroup1Repository;
+import com.govia.audit.riskscoring.masterdata.repository.RiskGroup2Repository;
 import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQualitativeValueRequest;
 import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQualitativeValueResponse;
 import com.govia.audit.riskscoring.scoring.entity.RiskCriteriaQualitativeValue;
@@ -41,6 +45,8 @@ public class RiskCriteriaQualitativeValueService {
 
     private final RiskCriteriaQualitativeValueRepository repository;
     private final RiskCriteriaQualitativeRepository criteriaRepository;
+    private final RiskGroup1Repository group1Repository;
+    private final RiskGroup2Repository group2Repository;
     private final AuditObjectUnitRepository auditObjectUnitRepository;
     private final AuditLogService auditLogService;
     private final ExcelImportService excelImportService;
@@ -49,6 +55,8 @@ public class RiskCriteriaQualitativeValueService {
 
     public RiskCriteriaQualitativeValueService(RiskCriteriaQualitativeValueRepository repository,
                                                 RiskCriteriaQualitativeRepository criteriaRepository,
+                                                RiskGroup1Repository group1Repository,
+                                                RiskGroup2Repository group2Repository,
                                                 AuditObjectUnitRepository auditObjectUnitRepository,
                                                 AuditLogService auditLogService,
                                                 ExcelImportService excelImportService,
@@ -56,6 +64,8 @@ public class RiskCriteriaQualitativeValueService {
                                                 WordExportService wordExportService) {
         this.repository = repository;
         this.criteriaRepository = criteriaRepository;
+        this.group1Repository = group1Repository;
+        this.group2Repository = group2Repository;
         this.auditObjectUnitRepository = auditObjectUnitRepository;
         this.auditLogService = auditLogService;
         this.excelImportService = excelImportService;
@@ -68,8 +78,10 @@ public class RiskCriteriaQualitativeValueService {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, RiskCriteriaQualitative> criteria = criteriaById(tenantId);
         Map<String, AuditObjectUnit> units = unitsByCode(tenantId);
+        Map<UUID, RiskGroup1> groups1 = group1ById(tenantId);
+        Map<UUID, RiskGroup2> groups2 = group2ById(tenantId);
         return repository.findByTenantIdAndYearOrderByBranchCodeAsc(tenantId, year).stream()
-                .map(item -> toResponse(item, criteria, units))
+                .map(item -> toResponse(item, criteria, units, groups1, groups2))
                 .toList();
     }
 
@@ -87,7 +99,7 @@ public class RiskCriteriaQualitativeValueService {
 
         auditLogService.record("RiskCriteriaQualitativeValue", item.getId(), AuditAction.CREATE,
                 "Tao HSRR dinh tinh: " + item.getBranchCode() + "/" + item.getYear());
-        return toResponse(item, criteriaById(tenantId), unitsByCode(tenantId));
+        return toResponse(item, criteriaById(tenantId), unitsByCode(tenantId), group1ById(tenantId), group2ById(tenantId));
     }
 
     @Transactional
@@ -103,7 +115,7 @@ public class RiskCriteriaQualitativeValueService {
 
         auditLogService.record("RiskCriteriaQualitativeValue", item.getId(), AuditAction.UPDATE,
                 "Cap nhat HSRR dinh tinh: " + item.getBranchCode() + "/" + item.getYear());
-        return toResponse(item, criteriaById(tenantId), unitsByCode(tenantId));
+        return toResponse(item, criteriaById(tenantId), unitsByCode(tenantId), group1ById(tenantId), group2ById(tenantId));
     }
 
     @Transactional
@@ -182,11 +194,15 @@ public class RiskCriteriaQualitativeValueService {
         return new ImportResult(success, errors.size(), errors);
     }
 
-    /** Khop dung tieu de cot cua mau DT_HSRR_Upload - "Ma nhom"/"Ma nhom cap 2"/"Ten chi tieu" khong
-     * doc vi tu suy ra duoc tu chi tieu (RiskCriteriaQualitative), khong can nhap lai. */
+    /** Khop dung tieu de + thu tu cot cua mau DT_HSRR_Upload. "Ma nhom"/"Ma nhom cap 2"/"Ten chi
+     * tieu" chi de doc (suy ra tu chi tieu qua RiskCriteriaQualitative.group1Id/group2Id), import
+     * chi dung criteriaCode/branchCode/year/violation/note - cac cot con lai bi bo qua neu co mat. */
     private List<ExportColumn> templateColumns() {
         return List.of(
+                new ExportColumn("group1Code", "Mã nhóm"),
+                new ExportColumn("group2Code", "Mã nhóm cấp 2"),
                 new ExportColumn("criteriaCode", "Mã chỉ tiêu"),
+                new ExportColumn("criteriaName", "Tên chỉ tiêu"),
                 new ExportColumn("branchCode", "Mã chi nhánh"),
                 new ExportColumn("year", "Năm"),
                 new ExportColumn("violation", "Sai phạm"),
@@ -196,12 +212,18 @@ public class RiskCriteriaQualitativeValueService {
     private List<Map<String, Object>> exportRows(Integer year) {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, RiskCriteriaQualitative> criteria = criteriaById(tenantId);
-        Map<String, AuditObjectUnit> units = unitsByCode(tenantId);
+        Map<UUID, RiskGroup1> groups1 = group1ById(tenantId);
+        Map<UUID, RiskGroup2> groups2 = group2ById(tenantId);
         return repository.findByTenantIdAndYearOrderByBranchCodeAsc(tenantId, year).stream()
                 .map(item -> {
                     RiskCriteriaQualitative criterion = criteria.get(item.getCriteriaId());
+                    RiskGroup1 group1 = criterion != null ? groups1.get(criterion.getGroup1Id()) : null;
+                    RiskGroup2 group2 = criterion != null ? groups2.get(criterion.getGroup2Id()) : null;
                     Map<String, Object> row = new HashMap<>();
+                    row.put("group1Code", group1 != null ? group1.getCode() : null);
+                    row.put("group2Code", group2 != null ? group2.getCode() : null);
                     row.put("criteriaCode", criterion != null ? criterion.getCode() : null);
+                    row.put("criteriaName", criterion != null ? criterion.getName() : null);
                     row.put("branchCode", item.getBranchCode());
                     row.put("year", item.getYear());
                     row.put("violation", item.getViolation());
@@ -270,6 +292,18 @@ public class RiskCriteriaQualitativeValueService {
         return map;
     }
 
+    private Map<UUID, RiskGroup1> group1ById(UUID tenantId) {
+        Map<UUID, RiskGroup1> map = new HashMap<>();
+        group1Repository.findByTenantIdOrderByCodeAsc(tenantId).forEach(g -> map.put(g.getId(), g));
+        return map;
+    }
+
+    private Map<UUID, RiskGroup2> group2ById(UUID tenantId) {
+        Map<UUID, RiskGroup2> map = new HashMap<>();
+        group2Repository.findByTenantIdOrderByCodeAsc(tenantId).forEach(g -> map.put(g.getId(), g));
+        return map;
+    }
+
     private Map<String, AuditObjectUnit> unitsByCode(UUID tenantId) {
         Map<String, AuditObjectUnit> map = new HashMap<>();
         auditObjectUnitRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(u -> map.put(u.getCode(), u));
@@ -278,12 +312,17 @@ public class RiskCriteriaQualitativeValueService {
 
     private RiskCriteriaQualitativeValueResponse toResponse(RiskCriteriaQualitativeValue item,
                                                               Map<UUID, RiskCriteriaQualitative> criteria,
-                                                              Map<String, AuditObjectUnit> units) {
+                                                              Map<String, AuditObjectUnit> units,
+                                                              Map<UUID, RiskGroup1> groups1,
+                                                              Map<UUID, RiskGroup2> groups2) {
         RiskCriteriaQualitative criterion = criteria.get(item.getCriteriaId());
         AuditObjectUnit unit = units.get(item.getBranchCode());
+        RiskGroup1 group1 = criterion != null ? groups1.get(criterion.getGroup1Id()) : null;
+        RiskGroup2 group2 = criterion != null ? groups2.get(criterion.getGroup2Id()) : null;
         return new RiskCriteriaQualitativeValueResponse(item.getId(), item.getYear(), item.getBranchCode(),
                 unit != null ? unit.getName() : null,
                 item.getCriteriaId(), criterion != null ? criterion.getCode() : null, criterion != null ? criterion.getName() : null,
+                group1 != null ? group1.getCode() : null, group2 != null ? group2.getCode() : null,
                 item.getViolation(), item.getNote());
     }
 }

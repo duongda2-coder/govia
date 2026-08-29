@@ -177,6 +177,18 @@ export function RiskCriteriaQualitativeValueTable() {
 
   const columns: CrudColumn<RiskCriteriaQualitativeValueItem>[] = [
     { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 90, sorter: (a, b) => a.year - b.year },
+    {
+      title: t("riskScoringExec.hsrr.group1Code"),
+      width: 100,
+      ...getSearchColumnProps("group1Code", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoringExec.hsrr.group2Code"),
+      width: 120,
+      ...getSearchColumnProps("group2Code", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoringExec.hsrr.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
     {
       title: t("riskScoringExec.hsrr.branchName"),
@@ -267,7 +279,7 @@ export function RiskCriteriaQualitativeValueTable() {
             <Input maxLength={20} />
           </Form.Item>
           <Form.Item name="note" label={t("riskScoringExec.hsrr.note")}>
-            <Input.TextArea rows={2} maxLength={200} />
+            <Input.TextArea rows={2} maxLength={500} />
           </Form.Item>
         </Form>
       </Modal>

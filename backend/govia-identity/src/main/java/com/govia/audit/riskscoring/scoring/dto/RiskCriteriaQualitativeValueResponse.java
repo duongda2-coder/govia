@@ -10,6 +10,8 @@ public record RiskCriteriaQualitativeValueResponse(
         UUID criteriaId,
         String criteriaCode,
         String criteriaName,
+        String group1Code,
+        String group2Code,
         String violation,
         String note
 ) {

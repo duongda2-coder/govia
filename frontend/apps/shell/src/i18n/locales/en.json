@@ -808,6 +808,8 @@
     "hsrr": {
       "tabQuantitative": "Quantitative Risk Profile",
       "tabQualitative": "Qualitative Risk Profile",
+      "group1Code": "Group Code",
+      "group2Code": "Sub-group Code",
       "branchCode": "Branch Code",
       "branchName": "Branch Name",
       "value": "Value",

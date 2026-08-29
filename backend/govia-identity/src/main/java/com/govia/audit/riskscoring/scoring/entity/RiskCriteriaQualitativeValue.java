@@ -33,6 +33,6 @@ public class RiskCriteriaQualitativeValue extends BaseEntity {
     @Column(name = "violation", length = 20)
     private String violation;
 
-    @Column(name = "note", length = 200)
+    @Column(name = "note", length = 500)
     private String note;
 }

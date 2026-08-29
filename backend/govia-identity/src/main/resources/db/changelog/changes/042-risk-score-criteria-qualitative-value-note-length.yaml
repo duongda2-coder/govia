@@ -1,0 +1,12 @@
+databaseChangeLog:
+
+  # Sheet DT_Nhaptructiep mo ta cot "Ghi chu" la Char 500, nhung schema 036 tao "note" chi VARCHAR(200).
+  - changeSet:
+      id: 042-1-risk-score-criteria-qualitative-value-note-length
+      author: govia
+      comment: "Mo rong risk_score_criteria_qualitative_value.note tu VARCHAR(200) len VARCHAR(500) khop mo ta Char 500"
+      changes:
+        - modifyDataType:
+            tableName: risk_score_criteria_qualitative_value
+            columnName: note
+            newDataType: VARCHAR(500)

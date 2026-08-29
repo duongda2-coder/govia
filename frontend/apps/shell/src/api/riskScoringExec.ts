@@ -172,6 +172,8 @@ export interface RiskCriteriaQualitativeValueItem {
   criteriaId: string;
   criteriaCode: string | null;
   criteriaName: string | null;
+  group1Code: string | null;
+  group2Code: string | null;
   violation: string | null;
   note: string | null;
 }
