@@ -63,7 +63,12 @@
     "username": "Username",
     "employeeCode": "Employee Code",
     "tenant": "Tenant",
-    "roles": "Roles"
+    "roles": "Roles",
+    "search": {
+      "title": "Search features",
+      "placeholder": "Type a screen or feature name...",
+      "noResults": "No matching feature found"
+    }
   },
   "common": {
     "resizeSidebar": "Drag to resize",

@@ -2,57 +2,17 @@ import { useEffect, useRef, useState } from "react";
 import { Layout, Menu, Avatar, Dropdown, Typography, Space } from "antd";
 import type { MenuProps } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { AuditOutlined, DashboardOutlined, KeyOutlined, LogoutOutlined, NodeIndexOutlined, SafetyCertificateOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+import { KeyOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthContext";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { ChangePasswordModal } from "../components/ChangePasswordModal";
+import { MENU_ROUTES, useAppMenu, type SearchableScreen } from "./useAppMenu";
 
 const { Header, Sider, Content } = Layout;
 
-type MenuItemType = NonNullable<MenuProps["items"]>[number];
-
-/**
- * Route ung voi key cua tung mo-dun trong menu - dung de dieu huong khi bam menu
- * va de xac dinh menu nao dang duoc chon dua theo URL hien tai.
- */
-const MENU_ROUTES: Record<string, string> = {
-  dashboard: "/",
-  "people-employees": "/people/employees",
-  "people-positions": "/people/positions",
-  "people-org-units": "/people/org-units",
-  "admin-roles": "/admin/roles",
-  "admin-accounts": "/admin/accounts",
-  "workflow-tasks": "/workflow/tasks",
-  "workflow-instances": "/workflow/instances",
-  "workflow-approval-matrix": "/workflow/approval-matrix",
-  "audit-md-risk": "/audit/master-data/risk",
-  "audit-md-general": "/audit/master-data/general",
-  "audit-md-document-library": "/audit/master-data/document-library",
-  "audit-md-control-point": "/audit/master-data/control-point",
-  "audit-md-department": "/audit/master-data/department",
-  "audit-md-year": "/audit/master-data/year",
-  "audit-md-business-segment": "/audit/master-data/business-segment",
-  "audit-md-unit-type": "/audit/master-data/unit-type",
-  "audit-rs-groups": "/audit/risk-scoring/master-data/groups",
-  "audit-rs-criteria": "/audit/risk-scoring/master-data/criteria",
-  "audit-rs-weight": "/audit/risk-scoring/master-data/weight",
-  "audit-rs-coefficient-matrix": "/audit/risk-scoring/master-data/coefficient-matrix",
-  "audit-rs-audit-objects": "/audit/risk-scoring/master-data/audit-objects",
-  "audit-rs-user-assignment": "/audit/risk-scoring/master-data/user-assignment",
-  "audit-rse-group-ho": "/audit/risk-scoring/scoring/group-ho",
-  "audit-rse-risk-type-ho": "/audit/risk-scoring/scoring/risk-type-ho",
-  "audit-rse-criteria-other": "/audit/risk-scoring/scoring/criteria-other",
-  "audit-rse-criteria-other-scale": "/audit/risk-scoring/scoring/criteria-other-scale",
-  "audit-rse-assessment-other": "/audit/risk-scoring/scoring/assessment-other",
-  "audit-rse-assessment-other-ranking": "/audit/risk-scoring/scoring/assessment-other-ranking",
-  "audit-rse-assessment-other-expert-rank": "/audit/risk-scoring/scoring/assessment-other-expert-rank",
-  "audit-rse-hsrr": "/audit/risk-scoring/scoring/hsrr",
-};
-
-/** Gan title HTML len nhan menu de trinh duyet tu hien tooltip khi chu bi cat ngan (...) do sider hep. */
-function menuLabel(text: string) {
-  return <span title={text}>{text}</span>;
+export interface AppLayoutOutletContext {
+  searchableScreens: SearchableScreen[];
 }
 
 const SIDER_WIDTH_STORAGE_KEY = "govia.siderWidth";
@@ -61,11 +21,12 @@ const SIDER_MAX_WIDTH = 420;
 const SIDER_DEFAULT_WIDTH = 220;
 
 export function AppLayout() {
-  const { user, logout, hasPermission } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const { moduleMenuItems, searchableScreens } = useAppMenu();
 
   const [siderWidth, setSiderWidth] = useState(() => {
     const stored = Number(localStorage.getItem(SIDER_WIDTH_STORAGE_KEY));
@@ -115,107 +76,6 @@ export function AppLayout() {
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
   };
-
-  /**
-   * Menu chi liet ke module da co man hinh that. Cac module khac trong NOTE.txt / yeu cau 1
-   * (Access, Audit, Risk, Compliance, Asset, Vendor, Policy, Analytics, AI)
-   * se duoc them lai vao day khi tung module thuc su co UI, thay vi de placeholder disabled.
-   */
-  const isSuperAdmin = user?.roles.includes("SUPER_ADMIN") ?? false;
-
-  /**
-   * Loc menu theo dung quyen VIEW cua tung man hinh (cung ma quyen ma chinh trang do dang tu kiem
-   * tra qua hasPermission, xem vd MasterDataGroupPage/RiskScoring tables) - user khong co quyen thi
-   * KHONG thay module/man hinh do trong sidebar, khong chi bi chan luc bam vao. "false" bi loai boi
-   * dropNulls, nen 1 dong co the vua la dieu kien vua la item.
-   */
-  const dropNulls = (items: (MenuItemType | false | null | undefined)[]): MenuItemType[] =>
-    items.filter((item): item is MenuItemType => Boolean(item));
-
-  const peopleChildren = dropNulls([
-    hasPermission("PEOPLE.EMPLOYEE.VIEW") && { key: "people-employees", label: menuLabel(t("menu.employees")) },
-    hasPermission("PEOPLE.POSITION.VIEW") && { key: "people-positions", label: menuLabel(t("menu.positions")) },
-    hasPermission("PEOPLE.ORGUNIT.VIEW") && { key: "people-org-units", label: menuLabel(t("menu.orgUnits")) },
-  ]);
-
-  const workflowChildren = dropNulls([
-    hasPermission("WORKFLOW.TASK.VIEW") && { key: "workflow-tasks", label: menuLabel(t("menu.workflowTasks")) },
-    hasPermission("WORKFLOW.INSTANCE.VIEW") && { key: "workflow-instances", label: menuLabel(t("menu.workflowInstances")) },
-    hasPermission("WORKFLOW.APPROVAL_MATRIX.VIEW") && { key: "workflow-approval-matrix", label: menuLabel(t("menu.workflowApprovalMatrix")) },
-  ]);
-
-  const canViewAuditMasterData = hasPermission("AUDIT.MASTER_DATA.VIEW");
-  const canViewRiskScoring = hasPermission("AUDIT.RISK_SCORING.VIEW");
-  const canViewRiskScoringExec = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
-
-  const auditChildren = dropNulls([
-    canViewAuditMasterData && {
-      key: "audit-master-data",
-      label: menuLabel(t("menu.auditMasterData")),
-      children: [
-        { key: "audit-md-risk", label: menuLabel(t("menu.auditMdRisk")) },
-        { key: "audit-md-general", label: menuLabel(t("menu.auditMdGeneral")) },
-        { key: "audit-md-document-library", label: menuLabel(t("menu.auditMdDocumentLibrary")) },
-        { key: "audit-md-control-point", label: menuLabel(t("menu.auditMdControlPoint")) },
-        { key: "audit-md-department", label: menuLabel(t("menu.auditMdDepartment")) },
-        { key: "audit-md-year", label: menuLabel(t("menu.auditMdYear")) },
-        { key: "audit-md-business-segment", label: menuLabel(t("menu.auditMdBusinessSegment")) },
-        { key: "audit-md-unit-type", label: menuLabel(t("menu.auditMdUnitType")) },
-      ],
-    },
-    (canViewRiskScoring || canViewRiskScoringExec) && {
-      key: "audit-risk-scoring",
-      label: menuLabel(t("menu.riskScoring")),
-      children: dropNulls([
-        canViewRiskScoring && {
-          key: "audit-rs-master-data",
-          label: menuLabel(t("menu.riskScoringMasterData")),
-          children: [
-            { key: "audit-rs-groups", label: menuLabel(t("menu.riskScoringGroups")) },
-            { key: "audit-rs-criteria", label: menuLabel(t("menu.riskScoringCriteria")) },
-            { key: "audit-rs-weight", label: menuLabel(t("menu.riskScoringWeight")) },
-            { key: "audit-rs-coefficient-matrix", label: menuLabel(t("menu.riskScoringCoefficientMatrix")) },
-            { key: "audit-rs-user-assignment", label: menuLabel(t("menu.riskScoringUserAssignment")) },
-            { key: "audit-rs-audit-objects", label: menuLabel(t("menu.riskScoringAuditObjects")) },
-          ],
-        },
-        canViewRiskScoringExec && {
-          key: "audit-rse-master-data",
-          label: menuLabel(t("menu.riskScoringExec")),
-          children: [
-            // Them tab moi vao day khi xu ly them sheet cua "2. Cham diem.xlsx" - moi sheet la 1 muc
-            // menu/route rieng (giong Master Data CDRR), khong phai tab trong 1 trang.
-            { key: "audit-rse-group-ho", label: menuLabel(t("menu.riskScoringExecGroupHO")) },
-            { key: "audit-rse-risk-type-ho", label: menuLabel(t("menu.riskScoringExecRiskTypeHO")) },
-            { key: "audit-rse-criteria-other", label: menuLabel(t("menu.riskScoringExecCriteriaOther")) },
-            { key: "audit-rse-criteria-other-scale", label: menuLabel(t("menu.riskScoringExecCriteriaOtherScale")) },
-            { key: "audit-rse-assessment-other", label: menuLabel(t("menu.riskScoringExecAssessmentOther")) },
-            { key: "audit-rse-assessment-other-ranking", label: menuLabel(t("menu.riskScoringExecAssessmentOtherRanking")) },
-            { key: "audit-rse-assessment-other-expert-rank", label: menuLabel(t("menu.riskScoringExecAssessmentOtherExpertRank")) },
-            { key: "audit-rse-hsrr", label: menuLabel(t("menu.riskScoringExecHsrr")) },
-          ],
-        },
-      ]),
-    },
-    // Ke hoach (Audit Plan/Universe) va Thuc hien (Work Program/Finding...) se them vao day
-    // khi tung phan thuc su co man hinh, cung cap voi "audit-master-data".
-  ]);
-
-  const moduleMenuItems: MenuProps["items"] = dropNulls([
-    { key: "dashboard", icon: <DashboardOutlined />, label: menuLabel(t("menu.dashboard")) },
-    peopleChildren.length > 0 && { key: "people", icon: <TeamOutlined />, label: menuLabel(t("menu.people")), children: peopleChildren },
-    workflowChildren.length > 0 && { key: "workflow", icon: <NodeIndexOutlined />, label: menuLabel(t("menu.workflow")), children: workflowChildren },
-    auditChildren.length > 0 && { key: "audit", icon: <AuditOutlined />, label: menuLabel(t("menu.audit")), children: auditChildren },
-    isSuperAdmin && {
-      key: "admin",
-      icon: <SafetyCertificateOutlined />,
-      label: menuLabel(t("menu.admin")),
-      children: [
-        { key: "admin-roles", label: menuLabel(t("menu.roles")) },
-        { key: "admin-accounts", label: menuLabel(t("menu.accounts")) },
-      ],
-    },
-  ]);
 
   const selectedKey =
     Object.entries(MENU_ROUTES)
@@ -274,7 +134,7 @@ export function AppLayout() {
           </Space>
         </Header>
         <Content style={{ margin: 24 }}>
-          <Outlet />
+          <Outlet context={{ searchableScreens } satisfies AppLayoutOutletContext} />
         </Content>
       </Layout>
 

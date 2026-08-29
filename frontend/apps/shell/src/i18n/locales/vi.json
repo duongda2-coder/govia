@@ -63,7 +63,12 @@
     "username": "Tên đăng nhập",
     "employeeCode": "Mã nhân viên",
     "tenant": "Tenant",
-    "roles": "Vai trò"
+    "roles": "Vai trò",
+    "search": {
+      "title": "Tìm kiếm chức năng",
+      "placeholder": "Nhập tên màn hình, chức năng cần tìm...",
+      "noResults": "Không tìm thấy chức năng phù hợp"
+    }
   },
   "common": {
     "resizeSidebar": "Kéo để thay đổi độ rộng",
