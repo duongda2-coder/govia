@@ -40,6 +40,8 @@ import java.util.UUID;
  * - Xep loai: doi chieu Diem rui ro voi khoang [scoreFrom, scoreTo] con hieu luc trong nam do cua
  *   danh muc Thang diem xep loai rui ro (xem RiskScoreRank/ScoreRankService, sheet "QL thang diem",
  *   tcode ztc_rank).
+ * - Chi hien thi doi tuong kiem toan da co it nhat 1 chi tieu duoc cham diem (line.scaleId != null)
+ *   trong nam do - header vua tao (chua cham diem chi tieu nao) khong duoc liet ke.
  */
 @Service
 public class RiskAssessmentOtherRankingService {
@@ -88,11 +90,17 @@ public class RiskAssessmentOtherRankingService {
             if (!header.getYear().equals(year)) {
                 continue;
             }
+            List<RiskAssessmentOtherLine> lines = lineRepository.findByHeaderIdOrderByCriteriaOtherIdAsc(header.getId());
+            boolean hasAnyScore = lines.stream().anyMatch(l -> l.getScaleId() != null);
+            if (!hasAnyScore) {
+                continue;
+            }
+
             AuditObjectCategory category = categories.get(header.getAuditObjectCategoryId());
             String categoryCode = category != null ? category.getCode() : null;
             String objectName = objectResolver.resolveName(tenantId, category, header.getAuditObjectCode());
 
-            BigDecimal score = computeScore(tenantId, header, categoryCode, criteria, scales, riskTypes);
+            BigDecimal score = computeScore(tenantId, header, lines, categoryCode, criteria, scales, riskTypes);
             String rankLabel = resolveRankLabel(ranks, score, year);
 
             result.add(new RiskAssessmentOtherRankingResponse(header.getId(), header.getYear(),
@@ -103,7 +111,7 @@ public class RiskAssessmentOtherRankingService {
         return result;
     }
 
-    private BigDecimal computeScore(UUID tenantId, RiskAssessmentOtherHeader header, String categoryCode,
+    private BigDecimal computeScore(UUID tenantId, RiskAssessmentOtherHeader header, List<RiskAssessmentOtherLine> lines, String categoryCode,
                                      Map<UUID, RiskCriteriaOther> criteria, Map<UUID, RiskCriteriaOtherScale> scales,
                                      Map<UUID, RiskTypeHO> riskTypes) {
         boolean useGroupWeight = "HO".equals(categoryCode)
@@ -112,7 +120,7 @@ public class RiskAssessmentOtherRankingService {
                         .orElse(false);
 
         BigDecimal total = BigDecimal.ZERO;
-        for (RiskAssessmentOtherLine line : lineRepository.findByHeaderIdOrderByCriteriaOtherIdAsc(header.getId())) {
+        for (RiskAssessmentOtherLine line : lines) {
             if (line.getScaleId() == null) {
                 continue;
             }
