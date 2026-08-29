@@ -90,6 +90,26 @@ export interface RiskAssessmentOtherLineRequest {
   scaleId: string | null;
 }
 
+/** Ban "phang" cua RiskAssessmentOtherHeaderItem - 1 item ung voi 1 chi tieu (line) cua 1 header,
+ * dung cho man hinh danh sach hien 1 dong/1 chi tieu (dung dinh dang voi file Excel export/import). */
+export interface RiskAssessmentOtherRowItem {
+  headerId: string;
+  auditObjectCategoryId: string;
+  auditObjectCategoryCode: string | null;
+  auditObjectCategoryName: string | null;
+  auditObjectCode: string;
+  auditObjectName: string | null;
+  year: number;
+  active: boolean;
+  lineId: string;
+  criteriaOtherId: string;
+  criteriaOtherCode: string | null;
+  criteriaOtherName: string | null;
+  scaleId: string | null;
+  scaleScore: number | null;
+  ratingLevel: string | null;
+}
+
 export interface RiskAssessmentOtherRankingItem {
   headerId: string;
   year: number;
@@ -246,6 +266,10 @@ const assessmentOtherResource = createResourceApi<RiskAssessmentOtherHeaderItem,
 );
 export const riskAssessmentOtherApi = {
   ...assessmentOtherResource,
+  async rows(): Promise<RiskAssessmentOtherRowItem[]> {
+    const res = await httpClient.get<ApiResponse<RiskAssessmentOtherRowItem[]>>(`${BASE}/assessment-other/rows`);
+    return res.data.data;
+  },
   async lines(headerId: string): Promise<RiskAssessmentOtherLineItem[]> {
     const res = await httpClient.get<ApiResponse<RiskAssessmentOtherLineItem[]>>(`${BASE}/assessment-other/${headerId}/lines`);
     return res.data.data;

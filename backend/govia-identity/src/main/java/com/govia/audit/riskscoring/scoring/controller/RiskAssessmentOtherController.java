@@ -4,6 +4,7 @@ import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherHeaderRequest;
 import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherHeaderResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherLineRequest;
 import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherLineResponse;
+import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherRowResponse;
 import com.govia.audit.riskscoring.scoring.entity.RiskAssessmentOtherHeader;
 import com.govia.audit.riskscoring.scoring.service.RiskAssessmentOtherHeaderService;
 import com.govia.audit.riskscoring.scoring.service.RiskAssessmentOtherLineService;
@@ -49,6 +50,14 @@ public class RiskAssessmentOtherController {
     @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.VIEW')")
     public ApiResponse<List<RiskAssessmentOtherHeaderResponse>> list() {
         return ApiResponse.ok(headerService.list());
+    }
+
+    /** Ban "phang" cua list() - 1 dong/1 chi tieu, dung de man hinh danh sach hien theo dung 6 cot
+     * cua file Excel export/import (thay vi 1 dong/1 header nhu list()). */
+    @GetMapping("/rows")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.VIEW')")
+    public ApiResponse<List<RiskAssessmentOtherRowResponse>> rows() {
+        return ApiResponse.ok(headerService.listRows());
     }
 
     @PostMapping

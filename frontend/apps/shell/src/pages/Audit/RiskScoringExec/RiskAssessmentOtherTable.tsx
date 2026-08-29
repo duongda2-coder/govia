@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { App, Form, Modal, Select, Switch, Table, Typography } from "antd";
+import { App, Form, Input, Modal, Select, Switch } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
@@ -9,6 +9,7 @@ import {
   riskCriteriaOtherScaleApi,
   type RiskAssessmentOtherHeaderItem,
   type RiskAssessmentOtherHeaderRequest,
+  type RiskAssessmentOtherRowItem,
   type RiskCriteriaOtherItem,
   type RiskCriteriaOtherScaleItem,
 } from "../../../api/riskScoringExec";
@@ -28,18 +29,17 @@ interface FormValues {
   auditObjectCategoryId: string;
   auditObjectCode: string;
   year: number;
+  criteriaOtherId: string;
+  scaleId: string | null;
   active: boolean;
 }
 
-interface LineRow {
-  lineId: string | null;
-  criteriaOtherId: string;
-  criteriaOtherCode: string | null;
-  criteriaOtherName: string;
-  scaleId: string | null;
-}
-
-/** Man hinh "Cham diem rui ro HO, CNTT, Du an, Dich vu thue ngoai..." (sheet ZTC_CDRR_KHAC) - header. */
+/**
+ * Man hinh "Cham diem rui ro HO, CNTT, Du an, Dich vu thue ngoai..." (sheet ZTC_CDRR_KHAC) - 1 dong
+ * danh sach ung voi 1 chi tieu (line) da/can cham diem cua 1 ky (Loai doi tuong KT + Ma doi tuong KT
+ * + Nam), dung dinh dang voi file Excel export/import (6 cot). Nhieu dong co the cung 1 ky (header)
+ * neu khac chi tieu - header duoc tu dong tao moi/tai su dung dung ky da co khi luu.
+ */
 export function RiskAssessmentOtherTable() {
   const { t } = useTranslation();
   const { message, modal } = App.useApp();
@@ -50,10 +50,11 @@ export function RiskAssessmentOtherTable() {
   const canDelete = hasPermission("AUDIT.RISK_SCORING_EXEC.DELETE");
   const canExport = hasPermission("AUDIT.RISK_SCORING_EXEC.EXPORT");
   const canImport = hasPermission("AUDIT.RISK_SCORING_EXEC.IMPORT");
-  const { getSearchColumnProps } = useClientSearchColumn<RiskAssessmentOtherHeaderItem>();
+  const { getSearchColumnProps } = useClientSearchColumn<RiskAssessmentOtherRowItem>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
-  const [items, setItems] = useState<RiskAssessmentOtherHeaderItem[]>([]);
+  const [rows, setRows] = useState<RiskAssessmentOtherRowItem[]>([]);
+  const [headers, setHeaders] = useState<RiskAssessmentOtherHeaderItem[]>([]);
   const [categories, setCategories] = useState<AuditObjectCategoryItem[]>([]);
   const [years, setYears] = useState<MasterDataItem[]>([]);
   const [criteriaList, setCriteriaList] = useState<RiskCriteriaOtherItem[]>([]);
@@ -61,29 +62,39 @@ export function RiskAssessmentOtherTable() {
   const [objectCodeOptions, setObjectCodeOptions] = useState<{ value: string; label: string }[]>([]);
   const [objectCodeLoading, setObjectCodeLoading] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState<RiskAssessmentOtherHeaderItem[]>([]);
+  const [selected, setSelected] = useState<RiskAssessmentOtherRowItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editing, setEditing] = useState<RiskAssessmentOtherHeaderItem | null>(null);
+  const [editing, setEditing] = useState<RiskAssessmentOtherRowItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [lineRows, setLineRows] = useState<LineRow[]>([]);
-  const [linesLoading, setLinesLoading] = useState(false);
   const [form] = Form.useForm<FormValues>();
   const selectedCategoryId = Form.useWatch("auditObjectCategoryId", form);
+  const selectedCriteriaId = Form.useWatch("criteriaOtherId", form);
 
   const categoryOptions = useMemo(() => categories.map((c) => ({ value: c.id, label: `${c.code} - ${c.name}` })), [categories]);
   const yearOptions = useMemo(() => years.map((y) => ({ value: Number(y.code), label: y.code })), [years]);
+  const criteriaOptions = useMemo(
+    () => criteriaList.filter((c) => c.auditObjectCategoryId === selectedCategoryId).map((c) => ({ value: c.id, label: `${c.code} - ${c.name}` })),
+    [criteriaList, selectedCategoryId],
+  );
+  const scaleOptions = useMemo(
+    () => scaleList.filter((s) => s.criteriaOtherId === selectedCriteriaId).map((s) => ({ value: s.id, label: `${s.scaleScore} - ${s.ratingLevel}` })),
+    [scaleList, selectedCriteriaId],
+  );
+  const selectedCriteriaName = useMemo(() => criteriaList.find((c) => c.id === selectedCriteriaId)?.name ?? "", [criteriaList, selectedCriteriaId]);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [list, categoryList, yearList, criteria, scales] = await Promise.all([
+      const [rowList, headerList, categoryList, yearList, criteria, scales] = await Promise.all([
+        riskAssessmentOtherApi.rows(),
         riskAssessmentOtherApi.list(),
         auditObjectCategoryApi.list(),
         listMasterDataItems("YEAR"),
         riskCriteriaOtherApi.list(),
         riskCriteriaOtherScaleApi.list(),
       ]);
-      setItems(list);
+      setRows(rowList);
+      setHeaders(headerList);
       setCategories(categoryList);
       setYears(yearList);
       setCriteriaList(criteria);
@@ -122,40 +133,6 @@ export function RiskAssessmentOtherTable() {
       .finally(() => setObjectCodeLoading(false));
   }, [selectedCategoryId, categories]);
 
-  // Bang "Cham diem chi tieu" ben trong modal: neu dang sua va category chua doi, dung dung cac
-  // dong da co san (kem diem da cham) - nguoc lai (them moi, hoac doi sang category khac) chi hien
-  // truoc danh sach chi tieu phu hop de NSD cham diem ngay, dong that se duoc tao khi bam Luu.
-  useEffect(() => {
-    if (!modalOpen || !selectedCategoryId) {
-      setLineRows([]);
-      return;
-    }
-    if (editing && editing.auditObjectCategoryId === selectedCategoryId) {
-      setLinesLoading(true);
-      riskAssessmentOtherApi
-        .lines(editing.id)
-        .then((lines) =>
-          setLineRows(
-            lines.map((l) => ({
-              lineId: l.id,
-              criteriaOtherId: l.criteriaOtherId,
-              criteriaOtherCode: l.criteriaOtherCode,
-              criteriaOtherName: l.criteriaOtherName ?? "",
-              scaleId: l.scaleId,
-            })),
-          ),
-        )
-        .catch(() => message.error(t("riskScoringExec.messages.loadError")))
-        .finally(() => setLinesLoading(false));
-      return;
-    }
-    setLineRows(
-      criteriaList
-        .filter((c) => c.auditObjectCategoryId === selectedCategoryId)
-        .map((c) => ({ lineId: null, criteriaOtherId: c.id, criteriaOtherCode: c.code, criteriaOtherName: c.name, scaleId: null })),
-    );
-  }, [modalOpen, selectedCategoryId, editing, criteriaList, message, t]);
-
   const openCreate = () => {
     setEditing(null);
     form.resetFields();
@@ -171,13 +148,11 @@ export function RiskAssessmentOtherTable() {
       auditObjectCategoryId: target.auditObjectCategoryId,
       auditObjectCode: target.auditObjectCode,
       year: target.year,
+      criteriaOtherId: target.criteriaOtherId,
+      scaleId: target.scaleId,
       active: target.active,
     });
     setModalOpen(true);
-  };
-
-  const handleScoreChange = (criteriaOtherId: string, scaleId: string | null) => {
-    setLineRows((prev) => prev.map((row) => (row.criteriaOtherId === criteriaOtherId ? { ...row, scaleId } : row)));
   };
 
   const handleSubmit = async () => {
@@ -189,23 +164,26 @@ export function RiskAssessmentOtherTable() {
     }
     setSubmitting(true);
     try {
-      const request: RiskAssessmentOtherHeaderRequest = {
+      const headerRequest: RiskAssessmentOtherHeaderRequest = {
         auditObjectCategoryId: values.auditObjectCategoryId,
         auditObjectCode: values.auditObjectCode,
         year: values.year,
         active: values.active,
       };
-      const header = editing ? await riskAssessmentOtherApi.update(editing.id, request) : await riskAssessmentOtherApi.create(request);
-
-      // He thong tu sinh du dong chi tieu ngay khi tao/cap nhat header (xem ensureLines o backend) -
-      // doi chieu lai voi diem NSD da chon o bang preview de cap nhat dung dong tuong ung.
-      const realLines = await riskAssessmentOtherApi.lines(header.id);
-      const scoreByCriteria = new Map(lineRows.map((row) => [row.criteriaOtherId, row.scaleId]));
-      await Promise.all(
-        realLines
-          .filter((line) => scoreByCriteria.get(line.criteriaOtherId) !== undefined && scoreByCriteria.get(line.criteriaOtherId) !== line.scaleId)
-          .map((line) => riskAssessmentOtherApi.updateLine(header.id, line.id, { scaleId: scoreByCriteria.get(line.criteriaOtherId) ?? null })),
+      // 1 ky (header) co the co nhieu dong (1 dong/1 chi tieu) - neu ky nay da ton tai (do dong khac
+      // cung ky da tao truoc do) thi tai su dung, khong tao moi (se bi loi trung).
+      const existingHeader = headers.find(
+        (h) => h.auditObjectCategoryId === values.auditObjectCategoryId && h.auditObjectCode === values.auditObjectCode && h.year === values.year,
       );
+      const header = existingHeader
+        ? await riskAssessmentOtherApi.update(existingHeader.id, headerRequest)
+        : await riskAssessmentOtherApi.create(headerRequest);
+
+      const lines = await riskAssessmentOtherApi.lines(header.id);
+      const targetLine = lines.find((l) => l.criteriaOtherId === values.criteriaOtherId);
+      if (targetLine) {
+        await riskAssessmentOtherApi.updateLine(header.id, targetLine.id, { scaleId: values.scaleId ?? null });
+      }
 
       message.success(t(editing ? "riskScoringExec.messages.updateSuccess" : "riskScoringExec.messages.createSuccess"));
       setModalOpen(false);
@@ -218,6 +196,8 @@ export function RiskAssessmentOtherTable() {
     }
   };
 
+  // Dong (line) luon ton tai san cho moi chi tieu phu hop (ensureLines o backend tu sinh) - "Xoa" o
+  // day nghia la bo diem da cham ve chua cham, khong xoa han dong khoi danh sach.
   const handleDelete = () => {
     if (selected.length === 0) return;
     modal.confirm({
@@ -227,7 +207,7 @@ export function RiskAssessmentOtherTable() {
       okButtonProps: { danger: true },
       onOk: async () => {
         try {
-          await Promise.all(selected.map((item) => riskAssessmentOtherApi.remove(item.id)));
+          await Promise.all(selected.map((row) => riskAssessmentOtherApi.updateLine(row.headerId, row.lineId, { scaleId: null })));
           message.success(t("riskScoringExec.messages.deleteSuccess"));
           setSelected([]);
           await load();
@@ -238,20 +218,43 @@ export function RiskAssessmentOtherTable() {
     });
   };
 
-  const columns: TableProps<RiskAssessmentOtherHeaderItem>["columns"] = [
+  const columns: TableProps<RiskAssessmentOtherRowItem>["columns"] = [
     {
       title: t("riskScoring.columns.auditObjectCategory"),
-      width: 160,
+      width: 150,
       ...getSearchColumnProps("auditObjectCategoryCode", searchLabels),
       render: (v: string | null) => v ?? "-",
     },
-    { title: t("riskScoringExec.assessmentOther.auditObjectCode"), dataIndex: "auditObjectCode", width: 140, ...getSearchColumnProps("auditObjectCode", searchLabels) },
+    {
+      title: t("riskScoringExec.assessmentOther.auditObjectCode"),
+      dataIndex: "auditObjectCode",
+      width: 130,
+      ...getSearchColumnProps("auditObjectCode", searchLabels),
+    },
     {
       title: t("riskScoringExec.assessmentOther.auditObjectName"),
       ...getSearchColumnProps("auditObjectName", searchLabels),
       render: (v: string | null) => v ?? "-",
     },
-    { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 100, sorter: (a, b) => a.year - b.year },
+    { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 90, sorter: (a, b) => a.year - b.year },
+    {
+      title: t("riskScoringExec.columns.criteriaCode"),
+      dataIndex: "criteriaOtherCode",
+      width: 110,
+      ...getSearchColumnProps("criteriaOtherCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoringExec.columns.criteriaName"),
+      dataIndex: "criteriaOtherName",
+      ...getSearchColumnProps("criteriaOtherName", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoringExec.columns.scaleScore"),
+      width: 140,
+      render: (_, record) => (record.scaleScore != null ? `${record.scaleScore} - ${record.ratingLevel}` : "-"),
+    },
     {
       title: t("common.active"),
       dataIndex: "active",
@@ -267,18 +270,18 @@ export function RiskAssessmentOtherTable() {
 
   return (
     <div>
-      <CrudTable<RiskAssessmentOtherHeaderItem>
+      <CrudTable<RiskAssessmentOtherRowItem>
         tableId="riskScoringExec.assessmentOther"
         columns={columns}
-        dataSource={items}
-        rowKey="id"
+        dataSource={rows}
+        rowKey="lineId"
         loading={loading}
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length === 0}
-        onSelectionChange={(_keys, rows) => setSelected(rows)}
+        onSelectionChange={(_keys, selectedRows) => setSelected(selectedRows)}
         onExportExcel={canExport ? () => riskAssessmentOtherApi.exportFile("excel") : undefined}
         onExportWord={canExport ? () => riskAssessmentOtherApi.exportFile("word") : undefined}
         onImport={
@@ -298,20 +301,16 @@ export function RiskAssessmentOtherTable() {
         onCancel={() => setModalOpen(false)}
         onOk={handleSubmit}
         confirmLoading={submitting}
-        width={760}
         destroyOnClose
       >
-        <Form<FormValues>
-          form={form}
-          layout="vertical"
-          onValuesChange={(changed) => {
-            if (changed.auditObjectCategoryId) {
-              form.setFieldValue("auditObjectCode", undefined);
-            }
-          }}
-        >
+        <Form<FormValues> form={form} layout="vertical">
           <Form.Item name="auditObjectCategoryId" label={t("riskScoring.columns.auditObjectCategory")} rules={[{ required: true }]}>
-            <Select options={categoryOptions} showSearch optionFilterProp="label" />
+            <Select
+              options={categoryOptions}
+              showSearch
+              optionFilterProp="label"
+              onChange={() => form.setFieldsValue({ auditObjectCode: undefined, criteriaOtherId: undefined, scaleId: undefined })}
+            />
           </Form.Item>
           <Form.Item name="auditObjectCode" label={t("riskScoringExec.assessmentOther.auditObjectCode")} rules={[{ required: true }]}>
             <Select options={objectCodeOptions} loading={objectCodeLoading} showSearch optionFilterProp="label" disabled={!selectedCategoryId} />
@@ -319,48 +318,33 @@ export function RiskAssessmentOtherTable() {
           <Form.Item name="year" label={t("riskScoringExec.assessmentOther.year")} rules={[{ required: true }]}>
             <Select options={yearOptions} showSearch optionFilterProp="label" />
           </Form.Item>
+          <Form.Item name="criteriaOtherId" label={t("riskScoringExec.columns.criteriaCode")} rules={[{ required: true }]}>
+            <Select
+              options={criteriaOptions}
+              showSearch
+              optionFilterProp="label"
+              disabled={!selectedCategoryId}
+              placeholder={selectedCategoryId ? undefined : t("riskScoringExec.assessmentOther.selectCategoryFirst")}
+              onChange={() => form.setFieldValue("scaleId", undefined)}
+            />
+          </Form.Item>
+          <Form.Item label={t("riskScoringExec.columns.criteriaName")}>
+            <Input value={selectedCriteriaName} disabled />
+          </Form.Item>
+          <Form.Item name="scaleId" label={t("riskScoringExec.columns.scaleScore")}>
+            <Select
+              options={scaleOptions}
+              allowClear
+              showSearch
+              optionFilterProp="label"
+              disabled={!selectedCriteriaId}
+              placeholder={t("riskScoringExec.assessmentOther.selectScore")}
+            />
+          </Form.Item>
           <Form.Item name="active" label={t("common.active")} valuePropName="checked">
             <Switch />
           </Form.Item>
         </Form>
-
-        <Typography.Title level={5} style={{ marginTop: 8 }}>
-          {t("riskScoringExec.assessmentOther.scoreLines")}
-        </Typography.Title>
-        {selectedCategoryId ? (
-          <Table<LineRow>
-            rowKey="criteriaOtherId"
-            size="small"
-            loading={linesLoading}
-            dataSource={lineRows}
-            pagination={false}
-            columns={[
-              { title: t("riskScoringExec.columns.criteriaCode"), dataIndex: "criteriaOtherCode", width: 100, render: (v: string | null) => v ?? "-" },
-              { title: t("riskScoringExec.columns.criteriaName"), dataIndex: "criteriaOtherName" },
-              {
-                title: t("riskScoringExec.columns.scaleScore"),
-                width: 240,
-                render: (_: unknown, row: LineRow) => {
-                  const options = scaleList
-                    .filter((s) => s.criteriaOtherId === row.criteriaOtherId)
-                    .map((s) => ({ value: s.id, label: `${s.scaleScore} - ${s.ratingLevel}` }));
-                  return (
-                    <Select
-                      style={{ width: "100%" }}
-                      allowClear
-                      placeholder={t("riskScoringExec.assessmentOther.selectScore")}
-                      value={row.scaleId ?? undefined}
-                      options={options}
-                      onChange={(value) => handleScoreChange(row.criteriaOtherId, value ?? null)}
-                    />
-                  );
-                },
-              },
-            ]}
-          />
-        ) : (
-          <Typography.Text type="secondary">{t("riskScoringExec.assessmentOther.selectCategoryFirst")}</Typography.Text>
-        )}
       </Modal>
     </div>
   );

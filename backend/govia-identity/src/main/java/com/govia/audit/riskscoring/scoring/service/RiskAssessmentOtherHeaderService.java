@@ -5,6 +5,8 @@ import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepo
 import com.govia.audit.riskscoring.masterdata.service.AuditObjectResolverService;
 import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherHeaderRequest;
 import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherHeaderResponse;
+import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherLineResponse;
+import com.govia.audit.riskscoring.scoring.dto.RiskAssessmentOtherRowResponse;
 import com.govia.audit.riskscoring.scoring.entity.RiskAssessmentOtherHeader;
 import com.govia.audit.riskscoring.scoring.repository.RiskAssessmentOtherHeaderRepository;
 import com.govia.core.audit.AuditAction;
@@ -71,6 +73,31 @@ public class RiskAssessmentOtherHeaderService {
         return repository.findByTenantIdOrderByYearDescAuditObjectCodeAsc(tenantId).stream()
                 .map(item -> toResponse(item, categories))
                 .toList();
+    }
+
+    /**
+     * Ban "phang" cua list() - 1 dong tra ve ung voi 1 chi tieu (line) cua 1 header, dung dinh dang
+     * voi Excel export/import de man hinh danh sach hien 1 dong/1 chi tieu thay vi 1 dong/1 header
+     * (moi header co the co nhieu chi tieu can cham diem rieng).
+     */
+    @Transactional(readOnly = true)
+    public List<RiskAssessmentOtherRowResponse> listRows() {
+        UUID tenantId = TenantContext.getTenantId();
+        Map<UUID, AuditObjectCategory> categories = categoriesById(tenantId);
+        List<RiskAssessmentOtherRowResponse> rows = new ArrayList<>();
+        for (RiskAssessmentOtherHeader header : repository.findByTenantIdOrderByYearDescAuditObjectCodeAsc(tenantId)) {
+            AuditObjectCategory category = categories.get(header.getAuditObjectCategoryId());
+            String auditObjectName = category != null ? objectResolver.resolveName(tenantId, category, header.getAuditObjectCode()) : null;
+            for (RiskAssessmentOtherLineResponse line : lineService.listByHeaderReadOnly(header)) {
+                rows.add(new RiskAssessmentOtherRowResponse(
+                        header.getId(), header.getAuditObjectCategoryId(), category != null ? category.getCode() : null,
+                        category != null ? category.getName() : null, header.getAuditObjectCode(), auditObjectName,
+                        header.getYear(), header.isActive(),
+                        line.id(), line.criteriaOtherId(), line.criteriaOtherCode(), line.criteriaOtherName(),
+                        line.scaleId(), line.scaleScore(), line.ratingLevel()));
+            }
+        }
+        return rows;
     }
 
     @Transactional
