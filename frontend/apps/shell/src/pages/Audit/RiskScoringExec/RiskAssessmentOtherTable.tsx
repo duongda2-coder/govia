@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { App, Button, Form, Modal, Select, Switch } from "antd";
+import { App, Form, Modal, Select, Switch, Table, Typography } from "antd";
 import type { TableProps } from "antd";
-import { FormOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
 import {
   riskAssessmentOtherApi,
+  riskCriteriaOtherApi,
+  riskCriteriaOtherScaleApi,
   type RiskAssessmentOtherHeaderItem,
   type RiskAssessmentOtherHeaderRequest,
+  type RiskCriteriaOtherItem,
+  type RiskCriteriaOtherScaleItem,
 } from "../../../api/riskScoringExec";
 import {
   auditObjectCategoryApi,
@@ -20,13 +23,20 @@ import {
 } from "../../../api/riskScoring";
 import { listMasterDataItems, type MasterDataItem } from "../../../api/auditMasterData";
 import { useAuth } from "../../../auth/AuthContext";
-import { RiskAssessmentOtherLineDrawer } from "./RiskAssessmentOtherLineDrawer";
 
 interface FormValues {
   auditObjectCategoryId: string;
   auditObjectCode: string;
   year: number;
   active: boolean;
+}
+
+interface LineRow {
+  lineId: string | null;
+  criteriaOtherId: string;
+  criteriaOtherCode: string | null;
+  criteriaOtherName: string;
+  scaleId: string | null;
 }
 
 /** Man hinh "Cham diem rui ro HO, CNTT, Du an, Dich vu thue ngoai..." (sheet ZTC_CDRR_KHAC) - header. */
@@ -46,6 +56,8 @@ export function RiskAssessmentOtherTable() {
   const [items, setItems] = useState<RiskAssessmentOtherHeaderItem[]>([]);
   const [categories, setCategories] = useState<AuditObjectCategoryItem[]>([]);
   const [years, setYears] = useState<MasterDataItem[]>([]);
+  const [criteriaList, setCriteriaList] = useState<RiskCriteriaOtherItem[]>([]);
+  const [scaleList, setScaleList] = useState<RiskCriteriaOtherScaleItem[]>([]);
   const [objectCodeOptions, setObjectCodeOptions] = useState<{ value: string; label: string }[]>([]);
   const [objectCodeLoading, setObjectCodeLoading] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -53,7 +65,8 @@ export function RiskAssessmentOtherTable() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<RiskAssessmentOtherHeaderItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [scoringTarget, setScoringTarget] = useState<RiskAssessmentOtherHeaderItem | null>(null);
+  const [lineRows, setLineRows] = useState<LineRow[]>([]);
+  const [linesLoading, setLinesLoading] = useState(false);
   const [form] = Form.useForm<FormValues>();
   const selectedCategoryId = Form.useWatch("auditObjectCategoryId", form);
 
@@ -63,14 +76,18 @@ export function RiskAssessmentOtherTable() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [list, categoryList, yearList] = await Promise.all([
+      const [list, categoryList, yearList, criteria, scales] = await Promise.all([
         riskAssessmentOtherApi.list(),
         auditObjectCategoryApi.list(),
         listMasterDataItems("YEAR"),
+        riskCriteriaOtherApi.list(),
+        riskCriteriaOtherScaleApi.list(),
       ]);
       setItems(list);
       setCategories(categoryList);
       setYears(yearList);
+      setCriteriaList(criteria);
+      setScaleList(scales);
     } catch {
       message.error(t("riskScoringExec.messages.loadError"));
     } finally {
@@ -105,6 +122,40 @@ export function RiskAssessmentOtherTable() {
       .finally(() => setObjectCodeLoading(false));
   }, [selectedCategoryId, categories]);
 
+  // Bang "Cham diem chi tieu" ben trong modal: neu dang sua va category chua doi, dung dung cac
+  // dong da co san (kem diem da cham) - nguoc lai (them moi, hoac doi sang category khac) chi hien
+  // truoc danh sach chi tieu phu hop de NSD cham diem ngay, dong that se duoc tao khi bam Luu.
+  useEffect(() => {
+    if (!modalOpen || !selectedCategoryId) {
+      setLineRows([]);
+      return;
+    }
+    if (editing && editing.auditObjectCategoryId === selectedCategoryId) {
+      setLinesLoading(true);
+      riskAssessmentOtherApi
+        .lines(editing.id)
+        .then((lines) =>
+          setLineRows(
+            lines.map((l) => ({
+              lineId: l.id,
+              criteriaOtherId: l.criteriaOtherId,
+              criteriaOtherCode: l.criteriaOtherCode,
+              criteriaOtherName: l.criteriaOtherName ?? "",
+              scaleId: l.scaleId,
+            })),
+          ),
+        )
+        .catch(() => message.error(t("riskScoringExec.messages.loadError")))
+        .finally(() => setLinesLoading(false));
+      return;
+    }
+    setLineRows(
+      criteriaList
+        .filter((c) => c.auditObjectCategoryId === selectedCategoryId)
+        .map((c) => ({ lineId: null, criteriaOtherId: c.id, criteriaOtherCode: c.code, criteriaOtherName: c.name, scaleId: null })),
+    );
+  }, [modalOpen, selectedCategoryId, editing, criteriaList, message, t]);
+
   const openCreate = () => {
     setEditing(null);
     form.resetFields();
@@ -125,6 +176,10 @@ export function RiskAssessmentOtherTable() {
     setModalOpen(true);
   };
 
+  const handleScoreChange = (criteriaOtherId: string, scaleId: string | null) => {
+    setLineRows((prev) => prev.map((row) => (row.criteriaOtherId === criteriaOtherId ? { ...row, scaleId } : row)));
+  };
+
   const handleSubmit = async () => {
     let values: FormValues;
     try {
@@ -140,13 +195,19 @@ export function RiskAssessmentOtherTable() {
         year: values.year,
         active: values.active,
       };
-      if (editing) {
-        await riskAssessmentOtherApi.update(editing.id, request);
-        message.success(t("riskScoringExec.messages.updateSuccess"));
-      } else {
-        await riskAssessmentOtherApi.create(request);
-        message.success(t("riskScoringExec.messages.createSuccess"));
-      }
+      const header = editing ? await riskAssessmentOtherApi.update(editing.id, request) : await riskAssessmentOtherApi.create(request);
+
+      // He thong tu sinh du dong chi tieu ngay khi tao/cap nhat header (xem ensureLines o backend) -
+      // doi chieu lai voi diem NSD da chon o bang preview de cap nhat dung dong tuong ung.
+      const realLines = await riskAssessmentOtherApi.lines(header.id);
+      const scoreByCriteria = new Map(lineRows.map((row) => [row.criteriaOtherId, row.scaleId]));
+      await Promise.all(
+        realLines
+          .filter((line) => scoreByCriteria.get(line.criteriaOtherId) !== undefined && scoreByCriteria.get(line.criteriaOtherId) !== line.scaleId)
+          .map((line) => riskAssessmentOtherApi.updateLine(header.id, line.id, { scaleId: scoreByCriteria.get(line.criteriaOtherId) ?? null })),
+      );
+
+      message.success(t(editing ? "riskScoringExec.messages.updateSuccess" : "riskScoringExec.messages.createSuccess"));
       setModalOpen(false);
       setSelected([]);
       await load();
@@ -198,15 +259,6 @@ export function RiskAssessmentOtherTable() {
       sorter: (a, b) => Number(a.active) - Number(b.active),
       render: (v: boolean) => (v ? t("common.active") : t("common.inactive")),
     },
-    {
-      title: t("riskScoringExec.assessmentOther.scoreLines"),
-      key: "score",
-      width: 130,
-      align: "center",
-      render: (_, record) => (
-        <Button type="text" size="small" icon={<FormOutlined style={{ fontSize: 16 }} />} onClick={() => setScoringTarget(record)} />
-      ),
-    },
   ];
 
   if (!canView) {
@@ -246,6 +298,7 @@ export function RiskAssessmentOtherTable() {
         onCancel={() => setModalOpen(false)}
         onOk={handleSubmit}
         confirmLoading={submitting}
+        width={760}
         destroyOnClose
       >
         <Form<FormValues>
@@ -270,9 +323,45 @@ export function RiskAssessmentOtherTable() {
             <Switch />
           </Form.Item>
         </Form>
-      </Modal>
 
-      <RiskAssessmentOtherLineDrawer open={!!scoringTarget} header={scoringTarget} onClose={() => setScoringTarget(null)} />
+        <Typography.Title level={5} style={{ marginTop: 8 }}>
+          {t("riskScoringExec.assessmentOther.scoreLines")}
+        </Typography.Title>
+        {selectedCategoryId ? (
+          <Table<LineRow>
+            rowKey="criteriaOtherId"
+            size="small"
+            loading={linesLoading}
+            dataSource={lineRows}
+            pagination={false}
+            columns={[
+              { title: t("riskScoringExec.columns.criteriaCode"), dataIndex: "criteriaOtherCode", width: 100, render: (v: string | null) => v ?? "-" },
+              { title: t("riskScoringExec.columns.criteriaName"), dataIndex: "criteriaOtherName" },
+              {
+                title: t("riskScoringExec.columns.scaleScore"),
+                width: 240,
+                render: (_: unknown, row: LineRow) => {
+                  const options = scaleList
+                    .filter((s) => s.criteriaOtherId === row.criteriaOtherId)
+                    .map((s) => ({ value: s.id, label: `${s.scaleScore} - ${s.ratingLevel}` }));
+                  return (
+                    <Select
+                      style={{ width: "100%" }}
+                      allowClear
+                      placeholder={t("riskScoringExec.assessmentOther.selectScore")}
+                      value={row.scaleId ?? undefined}
+                      options={options}
+                      onChange={(value) => handleScoreChange(row.criteriaOtherId, value ?? null)}
+                    />
+                  );
+                },
+              },
+            ]}
+          />
+        ) : (
+          <Typography.Text type="secondary">{t("riskScoringExec.assessmentOther.selectCategoryFirst")}</Typography.Text>
+        )}
+      </Modal>
     </div>
   );
 }

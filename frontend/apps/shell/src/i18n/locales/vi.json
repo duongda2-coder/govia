@@ -785,7 +785,8 @@
       "auditObjectName": "Tên đối tượng KT",
       "year": "Năm",
       "scoreLines": "Chấm điểm",
-      "selectScore": "Chọn điểm"
+      "selectScore": "Chọn điểm",
+      "selectCategoryFirst": "Chọn Loại đối tượng KT để hiện danh sách chỉ tiêu cần chấm điểm"
     },
     "ranking": {
       "riskScore": "Điểm rủi ro",

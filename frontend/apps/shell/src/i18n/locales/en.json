@@ -785,7 +785,8 @@
       "auditObjectName": "Audit Object Name",
       "year": "Year",
       "scoreLines": "Score",
-      "selectScore": "Select score"
+      "selectScore": "Select score",
+      "selectCategoryFirst": "Select an Audit Object Category to show the criteria to score"
     },
     "ranking": {
       "riskScore": "Risk Score",
