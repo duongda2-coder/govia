@@ -85,8 +85,8 @@ export function RiskCriteriaOtherTable() {
       code: target.code,
       name: target.name,
       weight: target.weight ?? undefined,
-      groupHoId: target.groupHoId,
-      riskTypeHoId: target.riskTypeHoId,
+      groupHoId: target.groupHoId ?? undefined,
+      riskTypeHoId: target.riskTypeHoId ?? undefined,
       active: target.active,
     });
     setModalOpen(true);
@@ -101,8 +101,8 @@ export function RiskCriteriaOtherTable() {
       code: "",
       name: target.name,
       weight: target.weight ?? undefined,
-      groupHoId: target.groupHoId,
-      riskTypeHoId: target.riskTypeHoId,
+      groupHoId: target.groupHoId ?? undefined,
+      riskTypeHoId: target.riskTypeHoId ?? undefined,
       active: target.active,
     });
     setModalOpen(true);
