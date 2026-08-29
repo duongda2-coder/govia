@@ -149,7 +149,12 @@ export function RiskTypeHOTable() {
   };
 
   const columns: TableProps<RiskTypeHOItem>["columns"] = [
-    { title: t("riskScoringExec.columns.groupHo"), dataIndex: "groupHoCode", width: 160, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoringExec.columns.groupHo"),
+      width: 160,
+      ...getSearchColumnProps("groupHoCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoringExec.columns.riskTypeCode"), dataIndex: "code", width: 120, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoringExec.columns.riskTypeName"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("riskScoring.columns.weight"), dataIndex: "weight", width: 100, render: (v: number | null) => v ?? "-" },

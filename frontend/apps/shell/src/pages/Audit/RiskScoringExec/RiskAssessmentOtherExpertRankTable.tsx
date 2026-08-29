@@ -3,7 +3,7 @@ import { App, Button, DatePicker, Form, Input, Modal, Select, Space, Typography 
 import { SyncOutlined, ReloadOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
-import { CrudTable, type CrudColumn } from "@govia/ui-kit";
+import { CrudTable, useClientSearchColumn, type CrudColumn } from "@govia/ui-kit";
 import {
   riskAssessmentOtherExpertRankApi,
   type RiskAssessmentOtherExpertRankItem,
@@ -35,6 +35,8 @@ export function RiskAssessmentOtherExpertRankTable() {
   const canView = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
   const canSync = hasPermission("AUDIT.RISK_SCORING_EXEC.CREATE");
   const canEdit = hasPermission("AUDIT.RISK_SCORING_EXEC.EDIT");
+  const { getSearchColumnProps } = useClientSearchColumn<RiskAssessmentOtherExpertRankItem>();
+  const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
   const [years, setYears] = useState<MasterDataItem[]>([]);
   const [year, setYear] = useState<number | undefined>(undefined);
@@ -138,17 +140,52 @@ export function RiskAssessmentOtherExpertRankTable() {
   };
 
   const columns: CrudColumn<RiskAssessmentOtherExpertRankItem>[] = [
-    { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 90 },
-    { title: t("riskScoring.columns.auditObjectCategory"), dataIndex: "auditObjectCategoryCode", width: 120, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoringExec.assessmentOther.auditObjectCode"), dataIndex: "auditObjectCode", width: 130 },
-    { title: t("riskScoringExec.assessmentOther.auditObjectName"), dataIndex: "auditObjectName", render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoringExec.ranking.riskScore"), dataIndex: "riskScore", width: 110, render: (v: number | null) => v ?? "-" },
-    { title: t("riskScoringExec.ranking.rankLabel"), dataIndex: "baseRankLabel", width: 110, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoringExec.expertRank.reRankLabel"), dataIndex: "reRankLabel", width: 140, render: (v: string | null) => v ?? "-" },
+    { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 90, sorter: (a, b) => a.year - b.year },
+    {
+      title: t("riskScoring.columns.auditObjectCategory"),
+      width: 120,
+      ...getSearchColumnProps("auditObjectCategoryCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    { title: t("riskScoringExec.assessmentOther.auditObjectCode"), width: 130, ...getSearchColumnProps("auditObjectCode", searchLabels) },
+    {
+      title: t("riskScoringExec.assessmentOther.auditObjectName"),
+      ...getSearchColumnProps("auditObjectName", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoringExec.ranking.riskScore"),
+      dataIndex: "riskScore",
+      width: 110,
+      sorter: (a, b) => (a.riskScore ?? 0) - (b.riskScore ?? 0),
+      render: (v: number | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoringExec.ranking.rankLabel"),
+      width: 110,
+      ...getSearchColumnProps("baseRankLabel", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoringExec.expertRank.reRankLabel"),
+      width: 140,
+      ...getSearchColumnProps("reRankLabel", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoringExec.expertRank.reason"), dataIndex: "reason", render: (v: string | null) => v ?? "-" },
     { title: t("riskScoringExec.expertRank.assessedDate"), dataIndex: "assessedDate", width: 130, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoringExec.expertRank.expertName"), dataIndex: "expertName", width: 160, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoringExec.expertRank.finalRankLabel"), dataIndex: "finalRankLabel", width: 140, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoringExec.expertRank.expertName"),
+      width: 160,
+      ...getSearchColumnProps("expertName", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoringExec.expertRank.finalRankLabel"),
+      width: 140,
+      ...getSearchColumnProps("finalRankLabel", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoringExec.expertRank.updatedBy"), dataIndex: "updatedBy", width: 130, defaultHidden: true, render: (v: string | null) => v ?? "-" },
   ];
 

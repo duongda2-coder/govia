@@ -182,8 +182,8 @@ export function ControlPointPage() {
     { title: t("auditControlPoint.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     {
       title: t("auditControlPoint.columns.businessSegment"),
-      dataIndex: "businessSegmentName",
       width: 160,
+      ...getSearchColumnProps("businessSegmentName", searchLabels),
       render: (v: string | null) => v ?? "-",
     },
     { title: t("auditControlPoint.columns.possibleRisk"), dataIndex: "possibleRisk", render: (v: string | null) => v ?? "-" },

@@ -215,7 +215,12 @@ export function DocumentLibraryPage() {
     },
     { title: t("documentLibrary.columns.issueDate"), dataIndex: "issueDate", width: 120, render: (v: string | null) => v ?? "-" },
     { title: t("documentLibrary.columns.effectiveDate"), dataIndex: "effectiveDate", width: 120, render: (v: string | null) => v ?? "-" },
-    { title: t("documentLibrary.columns.issuerPosition"), dataIndex: "issuerPositionName", width: 160, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("documentLibrary.columns.issuerPosition"),
+      width: 160,
+      ...getSearchColumnProps("issuerPositionName", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("documentLibrary.columns.businessActivity"), dataIndex: "businessActivity", render: (v: string | null) => v ?? "-" },
     { title: t("documentLibrary.columns.topic"), dataIndex: "topic", render: (v: string | null) => v ?? "-" },
     {

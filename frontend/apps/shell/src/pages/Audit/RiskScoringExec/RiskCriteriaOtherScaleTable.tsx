@@ -160,9 +160,18 @@ export function RiskCriteriaOtherScaleTable() {
     .map((c) => ({ value: c.id, label: `${c.code} - ${c.name}` }));
 
   const columns: TableProps<RiskCriteriaOtherScaleItem>["columns"] = [
-    { title: t("riskScoring.columns.auditObjectCategory"), dataIndex: "auditObjectCategoryCode", width: 160, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.auditObjectCategory"),
+      width: 160,
+      ...getSearchColumnProps("auditObjectCategoryCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoringExec.columns.criteriaCode"), dataIndex: "criteriaOtherCode", width: 120, ...getSearchColumnProps("criteriaOtherCode", searchLabels) },
-    { title: t("riskScoringExec.columns.criteriaName"), dataIndex: "criteriaOtherName", render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoringExec.columns.criteriaName"),
+      ...getSearchColumnProps("criteriaOtherName", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoringExec.columns.scaleScore"), dataIndex: "scaleScore", width: 110, sorter: (a, b) => a.scaleScore - b.scaleScore },
     { title: t("riskScoringExec.columns.ratingLevel"), dataIndex: "ratingLevel", width: 160, ...getSearchColumnProps("ratingLevel", searchLabels) },
     { title: t("riskScoringExec.columns.description"), dataIndex: "description", render: (v: string | null) => v ?? "-" },

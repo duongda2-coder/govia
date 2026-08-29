@@ -212,8 +212,8 @@ export function AuditObjectUnitTable() {
     },
     {
       title: t("riskScoring.columns.auditObjectCategory"),
-      dataIndex: "auditObjectCategoryCode",
       width: 150,
+      ...getSearchColumnProps("auditObjectCategoryCode", searchLabels),
       render: (v: string | null) => v ?? "-",
     },
     { title: t("riskScoring.columns.totalStaff"), dataIndex: "totalStaff", width: 100, render: (v: number | null) => v ?? "-" },
@@ -222,8 +222,8 @@ export function AuditObjectUnitTable() {
     { title: t("riskScoring.columns.rankValue"), dataIndex: "rankValue", width: 100, render: (v: number | null) => v ?? "-" },
     {
       title: t("riskScoring.columns.defenseLineGroup"),
-      dataIndex: "defenseLineGroupCode",
       width: 130,
+      ...getSearchColumnProps("defenseLineGroupCode", searchLabels),
       render: (v: string | null) => v ?? "-",
     },
     {

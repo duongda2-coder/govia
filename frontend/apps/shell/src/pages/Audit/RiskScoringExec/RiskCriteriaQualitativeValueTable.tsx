@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { App, Select, Space, Typography } from "antd";
 import { useTranslation } from "react-i18next";
-import { CrudTable, type CrudColumn } from "@govia/ui-kit";
+import { CrudTable, useClientSearchColumn, type CrudColumn } from "@govia/ui-kit";
 import { riskCriteriaQualitativeValueApi, type RiskCriteriaQualitativeValueItem } from "../../../api/riskScoringExec";
 import { listMasterDataItems, type MasterDataItem } from "../../../api/auditMasterData";
 import { useAuth } from "../../../auth/AuthContext";
@@ -16,6 +16,8 @@ export function RiskCriteriaQualitativeValueTable() {
   const { hasPermission } = useAuth();
   const canView = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
   const canImport = hasPermission("AUDIT.RISK_SCORING_EXEC.IMPORT");
+  const { getSearchColumnProps } = useClientSearchColumn<RiskCriteriaQualitativeValueItem>();
+  const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
   const [years, setYears] = useState<MasterDataItem[]>([]);
   const [year, setYear] = useState<number | undefined>(undefined);
@@ -50,12 +52,30 @@ export function RiskCriteriaQualitativeValueTable() {
   }, [canView, year, load]);
 
   const columns: CrudColumn<RiskCriteriaQualitativeValueItem>[] = [
-    { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 90 },
-    { title: t("riskScoringExec.hsrr.branchCode"), dataIndex: "branchCode", width: 110 },
-    { title: t("riskScoringExec.hsrr.branchName"), dataIndex: "branchName", render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoringExec.columns.criteriaCode"), dataIndex: "criteriaCode", width: 110, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoringExec.columns.criteriaName"), dataIndex: "criteriaName", render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoringExec.hsrr.violation"), dataIndex: "violation", width: 110, render: (v: string | null) => v ?? "-" },
+    { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 90, sorter: (a, b) => a.year - b.year },
+    { title: t("riskScoringExec.hsrr.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
+    {
+      title: t("riskScoringExec.hsrr.branchName"),
+      ...getSearchColumnProps("branchName", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoringExec.columns.criteriaCode"),
+      width: 110,
+      ...getSearchColumnProps("criteriaCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoringExec.columns.criteriaName"),
+      ...getSearchColumnProps("criteriaName", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoringExec.hsrr.violation"),
+      width: 110,
+      ...getSearchColumnProps("violation", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoringExec.hsrr.note"), dataIndex: "note", render: (v: string | null) => v ?? "-" },
   ];
 

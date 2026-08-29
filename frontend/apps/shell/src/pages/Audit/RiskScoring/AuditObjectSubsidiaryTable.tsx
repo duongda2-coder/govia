@@ -195,7 +195,12 @@ export function AuditObjectSubsidiaryTable() {
   const columns: TableProps<AuditObjectSubsidiaryItem>["columns"] = [
     { title: t("riskScoring.columns.code"), width: 100, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
-    { title: t("riskScoring.columns.companyType"), dataIndex: "companyType", width: 140, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.companyType"),
+      width: 140,
+      ...getSearchColumnProps("companyType", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoring.columns.staffCount"), dataIndex: "staffCount", width: 100, render: (v: number | null) => v ?? "-" },
     { title: t("riskScoring.columns.leaderCount"), dataIndex: "leaderCount", width: 100, render: (v: number | null) => v ?? "-" },
     { title: t("riskScoring.columns.inspectionYear"), dataIndex: "inspectionYear", width: 110, render: (v: number | null) => v ?? "-" },

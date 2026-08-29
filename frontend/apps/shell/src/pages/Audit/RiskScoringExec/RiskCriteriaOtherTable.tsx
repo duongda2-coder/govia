@@ -168,12 +168,27 @@ export function RiskCriteriaOtherTable() {
     .map((rt) => ({ value: rt.id, label: `${rt.code} - ${rt.name}` }));
 
   const columns: TableProps<RiskCriteriaOtherItem>["columns"] = [
-    { title: t("riskScoring.columns.auditObjectCategory"), dataIndex: "auditObjectCategoryCode", width: 160, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.auditObjectCategory"),
+      width: 160,
+      ...getSearchColumnProps("auditObjectCategoryCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoringExec.columns.criteriaCode"), dataIndex: "code", width: 120, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoringExec.columns.criteriaName"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("riskScoring.columns.weight"), dataIndex: "weight", width: 100, render: (v: number | null) => v ?? "-" },
-    { title: t("riskScoringExec.columns.groupHo"), dataIndex: "groupHoCode", width: 160, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoringExec.columns.riskType"), dataIndex: "riskTypeHoCode", width: 160, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoringExec.columns.groupHo"),
+      width: 160,
+      ...getSearchColumnProps("groupHoCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoringExec.columns.riskType"),
+      width: 160,
+      ...getSearchColumnProps("riskTypeHoCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     {
       title: t("common.active"),
       dataIndex: "active",

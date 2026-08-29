@@ -152,7 +152,12 @@ export function Group2Table() {
   };
 
   const columns: TableProps<Group2Item>["columns"] = [
-    { title: t("riskScoring.columns.group1"), dataIndex: "group1Code", width: 120, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.group1"),
+      width: 120,
+      ...getSearchColumnProps("group1Code", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoring.columns.code"), width: 120, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("riskScoring.columns.weight"), dataIndex: "weight", width: 100, render: (v: number | null) => v ?? "-" },

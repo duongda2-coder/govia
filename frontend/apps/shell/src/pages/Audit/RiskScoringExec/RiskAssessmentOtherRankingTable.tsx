@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { App, Select, Space, Typography } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
-import { CrudTable } from "@govia/ui-kit";
+import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
 import { riskAssessmentOtherRankingApi, type RiskAssessmentOtherRankingItem } from "../../../api/riskScoringExec";
 import { listMasterDataItems, type MasterDataItem } from "../../../api/auditMasterData";
 import { useAuth } from "../../../auth/AuthContext";
@@ -18,6 +18,8 @@ export function RiskAssessmentOtherRankingTable() {
   const { message } = App.useApp();
   const { hasPermission } = useAuth();
   const canView = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
+  const { getSearchColumnProps } = useClientSearchColumn<RiskAssessmentOtherRankingItem>();
+  const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
   const [years, setYears] = useState<MasterDataItem[]>([]);
   const [year, setYear] = useState<number | undefined>(undefined);
@@ -52,10 +54,19 @@ export function RiskAssessmentOtherRankingTable() {
   }, [canView, year, load]);
 
   const columns: TableProps<RiskAssessmentOtherRankingItem>["columns"] = [
-    { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 90 },
-    { title: t("riskScoring.columns.auditObjectCategory"), dataIndex: "auditObjectCategoryCode", width: 140, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoringExec.assessmentOther.auditObjectCode"), dataIndex: "auditObjectCode", width: 140 },
-    { title: t("riskScoringExec.assessmentOther.auditObjectName"), dataIndex: "auditObjectName", render: (v: string | null) => v ?? "-" },
+    { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 90, sorter: (a, b) => a.year - b.year },
+    {
+      title: t("riskScoring.columns.auditObjectCategory"),
+      width: 140,
+      ...getSearchColumnProps("auditObjectCategoryCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    { title: t("riskScoringExec.assessmentOther.auditObjectCode"), width: 140, ...getSearchColumnProps("auditObjectCode", searchLabels) },
+    {
+      title: t("riskScoringExec.assessmentOther.auditObjectName"),
+      ...getSearchColumnProps("auditObjectName", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     {
       title: t("riskScoringExec.ranking.riskScore"),
       dataIndex: "riskScore",
@@ -63,7 +74,12 @@ export function RiskAssessmentOtherRankingTable() {
       sorter: (a, b) => a.riskScore - b.riskScore,
       defaultSortOrder: "descend",
     },
-    { title: t("riskScoringExec.ranking.rankLabel"), dataIndex: "rankLabel", width: 140, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoringExec.ranking.rankLabel"),
+      width: 140,
+      ...getSearchColumnProps("rankLabel", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
   ];
 
   if (!canView) {

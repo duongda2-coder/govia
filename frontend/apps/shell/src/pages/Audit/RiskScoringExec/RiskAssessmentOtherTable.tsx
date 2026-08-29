@@ -178,9 +178,18 @@ export function RiskAssessmentOtherTable() {
   };
 
   const columns: TableProps<RiskAssessmentOtherHeaderItem>["columns"] = [
-    { title: t("riskScoring.columns.auditObjectCategory"), dataIndex: "auditObjectCategoryCode", width: 160, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.auditObjectCategory"),
+      width: 160,
+      ...getSearchColumnProps("auditObjectCategoryCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoringExec.assessmentOther.auditObjectCode"), dataIndex: "auditObjectCode", width: 140, ...getSearchColumnProps("auditObjectCode", searchLabels) },
-    { title: t("riskScoringExec.assessmentOther.auditObjectName"), dataIndex: "auditObjectName", render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoringExec.assessmentOther.auditObjectName"),
+      ...getSearchColumnProps("auditObjectName", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 100, sorter: (a, b) => a.year - b.year },
     {
       title: t("common.active"),

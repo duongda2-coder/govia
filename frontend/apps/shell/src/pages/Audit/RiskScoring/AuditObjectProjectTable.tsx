@@ -186,10 +186,25 @@ export function AuditObjectProjectTable() {
   const columns: TableProps<AuditObjectProjectItem>["columns"] = [
     { title: t("riskScoring.columns.code"), width: 100, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
-    { title: t("riskScoring.columns.projectType"), dataIndex: "projectType", width: 140, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoring.columns.approvalAuthority"), dataIndex: "approvalAuthority", width: 150, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.projectType"),
+      width: 140,
+      ...getSearchColumnProps("projectType", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoring.columns.approvalAuthority"),
+      width: 150,
+      ...getSearchColumnProps("approvalAuthority", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoring.columns.investmentValue"), dataIndex: "investmentValue", width: 140, render: (v: number | null) => v ?? "-" },
-    { title: t("riskScoring.columns.provider"), dataIndex: "provider", width: 160, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.provider"),
+      width: 160,
+      ...getSearchColumnProps("provider", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoring.columns.inspectionYear"), dataIndex: "inspectionYear", width: 110, render: (v: number | null) => v ?? "-" },
     { title: t("riskScoring.columns.auditYear"), dataIndex: "auditYear", width: 100, render: (v: number | null) => v ?? "-" },
     {

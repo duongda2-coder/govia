@@ -158,6 +158,7 @@ export function Group1Table() {
     {
       title: t("riskScoring.columns.auditObjectCategory"),
       width: 220,
+      ...getSearchColumnProps("auditObjectCategoryCode", searchLabels),
       render: (_: unknown, record: Group1Item) =>
         record.auditObjectCategoryCode ? `${record.auditObjectCategoryCode} - ${record.auditObjectCategoryName}` : "-",
     },

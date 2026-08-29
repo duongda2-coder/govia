@@ -150,9 +150,23 @@ export function UserAssignmentTable() {
 
   const columns: TableProps<UserAssignmentItem>["columns"] = [
     { title: t("riskScoring.columns.username"), width: 150, ...getSearchColumnProps("username", searchLabels) },
-    { title: t("riskScoring.columns.criteria"), dataIndex: "criteriaCode", width: 130, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoring.columns.branchCode"), dataIndex: "branchCode", width: 110, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoring.columns.classification"), dataIndex: "classification", render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.criteria"),
+      width: 130,
+      ...getSearchColumnProps("criteriaCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoring.columns.branchCode"),
+      width: 110,
+      ...getSearchColumnProps("branchCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoring.columns.classification"),
+      ...getSearchColumnProps("classification", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     {
       title: t("common.active"),
       dataIndex: "active",

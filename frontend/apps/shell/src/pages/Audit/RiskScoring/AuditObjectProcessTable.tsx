@@ -160,7 +160,12 @@ export function AuditObjectProcessTable() {
   };
 
   const columns: TableProps<AuditObjectProcessItem>["columns"] = [
-    { title: t("riskScoring.columns.segmentCodeProcess"), dataIndex: "segmentCode", width: 130, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.segmentCodeProcess"),
+      width: 130,
+      ...getSearchColumnProps("segmentCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoring.columns.code"), width: 110, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("riskScoring.columns.referenceDocument"), dataIndex: "referenceDocument", width: 180, render: (v: string | null) => v ?? "-" },

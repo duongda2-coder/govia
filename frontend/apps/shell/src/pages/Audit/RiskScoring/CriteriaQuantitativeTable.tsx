@@ -212,11 +212,22 @@ export function CriteriaQuantitativeTable() {
     {
       title: t("riskScoring.columns.auditObjectCategory"),
       width: 200,
+      ...getSearchColumnProps("auditObjectCategoryCode", searchLabels),
       render: (_: unknown, record: CriteriaQuantitativeItem) =>
         record.auditObjectCategoryCode ? `${record.auditObjectCategoryCode} - ${record.auditObjectCategoryName}` : "-",
     },
-    { title: t("riskScoring.columns.group1"), dataIndex: "group1Code", width: 100, render: (v: string | null) => v ?? "-" },
-    { title: t("riskScoring.columns.group2"), dataIndex: "group2Code", width: 100, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("riskScoring.columns.group1"),
+      width: 100,
+      ...getSearchColumnProps("group1Code", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("riskScoring.columns.group2"),
+      width: 100,
+      ...getSearchColumnProps("group2Code", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("riskScoring.columns.code"), width: 110, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     {
