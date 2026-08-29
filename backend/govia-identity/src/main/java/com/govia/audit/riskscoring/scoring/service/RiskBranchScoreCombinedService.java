@@ -15,6 +15,9 @@ import com.govia.audit.riskscoring.masterdata.repository.RiskWeightByBusinessRep
 import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreCombinedRowResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreQualitativeRowResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreQuantitativeRowResponse;
+import com.govia.core.export.ExcelExportService;
+import com.govia.core.export.ExportColumn;
+import com.govia.core.export.WordExportService;
 import com.govia.core.tenant.TenantContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,6 +60,8 @@ public class RiskBranchScoreCombinedService {
     private final RiskWeightByBusinessRepository weightByBusinessRepository;
     private final AuditObjectUnitRepository auditObjectUnitRepository;
     private final RiskScoreRankRepository rankRepository;
+    private final ExcelExportService excelExportService;
+    private final WordExportService wordExportService;
 
     public RiskBranchScoreCombinedService(RiskBranchScoreQuantitativeService quantitativeService,
                                            RiskBranchScoreQualitativeService qualitativeService,
@@ -65,7 +70,9 @@ public class RiskBranchScoreCombinedService {
                                            RiskGroup2Repository group2Repository,
                                            RiskWeightByBusinessRepository weightByBusinessRepository,
                                            AuditObjectUnitRepository auditObjectUnitRepository,
-                                           RiskScoreRankRepository rankRepository) {
+                                           RiskScoreRankRepository rankRepository,
+                                           ExcelExportService excelExportService,
+                                           WordExportService wordExportService) {
         this.quantitativeService = quantitativeService;
         this.qualitativeService = qualitativeService;
         this.criteriaQuantitativeRepository = criteriaQuantitativeRepository;
@@ -74,6 +81,8 @@ public class RiskBranchScoreCombinedService {
         this.weightByBusinessRepository = weightByBusinessRepository;
         this.auditObjectUnitRepository = auditObjectUnitRepository;
         this.rankRepository = rankRepository;
+        this.excelExportService = excelExportService;
+        this.wordExportService = wordExportService;
     }
 
     @Transactional(readOnly = true)
@@ -154,6 +163,59 @@ public class RiskBranchScoreCombinedService {
         }
         result.sort((a, b) -> b.totalScore().compareTo(a.totalScore()));
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportExcel(Integer year) {
+        List<String> businessLines = allBusinessLineCodes(TenantContext.getTenantId());
+        return excelExportService.export("risk_score_branch_score_combined", exportColumns(businessLines), exportRows(year, businessLines));
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportWord(Integer year) {
+        List<String> businessLines = allBusinessLineCodes(TenantContext.getTenantId());
+        return wordExportService.export("Kết quả chấm điểm tổng hợp", exportColumns(businessLines), exportRows(year, businessLines));
+    }
+
+    private List<ExportColumn> exportColumns(List<String> businessLines) {
+        List<ExportColumn> columns = new ArrayList<>(List.of(
+                new ExportColumn("year", "Năm"),
+                new ExportColumn("branchCode", "Mã chi nhánh"),
+                new ExportColumn("branchName", "Tên chi nhánh"),
+                new ExportColumn("totalScore", "Tổng điểm"),
+                new ExportColumn("rankLabel", "Xếp hạng")));
+        for (String businessLine : businessLines) {
+            columns.add(new ExportColumn(businessLine, businessLine));
+        }
+        return columns;
+    }
+
+    private List<Map<String, Object>> exportRows(Integer year, List<String> businessLines) {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (RiskBranchScoreCombinedRowResponse row : list(year)) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("year", row.year());
+            map.put("branchCode", row.branchCode());
+            map.put("branchName", row.branchName());
+            map.put("totalScore", row.totalScore());
+            map.put("rankLabel", row.rankLabel());
+            for (String businessLine : businessLines) {
+                map.put(businessLine, row.scoresByBusinessLineCode().get(businessLine));
+            }
+            rows.add(map);
+        }
+        return rows;
+    }
+
+    private List<String> allBusinessLineCodes(UUID tenantId) {
+        Set<String> codes = new HashSet<>();
+        for (RiskGroup1 g : group1Repository.findByTenantIdOrderByCodeAsc(tenantId)) {
+            codes.add(businessLineOf(g));
+        }
+        for (RiskWeightByBusiness w : weightByBusinessRepository.findByTenantIdOrderByBusinessCodeAscFromYearAsc(tenantId)) {
+            codes.add(w.getBusinessCode());
+        }
+        return codes.stream().sorted().toList();
     }
 
     /** Ma nghiep vu cua 1 nhom cap 1: uu tien businessLineCode neu da nhap, khong thi dung tam ma

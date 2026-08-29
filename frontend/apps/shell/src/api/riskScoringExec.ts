@@ -357,6 +357,12 @@ export const riskBranchScoreApi = {
     const res = await httpClient.get<ApiResponse<RiskBranchScoreCombinedRowItem[]>>(`${BASE}/branch-score/combined`, { params: { year } });
     return res.data.data;
   },
+  exportQuantitativeFile: (year: number, kind: "excel" | "word") =>
+    downloadHsrrFile("branch-score/quantitative", year, kind, "risk_score_branch_score_quantitative"),
+  exportQualitativeFile: (year: number, kind: "excel" | "word") =>
+    downloadHsrrFile("branch-score/qualitative", year, kind, "risk_score_branch_score_qualitative"),
+  exportCombinedFile: (year: number, kind: "excel" | "word") =>
+    downloadHsrrFile("branch-score/combined", year, kind, "risk_score_branch_score_combined"),
 };
 
 /** "Xep hang rui ro theo y kien chuyen gia cua DTKT khac" (sheet ZTC_XHRR_KHAC_CG). */

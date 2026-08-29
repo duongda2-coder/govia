@@ -15,6 +15,9 @@ import com.govia.audit.riskscoring.masterdata.repository.RiskScoreRankRepository
 import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreQualitativeRowResponse;
 import com.govia.audit.riskscoring.scoring.entity.RiskCriteriaQualitativeValue;
 import com.govia.audit.riskscoring.scoring.repository.RiskCriteriaQualitativeValueRepository;
+import com.govia.core.export.ExcelExportService;
+import com.govia.core.export.ExportColumn;
+import com.govia.core.export.WordExportService;
 import com.govia.core.tenant.TenantContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +68,8 @@ public class RiskBranchScoreQualitativeService {
     private final RiskFrequencyCoefficientRepository frequencyCoefficientRepository;
     private final AuditObjectUnitRepository auditObjectUnitRepository;
     private final RiskScoreRankRepository rankRepository;
+    private final ExcelExportService excelExportService;
+    private final WordExportService wordExportService;
 
     public RiskBranchScoreQualitativeService(RiskCriteriaQualitativeValueRepository valueRepository,
                                               RiskCriteriaQualitativeRepository criteriaRepository,
@@ -72,7 +77,9 @@ public class RiskBranchScoreQualitativeService {
                                               RiskMatrixRepository matrixRepository,
                                               RiskFrequencyCoefficientRepository frequencyCoefficientRepository,
                                               AuditObjectUnitRepository auditObjectUnitRepository,
-                                              RiskScoreRankRepository rankRepository) {
+                                              RiskScoreRankRepository rankRepository,
+                                              ExcelExportService excelExportService,
+                                              WordExportService wordExportService) {
         this.valueRepository = valueRepository;
         this.criteriaRepository = criteriaRepository;
         this.group2Repository = group2Repository;
@@ -80,6 +87,8 @@ public class RiskBranchScoreQualitativeService {
         this.frequencyCoefficientRepository = frequencyCoefficientRepository;
         this.auditObjectUnitRepository = auditObjectUnitRepository;
         this.rankRepository = rankRepository;
+        this.excelExportService = excelExportService;
+        this.wordExportService = wordExportService;
     }
 
     @Transactional(readOnly = true)
@@ -149,6 +158,52 @@ public class RiskBranchScoreQualitativeService {
         }
         result.sort((a, b) -> b.totalScore().compareTo(a.totalScore()));
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportExcel(Integer year) {
+        List<RiskGroup2> groups2 = activeGroups2(TenantContext.getTenantId());
+        return excelExportService.export("risk_score_branch_score_qualitative", exportColumns(groups2), exportRows(year, groups2));
+    }
+
+    @Transactional(readOnly = true)
+    public byte[] exportWord(Integer year) {
+        List<RiskGroup2> groups2 = activeGroups2(TenantContext.getTenantId());
+        return wordExportService.export("Kết quả chấm điểm rủi ro định tính", exportColumns(groups2), exportRows(year, groups2));
+    }
+
+    private List<ExportColumn> exportColumns(List<RiskGroup2> groups2) {
+        List<ExportColumn> columns = new ArrayList<>(List.of(
+                new ExportColumn("year", "Năm"),
+                new ExportColumn("branchCode", "Mã chi nhánh"),
+                new ExportColumn("branchName", "Tên chi nhánh"),
+                new ExportColumn("totalScore", "Tổng điểm"),
+                new ExportColumn("rankLabel", "Xếp hạng")));
+        for (RiskGroup2 g : groups2) {
+            columns.add(new ExportColumn(g.getCode(), g.getCode()));
+        }
+        return columns;
+    }
+
+    private List<Map<String, Object>> exportRows(Integer year, List<RiskGroup2> groups2) {
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (RiskBranchScoreQualitativeRowResponse row : list(year)) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("year", row.year());
+            map.put("branchCode", row.branchCode());
+            map.put("branchName", row.branchName());
+            map.put("totalScore", row.totalScore());
+            map.put("rankLabel", row.rankLabel());
+            for (RiskGroup2 g : groups2) {
+                map.put(g.getCode(), row.scoresByGroup2Code().get(g.getCode()));
+            }
+            rows.add(map);
+        }
+        return rows;
+    }
+
+    private List<RiskGroup2> activeGroups2(UUID tenantId) {
+        return group2Repository.findByTenantIdOrderByCodeAsc(tenantId).stream().filter(RiskGroup2::isActive).toList();
     }
 
     private BigDecimal matrixScore(Map<Integer, RiskMatrix> matrixByFrequency, RiskCriteriaQualitative criterion) {

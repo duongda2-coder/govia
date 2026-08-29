@@ -18,6 +18,7 @@ export function RiskBranchScoreQualitativeTable() {
   const { message } = App.useApp();
   const { hasPermission } = useAuth();
   const canView = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
+  const canExport = hasPermission("AUDIT.RISK_SCORING_EXEC.EXPORT");
   const { getSearchColumnProps } = useClientSearchColumn<RiskBranchScoreQualitativeRowItem>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
@@ -62,6 +63,14 @@ export function RiskBranchScoreQualitativeTable() {
   useEffect(() => {
     if (canView && year != null) load(year);
   }, [canView, year, load]);
+
+  const handleExport = (kind: "excel" | "word") => {
+    if (year == null) {
+      message.warning(t("riskScoringExec.hsrr.selectYearFirst"));
+      return Promise.resolve();
+    }
+    return riskBranchScoreApi.exportQualitativeFile(year, kind);
+  };
 
   const columns: CrudColumn<RiskBranchScoreQualitativeRowItem>[] = useMemo(() => {
     const fixed: CrudColumn<RiskBranchScoreQualitativeRowItem>[] = [
@@ -136,6 +145,8 @@ export function RiskBranchScoreQualitativeTable() {
         dataSource={rows}
         rowKey="branchCode"
         loading={loading}
+        onExportExcel={canExport ? () => handleExport("excel") : undefined}
+        onExportWord={canExport ? () => handleExport("word") : undefined}
       />
     </div>
   );
