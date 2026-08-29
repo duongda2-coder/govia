@@ -1,7 +1,9 @@
 package com.govia.audit.riskscoring.scoring.controller;
 
+import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreCombinedRowResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreQualitativeRowResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreQuantitativeRowResponse;
+import com.govia.audit.riskscoring.scoring.service.RiskBranchScoreCombinedService;
 import com.govia.audit.riskscoring.scoring.service.RiskBranchScoreQualitativeService;
 import com.govia.audit.riskscoring.scoring.service.RiskBranchScoreQuantitativeService;
 import com.govia.core.web.ApiResponse;
@@ -21,11 +23,14 @@ public class RiskBranchScoreController {
 
     private final RiskBranchScoreQuantitativeService quantitativeService;
     private final RiskBranchScoreQualitativeService qualitativeService;
+    private final RiskBranchScoreCombinedService combinedService;
 
     public RiskBranchScoreController(RiskBranchScoreQuantitativeService quantitativeService,
-                                      RiskBranchScoreQualitativeService qualitativeService) {
+                                      RiskBranchScoreQualitativeService qualitativeService,
+                                      RiskBranchScoreCombinedService combinedService) {
         this.quantitativeService = quantitativeService;
         this.qualitativeService = qualitativeService;
+        this.combinedService = combinedService;
     }
 
     @GetMapping("/quantitative")
@@ -38,5 +43,11 @@ public class RiskBranchScoreController {
     @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.VIEW')")
     public ApiResponse<List<RiskBranchScoreQualitativeRowResponse>> listQualitative(@RequestParam Integer year) {
         return ApiResponse.ok(qualitativeService.list(year));
+    }
+
+    @GetMapping("/combined")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.VIEW')")
+    public ApiResponse<List<RiskBranchScoreCombinedRowResponse>> listCombined(@RequestParam Integer year) {
+        return ApiResponse.ok(combinedService.list(year));
     }
 }

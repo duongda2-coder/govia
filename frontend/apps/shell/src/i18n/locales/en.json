@@ -44,7 +44,8 @@
     "riskScoringExecAssessmentOtherExpertRank": "Other Risk Expert Ranking",
     "riskScoringExecHsrr": "Risk Profile",
     "riskScoringExecBranchScoreQuantitative": "Quantitative Risk Score Results",
-    "riskScoringExecBranchScoreQualitative": "Qualitative Risk Score Results"
+    "riskScoringExecBranchScoreQualitative": "Qualitative Risk Score Results",
+    "riskScoringExecBranchScoreCombined": "Combined Score Results"
   },
   "header": {
     "logout": "Log out"

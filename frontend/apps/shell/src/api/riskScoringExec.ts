@@ -223,6 +223,17 @@ export interface RiskBranchScoreQualitativeRowItem {
   scoresByGroup2Code: Record<string, number | null>;
 }
 
+/** 1 dong = 1 chi nhanh/nam (sheet CT_Diem_All) - moi nghiep vu la 1 entry trong
+ * scoresByBusinessLineCode (da la diem quy doi gop dinh tinh + dinh luong). */
+export interface RiskBranchScoreCombinedRowItem {
+  branchCode: string;
+  branchName: string | null;
+  year: number;
+  totalScore: number;
+  rankLabel: string | null;
+  scoresByBusinessLineCode: Record<string, number | null>;
+}
+
 export interface RiskCriteriaOtherScaleItem {
   id: string;
   auditObjectCategoryId: string;
@@ -340,6 +351,10 @@ export const riskBranchScoreApi = {
   },
   async listQualitative(year: number): Promise<RiskBranchScoreQualitativeRowItem[]> {
     const res = await httpClient.get<ApiResponse<RiskBranchScoreQualitativeRowItem[]>>(`${BASE}/branch-score/qualitative`, { params: { year } });
+    return res.data.data;
+  },
+  async listCombined(year: number): Promise<RiskBranchScoreCombinedRowItem[]> {
+    const res = await httpClient.get<ApiResponse<RiskBranchScoreCombinedRowItem[]>>(`${BASE}/branch-score/combined`, { params: { year } });
     return res.data.data;
   },
 };
