@@ -43,6 +43,13 @@ public final class RiskCriteriaQuantitativeOrder {
      * khong "TDAT10" se khong khop chuoi "TDAT010" va bi xep lac xuong cuoi danh sach. */
     private static final Pattern CODE_PATTERN = Pattern.compile("^([A-Z]+)0*(\\d+)$");
 
+    /** Tien to ma nghiep vu thuc te dang dung tren he thong nhung khac voi tien to trong tai lieu
+     * goc (thuong la ten day du hon) - map ve dung tien to trong CANONICAL_CODES de xep dung vi tri
+     * nhom. Vd nhom "FA" (FA01..FA05) trong FS nhung he thong dang dung "FACB" (FACB01, FACB02...). */
+    private static final Map<String, String> PREFIX_ALIASES = Map.of(
+            "FACB", "FA"
+    );
+
     private record CanonicalKey(String prefix, int number) {
     }
 
@@ -91,6 +98,7 @@ public final class RiskCriteriaQuantitativeOrder {
         if (!m.matches()) {
             return null;
         }
-        return new CanonicalKey(m.group(1), Integer.parseInt(m.group(2)));
+        String prefix = PREFIX_ALIASES.getOrDefault(m.group(1), m.group(1));
+        return new CanonicalKey(prefix, Integer.parseInt(m.group(2)));
     }
 }
