@@ -110,6 +110,13 @@ public class RiskCriteriaValueController {
         return ApiResponse.ok(quantitativeService.saveWideRow(request));
     }
 
+    @DeleteMapping("/quantitative/wide")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.DELETE')")
+    public ApiResponse<Void> deleteQuantitativeWideRow(@RequestParam String branchCode, @RequestParam Integer year) {
+        quantitativeService.deleteWideRow(branchCode, year);
+        return ApiResponse.ok(null);
+    }
+
     @GetMapping("/qualitative")
     @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.VIEW')")
     public ApiResponse<List<RiskCriteriaQualitativeValueResponse>> listQualitative(@RequestParam Integer year) {

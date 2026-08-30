@@ -429,6 +429,10 @@ export const riskCriteriaQuantitativeValueApi = {
     const res = await httpClient.put<ApiResponse<RiskCriteriaQuantitativeWideRowItem>>(`${BASE}/hsrr/quantitative/wide`, request);
     return res.data.data;
   },
+  /** Xoa toan bo gia tri chi tieu cua 1 chi nhanh/nam (1 dong tren luoi dang bang tong hop). */
+  async removeWideRow(branchCode: string, year: number): Promise<void> {
+    await httpClient.delete(`${BASE}/hsrr/quantitative/wide`, { params: { branchCode, year } });
+  },
 };
 
 /** "Ho so rui ro dinh tinh" (sheet ZTC_HSRR, mau DT_HSRR_Upload) - long-format. */

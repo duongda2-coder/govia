@@ -214,6 +214,22 @@ public class RiskCriteriaQuantitativeValueService {
                 "Xoa HSRR dinh luong: " + item.getBranchCode() + "/" + item.getYear());
     }
 
+    /** Xoa 1 "dong" tren man hinh dang bang tong hop - vi 1 dong khong phai entity rieng (chi ton
+     * tai gian tiep qua cac gia tri chi tieu), xoa dong nghia la xoa TOAN BO gia tri cua chi
+     * nhanh/nam do cung luc. */
+    @Transactional
+    public void deleteWideRow(String branchCode, Integer year) {
+        UUID tenantId = TenantContext.getTenantId();
+        List<RiskCriteriaQuantitativeValue> items = repository.findByTenantIdAndBranchCodeAndYear(tenantId, branchCode, year);
+        if (items.isEmpty()) {
+            throw new BusinessException("RISK_CRITERIA_QUANTITATIVE_VALUE_NOT_FOUND", "Khong tim thay du lieu HSRR cho chi nhanh/nam nay",
+                    HttpStatus.NOT_FOUND);
+        }
+        repository.deleteAll(items);
+        auditLogService.record("RiskCriteriaQuantitativeValue", null, AuditAction.DELETE,
+                "Xoa HSRR dinh luong (dang bang tong hop): " + branchCode + "/" + year + " (" + items.size() + " gia tri)");
+    }
+
     /** Xuat dung dinh dang wide (khop 1-1 voi man hinh va voi mau upload DL_HSRR_Upload: STT | Nam
      * | Chi Nhanh | Ten Chi Nhanh | Ngay | tung chi tieu 1 cot) thay vi dang bang dai truoc day
      * (Ma chi tieu/Ma chi nhanh/Nam/Ngay nhap/Gia tri) - dam bao file xuat ra co the import lai duoc
@@ -234,7 +250,11 @@ public class RiskCriteriaQuantitativeValueService {
         String username = TenantContext.getCurrentUser();
 
         Map<String, UUID> criteriaIdsByCode = new HashMap<>();
-        criteriaRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> criteriaIdsByCode.put(c.getCode(), c.getId()));
+        Map<UUID, String> criteriaCodesById = new HashMap<>();
+        criteriaRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> {
+            criteriaIdsByCode.put(c.getCode(), c.getId());
+            criteriaCodesById.put(c.getId(), c.getCode());
+        });
 
         int success = 0;
         List<ImportResult.ImportRowError> errors = new ArrayList<>();
@@ -306,6 +326,11 @@ public class RiskCriteriaQuantitativeValueService {
                     }
                     LocalDate entryDate = dateCol == null ? null : parseDate(row.getCell(dateCol), formatter);
 
+                    // Cot bi bo qua vi khong duoc phan quyen (khac voi o trong/gia tri khong hop le)
+                    // phai duoc bao loi ro rang - neu khong, 1 file upload day du nhung nguoi dung
+                    // KHONG duoc mapping bat ky chi tieu nao se "thanh cong" voi 0 dong duoc luu,
+                    // ma khong co bat ky canh bao nao ve viec bi thieu quyen.
+                    List<String> unauthorizedCodes = new ArrayList<>();
                     for (Map.Entry<Integer, UUID> col : criteriaColumns.entrySet()) {
                         Cell cell = row.getCell(col.getKey());
                         String raw = cell == null ? "" : formatter.formatCellValue(cell).trim();
@@ -316,6 +341,7 @@ public class RiskCriteriaQuantitativeValueService {
                         Set<String> allowedBranches = allowedBranchesByCriteria.get(criteriaId);
                         boolean authorized = allowedBranches == null || allowedBranches.contains(branchCode);
                         if (!authorized) {
+                            unauthorizedCodes.add(criteriaCodesById.get(criteriaId));
                             continue;
                         }
                         BigDecimal value = parseDecimal(raw);
@@ -324,6 +350,11 @@ public class RiskCriteriaQuantitativeValueService {
                         }
                         saveValue(tenantId, criteriaId, branchCode, year, entryDate, value);
                         success++;
+                    }
+                    if (!unauthorizedCodes.isEmpty()) {
+                        throw new BusinessException("IMPORT_NOT_AUTHORIZED",
+                                "Khong co quyen cap nhat chi tieu " + String.join(", ", unauthorizedCodes)
+                                        + " cho chi nhanh " + branchCode);
                     }
                 } catch (BusinessException e) {
                     errors.add(new ImportResult.ImportRowError(rowNumber, e.getMessage()));

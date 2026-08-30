@@ -30,11 +30,12 @@ interface FormValues {
  */
 export function RiskCriteriaQuantitativeWideTable() {
   const { t } = useTranslation();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
   const { hasPermission } = useAuth();
   const canView = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
   const canCreate = hasPermission("AUDIT.RISK_SCORING_EXEC.CREATE");
   const canEdit = hasPermission("AUDIT.RISK_SCORING_EXEC.EDIT");
+  const canDelete = hasPermission("AUDIT.RISK_SCORING_EXEC.DELETE");
   const canExport = hasPermission("AUDIT.RISK_SCORING_EXEC.EXPORT");
   const canImport = hasPermission("AUDIT.RISK_SCORING_EXEC.IMPORT");
   const { getSearchColumnProps } = useClientSearchColumn<RiskCriteriaQuantitativeWideRowItem>();
@@ -134,6 +135,27 @@ export function RiskCriteriaQuantitativeWideTable() {
     setModalOpen(true);
   };
 
+  /** Xoa 1 dong = xoa TOAN BO gia tri chi tieu cua chi nhanh/nam do (dong khong phai entity rieng). */
+  const handleDelete = () => {
+    if (selected.length === 0 || year == null) return;
+    modal.confirm({
+      title: selected.length > 1 ? t("common.deleteConfirmTitleCount", { count: selected.length }) : t("riskScoringExec.deleteConfirmTitle"),
+      okText: t("common.yes"),
+      cancelText: t("common.no"),
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await Promise.all(selected.map((row) => riskCriteriaQuantitativeValueApi.removeWideRow(row.branchCode, row.year)));
+          message.success(t("riskScoringExec.messages.deleteSuccess"));
+          setSelected([]);
+          await load(year);
+        } catch {
+          message.error(t("riskScoringExec.messages.deleteError"));
+        }
+      },
+    });
+  };
+
   const handleSubmit = async () => {
     if (year == null) return;
     let values: FormValues;
@@ -222,6 +244,8 @@ export function RiskCriteriaQuantitativeWideTable() {
         onAdd={canCreate ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
+        onDelete={canDelete ? handleDelete : undefined}
+        deleteDisabled={selected.length === 0}
         onSelectionChange={(_keys, selectedRows) => setSelected(selectedRows)}
         onExportExcel={canExport ? () => handleExport("excel") : undefined}
         onExportWord={canExport ? () => handleExport("word") : undefined}
