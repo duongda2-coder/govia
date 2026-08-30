@@ -104,6 +104,9 @@ export function RiskBranchScoreQuantitativeTable() {
       criteriaByGroup1.get(c.group1Id)?.push(c);
     }
 
+    // KHONG sap xep lai theo alphabet tieu de nhom - criteriaList da duoc backend tra ve dung thu
+    // tu FS (sheet DL_Nhaptructiep: nhom TDQM truoc, roi TDCL, TDAT, DPQM...), Map giu nguyen thu tu
+    // insert nen chi can gom nhom theo dung thu tu gap trong criteriaList la ra dung thu tu FS.
     const dynamic: CrudColumn<RiskBranchScoreQuantitativeRowItem>[] = [...criteriaByGroup1.entries()]
       .map(([group1Id, items]) => {
         const group = group1ById.get(group1Id);
@@ -115,8 +118,7 @@ export function RiskBranchScoreQuantitativeTable() {
             render: (_: unknown, record: RiskBranchScoreQuantitativeRowItem) => record.scoresByCriteriaCode[c.code] ?? "-",
           })),
         };
-      })
-      .sort((a, b) => String(a.title).localeCompare(String(b.title)));
+      });
 
     return [...fixed, ...dynamic];
     // eslint-disable-next-line react-hooks/exhaustive-deps
