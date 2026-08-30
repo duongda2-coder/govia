@@ -83,6 +83,7 @@
     "delete": "Xóa",
     "exportExcel": "Xuất Excel",
     "exportWord": "Xuất Word",
+    "exporting": "Đang xuất file...",
     "attachment": "Đính kèm",
     "search": "Tìm kiếm",
     "reset": "Đặt lại",
@@ -830,7 +831,8 @@
       "updateSuccess": "Đã cập nhật",
       "deleteSuccess": "Đã xóa",
       "deleteError": "Xóa thất bại",
-      "saveError": "Lưu thất bại"
+      "saveError": "Lưu thất bại",
+      "exportError": "Xuất file thất bại"
     }
   }
 }

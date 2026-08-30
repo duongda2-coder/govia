@@ -83,6 +83,7 @@
     "delete": "Delete",
     "exportExcel": "Export Excel",
     "exportWord": "Export Word",
+    "exporting": "Exporting file...",
     "attachment": "Attachment",
     "search": "Search",
     "reset": "Reset",
@@ -830,7 +831,8 @@
       "updateSuccess": "Updated",
       "deleteSuccess": "Deleted",
       "deleteError": "Failed to delete",
-      "saveError": "Failed to save"
+      "saveError": "Failed to save",
+      "exportError": "Failed to export file"
     }
   }
 }

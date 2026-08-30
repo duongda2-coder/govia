@@ -147,12 +147,19 @@ export function RiskCriteriaQualitativeValueTable() {
     }
   };
 
-  const handleExport = (kind: "excel" | "word") => {
+  const handleExport = async (kind: "excel" | "word") => {
     if (year == null) {
       message.warning(t("riskScoringExec.hsrr.selectYearFirst"));
-      return Promise.resolve();
+      return;
     }
-    return riskCriteriaQualitativeValueApi.exportFile(year, kind);
+    const hide = message.loading(t("common.exporting"), 0);
+    try {
+      await riskCriteriaQualitativeValueApi.exportFile(year, kind);
+    } catch {
+      message.error(t("riskScoringExec.messages.exportError"));
+    } finally {
+      hide();
+    }
   };
 
   const handleDelete = () => {

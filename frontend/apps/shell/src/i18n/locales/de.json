@@ -49,6 +49,7 @@
     "delete": "Löschen",
     "exportExcel": "Excel exportieren",
     "exportWord": "Word exportieren",
+    "exporting": "Datei wird exportiert...",
     "attachment": "Anhang",
     "search": "Suchen",
     "reset": "Zurücksetzen",
@@ -455,7 +456,8 @@
       "updateSuccess": "Aktualisiert",
       "deleteSuccess": "Gelöscht",
       "deleteError": "Löschen fehlgeschlagen",
-      "saveError": "Speichern fehlgeschlagen"
+      "saveError": "Speichern fehlgeschlagen",
+      "exportError": "Export fehlgeschlagen"
     }
   }
 }

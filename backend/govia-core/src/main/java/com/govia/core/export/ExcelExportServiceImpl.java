@@ -28,10 +28,12 @@ public class ExcelExportServiceImpl implements ExcelExportService {
             headerStyle.setFont(headerFont);
 
             Row headerRow = sheet.createRow(0);
+            int[] maxLen = new int[columns.size()];
             for (int c = 0; c < columns.size(); c++) {
                 Cell cell = headerRow.createCell(c);
                 cell.setCellValue(columns.get(c).header());
                 cell.setCellStyle(headerStyle);
+                maxLen[c] = columns.get(c).header().length();
             }
 
             int rowIdx = 1;
@@ -39,12 +41,21 @@ public class ExcelExportServiceImpl implements ExcelExportService {
                 Row row = sheet.createRow(rowIdx++);
                 for (int c = 0; c < columns.size(); c++) {
                     Object value = rowData.get(columns.get(c).field());
-                    row.createCell(c).setCellValue(value == null ? "" : value.toString());
+                    String text = value == null ? "" : value.toString();
+                    row.createCell(c).setCellValue(text);
+                    if (text.length() > maxLen[c]) {
+                        maxLen[c] = text.length();
+                    }
                 }
             }
 
+            // KHONG dung sheet.autoSizeColumn() - render font qua AWT/Graphics2D nen cuc cham voi
+            // bang nhieu dong (vd HSRR dinh luong/dinh tinh dang long-format co the len toi hang
+            // chuc nghin dong), co truong hop con treo/loi tren server headless thieu font. Uoc
+            // luong do rong tu do dai chuoi la du dung va nhanh hon nhieu bac.
             for (int c = 0; c < columns.size(); c++) {
-                sheet.autoSizeColumn(c);
+                int width = Math.min(Math.max(maxLen[c] + 2, 8), 60) * 256;
+                sheet.setColumnWidth(c, width);
             }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
