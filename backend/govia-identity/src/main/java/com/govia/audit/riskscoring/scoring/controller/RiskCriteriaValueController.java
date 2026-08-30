@@ -9,12 +9,14 @@ import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaQuantitativeWideRowRe
 import com.govia.audit.riskscoring.scoring.service.RiskCriteriaQualitativeValueService;
 import com.govia.audit.riskscoring.scoring.service.RiskCriteriaQuantitativeValueService;
 import com.govia.core.export.ImportResult;
+import com.govia.core.security.CurrentUserPrincipal;
 import com.govia.core.web.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -91,8 +93,9 @@ public class RiskCriteriaValueController {
 
     @PostMapping("/quantitative/import")
     @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.IMPORT')")
-    public ApiResponse<ImportResult> importQuantitative(@RequestParam("file") MultipartFile file) {
-        return ApiResponse.ok(quantitativeService.importFromExcel(file));
+    public ApiResponse<ImportResult> importQuantitative(@AuthenticationPrincipal CurrentUserPrincipal principal,
+                                                          @RequestParam("file") MultipartFile file) {
+        return ApiResponse.ok(quantitativeService.importFromExcel(file, principal));
     }
 
     /** Ban "wide" cua man hinh dinh luong (1 dong = 1 chi nhanh/nam, tung chi tieu 1 cot) - dung

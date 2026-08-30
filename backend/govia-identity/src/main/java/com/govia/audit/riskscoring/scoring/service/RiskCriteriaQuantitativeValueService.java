@@ -19,6 +19,7 @@ import com.govia.core.export.ExcelExportService;
 import com.govia.core.export.ExportColumn;
 import com.govia.core.export.ImportResult;
 import com.govia.core.export.WordExportService;
+import com.govia.core.security.CurrentUserPrincipal;
 import com.govia.core.tenant.TenantContext;
 import com.govia.core.web.BusinessException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -55,6 +56,8 @@ import java.util.UUID;
  * thanh 1 dong gia tri. Chi ghi gia tri neu user dang upload duoc PHAN QUYEN chi tieu do (toan bo
  * chi nhanh hoac dung chi nhanh dang upload) - xem RiskUserAssignment (sheet ZTC_HSRR_DL_User),
  * dung theo dung yeu cau "chi update nhung cot theo user duoc mapping" trong tai lieu goc.
+ * SUPER_ADMIN bo qua kiem tra nay (giong pattern o WorkflowTaskService) - neu khong, tai khoan
+ * admin se bi chan hoan toan cho toi khi co nguoi tao san du lieu RiskUserAssignment cho no.
  */
 @Service
 public class RiskCriteriaQuantitativeValueService {
@@ -245,9 +248,10 @@ public class RiskCriteriaQuantitativeValueService {
     }
 
     @Transactional
-    public ImportResult importFromExcel(MultipartFile file) {
+    public ImportResult importFromExcel(MultipartFile file, CurrentUserPrincipal principal) {
         UUID tenantId = TenantContext.getTenantId();
         String username = TenantContext.getCurrentUser();
+        boolean isSuperAdmin = principal != null && principal.roles() != null && principal.roles().contains("SUPER_ADMIN");
 
         Map<String, UUID> criteriaIdsByCode = new HashMap<>();
         Map<UUID, String> criteriaCodesById = new HashMap<>();
@@ -297,6 +301,12 @@ public class RiskCriteriaQuantitativeValueService {
             Set<UUID> fileCriteriaIds = new HashSet<>(criteriaColumns.values());
             Map<UUID, Set<String>> allowedBranchesByCriteria = new HashMap<>();
             for (UUID criteriaId : fileCriteriaIds) {
+                if (isSuperAdmin) {
+                    // SUPER_ADMIN khong bi rang buoc boi RiskUserAssignment - null = "toan bo chi nhanh"
+                    // (xem ensureActorIsAssigneeOrAdmin trong WorkflowTaskService cho cung pattern).
+                    allowedBranchesByCriteria.put(criteriaId, null);
+                    continue;
+                }
                 Set<String> branches = new HashSet<>();
                 boolean allBranches = false;
                 for (RiskUserAssignment a : userAssignmentRepository.findByTenantIdAndUsernameAndCriteriaId(tenantId, username, criteriaId)) {
