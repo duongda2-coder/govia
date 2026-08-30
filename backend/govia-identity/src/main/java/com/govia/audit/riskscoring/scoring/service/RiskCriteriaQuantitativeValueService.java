@@ -205,14 +205,18 @@ public class RiskCriteriaQuantitativeValueService {
                 "Xoa HSRR dinh luong: " + item.getBranchCode() + "/" + item.getYear());
     }
 
+    /** Xuat dung dinh dang wide (khop 1-1 voi man hinh va voi mau upload DL_HSRR_Upload: STT | Nam
+     * | Chi Nhanh | Ten Chi Nhanh | Ngay | tung chi tieu 1 cot) thay vi dang bang dai truoc day
+     * (Ma chi tieu/Ma chi nhanh/Nam/Ngay nhap/Gia tri) - dam bao file xuat ra co the import lai duoc
+     * ngay (xem importFromExcel: doc header "Nam"/"Chi Nhanh"/"Ngay" + 1 cot/ma chi tieu). */
     @Transactional(readOnly = true)
     public byte[] exportExcel(Integer year) {
-        return excelExportService.export("risk_score_criteria_quantitative_value", exportColumns(), exportRows(year));
+        return excelExportService.export("risk_score_criteria_quantitative_value", wideExportColumns(), wideExportRows(year));
     }
 
     @Transactional(readOnly = true)
     public byte[] exportWord(Integer year) {
-        return wordExportService.export("Hồ sơ rủi ro định lượng", exportColumns(), exportRows(year));
+        return wordExportService.export("Hồ sơ rủi ro định lượng", wideExportColumns(), wideExportRows(year));
     }
 
     @Transactional
@@ -341,29 +345,32 @@ public class RiskCriteriaQuantitativeValueService {
         repository.save(item);
     }
 
-    private List<ExportColumn> exportColumns() {
-        return List.of(
-                new ExportColumn("criteriaCode", "Mã chỉ tiêu"),
-                new ExportColumn("branchCode", "Mã chi nhánh"),
-                new ExportColumn("year", "Năm"),
-                new ExportColumn("entryDate", "Ngày nhập"),
-                new ExportColumn("value", "Giá trị"));
+    private List<ExportColumn> wideExportColumns() {
+        UUID tenantId = TenantContext.getTenantId();
+        List<ExportColumn> columns = new ArrayList<>();
+        columns.add(new ExportColumn("stt", "STT"));
+        columns.add(new ExportColumn("year", "Năm"));
+        columns.add(new ExportColumn("branchCode", "Chi Nhánh"));
+        columns.add(new ExportColumn("branchName", "Tên Chi Nhánh"));
+        columns.add(new ExportColumn("entryDate", "Ngày"));
+        criteriaRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> columns.add(new ExportColumn(c.getCode(), c.getCode())));
+        return columns;
     }
 
-    private List<Map<String, Object>> exportRows(Integer year) {
-        UUID tenantId = TenantContext.getTenantId();
-        Map<UUID, RiskCriteriaQuantitative> criteria = criteriaById(tenantId);
-        return repository.findByTenantIdAndYearOrderByBranchCodeAsc(tenantId, year).stream()
-                .map(item -> {
-                    RiskCriteriaQuantitative criterion = criteria.get(item.getCriteriaId());
-                    Map<String, Object> row = new HashMap<>();
-                    row.put("criteriaCode", criterion != null ? criterion.getCode() : null);
-                    row.put("branchCode", item.getBranchCode());
-                    row.put("year", item.getYear());
-                    row.put("entryDate", item.getEntryDate());
-                    row.put("value", item.getValue());
-                    return row;
-                }).toList();
+    private List<Map<String, Object>> wideExportRows(Integer year) {
+        int stt = 1;
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (RiskCriteriaQuantitativeWideRowResponse wideRow : listWide(year)) {
+            Map<String, Object> row = new HashMap<>();
+            row.put("stt", stt++);
+            row.put("year", wideRow.year());
+            row.put("branchCode", wideRow.branchCode());
+            row.put("branchName", wideRow.branchName());
+            row.put("entryDate", wideRow.entryDate());
+            row.putAll(wideRow.valuesByCriteriaCode());
+            result.add(row);
+        }
+        return result;
     }
 
     private void applyRequest(RiskCriteriaQuantitativeValue item, RiskCriteriaQuantitativeValueRequest request) {
