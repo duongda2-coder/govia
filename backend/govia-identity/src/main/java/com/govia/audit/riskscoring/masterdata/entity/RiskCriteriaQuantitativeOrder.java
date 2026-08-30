@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Thu tu hien thi CHUAN cho chi tieu dinh luong - lay dung thu tu cot trong dong header (dong 5/12)
@@ -35,11 +37,23 @@ public final class RiskCriteriaQuantitativeOrder {
             "CARD01", "CARD02", "CARD03", "CARD04"
     );
 
-    private static final Map<String, Integer> INDEX_BY_CODE = new HashMap<>();
+    /** So khop theo (tien to chu, gia tri so) thay vi nguyen van chuoi - vai ma trong tai lieu goc
+     * dung 3 chu so cho muc thu 10 tro len (vd "TDAT010") trong khi ma nghiep vu dang dung tren he
+     * thong lai la 2 chu so (vd "TDAT10") - can quy ve cung 1 gia tri so (10) de khop dung, neu
+     * khong "TDAT10" se khong khop chuoi "TDAT010" va bi xep lac xuong cuoi danh sach. */
+    private static final Pattern CODE_PATTERN = Pattern.compile("^([A-Z]+)0*(\\d+)$");
+
+    private record CanonicalKey(String prefix, int number) {
+    }
+
+    private static final Map<CanonicalKey, Integer> INDEX_BY_KEY = new HashMap<>();
 
     static {
         for (int i = 0; i < CANONICAL_CODES.size(); i++) {
-            INDEX_BY_CODE.putIfAbsent(CANONICAL_CODES.get(i), i);
+            CanonicalKey key = parseKey(CANONICAL_CODES.get(i));
+            if (key != null) {
+                INDEX_BY_KEY.putIfAbsent(key, i);
+            }
         }
     }
 
@@ -57,14 +71,26 @@ public final class RiskCriteriaQuantitativeOrder {
     }
 
     private static int rank(String code) {
-        if (code == null) {
+        CanonicalKey key = parseKey(code);
+        if (key == null) {
             return Integer.MAX_VALUE;
+        }
+        Integer idx = INDEX_BY_KEY.get(key);
+        return idx != null ? idx : Integer.MAX_VALUE;
+    }
+
+    private static CanonicalKey parseKey(String code) {
+        if (code == null) {
+            return null;
         }
         String normalized = code.trim().toUpperCase();
         if (normalized.startsWith("Z") && normalized.length() > 1) {
             normalized = normalized.substring(1);
         }
-        Integer idx = INDEX_BY_CODE.get(normalized);
-        return idx != null ? idx : Integer.MAX_VALUE;
+        Matcher m = CODE_PATTERN.matcher(normalized);
+        if (!m.matches()) {
+            return null;
+        }
+        return new CanonicalKey(m.group(1), Integer.parseInt(m.group(2)));
     }
 }
