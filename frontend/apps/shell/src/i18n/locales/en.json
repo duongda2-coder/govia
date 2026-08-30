@@ -822,7 +822,8 @@
       "entryDate": "Entry Date",
       "violation": "Violation",
       "note": "Note",
-      "selectYearFirst": "Please select a year first"
+      "selectYearFirst": "Please select a year first",
+      "atLeastOneValueRequired": "Enter at least one criterion value to save this row"
     },
     "deleteConfirmTitle": "Delete this item?",
     "messages": {

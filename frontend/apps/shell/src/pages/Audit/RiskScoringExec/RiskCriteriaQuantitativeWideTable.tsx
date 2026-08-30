@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { App, DatePicker, Form, InputNumber, Modal, Select, Space, Typography } from "antd";
+import { isAxiosError } from "axios";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn, type CrudColumn } from "@govia/ui-kit";
@@ -141,6 +142,15 @@ export function RiskCriteriaQuantitativeWideTable() {
     } catch {
       return;
     }
+    // Dong wide-format khong phai 1 entity rieng - no chi "ton tai" gian tiep qua it nhat 1 gia tri
+    // chi tieu da luu (xem RiskCriteriaQuantitativeValueService.saveWideRow). Neu khong nhap chi
+    // tieu nao ca thi backend se tu choi luu - chan som o day de nguoi dung thay ngay, khoi phai cho
+    // roundtrip API roi moi bao loi.
+    const hasAnyValue = criteriaList.some((c) => values.values?.[c.code] != null);
+    if (!hasAnyValue) {
+      message.warning(t("riskScoringExec.hsrr.atLeastOneValueRequired"));
+      return;
+    }
     setSubmitting(true);
     try {
       const request: RiskCriteriaQuantitativeWideRowRequest = {
@@ -154,8 +164,9 @@ export function RiskCriteriaQuantitativeWideTable() {
       setModalOpen(false);
       setSelected([]);
       await load(year);
-    } catch {
-      message.error(t("riskScoringExec.messages.saveError"));
+    } catch (err) {
+      const backendMessage = isAxiosError<{ message?: string }>(err) ? err.response?.data?.message : undefined;
+      message.error(backendMessage || t("riskScoringExec.messages.saveError"));
     } finally {
       setSubmitting(false);
     }

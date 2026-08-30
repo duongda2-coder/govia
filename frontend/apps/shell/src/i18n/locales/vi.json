@@ -822,7 +822,8 @@
       "entryDate": "Ngày",
       "violation": "Sai phạm",
       "note": "Ghi chú",
-      "selectYearFirst": "Vui lòng chọn năm trước"
+      "selectYearFirst": "Vui lòng chọn năm trước",
+      "atLeastOneValueRequired": "Phải nhập ít nhất 1 chỉ tiêu để lưu được dòng này"
     },
     "deleteConfirmTitle": "Xóa mục này?",
     "messages": {

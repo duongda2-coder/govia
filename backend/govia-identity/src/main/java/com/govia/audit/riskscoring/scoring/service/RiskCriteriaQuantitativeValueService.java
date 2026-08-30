@@ -144,6 +144,14 @@ public class RiskCriteriaQuantitativeValueService {
                 "Cap nhat HSRR dinh luong (dang bang tong hop): " + request.branchCode() + "/" + request.year());
 
         List<RiskCriteriaQuantitativeValue> items = repository.findByTenantIdAndBranchCodeAndYear(tenantId, request.branchCode(), request.year());
+        if (items.isEmpty()) {
+            // Dong wide-format khong phai 1 entity rieng - no chi "ton tai" gian tiep qua it nhat 1
+            // gia tri chi tieu da luu. Neu khong con gia tri nao (vd nguoi dung tao moi nhung khong
+            // nhap chi tieu nao ca) thi KHONG co gi de tra ve/hien thi lai o listWide() - bao loi ro
+            // thay vi tra ve "thanh cong" nhung dong lai bien mat sau khi tai lai danh sach.
+            throw new BusinessException("RISK_CRITERIA_QUANTITATIVE_VALUE_EMPTY",
+                    "Phai nhap it nhat 1 chi tieu dinh luong de luu duoc dong nay");
+        }
         return toWideRow(request.branchCode(), request.year(), items, criteriaById(tenantId), unitsByCode(tenantId));
     }
 
