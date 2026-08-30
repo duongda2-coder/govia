@@ -13,5 +13,5 @@ public interface RiskUserAssignmentRepository extends JpaRepository<RiskUserAssi
     Optional<RiskUserAssignment> findByTenantIdAndUsernameAndCriteriaIdAndBranchCode(
             UUID tenantId, String username, UUID criteriaId, String branchCode);
 
-    List<RiskUserAssignment> findByTenantIdAndUsernameAndCriteriaId(UUID tenantId, String username, UUID criteriaId);
+    List<RiskUserAssignment> findByTenantIdAndUsernameAndCriteriaIdAndActiveTrue(UUID tenantId, String username, UUID criteriaId);
 }

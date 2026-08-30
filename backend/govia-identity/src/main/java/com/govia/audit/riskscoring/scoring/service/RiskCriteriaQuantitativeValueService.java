@@ -309,7 +309,7 @@ public class RiskCriteriaQuantitativeValueService {
                 }
                 Set<String> branches = new HashSet<>();
                 boolean allBranches = false;
-                for (RiskUserAssignment a : userAssignmentRepository.findByTenantIdAndUsernameAndCriteriaId(tenantId, username, criteriaId)) {
+                for (RiskUserAssignment a : userAssignmentRepository.findByTenantIdAndUsernameAndCriteriaIdAndActiveTrue(tenantId, username, criteriaId)) {
                     if (a.getBranchCode() == null) {
                         allBranches = true;
                     } else {
