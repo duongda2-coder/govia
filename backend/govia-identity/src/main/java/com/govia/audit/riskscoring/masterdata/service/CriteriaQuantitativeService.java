@@ -4,6 +4,7 @@ import com.govia.audit.riskscoring.masterdata.dto.CriteriaQuantitativeRequest;
 import com.govia.audit.riskscoring.masterdata.dto.CriteriaQuantitativeResponse;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectCategory;
 import com.govia.audit.riskscoring.masterdata.entity.RiskCriteriaQuantitative;
+import com.govia.audit.riskscoring.masterdata.entity.RiskCriteriaQuantitativeOrder;
 import com.govia.audit.riskscoring.masterdata.entity.RiskGroup1;
 import com.govia.audit.riskscoring.masterdata.entity.RiskGroup2;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepository;
@@ -60,13 +61,17 @@ public class CriteriaQuantitativeService {
         this.excelImportService = excelImportService;
     }
 
+    /** Thu tu tra ve khop dung thu tu cot trong sheet DL_Nhaptructiep (xem RiskCriteriaQuantitativeOrder)
+     * thay vi alphabet don gian - dam bao dong nhat voi man hinh HSRR dinh luong va file export. */
     @Transactional(readOnly = true)
     public List<CriteriaQuantitativeResponse> list() {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, String> group1Codes = group1CodesById(tenantId);
         Map<UUID, String> group2Codes = group2CodesById(tenantId);
         Map<UUID, AuditObjectCategory> categories = auditObjectCategoriesById(tenantId);
-        return repository.findByTenantIdOrderByCodeAsc(tenantId).stream()
+        List<RiskCriteriaQuantitative> ordered = RiskCriteriaQuantitativeOrder.sortByFsOrder(
+                repository.findByTenantIdOrderByCodeAsc(tenantId), RiskCriteriaQuantitative::getCode);
+        return ordered.stream()
                 .map(item -> toResponse(item, group1Codes, group2Codes, categories)).toList();
     }
 

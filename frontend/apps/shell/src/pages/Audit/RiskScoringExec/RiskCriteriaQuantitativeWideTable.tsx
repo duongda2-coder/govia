@@ -162,14 +162,18 @@ export function RiskCriteriaQuantitativeWideTable() {
   };
 
   const columns: CrudColumn<RiskCriteriaQuantitativeWideRowItem>[] = useMemo(() => {
-    // Thu tu cot LUOI MAN HINH dung nhu anh chup man hinh "Quan ly chi tieu danh gia rui ro theo
-    // DTKT" nhung trong chinh sheet DL_Nhaptructiep cua file "2. Cham diem (2).xlsx": Nam | Chi Nhanh
-    // | Ngay | tung chi tieu dinh luong - KHONG co cot "Ten chi nhanh" o day (cot do chi xuat hien
-    // trong file MAU UPLOAD DL_HSRR_Upload, xem RiskCriteriaQuantitativeValueService.wideExportColumns
-    // o backend - export/import Excel van giu Ten chi nhanh cho de doc, nhung luoi man hinh thi khong).
+    // Thu tu cot dung CHINH XAC dong header (dong 5/12, cot B tro di) cua sheet DL_Nhaptructiep,
+    // file "2. Cham diem (2).xlsx" - doc duoc tu shared-string cell (STT | Nam | Ma CN | TEN CHI
+    // NHANH | Thoi diem cham | TDQM01... - STT khong hien tren luoi, chi dung cho file Excel).
     const fixed: CrudColumn<RiskCriteriaQuantitativeWideRowItem>[] = [
       { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 90, sorter: (a, b) => a.year - b.year },
       { title: t("riskScoringExec.hsrr.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
+      {
+        title: t("riskScoringExec.hsrr.branchName"),
+        width: 200,
+        ...getSearchColumnProps("branchName", searchLabels),
+        render: (v: string | null) => v ?? "-",
+      },
       { title: t("riskScoringExec.hsrr.entryDate"), dataIndex: "entryDate", width: 110, render: (v: string | null) => v ?? "-" },
     ];
     const dynamic: CrudColumn<RiskCriteriaQuantitativeWideRowItem>[] = criteriaList.map((c) => ({

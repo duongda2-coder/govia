@@ -2,6 +2,7 @@ package com.govia.audit.riskscoring.scoring.service;
 
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.riskscoring.masterdata.entity.RiskCriteriaQuantitative;
+import com.govia.audit.riskscoring.masterdata.entity.RiskCriteriaQuantitativeOrder;
 import com.govia.audit.riskscoring.masterdata.entity.RiskUserAssignment;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
 import com.govia.audit.riskscoring.masterdata.repository.RiskCriteriaQuantitativeRepository;
@@ -353,7 +354,9 @@ public class RiskCriteriaQuantitativeValueService {
         columns.add(new ExportColumn("branchCode", "Chi Nhánh"));
         columns.add(new ExportColumn("branchName", "Tên Chi Nhánh"));
         columns.add(new ExportColumn("entryDate", "Ngày"));
-        criteriaRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> columns.add(new ExportColumn(c.getCode(), c.getCode())));
+        List<RiskCriteriaQuantitative> ordered = RiskCriteriaQuantitativeOrder.sortByFsOrder(
+                criteriaRepository.findByTenantIdOrderByCodeAsc(tenantId), RiskCriteriaQuantitative::getCode);
+        ordered.forEach(c -> columns.add(new ExportColumn(c.getCode(), c.getCode())));
         return columns;
     }
 

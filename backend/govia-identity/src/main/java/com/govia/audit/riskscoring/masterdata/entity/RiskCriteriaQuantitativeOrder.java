@@ -1,0 +1,70 @@
+package com.govia.audit.riskscoring.masterdata.entity;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+/**
+ * Thu tu hien thi CHUAN cho chi tieu dinh luong - lay dung thu tu cot trong dong header (dong 5/12)
+ * cua sheet DL_Nhaptructiep, file "2. Cham diem (2).xlsx": sau STT/Nam/Ma CN/Ten CN/Thoi diem cham
+ * la lan luot cac nhom TDQM, TDCL, TDAT, DPQM, DPAT, DPHQ, CEAT, THKH, KDNH, FA, CNTT, CARD. Danh
+ * muc chi tieu (RiskCriteriaQuantitative) khong co cot thu tu rieng nen KHONG the ORDER BY o DB -
+ * sap xep lai trong bo nho theo danh sach ma tham chieu nay. Vai ma trong tai lieu goc co tien to
+ * "Z" (ten truong ky thuat SAP, vd "ZCARD01") nhung ma nghiep vu thuc te dang dung khong co tien to
+ * nay (vd "CARD01") - so khop sau khi bo tien to "Z" o dau.
+ */
+public final class RiskCriteriaQuantitativeOrder {
+
+    private static final List<String> CANONICAL_CODES = List.of(
+            "TDQM01", "TDQM02", "TDQM03", "TDQM04", "TDQM05", "TDQM06", "TDQM07", "TDQM08", "TDQM09", "TDQM010",
+            "TDCL01", "TDCL02", "TDCL03", "TDCL04", "TDCL05", "TDCL06", "TDCL07", "TDCL08", "TDCL09", "TDCL10",
+            "TDCL11", "TDCL12", "TDCL13", "TDCL15",
+            "TDAT01", "TDAT02", "TDAT03", "TDAT04", "TDAT05", "TDAT06", "TDAT07", "TDAT08", "TDAT09", "TDAT010",
+            "TDAT011", "TDAT012",
+            "DPQM01", "DPQM02", "DPQM03", "DPQM04", "DPQM05", "DPQM06",
+            "DPAT01", "DPAT02", "DPAT03", "DPAT04", "DPAT05", "DPAT06", "DPAT07", "DPAT08",
+            "DPHQ01", "DPHQ02", "DPHQ03", "DPHQ04", "DPHQ05", "DPHQ06",
+            "CEAT01", "CEAT02", "CEAT03", "CEAT04", "CEAT05", "CEAT06", "CEAT07", "CEAT08", "CEAT09",
+            "THKH01", "THKH02", "THKH03", "THKH04", "THKH05", "THKH06", "THKH07", "THKH08", "THKH09",
+            "KDNH01", "KDNH02", "KDNH03", "KDNH04", "KDNH05",
+            "FA01", "FA02", "FA03", "FA04", "FA05",
+            "CNTT01", "CNTT02", "CNTT03", "CNTT04", "CNTT05", "CNTT06",
+            "CARD01", "CARD02", "CARD03", "CARD04"
+    );
+
+    private static final Map<String, Integer> INDEX_BY_CODE = new HashMap<>();
+
+    static {
+        for (int i = 0; i < CANONICAL_CODES.size(); i++) {
+            INDEX_BY_CODE.putIfAbsent(CANONICAL_CODES.get(i), i);
+        }
+    }
+
+    private RiskCriteriaQuantitativeOrder() {
+    }
+
+    /** Sap xep lai danh sach theo dung thu tu FS - ma nao khong nam trong danh sach chuan (chi tieu
+     * phat sinh sau nay, chua co trong tai lieu goc) thi xep sau cung, theo alphabet. */
+    public static <T> List<T> sortByFsOrder(List<T> items, Function<T, String> codeExtractor) {
+        List<T> sorted = new ArrayList<>(items);
+        sorted.sort(Comparator
+                .<T>comparingInt(item -> rank(codeExtractor.apply(item)))
+                .thenComparing(item -> codeExtractor.apply(item), String.CASE_INSENSITIVE_ORDER));
+        return sorted;
+    }
+
+    private static int rank(String code) {
+        if (code == null) {
+            return Integer.MAX_VALUE;
+        }
+        String normalized = code.trim().toUpperCase();
+        if (normalized.startsWith("Z") && normalized.length() > 1) {
+            normalized = normalized.substring(1);
+        }
+        Integer idx = INDEX_BY_CODE.get(normalized);
+        return idx != null ? idx : Integer.MAX_VALUE;
+    }
+}
