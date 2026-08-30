@@ -155,15 +155,12 @@ export function RiskCriteriaQuantitativeWideTable() {
   };
 
   const columns: CrudColumn<RiskCriteriaQuantitativeWideRowItem>[] = useMemo(() => {
+    // Thu tu cot dung nhu FS mo ta tai sheet DL_Nhaptructiep: Nam | Chi Nhanh (ma) | Ngay | tung
+    // chi tieu dinh luong - KHONG co cot rieng "Ten chi nhanh" (xem anh chup man hinh dinh kem
+    // trong file "2. Cham diem (2).xlsx", sheet DL_Nhaptructiep).
     const fixed: CrudColumn<RiskCriteriaQuantitativeWideRowItem>[] = [
       { title: t("riskScoringExec.assessmentOther.year"), dataIndex: "year", width: 90, sorter: (a, b) => a.year - b.year },
       { title: t("riskScoringExec.hsrr.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
-      {
-        title: t("riskScoringExec.hsrr.branchName"),
-        width: 200,
-        ...getSearchColumnProps("branchName", searchLabels),
-        render: (v: string | null) => v ?? "-",
-      },
       { title: t("riskScoringExec.hsrr.entryDate"), dataIndex: "entryDate", width: 110, render: (v: string | null) => v ?? "-" },
     ];
     const dynamic: CrudColumn<RiskCriteriaQuantitativeWideRowItem>[] = criteriaList.map((c) => ({
