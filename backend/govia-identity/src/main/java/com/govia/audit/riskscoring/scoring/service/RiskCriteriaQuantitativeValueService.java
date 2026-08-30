@@ -343,8 +343,7 @@ public class RiskCriteriaQuantitativeValueService {
                     List<String> unauthorizedCodes = new ArrayList<>();
                     for (Map.Entry<Integer, UUID> col : criteriaColumns.entrySet()) {
                         Cell cell = row.getCell(col.getKey());
-                        String raw = cell == null ? "" : formatter.formatCellValue(cell).trim();
-                        if (raw.isEmpty()) {
+                        if (isBlankCell(cell, formatter)) {
                             continue;
                         }
                         UUID criteriaId = col.getValue();
@@ -354,7 +353,7 @@ public class RiskCriteriaQuantitativeValueService {
                             unauthorizedCodes.add(criteriaCodesById.get(criteriaId));
                             continue;
                         }
-                        BigDecimal value = parseDecimal(raw);
+                        BigDecimal value = parseDecimal(cell, formatter);
                         if (value == null) {
                             continue;
                         }
@@ -489,9 +488,27 @@ public class RiskCriteriaQuantitativeValueService {
         }
     }
 
-    private BigDecimal parseDecimal(String value) {
+    /** true neu o "khong co gia tri" (bo qua, khong tinh la loi/khong tinh la unauthorized). */
+    private boolean isBlankCell(Cell cell, DataFormatter formatter) {
+        if (cell == null || cell.getCellType() == CellType.BLANK) {
+            return true;
+        }
+        if (cell.getCellType() == CellType.NUMERIC) {
+            return false;
+        }
+        return formatter.formatCellValue(cell).trim().isEmpty();
+    }
+
+    /** Doc truc tiep gia tri so cua o NUMERIC thay vi qua DataFormatter (formatCellValue ap dung
+     * dinh dang hien thi cua cell - vd dau phan cach hang nghin "1,234" - khien BigDecimal parse
+     * that bai va gia tri > ~1000 bi am tham bo qua khi cot duoc dinh dang co dau phan cach). */
+    private BigDecimal parseDecimal(Cell cell, DataFormatter formatter) {
+        if (cell.getCellType() == CellType.NUMERIC) {
+            return BigDecimal.valueOf(cell.getNumericCellValue());
+        }
+        String raw = formatter.formatCellValue(cell).trim().replace(",", "");
         try {
-            return new BigDecimal(value.trim());
+            return new BigDecimal(raw);
         } catch (Exception e) {
             return null;
         }
