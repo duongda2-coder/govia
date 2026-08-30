@@ -108,8 +108,8 @@ public class RiskBranchScoreQualitativeService {
         for (RiskFrequencyCoefficient c : caseCoefficients) {
             if (c.isRepeat()) {
                 repeatCoefficients.add(c);
-            } else {
-                caseByCode.put(c.getCode(), c);
+            } else if (c.getCode() != null) {
+                caseByCode.put(normalizeCaseCode(c.getCode()), c);
             }
         }
         Map<String, AuditObjectUnit> units = unitsByCode(tenantId);
@@ -237,12 +237,23 @@ public class RiskBranchScoreQualitativeService {
         if (result == null) {
             return BigDecimal.ZERO;
         }
-        RiskFrequencyCoefficient caseRow = caseByCode.get(String.valueOf(result.caseValue));
+        RiskFrequencyCoefficient caseRow = caseByCode.get(normalizeCaseCode(String.valueOf(result.caseValue)));
+        if (caseRow == null) {
+            // Danh muc "He so tan suat" khong huong dan ro user phai nhap ma "0".."4" - tai lieu goc
+            // tu goi 5 truong hop nay la "TH1".."TH5" (xem sheet CT_Diem_DT, muc 8.d) nen nguoi nhap
+            // lieu rat co the go dung ten do thay vi ma so noi bo. TH{n} voi n = 5 - caseValue
+            // (caseValue 4=TH1, 3=TH2, 2=TH3, 1=TH4, 0=TH5).
+            caseRow = caseByCode.get(normalizeCaseCode("TH" + (5 - result.caseValue)));
+        }
         BigDecimal bonus = caseRow != null && caseRow.getBonusPoint() != null ? caseRow.getBonusPoint() : BigDecimal.ZERO;
         if (result.repeatEligible && result.onesCount > 1) {
             bonus = bonus.add(findRepeatBonus(repeatCoefficients, result.onesCount - 1));
         }
         return bonus;
+    }
+
+    private String normalizeCaseCode(String code) {
+        return code.trim().toUpperCase();
     }
 
     private record HistoricalCase(int caseValue, boolean repeatEligible, int onesCount) {

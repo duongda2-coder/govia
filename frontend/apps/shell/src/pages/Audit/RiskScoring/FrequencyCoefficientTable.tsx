@@ -227,8 +227,8 @@ export function FrequencyCoefficientTable() {
         <Form<FormValues> form={form} layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]}>
-                <Input />
+              <Form.Item name="code" label={t("riskScoring.columns.code")} rules={[{ required: true }]} tooltip={t("riskScoring.frequencyCoefficientCodeHint")}>
+                <Input placeholder="TH1, TH2, TH3, TH4, TH5" />
               </Form.Item>
             </Col>
             <Col span={12}>

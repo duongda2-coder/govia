@@ -652,6 +652,7 @@
       "auditObjectProject": "Dự án/DVTN",
       "auditObjectProcess": "Quy trình"
     },
+    "frequencyCoefficientCodeHint": "Dùng đúng mã TH1, TH2, TH3, TH4, TH5 (5 trường hợp hệ số sai phạm lịch sử) - hệ thống tính điểm chấm điểm rủi ro định tính tra cứu theo đúng các mã này",
     "columns": {
       "auditObjectCategory": "Loại đối tượng kiểm toán",
       "note": "Ghi chú",

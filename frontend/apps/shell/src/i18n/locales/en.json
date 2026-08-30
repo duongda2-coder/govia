@@ -652,6 +652,7 @@
       "auditObjectProject": "Project/Outsourced Service",
       "auditObjectProcess": "Process"
     },
+    "frequencyCoefficientCodeHint": "Use exactly TH1, TH2, TH3, TH4, TH5 (the 5 historical-violation cases) - the qualitative risk score calculation looks these codes up exactly",
     "columns": {
       "auditObjectCategory": "Audit Object Category",
       "note": "Note",
