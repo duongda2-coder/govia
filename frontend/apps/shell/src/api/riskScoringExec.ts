@@ -420,7 +420,7 @@ export const riskCriteriaQuantitativeValueApi = {
     });
     return res.data.data;
   },
-  exportFile: (year: number, kind: "excel" | "word") => downloadHsrrFile("quantitative", year, kind, "risk_score_criteria_quantitative_value"),
+  exportFile: (year: number, kind: "excel" | "word") => downloadHsrrFile("hsrr/quantitative", year, kind, "risk_score_criteria_quantitative_value"),
   async listWide(year: number): Promise<RiskCriteriaQuantitativeWideRowItem[]> {
     const res = await httpClient.get<ApiResponse<RiskCriteriaQuantitativeWideRowItem[]>>(`${BASE}/hsrr/quantitative/wide`, { params: { year } });
     return res.data.data;
@@ -456,5 +456,5 @@ export const riskCriteriaQualitativeValueApi = {
     });
     return res.data.data;
   },
-  exportFile: (year: number, kind: "excel" | "word") => downloadHsrrFile("qualitative", year, kind, "risk_score_criteria_qualitative_value"),
+  exportFile: (year: number, kind: "excel" | "word") => downloadHsrrFile("hsrr/qualitative", year, kind, "risk_score_criteria_qualitative_value"),
 };
