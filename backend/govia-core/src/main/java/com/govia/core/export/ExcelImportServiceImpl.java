@@ -1,6 +1,7 @@
 package com.govia.core.export;
 
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +54,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
                 boolean hasData = false;
                 for (Map.Entry<Integer, String> entry : columnIndexToField.entrySet()) {
                     Cell cell = row.getCell(entry.getKey());
-                    String value = cell == null ? "" : formatter.formatCellValue(cell).trim();
+                    String value = cellToString(cell, formatter);
                     rowData.put(entry.getValue(), value);
                     hasData = hasData || !value.isEmpty();
                 }
@@ -64,5 +66,18 @@ public class ExcelImportServiceImpl implements ExcelImportService {
         } catch (IOException e) {
             throw new UncheckedIOException("Khong doc duoc file Excel", e);
         }
+    }
+
+    /** O NUMERIC doc truc tiep gia tri so thay vi qua DataFormatter - formatCellValue ap dung dinh
+     * dang hien thi cua o (vd dau phan cach hang nghin "1,234" hoac dau "%" cho o dinh dang phan
+     * tram) khien cac ham parseDecimal/parseInt phia sau parse that bai va am tham tra ve null. */
+    private String cellToString(Cell cell, DataFormatter formatter) {
+        if (cell == null) {
+            return "";
+        }
+        if (cell.getCellType() == CellType.NUMERIC) {
+            return BigDecimal.valueOf(cell.getNumericCellValue()).stripTrailingZeros().toPlainString();
+        }
+        return formatter.formatCellValue(cell).trim();
     }
 }
