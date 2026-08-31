@@ -34,6 +34,7 @@ import { RiskBranchScoreQualitativePage } from "./pages/Audit/RiskScoringExec/Ri
 import { RiskBranchScoreCombinedPage } from "./pages/Audit/RiskScoringExec/RiskBranchScoreCombinedPage";
 import { RiskBranchScoreExpertRankPage } from "./pages/Audit/RiskScoringExec/RiskBranchScoreExpertRankPage";
 import { RiskScoringExecDashboardPage } from "./pages/Audit/RiskScoringExec/RiskScoringExecDashboardPage";
+import { AuditFindingPage } from "./pages/Audit/RiskScoringExec/AuditFindingPage";
 import { GlobalModalKeyboardShortcuts } from "./components/GlobalModalKeyboardShortcuts";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -80,6 +81,7 @@ function App() {
           <Route path="audit/risk-scoring/master-data/user-assignment" element={<RiskScoringUserAssignmentPage />} />
           <Route path="audit/risk-scoring/master-data/audit-objects" element={<RiskScoringAuditObjectsPage />} />
           <Route path="audit/risk-scoring/scoring/dashboard" element={<RiskScoringExecDashboardPage />} />
+          <Route path="audit/risk-scoring/scoring/findings" element={<AuditFindingPage />} />
           <Route path="audit/risk-scoring/scoring/group-ho" element={<GroupHOPage />} />
           <Route path="audit/risk-scoring/scoring/risk-type-ho" element={<RiskTypeHOPage />} />
           <Route path="audit/risk-scoring/scoring/criteria-other" element={<RiskCriteriaOtherPage />} />

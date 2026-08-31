@@ -1,0 +1,19 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: "Audit AI Agent" =====================
+  # Chi 1 quyen VIEW - day la man hinh dung tinh nang (chat), khong phai CRUD nen khong can bo 6
+  # quyen chuan (CREATE/EDIT/DELETE/EXPORT/IMPORT khong co y nghia o day). Quyen truy cap tung Audit
+  # Tool cu the van do permission rieng cua tool do quyet dinh (AUDIT.RISK_SCORING_EXEC.VIEW,
+  # AUDIT.FINDING.VIEW) - quyen nay chi gate viec vao duoc man chat.
+  - changeSet:
+      id: 049-1-permission-catalog-audit-agent
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "aa000000-0000-0000-0000-000000000001" }
+              - column: { name: code, value: "AUDIT.AGENT.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Su dung Audit AI Assistant" }
+              - column: { name: resource_label, value: "Audit AI Assistant" }

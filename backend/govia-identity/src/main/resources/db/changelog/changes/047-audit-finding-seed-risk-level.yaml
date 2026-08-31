@@ -1,0 +1,24 @@
+databaseChangeLog:
+
+  # Seed danh muc RISK_LEVEL (da khai bao san trong AuditMasterDataCategory nhung chua tung duoc seed/
+  # dung) voi 3 gia tri mac dinh - can co truoc khi AuditFinding.severity tham chieu toi (xem
+  # AuditFindingService.validateSeverity, cung pattern voi 038-audit-master-data-seed-unit-type).
+  - changeSet:
+      id: 047-1-audit-finding-seed-risk-level
+      author: govia
+      comment: "Seed danh muc Muc do rui ro (Cao/Trung binh/Thap) moi tenant"
+      changes:
+        - sql:
+            sql: >
+              INSERT INTO audit_master_data_item (id, tenant_id, category, code, name, sort_order, active, created_at, row_version)
+              SELECT gen_random_uuid(), t.id, 'RISK_LEVEL', v.code, v.name, v.sort_order, true, now(), 0
+              FROM tenant t
+              CROSS JOIN (VALUES
+                ('CAO', 'Cao', 1),
+                ('TB', 'Trung bình', 2),
+                ('THAP', 'Thấp', 3)
+              ) AS v(code, name, sort_order)
+              WHERE NOT EXISTS (
+                SELECT 1 FROM audit_master_data_item i
+                WHERE i.tenant_id = t.id AND i.category = 'RISK_LEVEL' AND i.code = v.code
+              );

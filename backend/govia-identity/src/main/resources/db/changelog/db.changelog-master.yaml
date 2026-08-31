@@ -116,3 +116,24 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/044-risk-score-branch-score-expert-rank-schema.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/045-audit-finding-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/046-audit-finding-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/047-audit-finding-seed-risk-level.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/048-audit-agent-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/049-audit-agent-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/050-risk-score-quantitative-value-rename-column.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/051-risk-frequency-coefficient-rename-column.yaml
+      relativeToChangelogFile: false

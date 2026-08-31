@@ -1,0 +1,44 @@
+databaseChangeLog:
+
+  # ===================== Audit AI Agent - audit log rieng cho tool call =====================
+  # Khong tai dung bang "audit_log" dung chung (cot "detail" gioi han 4000 ky tu) vi mot so tool
+  # (vd get_risk_history) co the tra ve response dai hon muc do. Bang nay chi ghi lai (khong bao gio
+  # ghi Authorization header/token/password): cau hoi cua user, tool nao duoc goi voi tham so gi,
+  # trang thai + tom tat ket qua, va cau tra loi cuoi cung - phuc vu truy vet/kiem toan cho Agent.
+  - changeSet:
+      id: 048-1-audit-agent-tool-call-log-schema
+      author: govia
+      comment: "Bang agent_tool_call_log - audit log cho AI Agent (tool call + final answer)"
+      changes:
+        - createTable:
+            tableName: agent_tool_call_log
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: user_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: conversation_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: turn_seq, type: INT, constraints: { nullable: false } }
+              - column: { name: event_type, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: user_question, type: VARCHAR(4000) }
+              - column: { name: tool_name, type: VARCHAR(100) }
+              - column: { name: tool_arguments, type: VARCHAR(4000) }
+              - column: { name: tool_status, type: VARCHAR(20) }
+              - column: { name: response_summary, type: VARCHAR(4000) }
+              - column: { name: latency_ms, type: BIGINT }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: agent_tool_call_log
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_agent_tool_call_log_tenant
+        - createIndex:
+            tableName: agent_tool_call_log
+            indexName: ix_agent_tool_call_log_conversation
+            columns:
+              - column: { name: conversation_id }
+              - column: { name: turn_seq }

@@ -11,3 +11,7 @@ spring:
     password:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
+
+govia:
+  llm:
+    provider: fake   # dung FakeLlmProvider (xem com.govia.audit.agent.llm.FakeLlmProvider) - test khong goi Ollama that

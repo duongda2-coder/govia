@@ -1,0 +1,17 @@
+databaseChangeLog:
+
+  # "value" la tu khoa dung rieng (reserved keyword) cua H2 (KHONG phai cua Postgres) - moi truy van
+  # JPA dung ten cot nay se loi parse tren profile test (H2), phat hien khi them AgentApiTest goi
+  # get_branch_risk (RiskBranchScoreQuantitativeService doc bang nay). Doi ten cot sang
+  # "entered_value" de tranh xung dot tu khoa tren ca 2 dialect - KHONG doi field Java "value"
+  # (RiskCriteriaQuantitativeValue.value), chi doi @Column(name=...) tuong ung.
+  - changeSet:
+      id: 050-1-risk-score-quantitative-value-rename-column
+      author: govia
+      comment: "Doi ten cot risk_score_criteria_quantitative_value.value -> entered_value (tranh tu khoa dung rieng cua H2)"
+      changes:
+        - renameColumn:
+            tableName: risk_score_criteria_quantitative_value
+            oldColumnName: value
+            newColumnName: entered_value
+            columnDataType: "DECIMAL(18,4)"

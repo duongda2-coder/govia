@@ -3,6 +3,20 @@
     "name": "GOVIA Platform",
     "tagline": "Governance, Organization, Verification, Identity & Access"
   },
+  "agent": {
+    "chat": {
+      "emptyHint": "Ask about branch risk, comparisons, score history, or audit findings...",
+      "inputPlaceholder": "Type a question, e.g. Which branch has the highest risk?",
+      "errorUnavailable": "AI Assistant is currently unavailable because the local LLM service is not ready.",
+      "facts": "Facts",
+      "analysis": "Analysis",
+      "recommendations": "Recommendations",
+      "recommendationTag": "Recommendation",
+      "evidenceCount": "Evidence ({{count}})",
+      "notFullyGrounded": "Part of this answer could not be verified against tool data and was removed.",
+      "truncated": "Reached the processing step limit - this answer is based on the data gathered so far."
+    }
+  },
   "menu": {
     "dashboard": "Dashboard",
     "people": "People",
@@ -43,6 +57,8 @@
     "riskScoringExecAssessmentOtherRanking": "Other Risk Ranking",
     "riskScoringExecAssessmentOtherExpertRank": "Other Risk Expert Ranking",
     "riskScoringExecDashboard": "Dashboard",
+    "riskScoringExecFindings": "Audit Findings",
+    "riskScoringExecAgent": "Audit AI Assistant",
     "riskScoringExecHsrr": "Risk Profile",
     "riskScoringExecBranchScoreQuantitative": "Quantitative Risk Score Results",
     "riskScoringExecBranchScoreQualitative": "Qualitative Risk Score Results",
@@ -846,6 +862,23 @@
       "deleteError": "Failed to delete",
       "saveError": "Failed to save",
       "exportError": "Failed to export file"
+    },
+    "finding": {
+      "title": "Title",
+      "description": "Description",
+      "severity": "Severity",
+      "detectedDate": "Detected Date",
+      "createTitle": "Add Audit Finding",
+      "editTitle": "Edit Audit Finding",
+      "deleteConfirmTitle": "Delete this audit finding?",
+      "messages": {
+        "loadError": "Failed to load data",
+        "createSuccess": "Created",
+        "updateSuccess": "Updated",
+        "deleteSuccess": "Deleted",
+        "deleteError": "Failed to delete",
+        "saveError": "Failed to save"
+      }
     }
   }
 }

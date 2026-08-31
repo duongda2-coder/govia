@@ -1,0 +1,39 @@
+databaseChangeLog:
+
+  # ===================== Bang "Phat hien kiem toan" (Audit Finding) =====================
+  # Nguon du lieu that cho tool "get_audit_findings" cua AI Agent (xem docs/audit-tools-contract.md).
+  # Khong FK cung toi risk_score_audit_object_unit qua branch_code - dung pattern "value record" nhu
+  # risk_score_criteria_qualitative_value (036), khong phai pattern danh muc nhu 019.
+  - changeSet:
+      id: 045-1-audit-finding-schema
+      author: govia
+      comment: "Bang audit_finding - phat hien kiem toan gan voi 1 chi nhanh"
+      changes:
+        - createTable:
+            tableName: audit_finding
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: branch_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: title, type: VARCHAR(500), constraints: { nullable: false } }
+              - column: { name: description, type: VARCHAR(2000) }
+              - column: { name: severity, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: detected_date, type: DATE, constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_finding
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_finding_tenant
+        - createIndex:
+            tableName: audit_finding
+            indexName: ix_audit_finding_branch_code
+            columns:
+              - column: { name: tenant_id }
+              - column: { name: branch_code }

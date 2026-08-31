@@ -3,6 +3,20 @@
     "name": "GOVIA Platform",
     "tagline": "Governance, Organization, Verification, Identity & Access"
   },
+  "agent": {
+    "chat": {
+      "emptyHint": "Hỏi về rủi ro chi nhánh, so sánh, lịch sử điểm, hoặc phát hiện kiểm toán...",
+      "inputPlaceholder": "Nhập câu hỏi, vd: Chi nhánh nào có rủi ro cao nhất?",
+      "errorUnavailable": "AI Assistant hiện không khả dụng vì local LLM service chưa sẵn sàng.",
+      "facts": "Dữ kiện",
+      "analysis": "Phân tích",
+      "recommendations": "Đề xuất",
+      "recommendationTag": "Đề xuất",
+      "evidenceCount": "Evidence ({{count}})",
+      "notFullyGrounded": "Một phần nội dung chưa xác minh được căn cứ và đã bị loại bỏ.",
+      "truncated": "Đã đạt giới hạn số bước xử lý - câu trả lời dựa trên dữ liệu đã thu thập được."
+    }
+  },
   "menu": {
     "dashboard": "Tổng quan",
     "people": "Nhân sự",
@@ -36,6 +50,8 @@
     "riskScoringAuditObjects": "Đối tượng kiểm toán",
     "riskScoringExec": "Chấm Điểm",
     "riskScoringExecDashboard": "Dashboard",
+    "riskScoringExecFindings": "Phát hiện kiểm toán",
+    "riskScoringExecAgent": "Audit AI Assistant",
     "riskScoringExecGroupHO": "Nhóm rủi ro HO",
     "riskScoringExecRiskTypeHO": "Loại rủi ro HO",
     "riskScoringExecCriteriaOther": "Chỉ tiêu ĐGRR khác",
@@ -846,6 +862,23 @@
       "deleteError": "Xóa thất bại",
       "saveError": "Lưu thất bại",
       "exportError": "Xuất file thất bại"
+    },
+    "finding": {
+      "title": "Tiêu đề",
+      "description": "Mô tả",
+      "severity": "Mức độ",
+      "detectedDate": "Ngày phát hiện",
+      "createTitle": "Thêm phát hiện kiểm toán",
+      "editTitle": "Sửa phát hiện kiểm toán",
+      "deleteConfirmTitle": "Xóa phát hiện kiểm toán này?",
+      "messages": {
+        "loadError": "Không tải được dữ liệu",
+        "createSuccess": "Đã tạo",
+        "updateSuccess": "Đã cập nhật",
+        "deleteSuccess": "Đã xóa",
+        "deleteError": "Xóa thất bại",
+        "saveError": "Lưu thất bại"
+      }
     }
   }
 }

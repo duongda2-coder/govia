@@ -35,6 +35,10 @@ public class RiskCriteriaQuantitativeValue extends BaseEntity {
     @Column(name = "entry_date")
     private LocalDate entryDate;
 
-    @Column(name = "value", precision = 18, scale = 4)
+    // Cot vat ly ten "entered_value" (KHONG phai "value") - "value" la tu khoa dung rieng cua H2
+    // (khong phai Postgres) nen bat ky truy van nao dung ten cot do deu loi parse tren profile test
+    // (H2), du hoan toan hop le tren Postgres. Doi ten cot qua migration 050, giu nguyen ten field
+    // Java "value" (khong anh huong code goi getValue()/setValue() o noi khac).
+    @Column(name = "entered_value", precision = 18, scale = 4)
     private BigDecimal value;
 }

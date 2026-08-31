@@ -28,7 +28,9 @@ public class RiskFrequencyCoefficient extends BaseEntity {
     @Column(name = "label", nullable = false, length = 255)
     private String label;
 
-    @Column(name = "value", precision = 9, scale = 4)
+    // Cot vat ly ten "entered_value" (KHONG phai "value") - "value" la tu khoa dung rieng cua H2
+    // (khong phai Postgres), doi ten qua migration 051, giu nguyen ten field Java "value".
+    @Column(name = "entered_value", precision = 9, scale = 4)
     private BigDecimal value;
 
     @Column(name = "bonus_point", precision = 9, scale = 2)

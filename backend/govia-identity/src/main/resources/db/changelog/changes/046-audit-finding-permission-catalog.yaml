@@ -1,0 +1,42 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: "Phat hien kiem toan" (Audit Finding) =====================
+  # Tach rieng khoi AUDIT.RISK_SCORING_EXEC.* vi day la khai niem kiem toan rong hon rieng Cham diem
+  # rui ro, co the giao quyen doc lap cho kiem toan vien ghi nhan phat hien. Chi 4 quyen VIEW/CREATE/
+  # EDIT/DELETE - khong co EXPORT/IMPORT vi man hinh nay chua co nhu cau Excel.
+  - changeSet:
+      id: 046-1-permission-catalog-audit-finding
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a9000000-0000-0000-0000-000000000001" }
+              - column: { name: code, value: "AUDIT.FINDING.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem phat hien kiem toan" }
+              - column: { name: resource_label, value: "Phát hiện kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a9000000-0000-0000-0000-000000000002" }
+              - column: { name: code, value: "AUDIT.FINDING.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi phat hien kiem toan" }
+              - column: { name: resource_label, value: "Phát hiện kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a9000000-0000-0000-0000-000000000003" }
+              - column: { name: code, value: "AUDIT.FINDING.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua phat hien kiem toan" }
+              - column: { name: resource_label, value: "Phát hiện kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a9000000-0000-0000-0000-000000000004" }
+              - column: { name: code, value: "AUDIT.FINDING.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa phat hien kiem toan" }
+              - column: { name: resource_label, value: "Phát hiện kiểm toán" }

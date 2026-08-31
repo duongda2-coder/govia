@@ -34,6 +34,7 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-rs-audit-objects": "/audit/risk-scoring/master-data/audit-objects",
   "audit-rs-user-assignment": "/audit/risk-scoring/master-data/user-assignment",
   "audit-rse-dashboard": "/audit/risk-scoring/scoring/dashboard",
+  "audit-rse-findings": "/audit/risk-scoring/scoring/findings",
   "audit-rse-group-ho": "/audit/risk-scoring/scoring/group-ho",
   "audit-rse-risk-type-ho": "/audit/risk-scoring/scoring/risk-type-ho",
   "audit-rse-criteria-other": "/audit/risk-scoring/scoring/criteria-other",
@@ -101,6 +102,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
   const canViewAuditMasterData = hasPermission("AUDIT.MASTER_DATA.VIEW");
   const canViewRiskScoring = hasPermission("AUDIT.RISK_SCORING.VIEW");
   const canViewRiskScoringExec = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
+  const canViewFindings = hasPermission("AUDIT.FINDING.VIEW");
 
   const auditGroupLabel = t("menu.audit");
   const auditMdGroupLabel = `${auditGroupLabel} / ${t("menu.auditMasterData")}`;
@@ -141,10 +143,11 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
         canViewRiskScoringExec && {
           key: "audit-rse-master-data",
           label: menuLabel(t("menu.riskScoringExec")),
-          children: [
+          children: dropNulls([
             // Them tab moi vao day khi xu ly them sheet cua "2. Cham diem.xlsx" - moi sheet la 1 muc
             // menu/route rieng (giong Master Data CDRR), khong phai tab trong 1 trang.
             leaf("audit-rse-dashboard", t("menu.riskScoringExecDashboard"), auditRseGroupLabel),
+            canViewFindings && leaf("audit-rse-findings", t("menu.riskScoringExecFindings"), auditRseGroupLabel),
             leaf("audit-rse-group-ho", t("menu.riskScoringExecGroupHO"), auditRseGroupLabel),
             leaf("audit-rse-risk-type-ho", t("menu.riskScoringExecRiskTypeHO"), auditRseGroupLabel),
             leaf("audit-rse-criteria-other", t("menu.riskScoringExecCriteriaOther"), auditRseGroupLabel),
@@ -157,7 +160,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
             leaf("audit-rse-branch-score-dt", t("menu.riskScoringExecBranchScoreQualitative"), auditRseGroupLabel),
             leaf("audit-rse-branch-score-all", t("menu.riskScoringExecBranchScoreCombined"), auditRseGroupLabel),
             leaf("audit-rse-branch-score-expert-rank", t("menu.riskScoringExecBranchScoreExpertRank"), auditRseGroupLabel),
-          ],
+          ]),
         },
       ]),
     },

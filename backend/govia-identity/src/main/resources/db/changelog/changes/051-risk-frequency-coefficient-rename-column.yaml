@@ -1,0 +1,14 @@
+databaseChangeLog:
+
+  # Cung loi voi migration 050 - "value" la tu khoa dung rieng cua H2 (khong phai Postgres). Doi ten
+  # cot risk_score_frequency_coefficient.value -> entered_value. Khong doi field Java "value".
+  - changeSet:
+      id: 051-1-risk-frequency-coefficient-rename-column
+      author: govia
+      comment: "Doi ten cot risk_score_frequency_coefficient.value -> entered_value (tranh tu khoa dung rieng cua H2)"
+      changes:
+        - renameColumn:
+            tableName: risk_score_frequency_coefficient
+            oldColumnName: value
+            newColumnName: entered_value
+            columnDataType: "DECIMAL(9,4)"

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthContext";
 import { LanguageSwitcher } from "../components/LanguageSwitcher";
 import { ChangePasswordModal } from "../components/ChangePasswordModal";
+import { AuditAgentWidget } from "../components/AuditAgentWidget";
 import { MENU_ROUTES, useAppMenu, type SearchableScreen } from "./useAppMenu";
 
 const { Header, Sider, Content } = Layout;
@@ -139,6 +140,7 @@ export function AppLayout() {
       </Layout>
 
       <ChangePasswordModal open={changePasswordOpen} onClose={() => setChangePasswordOpen(false)} />
+      <AuditAgentWidget />
     </Layout>
   );
 }
