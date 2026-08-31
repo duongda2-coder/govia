@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/plots": "^2.6.8",
     "@govia/ui-kit": "*",
     "antd": "^5.21.0",
     "axios": "^1.7.7",

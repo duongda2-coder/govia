@@ -42,6 +42,7 @@
     "riskScoringExecAssessmentOther": "Other Risk Assessment",
     "riskScoringExecAssessmentOtherRanking": "Other Risk Ranking",
     "riskScoringExecAssessmentOtherExpertRank": "Other Risk Expert Ranking",
+    "riskScoringExecDashboard": "Dashboard",
     "riskScoringExecHsrr": "Risk Profile",
     "riskScoringExecBranchScoreQuantitative": "Quantitative Risk Score Results",
     "riskScoringExecBranchScoreQualitative": "Qualitative Risk Score Results",
@@ -795,6 +796,15 @@
       "scoreLines": "Score",
       "selectScore": "Select score",
       "selectCategoryFirst": "Select an Audit Object Category to show the criteria to score"
+    },
+    "dashboard": {
+      "title": "Risk Scoring Dashboard",
+      "kpiTotalBranches": "Total Branches",
+      "kpiAvgScore": "Average Risk Score",
+      "kpiTopBranch": "Highest-Scoring Branch",
+      "chartRankDistribution": "Distribution by Rating",
+      "chartTopBranches": "Top 10 Highest-Risk Branches",
+      "chartTrendTitle": "Average Risk Score Trend by Year"
     },
     "ranking": {
       "riskScore": "Risk Score",

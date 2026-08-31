@@ -35,6 +35,7 @@
     "riskScoringUserAssignment": "Phân quyền chỉ tiêu",
     "riskScoringAuditObjects": "Đối tượng kiểm toán",
     "riskScoringExec": "Chấm Điểm",
+    "riskScoringExecDashboard": "Dashboard",
     "riskScoringExecGroupHO": "Nhóm rủi ro HO",
     "riskScoringExecRiskTypeHO": "Loại rủi ro HO",
     "riskScoringExecCriteriaOther": "Chỉ tiêu ĐGRR khác",
@@ -800,6 +801,15 @@
       "riskScore": "Điểm rủi ro",
       "rankLabel": "Xếp loại",
       "selectYear": "Chọn năm"
+    },
+    "dashboard": {
+      "title": "Dashboard chấm điểm rủi ro",
+      "kpiTotalBranches": "Tổng số chi nhánh",
+      "kpiAvgScore": "Điểm rủi ro trung bình",
+      "kpiTopBranch": "Chi nhánh điểm cao nhất",
+      "chartRankDistribution": "Phân bố theo xếp loại",
+      "chartTopBranches": "Top 10 chi nhánh điểm rủi ro cao nhất",
+      "chartTrendTitle": "Xu hướng điểm rủi ro trung bình theo năm"
     },
     "expertRank": {
       "syncFromSource": "Cập nhật dữ liệu từ nguồn",

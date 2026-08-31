@@ -33,6 +33,7 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-rs-coefficient-matrix": "/audit/risk-scoring/master-data/coefficient-matrix",
   "audit-rs-audit-objects": "/audit/risk-scoring/master-data/audit-objects",
   "audit-rs-user-assignment": "/audit/risk-scoring/master-data/user-assignment",
+  "audit-rse-dashboard": "/audit/risk-scoring/scoring/dashboard",
   "audit-rse-group-ho": "/audit/risk-scoring/scoring/group-ho",
   "audit-rse-risk-type-ho": "/audit/risk-scoring/scoring/risk-type-ho",
   "audit-rse-criteria-other": "/audit/risk-scoring/scoring/criteria-other",
@@ -143,6 +144,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
           children: [
             // Them tab moi vao day khi xu ly them sheet cua "2. Cham diem.xlsx" - moi sheet la 1 muc
             // menu/route rieng (giong Master Data CDRR), khong phai tab trong 1 trang.
+            leaf("audit-rse-dashboard", t("menu.riskScoringExecDashboard"), auditRseGroupLabel),
             leaf("audit-rse-group-ho", t("menu.riskScoringExecGroupHO"), auditRseGroupLabel),
             leaf("audit-rse-risk-type-ho", t("menu.riskScoringExecRiskTypeHO"), auditRseGroupLabel),
             leaf("audit-rse-criteria-other", t("menu.riskScoringExecCriteriaOther"), auditRseGroupLabel),
