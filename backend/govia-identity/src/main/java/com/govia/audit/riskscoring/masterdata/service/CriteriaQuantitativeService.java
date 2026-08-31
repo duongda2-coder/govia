@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 /** CRUD + Import/Export cho danh muc "Chi tieu danh gia rui ro dinh luong" (sheet ZTC_CTDGRR_DL). */
@@ -126,6 +127,9 @@ public class CriteriaQuantitativeService {
         return wordExportService.export("Chỉ tiêu đánh giá rủi ro định lượng", exportColumns(), exportRows());
     }
 
+    /** Upsert theo "Ma chi tieu": dong co ma da ton tai se duoc cap nhat (giu nguyen id, khong tao
+     * trung), dong co ma moi se duoc tao moi - cho phep import lai cung file de sua gia tri (vd sau
+     * khi sua loi parse dinh dang %/dau phan cach hang nghin) ma khong can xoa du lieu cu truoc. */
     @Transactional
     public ImportResult importFromExcel(MultipartFile file) {
         List<Map<String, String>> rows;
@@ -166,11 +170,19 @@ public class CriteriaQuantitativeService {
                 }
                 String group2Code = row.get("group2Code");
                 UUID group2Id = isBlank(group2Code) ? null : group2IdsByCode.get(group2Code.trim());
-                create(new CriteriaQuantitativeRequest(auditObjectCategoryId, group1Id, group2Id,
+                Optional<RiskCriteriaQuantitative> existing = repository.findByTenantIdAndCode(tenantId, code.trim());
+                CriteriaQuantitativeRequest request = new CriteriaQuantitativeRequest(auditObjectCategoryId, group1Id, group2Id,
                         code.trim(), name.trim(), parseDecimal(row.get("weight")), parseInt(row.get("criteriaType")), parseDecimal(row.get("businessThreshold")),
                         parseDecimal(row.get("viewThreshold")), parseDecimal(row.get("score20")), parseDecimal(row.get("score40")),
                         parseDecimal(row.get("score60")), parseDecimal(row.get("score80")), parseDecimal(row.get("score100")),
-                        row.get("scoringGuide"), true, true));
+                        row.get("scoringGuide"),
+                        existing.map(RiskCriteriaQuantitative::isIncludeCurrentYear).orElse(true),
+                        existing.map(RiskCriteriaQuantitative::isActive).orElse(true));
+                if (existing.isPresent()) {
+                    update(existing.get().getId(), request);
+                } else {
+                    create(request);
+                }
                 success++;
             } catch (Exception e) {
                 errors.add(new ImportResult.ImportRowError(rowNumber, e.getMessage()));
