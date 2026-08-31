@@ -262,9 +262,10 @@ public class RiskBranchScoreQualitativeService {
     /** Phan loai 5 nam lich su theo dung 5 truong hop mo ta trong sheet CT_Diem_DT (muc "8.d").
      * Tra ve null neu khong khop truong hop nao (bo qua diem he so cho chi tieu do). */
     private HistoricalCase classifyHistory(List<String> violations) {
-        boolean allBlank = violations.stream().allMatch(v -> v == null || v.isBlank());
-        if (allBlank) {
-            return new HistoricalCase(4, false, 0); // TH1: chua kiem toan
+        boolean neverAudited = violations.stream()
+                .allMatch(v -> v == null || v.isBlank() || "N".equalsIgnoreCase(v.trim()));
+        if (neverAudited) {
+            return new HistoricalCase(4, false, 0); // TH1: chua kiem toan (rong hoac gia tri "N")
         }
         int ones = 0;
         int zeros = 0;
