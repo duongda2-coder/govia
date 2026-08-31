@@ -45,7 +45,8 @@
     "riskScoringExecHsrr": "Hồ sơ rủi ro",
     "riskScoringExecBranchScoreQuantitative": "Kết quả chấm điểm rủi ro định lượng",
     "riskScoringExecBranchScoreQualitative": "Kết quả chấm điểm rủi ro định tính",
-    "riskScoringExecBranchScoreCombined": "Kết quả chấm điểm tổng hợp"
+    "riskScoringExecBranchScoreCombined": "Kết quả chấm điểm tổng hợp",
+    "riskScoringExecBranchScoreExpertRank": "Xếp hạng rủi ro theo YKCG"
   },
   "header": {
     "logout": "Đăng xuất"

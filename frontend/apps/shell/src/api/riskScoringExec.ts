@@ -234,6 +234,28 @@ export interface RiskBranchScoreCombinedRowItem {
   scoresByBusinessLineCode: Record<string, number | null>;
 }
 
+export interface RiskBranchScoreExpertRankItem {
+  id: string;
+  year: number;
+  branchCode: string;
+  branchName: string | null;
+  totalScore: number | null;
+  baseRankLabel: string | null;
+  reRankLabel: string | null;
+  reason: string | null;
+  assessedDate: string | null;
+  expertName: string | null;
+  finalRankLabel: string | null;
+  updatedBy: string | null;
+}
+export interface RiskBranchScoreExpertRankRequest {
+  reRankLabel: string | null;
+  reason: string | null;
+  assessedDate: string | null;
+  expertName: string | null;
+  finalRankLabel: string | null;
+}
+
 export interface RiskCriteriaOtherScaleItem {
   id: string;
   auditObjectCategoryId: string;
@@ -380,6 +402,25 @@ export const riskAssessmentOtherExpertRankApi = {
   },
   async update(id: string, request: RiskAssessmentOtherExpertRankRequest): Promise<RiskAssessmentOtherExpertRankItem> {
     const res = await httpClient.put<ApiResponse<RiskAssessmentOtherExpertRankItem>>(`${BASE}/assessment-other-expert-rank/${id}`, request);
+    return res.data.data;
+  },
+};
+
+/** "Xep hang rui ro chi nhanh theo y kien chuyen gia" (sheet ZTC_DGRR_cg). */
+export const riskBranchScoreExpertRankApi = {
+  async list(year: number): Promise<RiskBranchScoreExpertRankItem[]> {
+    const res = await httpClient.get<ApiResponse<RiskBranchScoreExpertRankItem[]>>(`${BASE}/branch-score-expert-rank`, { params: { year } });
+    return res.data.data;
+  },
+  /** "Nut cap nhat du lieu tu nguon" - keo lai Tong diem/Xep hang moi nhat, giu nguyen cac truong chuyen gia da nhap. */
+  async sync(year: number): Promise<RiskBranchScoreExpertRankItem[]> {
+    const res = await httpClient.post<ApiResponse<RiskBranchScoreExpertRankItem[]>>(`${BASE}/branch-score-expert-rank/sync`, null, {
+      params: { year },
+    });
+    return res.data.data;
+  },
+  async update(id: string, request: RiskBranchScoreExpertRankRequest): Promise<RiskBranchScoreExpertRankItem> {
+    const res = await httpClient.put<ApiResponse<RiskBranchScoreExpertRankItem>>(`${BASE}/branch-score-expert-rank/${id}`, request);
     return res.data.data;
   },
 };

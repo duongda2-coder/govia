@@ -44,6 +44,7 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-rse-branch-score-dl": "/audit/risk-scoring/scoring/branch-score-dl",
   "audit-rse-branch-score-dt": "/audit/risk-scoring/scoring/branch-score-dt",
   "audit-rse-branch-score-all": "/audit/risk-scoring/scoring/branch-score-all",
+  "audit-rse-branch-score-expert-rank": "/audit/risk-scoring/scoring/branch-score-expert-rank",
 };
 
 /** Gan title HTML len nhan menu de trinh duyet tu hien tooltip khi chu bi cat ngan (...) do sider hep. */
@@ -153,6 +154,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
             leaf("audit-rse-branch-score-dl", t("menu.riskScoringExecBranchScoreQuantitative"), auditRseGroupLabel),
             leaf("audit-rse-branch-score-dt", t("menu.riskScoringExecBranchScoreQualitative"), auditRseGroupLabel),
             leaf("audit-rse-branch-score-all", t("menu.riskScoringExecBranchScoreCombined"), auditRseGroupLabel),
+            leaf("audit-rse-branch-score-expert-rank", t("menu.riskScoringExecBranchScoreExpertRank"), auditRseGroupLabel),
           ],
         },
       ]),
