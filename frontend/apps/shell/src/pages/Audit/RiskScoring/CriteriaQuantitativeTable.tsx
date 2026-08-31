@@ -226,12 +226,6 @@ export function CriteriaQuantitativeTable() {
       ...getSearchColumnProps("group1Code", searchLabels),
       render: (v: string | null) => v ?? "-",
     },
-    {
-      title: t("riskScoring.columns.group2"),
-      width: 100,
-      ...getSearchColumnProps("group2Code", searchLabels),
-      render: (v: string | null) => v ?? "-",
-    },
     { title: t("riskScoring.columns.code"), width: 110, ...getSearchColumnProps("code", searchLabels) },
     { title: t("riskScoring.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("riskScoring.columns.weight"), dataIndex: "weight", width: 90, render: (v: number | null) => v ?? "-" },
