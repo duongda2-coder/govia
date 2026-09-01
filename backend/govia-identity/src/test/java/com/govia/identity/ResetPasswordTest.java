@@ -72,10 +72,10 @@ class ResetPasswordTest {
 
         userAccountService.resetPassword(emp.id(), new AdminResetPasswordRequest("BrandNewPass789"));
 
-        LoginResponse response = authService.login(new LoginRequest("default", "rst.t01", "BrandNewPass789"));
+        LoginResponse response = authService.login(new LoginRequest("default", "rst.t01", "BrandNewPass789"), null, null).login();
         assertThat(response.accessToken()).isNotBlank();
 
-        assertThatThrownBy(() -> authService.login(new LoginRequest("default", "rst.t01", "OldPass123")))
+        assertThatThrownBy(() -> authService.login(new LoginRequest("default", "rst.t01", "OldPass123"), null, null).login())
                 .isInstanceOf(BusinessException.class);
     }
 

@@ -1,0 +1,48 @@
+databaseChangeLog:
+
+  # ===================== Phien dang nhap dang hoat dong (ho tro phat hien dang nhap dong thoi + da user) =====================
+  - changeSet:
+      id: 096-1-user-session-schema
+      author: govia
+      comment: "Tao bang user_session"
+      changes:
+        - createTable:
+            tableName: user_session
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: user_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: jti, type: VARCHAR(64), constraints: { nullable: false } }
+              - column: { name: device_info, type: VARCHAR(255) }
+              - column: { name: ip_address, type: VARCHAR(64) }
+              - column: { name: status, type: VARCHAR(20), defaultValue: ACTIVE, constraints: { nullable: false } }
+              - column: { name: last_seen_at, type: TIMESTAMP }
+              - column: { name: revoked_at, type: TIMESTAMP }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: user_session
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_user_session_tenant
+        - addForeignKeyConstraint:
+            baseTableName: user_session
+            baseColumnNames: user_id
+            referencedTableName: user_account
+            referencedColumnNames: id
+            constraintName: fk_user_session_user
+        - addUniqueConstraint:
+            tableName: user_session
+            columnNames: jti
+            constraintName: uk_user_session_jti
+        - createIndex:
+            tableName: user_session
+            indexName: ix_user_session_tenant_user_status
+            columns:
+              - column: { name: tenant_id }
+              - column: { name: user_id }
+              - column: { name: status }

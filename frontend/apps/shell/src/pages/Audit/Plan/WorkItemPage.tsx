@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { App, Col, Form, Input, InputNumber, Modal, Result, Row, Select, Switch, Typography } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
-import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
+import { CrudTable, useClientSearchColumn, useScreenLock } from "@govia/ui-kit";
 import {
   createAuditWorkItem,
   deleteAuditWorkItem,
@@ -15,7 +15,10 @@ import {
   type AuditWorkPhase,
 } from "../../../api/auditWorkItem";
 import { listMasterDataItems, type MasterDataItem } from "../../../api/auditMasterData";
+import { httpClient } from "../../../api/client";
 import { useAuth } from "../../../auth/AuthContext";
+
+const SCREEN_KEY = "audit.plan.workItem";
 
 interface FormValues {
   phase?: AuditWorkPhase;
@@ -36,7 +39,8 @@ const PHASES: AuditWorkPhase[] = ["PREPARATION", "EXECUTION", "CLOSING"];
 export function WorkItemPage() {
   const { t } = useTranslation();
   const { message, modal } = App.useApp();
-  const { hasPermission } = useAuth();
+  const { hasPermission, user } = useAuth();
+  const lock = useScreenLock(SCREEN_KEY, httpClient, user?.userId);
   const canView = hasPermission("AUDIT.WORK_ITEM.VIEW");
   const canCreate = hasPermission("AUDIT.WORK_ITEM.CREATE");
   const canEdit = hasPermission("AUDIT.WORK_ITEM.EDIT");
@@ -72,16 +76,26 @@ export function WorkItemPage() {
     if (canView) load();
   }, [canView, load]);
 
-  const openCreate = () => {
+  const openCreate = async () => {
+    const { ok, status } = await lock.acquire();
+    if (!ok) {
+      message.warning(t("common.screenLockedBy", { name: status.lockedByName, time: new Date(status.lockedAt ?? "").toLocaleString() }));
+      return;
+    }
     setEditing(null);
     form.resetFields();
     form.setFieldsValue({ active: true, hasSampleSelection: false });
     setModalOpen(true);
   };
 
-  const openEdit = () => {
+  const openEdit = async () => {
     const target = selected[0];
     if (!target) return;
+    const { ok, status } = await lock.acquire();
+    if (!ok) {
+      message.warning(t("common.screenLockedBy", { name: status.lockedByName, time: new Date(status.lockedAt ?? "").toLocaleString() }));
+      return;
+    }
     setEditing(target);
     form.setFieldsValue({
       phase: target.phase ?? undefined,
@@ -128,6 +142,7 @@ export function WorkItemPage() {
       }
       setModalOpen(false);
       setSelected([]);
+      await lock.release();
       await load();
     } catch {
       message.error(t("auditWorkItem.messages.saveError"));
@@ -199,7 +214,8 @@ export function WorkItemPage() {
     <div>
       <Typography.Title level={4}>{t("auditWorkItem.title")}</Typography.Title>
       <CrudTable<AuditWorkItemItem>
-        tableId="audit.plan.workItem"
+        tableId={SCREEN_KEY}
+        screenLock={{ screenKey: SCREEN_KEY, httpClient, currentUserId: user?.userId }}
         columns={columns}
         dataSource={items}
         rowKey="id"
@@ -226,7 +242,10 @@ export function WorkItemPage() {
       <Modal
         title={editing ? t("auditWorkItem.form.editTitle") : t("auditWorkItem.form.createTitle")}
         open={modalOpen}
-        onCancel={() => setModalOpen(false)}
+        onCancel={() => {
+          setModalOpen(false);
+          lock.release();
+        }}
         onOk={handleSubmit}
         confirmLoading={submitting}
         destroyOnClose

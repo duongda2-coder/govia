@@ -29,9 +29,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String PREFIX = "Bearer ";
 
     private final JwtTokenProvider tokenProvider;
+    private final UserSessionService sessionService;
 
-    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider) {
+    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, UserSessionService sessionService) {
         this.tokenProvider = tokenProvider;
+        this.sessionService = sessionService;
     }
 
     @Override
@@ -42,6 +44,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (header != null && header.startsWith(PREFIX)) {
                 String token = header.substring(PREFIX.length());
                 Claims claims = tokenProvider.parseClaims(token);
+
+                /* Phien co the da bi DA (REVOKED) boi 1 lan dang nhap khac tren may khac - chu ky
+                 * token van hop le (chua het han tu nhien) nen phai tra rieng bang user_session
+                 * moi request de biet co con duoc dung khong, khong the chi tin chu ky. */
+                if (claims.getId() != null && !sessionService.isActive(claims.getId())) {
+                    SecurityContextHolder.clearContext();
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"error\":\"SESSION_REVOKED\",\"message\":\"Phien dang nhap da bi thu hoi\"}");
+                    return;
+                }
+
                 CurrentUserPrincipal principal = tokenProvider.toPrincipal(claims);
 
                 List<GrantedAuthority> authorities = new ArrayList<>();

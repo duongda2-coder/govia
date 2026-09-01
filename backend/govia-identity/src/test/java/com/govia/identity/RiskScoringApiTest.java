@@ -361,7 +361,7 @@ class RiskScoringApiTest extends AbstractApiTest {
 
     @Test
     void adminHasAllRiskScoringPermissions() {
-        LoginResponse login = authService.login(new LoginRequest("default", "admin", "Admin@123"));
+        LoginResponse login = loginAsUser("admin", "Admin@123");
         assertThat(login.permissions()).contains(
                 "AUDIT.RISK_SCORING.VIEW", "AUDIT.RISK_SCORING.CREATE", "AUDIT.RISK_SCORING.EDIT",
                 "AUDIT.RISK_SCORING.DELETE", "AUDIT.RISK_SCORING.EXPORT", "AUDIT.RISK_SCORING.IMPORT");
@@ -371,7 +371,7 @@ class RiskScoringApiTest extends AbstractApiTest {
     void userWithoutRiskScoringPermissionIsForbidden() throws Exception {
         UUID roleId = ensureNoRiskScoringPermissionRoleId();
         createEmployeeWithAccount("NV-RS-NOPERM", "rsnopermuser", roleId);
-        String plainUserToken = authService.login(new LoginRequest("default", "rsnopermuser", PASSWORD)).accessToken();
+        String plainUserToken = authService.login(new LoginRequest("default", "rsnopermuser", PASSWORD), null, null).login().accessToken();
 
         mockMvc.perform(get("/api/audit/risk-scoring/master-data/group1").header("Authorization", "Bearer " + plainUserToken))
                 .andExpect(status().isForbidden());

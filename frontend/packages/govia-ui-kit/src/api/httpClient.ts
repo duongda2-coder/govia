@@ -1,4 +1,5 @@
 import axios, { AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from "axios";
+import { reconnectSocket } from "../ws/wsClient";
 
 /**
  * Response wrapper chuan tra ve tu moi API GOVIA (xem com.govia.core.web.ApiResponse ben backend).
@@ -60,6 +61,7 @@ export function createGoviaHttpClient(baseURL: string): AxiosInstance {
     });
     const newTokens = response.data.data;
     storeTokens(newTokens);
+    reconnectSocket();
     return newTokens;
   };
 

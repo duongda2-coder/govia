@@ -25,7 +25,7 @@ class AuthSmokeTest {
 
     @Test
     void loginWithSeededAdminAccountSucceeds() {
-        LoginResponse response = authService.login(new LoginRequest("default", "admin", "Admin@123"));
+        LoginResponse response = authService.login(new LoginRequest("default", "admin", "Admin@123"), null, null).login();
 
         assertThat(response.accessToken()).isNotBlank();
         assertThat(response.refreshToken()).isNotBlank();

@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { Table, Card, Popover, Checkbox, Button, Empty } from "antd";
+import { Table, Card, Popover, Checkbox, Button, Empty, Alert } from "antd";
 import type { TableProps } from "antd";
+import type { AxiosInstance } from "axios";
 import { SettingOutlined, ArrowUpOutlined, ArrowDownOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { StandardToolbar, type StandardToolbarProps } from "./StandardToolbar";
+import { useScreenLock } from "../hooks/useScreenLock";
 
 /** `defaultHidden: true` de dinh nghia san 1 cot nhung KHONG hien mac dinh (vd du lieu it dung -
  * username, ngay sinh...) - nguoi dung tu bat len qua nut "Tuy chinh cot" khi can, khong bat buoc
@@ -30,6 +32,13 @@ export interface CrudTableProps<T> extends StandardToolbarProps {
    * chinh chi ton tai trong phien lam viec hien tai).
    */
   tableId?: string;
+  /**
+   * Khai bao de bat tinh nang "khoa man hinh" - khi 1 user khac dang Them/Sua tren man hinh nay
+   * (xem useScreenLock), toolbar tu dong hien canh bao + vo hieu hoa Them/Sua/Xoa/Copy cho toi
+   * nguoi khac. Trang page van tu goi useScreenLock(screenKey, ...) RIENG de acquire()/release()
+   * quanh Modal Them/Sua cua no - prop nay chi lo phan HIEN THI dung chung.
+   */
+  screenLock?: { screenKey: string; httpClient: AxiosInstance; currentUserId: string | undefined };
 }
 
 interface ColumnPref {
@@ -84,8 +93,12 @@ function mergePrefs(saved: ColumnPref[], defaults: ColumnPref[]): ColumnPref[] {
  * nen dung component nay de dam bao layout/UX giong nhau toan platform.
  */
 export function CrudTable<T extends object>(props: CrudTableProps<T>) {
-  const { columns, dataSource, rowKey, loading, onSelectionChange, pagination, onChange, tableId, ...toolbarProps } = props;
+  const { columns, dataSource, rowKey, loading, onSelectionChange, pagination, onChange, tableId, screenLock, ...toolbarProps } = props;
   const { t } = useTranslation();
+
+  const lock = useScreenLock(screenLock?.screenKey, screenLock?.httpClient, screenLock?.currentUserId);
+  const lockedByOther = !!screenLock && lock.status.locked && !lock.isMine;
+  const lockedAtLabel = lock.status.lockedAt ? new Date(lock.status.lockedAt).toLocaleString() : "";
 
   const allColumns = useMemo(() => columns ?? [], [columns]);
   const columnKeysSignature = useMemo(() => allColumns.map((col, i) => columnKey(col, i)).join("|"), [allColumns]);
@@ -197,8 +210,23 @@ export function CrudTable<T extends object>(props: CrudTableProps<T>) {
 
   return (
     <Card>
+      {lockedByOther && (
+        <Alert
+          type="warning"
+          showIcon
+          style={{ marginBottom: 12 }}
+          message={t("common.screenLockedBy", { name: lock.status.lockedByName, time: lockedAtLabel })}
+        />
+      )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-        <StandardToolbar {...toolbarProps} loading={loading} />
+        <StandardToolbar
+          {...toolbarProps}
+          loading={loading}
+          addDisabled={toolbarProps.addDisabled || lockedByOther}
+          editDisabled={toolbarProps.editDisabled || lockedByOther}
+          deleteDisabled={toolbarProps.deleteDisabled || lockedByOther}
+          copyDisabled={toolbarProps.copyDisabled || lockedByOther}
+        />
         <Popover content={settingsContent} title={t("common.columnSettings")} trigger="click" placement="bottomRight">
           <Button icon={<SettingOutlined />} title={t("common.columnSettings")} />
         </Popover>

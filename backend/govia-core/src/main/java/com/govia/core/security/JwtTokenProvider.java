@@ -27,6 +27,8 @@ public class JwtTokenProvider {
     private static final String CLAIM_ROLES = "roles";
     private static final String CLAIM_PERMISSIONS = "permissions";
     private static final String CLAIM_USER_ID = "userId";
+    private static final String CLAIM_PURPOSE = "purpose";
+    private static final String PURPOSE_PENDING_LOGIN = "pending-login";
 
     private final JwtProperties properties;
     private final SecretKey key;
@@ -38,9 +40,10 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(UUID userId, String username, UUID tenantId, String employeeCode,
-                                       List<String> roles, List<String> permissions) {
+                                       List<String> roles, List<String> permissions, String jti) {
         Instant now = Instant.now();
         return Jwts.builder()
+                .id(jti)
                 .subject(username)
                 .claim(CLAIM_USER_ID, userId.toString())
                 .claim(CLAIM_TENANT, tenantId.toString())
@@ -53,15 +56,38 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String generateRefreshToken(UUID userId, String username) {
+    public String generateRefreshToken(UUID userId, String username, String jti) {
         Instant now = Instant.now();
         return Jwts.builder()
+                .id(jti)
                 .subject(username)
                 .claim(CLAIM_USER_ID, userId.toString())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(properties.getRefreshTokenDays(), ChronoUnit.DAYS)))
                 .signWith(key)
                 .compact();
+    }
+
+    /** Token ngan han (2 phut) sinh khi phat hien dang nhap dong thoi - xac nhan user da nhap
+     * dung mat khau (khong bat go lai) trong khi cho ho chon "da phien cu" hay "dang nhap song
+     * song" o buoc /api/auth/login/resolve. */
+    public String generatePendingLoginToken(UUID userId) {
+        Instant now = Instant.now();
+        return Jwts.builder()
+                .claim(CLAIM_USER_ID, userId.toString())
+                .claim(CLAIM_PURPOSE, PURPOSE_PENDING_LOGIN)
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plus(2, ChronoUnit.MINUTES)))
+                .signWith(key)
+                .compact();
+    }
+
+    public UUID parsePendingLoginToken(String token) {
+        Claims claims = parseClaims(token);
+        if (!PURPOSE_PENDING_LOGIN.equals(claims.get(CLAIM_PURPOSE, String.class))) {
+            throw new io.jsonwebtoken.JwtException("Token khong dung muc dich");
+        }
+        return UUID.fromString(claims.get(CLAIM_USER_ID, String.class));
     }
 
     public Claims parseClaims(String token) {
@@ -80,7 +106,8 @@ public class JwtTokenProvider {
                 UUID.fromString(claims.get(CLAIM_TENANT, String.class)),
                 claims.get(CLAIM_EMPLOYEE_CODE, String.class),
                 claims.get(CLAIM_ROLES, List.class),
-                claims.get(CLAIM_PERMISSIONS, List.class)
+                claims.get(CLAIM_PERMISSIONS, List.class),
+                claims.getId()
         );
     }
 }

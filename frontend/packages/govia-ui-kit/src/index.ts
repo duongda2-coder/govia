@@ -18,3 +18,8 @@ export type { ServerTableQuery } from "./table/useServerTable";
 
 export { useSearchColumn, useClientSearchColumn, useSelectFilterColumn } from "./table/serverColumnHelpers";
 export type { FilterActionLabels, SelectFilterOption } from "./table/serverColumnHelpers";
+
+export { initSocket, reconnectSocket, disconnectSocket, subscribeTopic } from "./ws/wsClient";
+
+export { useScreenLock } from "./hooks/useScreenLock";
+export type { ScreenLockStatus, UseScreenLockResult } from "./hooks/useScreenLock";

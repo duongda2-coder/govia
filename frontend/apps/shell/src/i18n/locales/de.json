@@ -33,7 +33,15 @@
     "passwordRequired": "Bitte Passwort eingeben",
     "submit": "Anmelden",
     "success": "Anmeldung erfolgreich",
-    "error": "Falscher Mandant, Benutzername oder Passwort"
+    "error": "Falscher Mandant, Benutzername oder Passwort",
+    "conflict": {
+      "title": "Konto bereits anderswo angemeldet",
+      "message": "Dieses Konto hat eine aktive Sitzung auf einem anderen Gerät. Was möchten Sie tun?",
+      "sessionItem": "{{device}} - IP {{ip}} - um {{time}}",
+      "kickOthers": "Andere Sitzung abmelden und hier anmelden",
+      "allowBoth": "Beide zulassen (beide Sitzungen behalten)"
+    },
+    "kickedOut": "Ihr Konto wurde anderswo angemeldet, daher wurde diese Sitzung abgemeldet."
   },
   "dashboard": {
     "welcome": "Willkommen bei GOVIA Platform",
@@ -57,6 +65,7 @@
     "yes": "Ja",
     "no": "Nein",
     "active": "Aktiv",
+    "screenLockedBy": "Dieser Bildschirm wird gerade von {{name}} um {{time}} bearbeitet",
     "inactive": "Inaktiv",
     "import": "Daten importieren",
     "importResultTitle": "Importergebnis",

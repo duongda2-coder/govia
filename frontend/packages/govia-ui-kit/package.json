@@ -6,7 +6,8 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "dependencies": {
-    "@ant-design/icons": "^5.5.1"
+    "@ant-design/icons": "^5.5.1",
+    "@stomp/stompjs": "^7.0.0"
   },
   "peerDependencies": {
     "antd": "^5.21.0",

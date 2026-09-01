@@ -142,7 +142,7 @@ class AgentApiTest extends AbstractApiTest {
         UUID conversationId = UUID.randomUUID();
         UUID roleId = createRoleWithOnlyAgentPermission();
         createEmployeeWithAccount("NV-AGENT-NOPERM", "agentnopermuser", roleId);
-        String restrictedToken = authService.login(new LoginRequest("default", "agentnopermuser", PASSWORD)).accessToken();
+        String restrictedToken = authService.login(new LoginRequest("default", "agentnopermuser", PASSWORD), null, null).login().accessToken();
 
         fakeLlmProvider.enqueueToolCall("get_branch_risk", Map.of("branchCode", "A1", "year", 2025));
         fakeLlmProvider.enqueueFinalAnswer(Map.of(

@@ -47,7 +47,7 @@ class TaskDelegationWorkflowTest extends AbstractApiTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[?(@.id == '" + taskId + "')]", org.hamcrest.Matchers.hasSize(0)));
 
-        String targetToken = authService.login(new LoginRequest("default", "targetuser", PASSWORD)).accessToken();
+        String targetToken = authService.login(new LoginRequest("default", "targetuser", PASSWORD), null, null).login().accessToken();
         mockMvc.perform(get("/api/workflow/tasks/my").header("Authorization", "Bearer " + targetToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[?(@.id == '" + taskId + "')]", org.hamcrest.Matchers.hasSize(1)));
@@ -67,7 +67,7 @@ class TaskDelegationWorkflowTest extends AbstractApiTest {
                         .content(objectMapper.writeValueAsString(Map.of("delegateUserId", delegateAccountId.toString()))))
                 .andExpect(status().isOk());
 
-        String delegateToken = authService.login(new LoginRequest("default", "delegateuser", PASSWORD)).accessToken();
+        String delegateToken = authService.login(new LoginRequest("default", "delegateuser", PASSWORD), null, null).login().accessToken();
         String delegateTasksBody = mockMvc.perform(get("/api/workflow/tasks/my").header("Authorization", "Bearer " + delegateToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[?(@.id == '" + taskId + "')]", org.hamcrest.Matchers.hasSize(1)))
@@ -103,7 +103,7 @@ class TaskDelegationWorkflowTest extends AbstractApiTest {
         startSimpleApproval();
         String taskId = firstMyTaskId(adminToken); // assignee = admin, khong phai bystander
 
-        String bystanderToken = authService.login(new LoginRequest("default", "bystanderuser", PASSWORD)).accessToken();
+        String bystanderToken = authService.login(new LoginRequest("default", "bystanderuser", PASSWORD), null, null).login().accessToken();
         mockMvc.perform(post("/api/workflow/tasks/" + taskId + "/reassign")
                         .header("Authorization", "Bearer " + bystanderToken)
                         .contentType(MediaType.APPLICATION_JSON)

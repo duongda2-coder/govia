@@ -1,0 +1,39 @@
+databaseChangeLog:
+
+  # ===================== Khoa man hinh dang chinh sua (ngan user khac sua cung 1 man hinh cung luc) =====================
+  - changeSet:
+      id: 097-1-screen-lock-schema
+      author: govia
+      comment: "Tao bang screen_lock"
+      changes:
+        - createTable:
+            tableName: screen_lock
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: screen_key, type: VARCHAR(150), constraints: { nullable: false } }
+              - column: { name: locked_by_user_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: locked_by_name, type: VARCHAR(255) }
+              - column: { name: locked_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: last_heartbeat_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: screen_lock
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_screen_lock_tenant
+        - addForeignKeyConstraint:
+            baseTableName: screen_lock
+            baseColumnNames: locked_by_user_id
+            referencedTableName: user_account
+            referencedColumnNames: id
+            constraintName: fk_screen_lock_user
+        - addUniqueConstraint:
+            tableName: screen_lock
+            columnNames: tenant_id, screen_key
+            constraintName: uk_screen_lock_tenant_screen_key

@@ -103,7 +103,15 @@
     "passwordRequired": "Please enter password",
     "submit": "Log in",
     "success": "Login successful",
-    "error": "Wrong tenant, username, or password"
+    "error": "Wrong tenant, username, or password",
+    "conflict": {
+      "title": "Account already signed in elsewhere",
+      "message": "This account has an active session on another device. What would you like to do?",
+      "sessionItem": "{{device}} - IP {{ip}} - at {{time}}",
+      "kickOthers": "Sign out the other session and log in here",
+      "allowBoth": "Allow both (keep both sessions signed in)"
+    },
+    "kickedOut": "Your account signed in elsewhere, so this session was signed out."
   },
   "dashboard": {
     "welcome": "Welcome to GOVIA Platform",
@@ -135,6 +143,7 @@
     "yes": "Yes",
     "no": "No",
     "active": "Active",
+    "screenLockedBy": "This screen is being edited by {{name}} at {{time}}",
     "inactive": "Inactive",
     "import": "Import Data",
     "importResultTitle": "Import Result",

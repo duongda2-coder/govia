@@ -36,6 +36,7 @@ export interface StandardToolbarProps {
   onExportWord?: () => void;
   onAttachment?: () => void;
   onImport?: (file: File) => Promise<ImportResult>;
+  addDisabled?: boolean;
   editDisabled?: boolean;
   copyDisabled?: boolean;
   deleteDisabled?: boolean;
@@ -53,6 +54,7 @@ export function StandardToolbar(props: StandardToolbarProps) {
     onExportWord,
     onAttachment,
     onImport,
+    addDisabled,
     editDisabled,
     copyDisabled,
     deleteDisabled,
@@ -86,7 +88,7 @@ export function StandardToolbar(props: StandardToolbarProps) {
     <>
       <Space wrap>
         {onAdd && (
-          <Button type="primary" icon={<PlusOutlined />} onClick={onAdd} loading={loading}>
+          <Button type="primary" icon={<PlusOutlined />} onClick={onAdd} loading={loading} disabled={addDisabled}>
             {t("common.add")}
           </Button>
         )}

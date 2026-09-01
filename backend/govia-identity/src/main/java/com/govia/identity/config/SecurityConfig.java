@@ -2,6 +2,7 @@ package com.govia.identity.config;
 
 import com.govia.core.security.JwtAuthenticationFilter;
 import com.govia.core.security.JwtTokenProvider;
+import com.govia.core.security.UserSessionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,11 +36,16 @@ public class SecurityConfig {
      */
     private static final String[] PUBLIC_ENDPOINTS = {
             "/api/auth/login",
+            "/api/auth/login/resolve",
             "/api/auth/refresh",
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/actuator/health"
+            "/actuator/health",
+            /* Handshake WebSocket khong the dinh kem header Authorization (gioi han cua browser
+             * WebSocket API) - token duoc truyen qua query param va tu xac thuc rieng trong
+             * WebSocketAuthInterceptor, KHONG phai bo qua xac thuc that su. */
+            "/ws/**"
     };
 
     @Value("${govia.cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
@@ -65,7 +71,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, JwtTokenProvider tokenProvider) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtTokenProvider tokenProvider,
+                                            UserSessionService sessionService) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
@@ -73,7 +80,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated())
-                .addFilterBefore(new JwtAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(tokenProvider, sessionService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

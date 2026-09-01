@@ -81,10 +81,10 @@ class ChangePasswordTest {
 
         authService.changePassword(account.getId(), new ChangePasswordRequest("OldPass123", "NewPass456"));
 
-        LoginResponse response = authService.login(new LoginRequest("default", "pwd.t01", "NewPass456"));
+        LoginResponse response = authService.login(new LoginRequest("default", "pwd.t01", "NewPass456"), null, null).login();
         assertThat(response.accessToken()).isNotBlank();
 
-        assertThatThrownBy(() -> authService.login(new LoginRequest("default", "pwd.t01", "OldPass123")))
+        assertThatThrownBy(() -> authService.login(new LoginRequest("default", "pwd.t01", "OldPass123"), null, null).login())
                 .isInstanceOf(BusinessException.class);
     }
 

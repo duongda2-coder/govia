@@ -1,8 +1,5 @@
 package com.govia.identity;
 
-import com.govia.identity.dto.LoginRequest;
-import com.govia.identity.dto.LoginResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
@@ -22,14 +19,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 class WorkflowEngineApiTest extends AbstractApiTest {
 
-    private String adminUserId;
-
-    @BeforeEach
-    void captureAdminUserId() {
-        LoginResponse login = authService.login(new LoginRequest("default", "admin", "Admin@123"));
-        adminUserId = login.userId().toString();
-    }
-
     @Test
     void sampleProcessDefinitionIsAutoDeployedForDefaultTenant() throws Exception {
         mockMvc.perform(get("/api/workflow/process-definitions")
@@ -43,7 +32,7 @@ class WorkflowEngineApiTest extends AbstractApiTest {
         String startBody = objectMapper.writeValueAsString(Map.of(
                 "processDefinitionKey", "simple_approval",
                 "businessKey", "TEST-BK-1",
-                "variables", Map.of("approverUserId", adminUserId)));
+                "variables", Map.of("approverUserId", adminUserId.toString())));
 
         String startResponse = mockMvc.perform(post("/api/workflow/instances/start")
                         .header("Authorization", "Bearer " + adminToken)

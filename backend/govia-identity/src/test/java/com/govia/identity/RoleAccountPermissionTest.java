@@ -82,7 +82,7 @@ class RoleAccountPermissionTest {
         EmployeeResponse emp = createEmployee("RBAC-T01");
         userAccountService.createForEmployee(emp.id(), new CreateUserAccountRequest("rbac.t01", "Password123"));
 
-        LoginResponse response = authService.login(new LoginRequest("default", "rbac.t01", "Password123"));
+        LoginResponse response = authService.login(new LoginRequest("default", "rbac.t01", "Password123"), null, null).login();
 
         assertThat(response.permissions()).isEmpty();
     }
@@ -98,7 +98,7 @@ class RoleAccountPermissionTest {
 
         userAccountService.assignRoles(accountId, new AssignRolesRequest(List.of(viewerRole.id())));
 
-        LoginResponse response = authService.login(new LoginRequest("default", "rbac.t02", "Password123"));
+        LoginResponse response = authService.login(new LoginRequest("default", "rbac.t02", "Password123"), null, null).login();
 
         assertThat(response.permissions()).containsExactly("PEOPLE.EMPLOYEE.VIEW");
         assertThat(response.roles()).containsExactly("EMPLOYEE_VIEWER");

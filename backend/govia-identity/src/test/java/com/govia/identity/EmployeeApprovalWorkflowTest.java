@@ -203,7 +203,7 @@ class EmployeeApprovalWorkflowTest extends AbstractApiTest {
     }
 
     private void completeOnlyTask(String username, String expectedTaskName, boolean approved) throws Exception {
-        String token = authService.login(new LoginRequest("default", username, PASSWORD)).accessToken();
+        String token = loginAsUser(username, PASSWORD).accessToken();
 
         String tasksBody = mockMvc.perform(get("/api/workflow/tasks/my")
                         .header("Authorization", "Bearer " + token))

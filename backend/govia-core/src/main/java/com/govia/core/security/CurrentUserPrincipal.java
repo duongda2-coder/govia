@@ -13,6 +13,7 @@ public record CurrentUserPrincipal(
         UUID tenantId,
         String employeeCode,
         List<String> roles,
-        List<String> permissions
+        List<String> permissions,
+        String sessionJti
 ) {
 }

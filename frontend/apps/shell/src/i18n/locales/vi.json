@@ -103,7 +103,15 @@
     "passwordRequired": "Nhập mật khẩu",
     "submit": "Đăng nhập",
     "success": "Đăng nhập thành công",
-    "error": "Sai tenant, tên đăng nhập hoặc mật khẩu"
+    "error": "Sai tenant, tên đăng nhập hoặc mật khẩu",
+    "conflict": {
+      "title": "Tài khoản đang đăng nhập ở nơi khác",
+      "message": "Tài khoản này đang có phiên đăng nhập hoạt động ở nơi khác. Bạn muốn làm gì?",
+      "sessionItem": "{{device}} - IP {{ip}} - lúc {{time}}",
+      "kickOthers": "Đăng xuất phiên kia và đăng nhập ở đây",
+      "allowBoth": "Đăng nhập song song (giữ cả 2 phiên)"
+    },
+    "kickedOut": "Tài khoản của bạn đã đăng nhập ở nơi khác nên phiên này đã bị đăng xuất."
   },
   "dashboard": {
     "welcome": "Chào mừng đến với GOVIA Platform",
@@ -135,6 +143,7 @@
     "yes": "Có",
     "no": "Không",
     "active": "Đang hoạt động",
+    "screenLockedBy": "Màn hình đang được sửa bởi {{name}} lúc {{time}}",
     "inactive": "Ngưng hoạt động",
     "import": "Import dữ liệu",
     "importResultTitle": "Kết quả Import",
