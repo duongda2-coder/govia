@@ -10,22 +10,26 @@ export interface AuditWorkItemItem {
   businessSegmentCode: string | null;
   businessSegmentName: string | null;
   code: string;
+  detailCode: string | null;
   name: string;
   applicableYear: number | null;
   workSetCode: string | null;
   workType: string | null;
   active: boolean;
+  hasSampleSelection: boolean;
 }
 
 export interface AuditWorkItemRequest {
   phase: AuditWorkPhase | null;
   businessSegmentId: string | null;
   code: string;
+  detailCode: string | null;
   name: string;
   applicableYear: number | null;
   workSetCode: string | null;
   workType: string | null;
   active: boolean;
+  hasSampleSelection: boolean;
 }
 
 const BASE = "/api/audit/plan/master-data/work-item";

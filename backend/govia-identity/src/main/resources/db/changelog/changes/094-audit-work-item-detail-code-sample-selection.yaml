@@ -1,0 +1,13 @@
+databaseChangeLog:
+
+  # ===================== Bo sung "Ma chi tiet" va "Co chon mau" cho danh muc "Cong viec kiem toan" (sheet ZTC_CV) =====================
+  - changeSet:
+      id: 094-1-audit-work-item-detail-code-sample-selection
+      author: govia
+      comment: "Bo sung cot detail_code, has_sample_selection cho audit_work_item"
+      changes:
+        - addColumn:
+            tableName: audit_work_item
+            columns:
+              - column: { name: detail_code, type: VARCHAR(20) }
+              - column: { name: has_sample_selection, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }

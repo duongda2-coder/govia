@@ -30,9 +30,6 @@ export interface AuditProcessStepDetailItem {
   processStepSummaryId: string | null;
   processStepSummaryCode: string | null;
   processStepSummaryName: string | null;
-  controlPointId: string | null;
-  controlPointCode: string | null;
-  controlPointName: string | null;
   code: string;
   active: boolean;
 }
@@ -40,7 +37,6 @@ export interface AuditProcessStepDetailItem {
 export interface AuditProcessStepDetailRequest {
   businessSegmentId: string | null;
   processStepSummaryId: string | null;
-  controlPointId: string | null;
   code: string;
   active: boolean;
 }

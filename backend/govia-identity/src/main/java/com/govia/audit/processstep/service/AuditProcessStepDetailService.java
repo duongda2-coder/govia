@@ -1,7 +1,5 @@
 package com.govia.audit.processstep.service;
 
-import com.govia.audit.controlpoint.entity.AuditControlPoint;
-import com.govia.audit.controlpoint.repository.AuditControlPointRepository;
 import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
 import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
@@ -42,21 +40,18 @@ public class AuditProcessStepDetailService {
     private final AuditProcessStepDetailRepository repository;
     private final AuditMasterDataItemRepository masterDataItemRepository;
     private final AuditProcessStepSummaryRepository processStepSummaryRepository;
-    private final AuditControlPointRepository controlPointRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
     private final ExcelImportService excelImportService;
 
     public AuditProcessStepDetailService(AuditProcessStepDetailRepository repository, AuditMasterDataItemRepository masterDataItemRepository,
-                                          AuditProcessStepSummaryRepository processStepSummaryRepository,
-                                          AuditControlPointRepository controlPointRepository, AuditLogService auditLogService,
+                                          AuditProcessStepSummaryRepository processStepSummaryRepository, AuditLogService auditLogService,
                                           ExcelExportService excelExportService, WordExportService wordExportService,
                                           ExcelImportService excelImportService) {
         this.repository = repository;
         this.masterDataItemRepository = masterDataItemRepository;
         this.processStepSummaryRepository = processStepSummaryRepository;
-        this.controlPointRepository = controlPointRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
@@ -68,9 +63,8 @@ public class AuditProcessStepDetailService {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, AuditMasterDataItem> segments = businessSegmentsById(tenantId);
         Map<UUID, AuditProcessStepSummary> summaries = summariesById(tenantId);
-        Map<UUID, AuditControlPoint> controlPoints = controlPointsById(tenantId);
         return repository.findByTenantIdOrderByCodeAsc(tenantId).stream()
-                .map(item -> toResponse(item, segments, summaries, controlPoints)).toList();
+                .map(item -> toResponse(item, segments, summaries)).toList();
     }
 
     @Transactional
@@ -79,7 +73,6 @@ public class AuditProcessStepDetailService {
         checkNoDuplicateCode(tenantId, request.code(), null);
         validateBusinessSegment(tenantId, request.businessSegmentId());
         validateProcessStepSummary(tenantId, request.processStepSummaryId());
-        validateControlPoint(tenantId, request.controlPointId());
 
         AuditProcessStepDetail item = new AuditProcessStepDetail();
         item.setTenantId(tenantId);
@@ -87,7 +80,7 @@ public class AuditProcessStepDetailService {
         item = repository.save(item);
 
         auditLogService.record("AuditProcessStepDetail", item.getId(), AuditAction.CREATE, "Tao buoc quy trinh chi tiet: " + item.getCode());
-        return toResponse(item, businessSegmentsById(tenantId), summariesById(tenantId), controlPointsById(tenantId));
+        return toResponse(item, businessSegmentsById(tenantId), summariesById(tenantId));
     }
 
     @Transactional
@@ -97,13 +90,12 @@ public class AuditProcessStepDetailService {
         checkNoDuplicateCode(tenantId, request.code(), id);
         validateBusinessSegment(tenantId, request.businessSegmentId());
         validateProcessStepSummary(tenantId, request.processStepSummaryId());
-        validateControlPoint(tenantId, request.controlPointId());
 
         applyRequest(item, request);
         item = repository.save(item);
 
         auditLogService.record("AuditProcessStepDetail", item.getId(), AuditAction.UPDATE, "Cap nhat buoc quy trinh chi tiet: " + item.getCode());
-        return toResponse(item, businessSegmentsById(tenantId), summariesById(tenantId), controlPointsById(tenantId));
+        return toResponse(item, businessSegmentsById(tenantId), summariesById(tenantId));
     }
 
     @Transactional
@@ -139,8 +131,6 @@ public class AuditProcessStepDetailService {
                 .forEach(s -> segmentIdsByCode.put(s.getCode(), s.getId()));
         Map<String, UUID> summaryIdsByCode = new HashMap<>();
         processStepSummaryRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(s -> summaryIdsByCode.put(s.getCode(), s.getId()));
-        Map<String, UUID> controlPointIdsByCode = new HashMap<>();
-        controlPointRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> controlPointIdsByCode.put(c.getCode(), c.getId()));
 
         int success = 0;
         List<ImportResult.ImportRowError> errors = new ArrayList<>();
@@ -156,12 +146,10 @@ public class AuditProcessStepDetailService {
                 UUID businessSegmentId = isBlank(segmentCode) ? null : segmentIdsByCode.get(segmentCode.trim());
                 String summaryCode = row.get("processStepSummaryCode");
                 UUID processStepSummaryId = isBlank(summaryCode) ? null : summaryIdsByCode.get(summaryCode.trim());
-                String controlPointCode = row.get("controlPointCode");
-                UUID controlPointId = isBlank(controlPointCode) ? null : controlPointIdsByCode.get(controlPointCode.trim());
 
                 Optional<AuditProcessStepDetail> existing = repository.findByTenantIdAndCode(tenantId, code.trim());
                 AuditProcessStepDetailRequest request = new AuditProcessStepDetailRequest(businessSegmentId, processStepSummaryId,
-                        controlPointId, code.trim(), existing.map(AuditProcessStepDetail::isActive).orElse(true));
+                        code.trim(), existing.map(AuditProcessStepDetail::isActive).orElse(true));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
                 } else {
@@ -181,7 +169,6 @@ public class AuditProcessStepDetailService {
     private void applyRequest(AuditProcessStepDetail item, AuditProcessStepDetailRequest request) {
         item.setBusinessSegmentId(request.businessSegmentId());
         item.setProcessStepSummaryId(request.processStepSummaryId());
-        item.setControlPointId(request.controlPointId());
         item.setCode(request.code());
         item.setActive(request.active());
     }
@@ -212,15 +199,6 @@ public class AuditProcessStepDetailService {
                 .orElseThrow(() -> new BusinessException("AUDIT_PROCESS_STEP_SUMMARY_NOT_FOUND", "Khong tim thay buoc quy trinh tong hop"));
     }
 
-    private void validateControlPoint(UUID tenantId, UUID controlPointId) {
-        if (controlPointId == null) {
-            return;
-        }
-        controlPointRepository.findById(controlPointId)
-                .filter(item -> item.getTenantId().equals(tenantId))
-                .orElseThrow(() -> new BusinessException("AUDIT_CONTROL_POINT_NOT_FOUND", "Khong tim thay chot kiem soat"));
-    }
-
     private AuditProcessStepDetail getOwnedOrThrow(UUID tenantId, UUID id) {
         return repository.findById(id)
                 .filter(item -> item.getTenantId().equals(tenantId))
@@ -237,16 +215,10 @@ public class AuditProcessStepDetailService {
                 .collect(Collectors.toMap(AuditProcessStepSummary::getId, i -> i));
     }
 
-    private Map<UUID, AuditControlPoint> controlPointsById(UUID tenantId) {
-        return controlPointRepository.findByTenantIdOrderByCodeAsc(tenantId).stream()
-                .collect(Collectors.toMap(AuditControlPoint::getId, i -> i));
-    }
-
     private List<ExportColumn> exportColumns() {
         return List.of(
                 new ExportColumn("businessSegmentCode", "Mảng nghiệp vụ"),
                 new ExportColumn("processStepSummaryCode", "Mã bước quy trình tổng hợp"),
-                new ExportColumn("controlPointCode", "Mã chốt kiểm soát"),
                 new ExportColumn("code", "Mã BQT chi tiết"));
     }
 
@@ -254,15 +226,12 @@ public class AuditProcessStepDetailService {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, AuditMasterDataItem> segments = businessSegmentsById(tenantId);
         Map<UUID, AuditProcessStepSummary> summaries = summariesById(tenantId);
-        Map<UUID, AuditControlPoint> controlPoints = controlPointsById(tenantId);
         return repository.findByTenantIdOrderByCodeAsc(tenantId).stream()
                 .map(item -> {
                     Map<String, Object> row = new HashMap<>();
                     row.put("businessSegmentCode", codeOf(segments.get(item.getBusinessSegmentId())));
                     AuditProcessStepSummary summary = summaries.get(item.getProcessStepSummaryId());
                     row.put("processStepSummaryCode", summary == null ? null : summary.getCode());
-                    AuditControlPoint controlPoint = controlPoints.get(item.getControlPointId());
-                    row.put("controlPointCode", controlPoint == null ? null : controlPoint.getCode());
                     row.put("code", item.getCode());
                     return row;
                 }).toList();
@@ -277,14 +246,12 @@ public class AuditProcessStepDetailService {
     }
 
     private AuditProcessStepDetailResponse toResponse(AuditProcessStepDetail item, Map<UUID, AuditMasterDataItem> segments,
-                                                        Map<UUID, AuditProcessStepSummary> summaries, Map<UUID, AuditControlPoint> controlPoints) {
+                                                        Map<UUID, AuditProcessStepSummary> summaries) {
         AuditMasterDataItem segment = item.getBusinessSegmentId() == null ? null : segments.get(item.getBusinessSegmentId());
         AuditProcessStepSummary summary = item.getProcessStepSummaryId() == null ? null : summaries.get(item.getProcessStepSummaryId());
-        AuditControlPoint controlPoint = item.getControlPointId() == null ? null : controlPoints.get(item.getControlPointId());
         return new AuditProcessStepDetailResponse(item.getId(), item.getBusinessSegmentId(),
                 segment == null ? null : segment.getCode(), segment == null ? null : segment.getName(),
                 item.getProcessStepSummaryId(), summary == null ? null : summary.getCode(), summary == null ? null : summary.getName(),
-                item.getControlPointId(), controlPoint == null ? null : controlPoint.getCode(), controlPoint == null ? null : controlPoint.getName(),
                 item.getCode(), item.isActive());
     }
 }

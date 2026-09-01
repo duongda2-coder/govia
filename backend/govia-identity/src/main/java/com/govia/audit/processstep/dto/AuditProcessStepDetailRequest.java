@@ -8,7 +8,6 @@ import java.util.UUID;
 public record AuditProcessStepDetailRequest(
         UUID businessSegmentId,
         UUID processStepSummaryId,
-        UUID controlPointId,
         @NotBlank @Size(max = 50) String code,
         boolean active
 ) {

@@ -51,7 +51,7 @@
     "auditPlanMdProcessStepDetail": "Bước quy trình chi tiết",
     "auditPlanMdExceptionMapping": "Mapping tồn tại sai sót",
     "auditPlanExecution": "Thực hiện kiểm toán",
-    "auditPlanExecCmTd1": "DS KH chọn mẫu tín dụng",
+    "auditPlanExecCmTd1": "DS KH chọn mẫu tín dụng - TD1",
     "auditPlanExecCmTd2": "KQ chọn mẫu BT hủy/lùi ngày",
     "auditPlanExecCmNtd1": "DS BT chọn mẫu TCKT",
     "auditPlanExecCmNtd2": "DS chọn mẫu GD HĐV",
@@ -686,10 +686,12 @@
       "phase": "Giai đoạn",
       "businessSegment": "Mảng nghiệp vụ",
       "code": "Mã công việc",
+      "detailCode": "Mã chi tiết",
       "name": "Tên công việc",
       "applicableYear": "Năm",
       "workSetCode": "Mã bộ công việc",
-      "workType": "Loại CV"
+      "workType": "Loại CV",
+      "hasSampleSelection": "Có chọn mẫu"
     },
     "phase": {
       "PREPARATION": "Chuẩn bị KT",
@@ -1270,7 +1272,6 @@
     "columns": {
       "businessSegment": "Mảng nghiệp vụ",
       "processStepSummary": "Bước quy trình tổng hợp",
-      "controlPoint": "Chốt kiểm soát",
       "code": "Mã BQT chi tiết"
     },
     "form": {

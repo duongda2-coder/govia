@@ -263,3 +263,9 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/093-audit-plan-cm-ntd14-permission-catalog.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/094-audit-work-item-detail-code-sample-selection.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/095-audit-process-step-detail-drop-control-point.yaml
+      relativeToChangelogFile: false

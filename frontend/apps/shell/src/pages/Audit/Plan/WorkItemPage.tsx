@@ -21,11 +21,13 @@ interface FormValues {
   phase?: AuditWorkPhase;
   businessSegmentId?: string;
   code: string;
+  detailCode?: string;
   name: string;
   applicableYear?: number;
   workSetCode?: string;
   workType?: string;
   active: boolean;
+  hasSampleSelection: boolean;
 }
 
 const PHASES: AuditWorkPhase[] = ["PREPARATION", "EXECUTION", "CLOSING"];
@@ -73,7 +75,7 @@ export function WorkItemPage() {
   const openCreate = () => {
     setEditing(null);
     form.resetFields();
-    form.setFieldsValue({ active: true });
+    form.setFieldsValue({ active: true, hasSampleSelection: false });
     setModalOpen(true);
   };
 
@@ -85,11 +87,13 @@ export function WorkItemPage() {
       phase: target.phase ?? undefined,
       businessSegmentId: target.businessSegmentId ?? undefined,
       code: target.code,
+      detailCode: target.detailCode ?? undefined,
       name: target.name,
       applicableYear: target.applicableYear ?? undefined,
       workSetCode: target.workSetCode ?? undefined,
       workType: target.workType ?? undefined,
       active: target.active,
+      hasSampleSelection: target.hasSampleSelection,
     });
     setModalOpen(true);
   };
@@ -107,11 +111,13 @@ export function WorkItemPage() {
         phase: values.phase ?? null,
         businessSegmentId: values.businessSegmentId ?? null,
         code: values.code,
+        detailCode: values.detailCode ?? null,
         name: values.name,
         applicableYear: values.applicableYear ?? null,
         workSetCode: values.workSetCode ?? null,
         workType: values.workType ?? null,
         active: values.active,
+        hasSampleSelection: values.hasSampleSelection,
       };
       if (editing) {
         await updateAuditWorkItem(editing.id, request);
@@ -164,10 +170,18 @@ export function WorkItemPage() {
       render: (v: string | null) => v ?? "-",
     },
     { title: t("auditWorkItem.columns.code"), width: 120, ...getSearchColumnProps("code", searchLabels) },
+    { title: t("auditWorkItem.columns.detailCode"), width: 120, ...getSearchColumnProps("detailCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditWorkItem.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("auditWorkItem.columns.applicableYear"), dataIndex: "applicableYear", width: 100, render: (v: number | null) => v ?? "-" },
     { title: t("auditWorkItem.columns.workSetCode"), dataIndex: "workSetCode", width: 140, render: (v: string | null) => v ?? "-" },
     { title: t("auditWorkItem.columns.workType"), dataIndex: "workType", width: 120, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("auditWorkItem.columns.hasSampleSelection"),
+      dataIndex: "hasSampleSelection",
+      width: 120,
+      sorter: (a, b) => Number(a.hasSampleSelection) - Number(b.hasSampleSelection),
+      render: (v: boolean) => (v ? t("common.yes") : t("common.no")),
+    },
     {
       title: t("common.active"),
       dataIndex: "active",
@@ -243,8 +257,8 @@ export function WorkItemPage() {
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="applicableYear" label={t("auditWorkItem.columns.applicableYear")}>
-                <InputNumber style={{ width: "100%" }} min={2000} max={2100} />
+              <Form.Item name="detailCode" label={t("auditWorkItem.columns.detailCode")}>
+                <Input maxLength={20} />
               </Form.Item>
             </Col>
           </Row>
@@ -253,19 +267,35 @@ export function WorkItemPage() {
           </Form.Item>
           <Row gutter={16}>
             <Col span={12}>
+              <Form.Item name="applicableYear" label={t("auditWorkItem.columns.applicableYear")}>
+                <InputNumber style={{ width: "100%" }} min={2000} max={2100} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
               <Form.Item name="workSetCode" label={t("auditWorkItem.columns.workSetCode")}>
                 <Input maxLength={20} />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="workType" label={t("auditWorkItem.columns.workType")}>
                 <Input maxLength={20} />
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item name="active" label={t("common.active")} valuePropName="checked">
-            <Switch />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="active" label={t("common.active")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="hasSampleSelection" label={t("auditWorkItem.columns.hasSampleSelection")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </div>

@@ -15,14 +15,12 @@ import {
   type AuditProcessStepDetailRequest,
   type AuditProcessStepSummaryItem,
 } from "../../../api/auditProcessStep";
-import { listAuditControlPoints, type AuditControlPointItem } from "../../../api/auditControlPoint";
 import { listMasterDataItems, type MasterDataItem } from "../../../api/auditMasterData";
 import { useAuth } from "../../../auth/AuthContext";
 
 interface FormValues {
   businessSegmentId?: string;
   processStepSummaryId?: string;
-  controlPointId?: string;
   code: string;
   active: boolean;
 }
@@ -44,7 +42,6 @@ export function ProcessStepDetailPage() {
   const [items, setItems] = useState<AuditProcessStepDetailItem[]>([]);
   const [businessSegments, setBusinessSegments] = useState<MasterDataItem[]>([]);
   const [summaries, setSummaries] = useState<AuditProcessStepSummaryItem[]>([]);
-  const [controlPoints, setControlPoints] = useState<AuditControlPointItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<AuditProcessStepDetailItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -55,16 +52,14 @@ export function ProcessStepDetailPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [list, segmentList, summaryList, controlPointList] = await Promise.all([
+      const [list, segmentList, summaryList] = await Promise.all([
         listAuditProcessStepDetails(),
         listMasterDataItems("BUSINESS_SEGMENT"),
         listAuditProcessStepSummaries(),
-        listAuditControlPoints(),
       ]);
       setItems(list);
       setBusinessSegments(segmentList);
       setSummaries(summaryList);
-      setControlPoints(controlPointList);
     } catch {
       message.error(t("auditProcessStepDetail.messages.loadError"));
     } finally {
@@ -90,7 +85,6 @@ export function ProcessStepDetailPage() {
     form.setFieldsValue({
       businessSegmentId: target.businessSegmentId ?? undefined,
       processStepSummaryId: target.processStepSummaryId ?? undefined,
-      controlPointId: target.controlPointId ?? undefined,
       code: target.code,
       active: target.active,
     });
@@ -109,7 +103,6 @@ export function ProcessStepDetailPage() {
       const request: AuditProcessStepDetailRequest = {
         businessSegmentId: values.businessSegmentId ?? null,
         processStepSummaryId: values.processStepSummaryId ?? null,
-        controlPointId: values.controlPointId ?? null,
         code: values.code,
         active: values.active,
       };
@@ -164,11 +157,6 @@ export function ProcessStepDetailPage() {
       title: t("auditProcessStepDetail.columns.processStepSummary"),
       width: 220,
       render: (_, record) => (record.processStepSummaryCode ? `${record.processStepSummaryCode} - ${record.processStepSummaryName}` : "-"),
-    },
-    {
-      title: t("auditProcessStepDetail.columns.controlPoint"),
-      width: 220,
-      render: (_, record) => (record.controlPointCode ? `${record.controlPointCode} - ${record.controlPointName}` : "-"),
     },
     { title: t("auditProcessStepDetail.columns.code"), width: 160, ...getSearchColumnProps("code", searchLabels) },
     {
@@ -245,14 +233,6 @@ export function ProcessStepDetailPage() {
               showSearch
               optionFilterProp="label"
               options={summaries.map((s) => ({ value: s.id, label: `${s.code} - ${s.name}` }))}
-            />
-          </Form.Item>
-          <Form.Item name="controlPointId" label={t("auditProcessStepDetail.columns.controlPoint")}>
-            <Select
-              allowClear
-              showSearch
-              optionFilterProp="label"
-              options={controlPoints.map((c) => ({ value: c.id, label: `${c.code} - ${c.name}` }))}
             />
           </Form.Item>
           <Form.Item name="active" label={t("common.active")} valuePropName="checked">

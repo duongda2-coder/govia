@@ -686,10 +686,12 @@
       "phase": "Phase",
       "businessSegment": "Business Segment",
       "code": "Work Item Code",
+      "detailCode": "Detail Code",
       "name": "Work Item Name",
       "applicableYear": "Year",
       "workSetCode": "Work Set Code",
-      "workType": "Work Type"
+      "workType": "Work Type",
+      "hasSampleSelection": "Has Sample Selection"
     },
     "phase": {
       "PREPARATION": "Preparation",
@@ -1172,7 +1174,6 @@
     "columns": {
       "businessSegment": "Business Segment",
       "processStepSummary": "Process Step Summary",
-      "controlPoint": "Control Point",
       "code": "Process Step Detail Code"
     },
     "form": {
