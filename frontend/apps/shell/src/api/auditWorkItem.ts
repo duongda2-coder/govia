@@ -1,7 +1,7 @@
 import type { ApiResponse, ImportResult } from "@govia/ui-kit";
 import { httpClient } from "./client";
 
-export type AuditWorkPhase = "PREPARATION" | "EXECUTION" | "CLOSING";
+export type AuditWorkPhase = "CBKT" | "THKT" | "DCKT";
 
 export interface AuditWorkItemItem {
   id: string;

@@ -703,9 +703,9 @@
       "hasSampleSelection": "Has Sample Selection"
     },
     "phase": {
-      "PREPARATION": "Preparation",
-      "EXECUTION": "Execution",
-      "CLOSING": "Closing"
+      "CBKT": "CBKT (Preparation)",
+      "THKT": "THKT (Execution)",
+      "DCKT": "DCKT (Closing)"
     },
     "form": {
       "createTitle": "Add Work Item",

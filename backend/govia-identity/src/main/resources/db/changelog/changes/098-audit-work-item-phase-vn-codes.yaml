@@ -1,0 +1,23 @@
+databaseChangeLog:
+
+  # ===================== Doi ma "Giai doan" cua audit_work_item sang dung ma tieng Viet nhu file nguon that (CBKT/THKT/DCKT) =====================
+  - changeSet:
+      id: 098-1-audit-work-item-phase-vn-codes
+      author: govia
+      comment: "Doi phase PREPARATION/EXECUTION/CLOSING sang CBKT/THKT/DCKT de khop dinh dang import/export that"
+      changes:
+        - update:
+            tableName: audit_work_item
+            columns:
+              - column: { name: phase, value: CBKT }
+            where: "phase = 'PREPARATION'"
+        - update:
+            tableName: audit_work_item
+            columns:
+              - column: { name: phase, value: THKT }
+            where: "phase = 'EXECUTION'"
+        - update:
+            tableName: audit_work_item
+            columns:
+              - column: { name: phase, value: DCKT }
+            where: "phase = 'CLOSING'"

@@ -703,9 +703,9 @@
       "hasSampleSelection": "Có chọn mẫu"
     },
     "phase": {
-      "PREPARATION": "Chuẩn bị KT",
-      "EXECUTION": "Thực hiện KT",
-      "CLOSING": "Đóng cuộc KT"
+      "CBKT": "CBKT",
+      "THKT": "THKT",
+      "DCKT": "ĐCKT"
     },
     "form": {
       "createTitle": "Thêm công việc kiểm toán",

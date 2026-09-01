@@ -33,7 +33,7 @@ interface FormValues {
   hasSampleSelection: boolean;
 }
 
-const PHASES: AuditWorkPhase[] = ["PREPARATION", "EXECUTION", "CLOSING"];
+const PHASES: AuditWorkPhase[] = ["CBKT", "THKT", "DCKT"];
 
 /** Danh muc "Cong viec kiem toan" (sheet ZTC_CV) - trong nhom "Danh muc" cua "Lap ke hoach". */
 export function WorkItemPage() {
