@@ -298,14 +298,41 @@ public class EmployeeService {
                 .and(EmployeeSpecifications.managerNameContains(filter.managerName()));
     }
 
+    /** Day du TAT CA truong co trong form Them/Sua nhan vien (EmployeeFormDrawer) cong them
+     * username/status (khong thuoc form nhung la thong tin nhan vien can xem) - TRU accountPassword
+     * (mat khau tai khoan dang nhap, khong bao gio duoc xuat ra). */
     private List<ExportColumn> exportColumns() {
         return List.of(
                 new ExportColumn("employeeCode", "Ma NV"),
                 new ExportColumn("fullName", "Ho ten"),
-                new ExportColumn("positionName", "Chuc danh"),
-                new ExportColumn("orgUnitName", "Don vi"),
+                new ExportColumn("gender", "Gioi tinh"),
+                new ExportColumn("email", "Email cong viec"),
+                new ExportColumn("personalEmail", "Email ca nhan"),
                 new ExportColumn("phone", "Dien thoai"),
-                new ExportColumn("email", "Email"),
+                new ExportColumn("idNumber", "So CCCD/CMND"),
+                new ExportColumn("orgUnitName", "Don vi"),
+                new ExportColumn("positionName", "Chuc danh"),
+                new ExportColumn("managerName", "Quan ly truc tiep"),
+                new ExportColumn("hireDate", "Ngay vao lam"),
+                new ExportColumn("dateOfBirth", "Ngay sinh"),
+                new ExportColumn("rankLevel", "Cap bac"),
+                new ExportColumn("ethnicity", "Dan toc"),
+                new ExportColumn("businessSegmentName", "Linh vuc"),
+                new ExportColumn("hometown", "Que quan"),
+                new ExportColumn("partyJoinDate", "Ngay vao Dang"),
+                new ExportColumn("auditDeptJoinDate", "Ngay vao Ban Kiem soat"),
+                new ExportColumn("priorWorkHistory", "Qua trinh cong tac truoc Agribank"),
+                new ExportColumn("educationLevel", "Trinh do chuyen mon"),
+                new ExportColumn("politicalLevel", "Trinh do chinh tri"),
+                new ExportColumn("foreignLanguageLevel", "Trinh do ngoai ngu"),
+                new ExportColumn("itSkillLevel", "Trinh do tin hoc"),
+                new ExportColumn("auditorClassification", "Phan loai nang luc KTV"),
+                new ExportColumn("teamLeadCapable", "Kha nang truong doan"),
+                new ExportColumn("auditedBranches", "Chi nhanh da kiem toan nam truoc"),
+                new ExportColumn("otherDuties", "Cong tac khac"),
+                new ExportColumn("relatedPersonBranches", "Chi nhanh co nguoi lien quan"),
+                new ExportColumn("onLeave", "Dang nghi che do"),
+                new ExportColumn("username", "Ten dang nhap"),
                 new ExportColumn("status", "Trang thai"));
     }
 
@@ -315,10 +342,34 @@ public class EmployeeService {
             Map<String, Object> row = new HashMap<>();
             row.put("employeeCode", e.getEmployeeCode());
             row.put("fullName", e.getFullName());
-            row.put("positionName", e.getPositionId() == null ? "" : nameOf(ctx.positions.get(e.getPositionId())));
-            row.put("orgUnitName", e.getOrgUnitId() == null ? "" : nameOf(ctx.orgUnits.get(e.getOrgUnitId())));
-            row.put("phone", e.getPhone());
+            row.put("gender", e.getGender());
             row.put("email", e.getEmail());
+            row.put("personalEmail", e.getPersonalEmail());
+            row.put("phone", e.getPhone());
+            row.put("idNumber", e.getIdNumber());
+            row.put("orgUnitName", e.getOrgUnitId() == null ? "" : nameOf(ctx.orgUnits.get(e.getOrgUnitId())));
+            row.put("positionName", e.getPositionId() == null ? "" : nameOf(ctx.positions.get(e.getPositionId())));
+            row.put("managerName", e.getManagerId() == null ? "" : nameOfEmployee(ctx.managers.get(e.getManagerId())));
+            row.put("hireDate", e.getHireDate());
+            row.put("dateOfBirth", e.getDateOfBirth());
+            row.put("rankLevel", e.getRankLevel());
+            row.put("ethnicity", e.getEthnicity());
+            row.put("businessSegmentName", e.getBusinessSegmentId() == null ? "" : nameOf(ctx.businessSegments.get(e.getBusinessSegmentId())));
+            row.put("hometown", e.getHometown());
+            row.put("partyJoinDate", e.getPartyJoinDate());
+            row.put("auditDeptJoinDate", e.getAuditDeptJoinDate());
+            row.put("priorWorkHistory", e.getPriorWorkHistory());
+            row.put("educationLevel", e.getEducationLevel());
+            row.put("politicalLevel", e.getPoliticalLevel());
+            row.put("foreignLanguageLevel", e.getForeignLanguageLevel());
+            row.put("itSkillLevel", e.getItSkillLevel());
+            row.put("auditorClassification", e.getAuditorClassification());
+            row.put("teamLeadCapable", e.isTeamLeadCapable() ? "Y" : "N");
+            row.put("auditedBranches", e.getAuditedBranches());
+            row.put("otherDuties", e.getOtherDuties());
+            row.put("relatedPersonBranches", e.getRelatedPersonBranches());
+            row.put("onLeave", e.isOnLeave() ? "Y" : "N");
+            row.put("username", ctx.usernames.get(e.getId()));
             row.put("status", e.getStatus());
             return row;
         }).toList();
@@ -479,6 +530,10 @@ public class EmployeeService {
 
     private static String nameOf(AuditMasterDataItem item) {
         return item == null ? "" : item.getName();
+    }
+
+    private static String nameOfEmployee(Employee employee) {
+        return employee == null ? "" : employee.getFullName();
     }
 
     private record ResponseContext(
