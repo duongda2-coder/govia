@@ -1,0 +1,34 @@
+databaseChangeLog:
+
+  # ===================== Danh muc "Chuc danh can bo chi nhanh" (sheet ZTC_CN_NV, bang ZTB_CN_NV) =====================
+  - changeSet:
+      id: 054-1-audit-plan-branch-staff-schema
+      author: govia
+      comment: "Tao bang audit_branch_staff"
+      changes:
+        - createTable:
+            tableName: audit_branch_staff
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: branch_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: staff_name, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: position, type: VARCHAR(100) }
+              - column: { name: priority, type: INTEGER }
+              - column: { name: note, type: VARCHAR(500) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_branch_staff
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_branch_staff_tenant
+        - addUniqueConstraint:
+            tableName: audit_branch_staff
+            columnNames: tenant_id, branch_code, staff_name
+            constraintName: uk_audit_branch_staff_tenant_branch_staff

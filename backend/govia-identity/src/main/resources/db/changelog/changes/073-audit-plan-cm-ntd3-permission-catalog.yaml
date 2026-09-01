@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Chon mau KH to chuc tien gui HDV (CM_NTD3) =====================
+  - changeSet:
+      id: 073-1-permission-catalog-audit-cm-ntd3
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "72315b68-3209-497b-9b32-3e4caa5f918b" }
+              - column: { name: code, value: "AUDIT.CM_NTD3.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh sach chon mau KH to chuc tien gui HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu KH tổ chức tiền gửi HĐV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "33a95c47-37c0-4f5e-819d-9c9affb4379f" }
+              - column: { name: code, value: "AUDIT.CM_NTD3.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi ban ghi chon mau KH to chuc tien gui HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu KH tổ chức tiền gửi HĐV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "32b02466-8e9f-4093-983d-d92a653eba93" }
+              - column: { name: code, value: "AUDIT.CM_NTD3.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua ban ghi chon mau KH to chuc tien gui HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu KH tổ chức tiền gửi HĐV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c555fe6b-c649-45be-b694-e330bca2eccb" }
+              - column: { name: code, value: "AUDIT.CM_NTD3.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa ban ghi chon mau KH to chuc tien gui HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu KH tổ chức tiền gửi HĐV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "0a2449e1-9a54-4262-b769-0643d60a85f3" }
+              - column: { name: code, value: "AUDIT.CM_NTD3.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu chon mau KH to chuc tien gui HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu KH tổ chức tiền gửi HĐV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "9cb75a31-2de1-4773-a851-8597d3998638" }
+              - column: { name: code, value: "AUDIT.CM_NTD3.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu chon mau KH to chuc tien gui HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu KH tổ chức tiền gửi HĐV" }

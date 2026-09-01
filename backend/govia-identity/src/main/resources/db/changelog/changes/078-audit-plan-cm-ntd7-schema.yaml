@@ -1,0 +1,37 @@
+databaseChangeLog:
+
+  # ===================== "Thuc hien kiem toan": Danh sach chon mau ho so cong trinh XDCB (sheet ZTC_CM_NTD7, phu luc 09B/BKS-KTNB) =====================
+  - changeSet:
+      id: 078-1-audit-plan-cm-ntd7-schema
+      author: govia
+      comment: "Tao bang audit_cm_ntd7"
+      changes:
+        - createTable:
+            tableName: audit_cm_ntd7
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: branch_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: construction_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: construction_name, type: VARCHAR(50) }
+              - column: { name: content, type: VARCHAR(120) }
+              - column: { name: document_type, type: VARCHAR(20) }
+              - column: { name: completeness_assessment, type: VARCHAR(120) }
+              - column: { name: assessment, type: VARCHAR(250) }
+              - column: { name: audit_result, type: VARCHAR(120) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_cm_ntd7
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_cm_ntd7_tenant
+        - addUniqueConstraint:
+            tableName: audit_cm_ntd7
+            columnNames: tenant_id, branch_code, construction_code
+            constraintName: uk_audit_cm_ntd7_tenant_branch_construction

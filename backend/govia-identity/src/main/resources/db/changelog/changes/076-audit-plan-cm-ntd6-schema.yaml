@@ -1,0 +1,38 @@
+databaseChangeLog:
+
+  # ===================== "Thuc hien kiem toan": Danh sach chon mau User Ipcas AD, KPI CNTT (sheet ZTC_CM_NTD6, phu luc 08B/BKS-KTNB) =====================
+  - changeSet:
+      id: 076-1-audit-plan-cm-ntd6-schema
+      author: govia
+      comment: "Tao bang audit_cm_ntd6"
+      changes:
+        - createTable:
+            tableName: audit_cm_ntd6
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: branch_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: staff_code, type: VARCHAR(50) }
+              - column: { name: staff_name, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: ipcas_user, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: ad_user, type: VARCHAR(20) }
+              - column: { name: security_device, type: VARCHAR(20) }
+              - column: { name: sample_reason, type: VARCHAR(50) }
+              - column: { name: sample_code, type: VARCHAR(20) }
+              - column: { name: audit_result, type: VARCHAR(120) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_cm_ntd6
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_cm_ntd6_tenant
+        - addUniqueConstraint:
+            tableName: audit_cm_ntd6
+            columnNames: tenant_id, branch_code, staff_name, ipcas_user
+            constraintName: uk_audit_cm_ntd6_tenant_branch_staff_ipcas

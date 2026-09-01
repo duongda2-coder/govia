@@ -26,6 +26,7 @@
     "admin": "Quản trị hệ thống",
     "roles": "Vai trò & Phân quyền",
     "accounts": "Tài khoản người dùng",
+    "activityLog": "Nhật ký thao tác",
     "workflow": "Quy trình",
     "workflowTasks": "Việc cần xử lý",
     "workflowInstances": "Quy trình đang chạy",
@@ -40,6 +41,31 @@
     "auditMdYear": "Danh mục Năm",
     "auditMdBusinessSegment": "Danh mục Mảng nghiệp vụ",
     "auditMdUnitType": "Danh mục Loại đơn vị",
+    "auditPlan": "Lập kế hoạch",
+    "auditPlanMasterData": "Danh mục",
+    "auditPlanMdBranchStaff": "Chức danh cán bộ chi nhánh",
+    "auditPlanMdWorkItem": "Công việc kiểm toán",
+    "auditPlanMdExceptionType": "Loại tồn tại sai sót",
+    "auditPlanMdRecommendationType": "Loại kiến nghị",
+    "auditPlanMdProcessStepSummary": "Bước quy trình tổng hợp",
+    "auditPlanMdProcessStepDetail": "Bước quy trình chi tiết",
+    "auditPlanMdExceptionMapping": "Mapping tồn tại sai sót",
+    "auditPlanExecution": "Thực hiện kiểm toán",
+    "auditPlanExecCmTd1": "DS KH chọn mẫu tín dụng",
+    "auditPlanExecCmTd2": "KQ chọn mẫu BT hủy/lùi ngày",
+    "auditPlanExecCmNtd1": "DS BT chọn mẫu TCKT",
+    "auditPlanExecCmNtd2": "DS chọn mẫu GD HĐV",
+    "auditPlanExecCmNtd3": "DS chọn mẫu KH tổ chức HĐV",
+    "auditPlanExecCmNtd4": "DS chọn mẫu LC/nhờ thu TTQT",
+    "auditPlanExecCmNtd6": "DS chọn mẫu User Ipcas AD/KPI CNTT",
+    "auditPlanExecCmNtd7": "DS chọn mẫu hồ sơ công trình XDCB",
+    "auditPlanExecCmNtd8": "DS chọn mẫu KH GD lớn/không TK",
+    "auditPlanExecCmNtd9": "DS chọn mẫu KH lần đầu GD",
+    "auditPlanExecCmNtd10": "KQ kiểm toán hồ sơ phát hành thẻ",
+    "auditPlanExecCmNtd11": "GD chuyển tiền NN & KD ngoại tệ",
+    "auditPlanExecCmNtd12": "DS BT chọn mẫu TCKT (thẻ)",
+    "auditPlanExecCmNtd13": "KQ kiểm toán ĐV chấp nhận thẻ",
+    "auditPlanExecCmNtd14": "DS chọn mẫu User Ipcas chấm công",
     "riskScoring": "Chấm điểm rủi ro",
     "riskScoringMasterData": "Master Data CDRR",
     "riskScoringGroups": "Nhóm chỉ tiêu",
@@ -550,7 +576,8 @@
       "DEPARTMENT": "Danh mục Bộ phận KT",
       "YEAR": "Danh mục Năm",
       "BUSINESS_SEGMENT": "Danh mục Mảng nghiệp vụ",
-      "UNIT_TYPE": "Danh mục Loại đơn vị"
+      "UNIT_TYPE": "Danh mục Loại đơn vị",
+      "RECOMMENDATION_TYPE": "Danh mục Loại kiến nghị"
     },
     "columns": {
       "code": "Mã",
@@ -644,6 +671,635 @@
       "editTitle": "Sửa chốt kiểm soát"
     },
     "deleteConfirmTitle": "Xóa chốt kiểm soát này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditWorkItem": {
+    "title": "Danh mục Công việc kiểm toán",
+    "columns": {
+      "phase": "Giai đoạn",
+      "businessSegment": "Mảng nghiệp vụ",
+      "code": "Mã công việc",
+      "name": "Tên công việc",
+      "applicableYear": "Năm",
+      "workSetCode": "Mã bộ công việc",
+      "workType": "Loại CV"
+    },
+    "phase": {
+      "PREPARATION": "Chuẩn bị KT",
+      "EXECUTION": "Thực hiện KT",
+      "CLOSING": "Đóng cuộc KT"
+    },
+    "form": {
+      "createTitle": "Thêm công việc kiểm toán",
+      "editTitle": "Sửa công việc kiểm toán"
+    },
+    "deleteConfirmTitle": "Xóa công việc kiểm toán này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditBranchStaff": {
+    "title": "Danh mục Chức danh cán bộ chi nhánh",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "staffName": "Tên nhân viên",
+      "position": "Chức vụ",
+      "priority": "Ưu tiên",
+      "note": "Ghi chú"
+    },
+    "form": {
+      "createTitle": "Thêm chức danh cán bộ chi nhánh",
+      "editTitle": "Sửa chức danh cán bộ chi nhánh"
+    },
+    "deleteConfirmTitle": "Xóa chức danh cán bộ chi nhánh này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmTd1": {
+    "title": "Danh sách khách hàng chọn mẫu tín dụng",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "auditDate": "Thời điểm kiểm toán",
+      "customerCode": "Mã khách hàng",
+      "customerName": "Tên khách hàng",
+      "approvedAmount": "Số tiền phê duyệt cho vay/cấp bảo lãnh",
+      "loanPurpose": "Mục đích vay vốn",
+      "description": "Diễn giải",
+      "onBalanceDebt": "Dư nợ nội bảng",
+      "guaranteeBalance": "Số dư bảo lãnh/LC",
+      "riskClassifiedDebt": "Dư nợ XLRR",
+      "vamcSoldDebt": "Dư nợ bán cho VAMC",
+      "totalCreditBalance": "Tổng số dư cấp tín dụng",
+      "debtGroup": "Nhóm nợ",
+      "auditScope": "Phạm vi kiểm toán",
+      "auditorCode": "Cán bộ kiểm toán",
+      "sampleReason": "Lý do chọn mẫu",
+      "note": "Ghi chú"
+    },
+    "form": {
+      "createTitle": "Thêm khách hàng chọn mẫu tín dụng",
+      "editTitle": "Sửa khách hàng chọn mẫu tín dụng"
+    },
+    "deleteConfirmTitle": "Xóa khách hàng chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "activityLog": {
+    "title": "Nhật ký thao tác",
+    "dateFrom": "Từ ngày",
+    "dateTo": "Đến ngày",
+    "columns": {
+      "performedAt": "Thời điểm",
+      "performedBy": "Người thực hiện",
+      "action": "Hành động",
+      "entityName": "Đối tượng",
+      "detail": "Chi tiết",
+      "entityId": "Mã đối tượng"
+    },
+    "action": {
+      "CREATE": "Tạo mới",
+      "UPDATE": "Cập nhật",
+      "DELETE": "Xóa",
+      "LOGIN": "Đăng nhập",
+      "LOGOUT": "Đăng xuất",
+      "EXPORT": "Xuất dữ liệu",
+      "APPROVE": "Phê duyệt",
+      "REJECT": "Từ chối"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu"
+    }
+  },
+  "auditCmTd2": {
+    "title": "Kết quả kiểm toán chọn mẫu các bút toán giao dịch hủy, lùi ngày",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "transactionDate": "Ngày giao dịch thực tế",
+      "valueDate": "Ngày giá trị",
+      "postingUser": "User hạch toán",
+      "entryNumber": "Số bút toán",
+      "customerCode": "Mã KH",
+      "customerName": "Tên KH",
+      "disbursementNumber": "Số giải ngân",
+      "businessCode": "Mã nghiệp vụ",
+      "transactionStatus": "Trạng thái giao dịch",
+      "currency": "Loại tiền tệ",
+      "debitAmount": "Số tiền ghi nợ",
+      "creditAmount": "Số tiền ghi có",
+      "accountNumber": "Tài khoản hạch toán",
+      "postingDateDiff": "Chênh lệch ngày hạch toán",
+      "ipcasReviewResult": "Kết quả rà soát trên IPCAS",
+      "documentCheckResult": "Kết quả kiểm tra chứng từ"
+    },
+    "form": { "createTitle": "Thêm bút toán chọn mẫu", "editTitle": "Sửa bút toán chọn mẫu" },
+    "deleteConfirmTitle": "Xóa bút toán chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd1": {
+    "title": "Danh sách các bút toán chọn mẫu TCKT",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "transactionDate": "Ngày giao dịch thực tế",
+      "postingUser": "User hạch toán",
+      "entryNumber": "Số bút toán",
+      "debitAmount": "Số phát sinh nợ",
+      "creditAmount": "Số phát sinh có",
+      "transactionStatus": "Trạng thái giao dịch",
+      "currency": "Loại tiền tệ",
+      "accountNumber": "Tài khoản hạch toán",
+      "content": "Nội dung",
+      "sampleReason": "Lý do chọn mẫu",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát",
+      "workType": "Loại hình CV"
+    },
+    "form": { "createTitle": "Thêm bút toán chọn mẫu TCKT", "editTitle": "Sửa bút toán chọn mẫu TCKT" },
+    "deleteConfirmTitle": "Xóa bút toán chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd2": {
+    "title": "Danh sách chọn mẫu giao dịch về nghiệp vụ HĐV",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "transactionDate": "Ngày giao dịch thực tế",
+      "valueDate": "Ngày giá trị",
+      "postingUser": "User hạch toán",
+      "entryNumber": "Số bút toán",
+      "currency": "Loại tiền tệ",
+      "amount": "Số tiền",
+      "accountNumber": "Tài khoản hạch toán",
+      "bookNumber": "Số sổ",
+      "transactionType": "Loại giao dịch",
+      "transactionStatus": "Trạng thái giao dịch",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát"
+    },
+    "form": { "createTitle": "Thêm giao dịch chọn mẫu HĐV", "editTitle": "Sửa giao dịch chọn mẫu HĐV" },
+    "deleteConfirmTitle": "Xóa giao dịch chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd3": {
+    "title": "Danh sách chọn mẫu khách hàng tổ chức tiền gửi HĐV",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "transactionDate": "Ngày giao dịch thực tế",
+      "customerCode": "Mã Khách hàng",
+      "customerName": "Tên khách hàng",
+      "customerAddress": "Địa chỉ khách hàng",
+      "accountNumber": "Tài khoản hạch toán",
+      "currency": "Loại tiền tệ",
+      "originalCurrencyBalance": "Số dư nguyên tệ",
+      "convertedBalance": "Số dư quy đổi",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát"
+    },
+    "form": { "createTitle": "Thêm khách hàng chọn mẫu HĐV", "editTitle": "Sửa khách hàng chọn mẫu HĐV" },
+    "deleteConfirmTitle": "Xóa khách hàng chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd4": {
+    "title": "Danh sách chọn mẫu LC và nhờ thu TTQT",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "referenceNumber": "Số tham chiếu",
+      "openDate": "Ngày mở",
+      "customerCode": "Mã Khách hàng",
+      "customerName": "Tên khách hàng",
+      "amount": "Số tiền",
+      "beneficiary": "Người thụ hưởng",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát"
+    },
+    "form": { "createTitle": "Thêm LC/nhờ thu chọn mẫu", "editTitle": "Sửa LC/nhờ thu chọn mẫu" },
+    "deleteConfirmTitle": "Xóa bản ghi chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd6": {
+    "title": "Danh sách chọn mẫu User Ipcas AD, KPI CNTT",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "staffCode": "Mã cán bộ",
+      "staffName": "Tên cán bộ",
+      "ipcasUser": "User Ipcas",
+      "adUser": "User AD",
+      "securityDevice": "Thiết bị bảo mật",
+      "sampleReason": "Lý do chọn mẫu",
+      "sampleCode": "Mã mẫu chọn",
+      "auditResult": "Kết quả kiểm toán"
+    },
+    "form": { "createTitle": "Thêm User Ipcas AD/KPI chọn mẫu", "editTitle": "Sửa User Ipcas AD/KPI chọn mẫu" },
+    "deleteConfirmTitle": "Xóa bản ghi chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd7": {
+    "title": "Danh sách chọn mẫu hồ sơ công trình XDCB",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "constructionCode": "Mã CT",
+      "constructionName": "Tên Công trình",
+      "content": "Nội dung",
+      "documentType": "Dạng tài liệu",
+      "completenessAssessment": "Đánh giá tính đầy đủ",
+      "assessment": "Đánh giá",
+      "auditResult": "Kết quả kiểm toán"
+    },
+    "form": { "createTitle": "Thêm hồ sơ công trình chọn mẫu", "editTitle": "Sửa hồ sơ công trình chọn mẫu" },
+    "deleteConfirmTitle": "Xóa hồ sơ công trình chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd8": {
+    "title": "Danh sách chọn mẫu khách hàng giao dịch số tiền lớn và không có TK",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "transactionDate": "Ngày giao dịch thực tế",
+      "referenceNumber": "Số tham chiếu",
+      "postingUser": "User hạch toán",
+      "entryNumber": "Số bút toán",
+      "amount": "Số tiền",
+      "currency": "Loại tiền tệ",
+      "orderingParty": "Đơn vị phát lệnh",
+      "beneficiaryParty": "Đơn vị thụ hưởng",
+      "beneficiaryAccount": "Tài khoản thụ hưởng",
+      "sampleReason": "Lý do chọn mẫu",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát"
+    },
+    "form": { "createTitle": "Thêm khách hàng chọn mẫu", "editTitle": "Sửa khách hàng chọn mẫu" },
+    "deleteConfirmTitle": "Xóa bản ghi chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd9": {
+    "title": "Danh sách chọn mẫu khách hàng lần đầu sử dụng dịch vụ của NH",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "transactionDate": "Ngày giao dịch thực tế",
+      "postingUser": "User hạch toán",
+      "customerCode": "Mã Khách hàng",
+      "customerName": "Tên khách hàng",
+      "idNumber": "Số CMND/Hộ chiếu",
+      "customerType": "Loại KH",
+      "transactionContent": "Nội dung giao dịch",
+      "sampleReason": "Lý do chọn mẫu",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát"
+    },
+    "form": { "createTitle": "Thêm khách hàng chọn mẫu", "editTitle": "Sửa khách hàng chọn mẫu" },
+    "deleteConfirmTitle": "Xóa khách hàng chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd10": {
+    "title": "Kết quả kiểm toán hồ sơ phát hành thẻ",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "issueDate": "Ngày phát hành",
+      "customerCode": "Mã Khách hàng",
+      "customerName": "Tên khách hàng",
+      "accountNumber": "Số tài khoản",
+      "cardTier": "Hạng thẻ",
+      "issuingUser": "User phát hành",
+      "issuanceFee": "Phí phát hành, phát hành lại",
+      "issuanceType": "Loại phát hành",
+      "issuanceOccurrence": "Lần phát hành",
+      "sampleReason": "Lý do chọn mẫu",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát"
+    },
+    "issuanceTypeOptions": { "fast": "Phát hành nhanh", "normal": "Phát hành thường" },
+    "issuanceOccurrenceOptions": { "first": "Lần đầu", "reissue": "Phát hành lại" },
+    "form": { "createTitle": "Thêm hồ sơ phát hành thẻ", "editTitle": "Sửa hồ sơ phát hành thẻ" },
+    "deleteConfirmTitle": "Xóa hồ sơ phát hành thẻ này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd11": {
+    "title": "Giao dịch chuyển tiền với Người nước ngoài và Kinh doanh ngoại tệ",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "referenceNumber": "Số tham chiếu",
+      "customerCode": "Mã Khách hàng",
+      "customerName": "Tên khách hàng",
+      "transactionDate": "Ngày giao dịch",
+      "currency": "Loại tiền",
+      "amount": "Số tiền",
+      "sampleReason": "Lý do chọn mẫu",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát"
+    },
+    "form": { "createTitle": "Thêm giao dịch chọn mẫu", "editTitle": "Sửa giao dịch chọn mẫu" },
+    "deleteConfirmTitle": "Xóa giao dịch chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd12": {
+    "title": "Danh sách các bút toán chọn mẫu TCKT (nghiệp vụ thẻ)",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "transactionDate": "Ngày giao dịch thực tế",
+      "postingUser": "User hạch toán",
+      "entryNumber": "Số bút toán",
+      "debitAmount": "Số phát sinh nợ",
+      "creditAmount": "Số phát sinh có",
+      "transactionStatus": "Trạng thái giao dịch",
+      "currency": "Loại tiền tệ",
+      "accountNumber": "Tài khoản hạch toán",
+      "content": "Nội dung",
+      "sampleReason": "Lý do chọn mẫu",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát"
+    },
+    "form": { "createTitle": "Thêm bút toán chọn mẫu TCKT", "editTitle": "Sửa bút toán chọn mẫu TCKT" },
+    "deleteConfirmTitle": "Xóa bút toán chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd13": {
+    "title": "Kết quả kiểm toán đơn vị chấp nhận thẻ (07D)",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "occurrenceDate": "Ngày phát sinh",
+      "merchantId": "Mechant ID",
+      "merchantAccountNumber": "Số tài khoản ĐVCNT",
+      "businessRegistrationName": "Tên ĐKKD",
+      "status": "Trạng thái",
+      "sampleReason": "Lý do chọn mẫu",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát"
+    },
+    "form": { "createTitle": "Thêm đơn vị chấp nhận thẻ chọn mẫu", "editTitle": "Sửa đơn vị chấp nhận thẻ chọn mẫu" },
+    "deleteConfirmTitle": "Xóa bản ghi chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd14": {
+    "title": "Danh sách chọn mẫu User Ipcas chấm công (08C)",
+    "columns": {
+      "branchCode": "Mã chi nhánh",
+      "attendanceDate": "Ngày chấm công",
+      "staffCode": "Mã cán bộ",
+      "staffName": "Tên cán bộ",
+      "attendanceCode": "Chấm công",
+      "description": "Diễn giải",
+      "matchedTransactionCount": "Số GD HT",
+      "unmatchedTransactionCount": "Số GD Ko HT",
+      "adjustedTransactionCount": "Số GD ĐK, CS TT",
+      "userCode": "User",
+      "note": "Ghi chú",
+      "sampleCode": "Mã mẫu chọn",
+      "sampleReason": "Lý do chọn mẫu",
+      "auditResult": "Kết quả kiểm toán"
+    },
+    "form": { "createTitle": "Thêm User Ipcas chấm công chọn mẫu", "editTitle": "Sửa User Ipcas chấm công chọn mẫu" },
+    "deleteConfirmTitle": "Xóa bản ghi chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditExceptionType": {
+    "title": "Danh mục Loại tồn tại sai sót",
+    "columns": {
+      "businessSegment": "Mảng nghiệp vụ",
+      "code": "Mã phát hiện",
+      "name": "Tên phát hiện",
+      "category": "Loại phát hiện",
+      "impactLevel": "Mức độ ảnh hưởng",
+      "classificationBasis": "Căn cứ phân loại"
+    },
+    "category": {
+      "RISK_MANAGEMENT": "QLRR",
+      "INTERNAL_CONTROL": "KSNB"
+    },
+    "level": {
+      "HIGH": "Cao",
+      "MEDIUM": "Trung bình",
+      "LOW": "Thấp"
+    },
+    "form": {
+      "createTitle": "Thêm loại tồn tại sai sót",
+      "editTitle": "Sửa loại tồn tại sai sót"
+    },
+    "deleteConfirmTitle": "Xóa loại tồn tại sai sót này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditProcessStepSummary": {
+    "title": "Danh mục Bước quy trình tổng hợp",
+    "columns": {
+      "businessSegment": "Mảng nghiệp vụ",
+      "code": "Mã bước quy trình tổng hợp",
+      "name": "Tên bước quy trình tổng hợp",
+      "workItem": "Mã công việc"
+    },
+    "form": {
+      "createTitle": "Thêm bước quy trình tổng hợp",
+      "editTitle": "Sửa bước quy trình tổng hợp"
+    },
+    "deleteConfirmTitle": "Xóa bước quy trình tổng hợp này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditProcessStepDetail": {
+    "title": "Danh mục Bước quy trình chi tiết",
+    "columns": {
+      "businessSegment": "Mảng nghiệp vụ",
+      "processStepSummary": "Bước quy trình tổng hợp",
+      "controlPoint": "Chốt kiểm soát",
+      "code": "Mã BQT chi tiết"
+    },
+    "form": {
+      "createTitle": "Thêm bước quy trình chi tiết",
+      "editTitle": "Sửa bước quy trình chi tiết"
+    },
+    "deleteConfirmTitle": "Xóa bước quy trình chi tiết này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditExceptionMapping": {
+    "title": "Danh mục Mapping tồn tại sai sót",
+    "columns": {
+      "businessSegment": "Mã mảng nv",
+      "processStepDetail": "Mã BQT_CT",
+      "exceptionTypeCode": "Mã TTSS",
+      "exceptionTypeName": "Tên TTSS"
+    },
+    "form": {
+      "createTitle": "Thêm mapping tồn tại sai sót",
+      "editTitle": "Sửa mapping tồn tại sai sót"
+    },
+    "deleteConfirmTitle": "Xóa mapping tồn tại sai sót này?",
     "messages": {
       "loadError": "Không tải được dữ liệu",
       "createSuccess": "Đã tạo",

@@ -1,0 +1,46 @@
+databaseChangeLog:
+
+  # ===================== "Thuc hien kiem toan": Danh sach khach hang chon mau tin dung (sheet ZTC_CM_TD1, phu luc 02L/BKS-KTNB) =====================
+  - changeSet:
+      id: 063-1-audit-plan-cm-td1-schema
+      author: govia
+      comment: "Tao bang audit_cm_td1"
+      changes:
+        - createTable:
+            tableName: audit_cm_td1
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: branch_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: audit_date, type: DATE, constraints: { nullable: false } }
+              - column: { name: customer_code, type: VARCHAR(50) }
+              - column: { name: customer_name, type: VARCHAR(200), constraints: { nullable: false } }
+              - column: { name: approved_amount, type: "DECIMAL(20,2)" }
+              - column: { name: loan_purpose, type: VARCHAR(60) }
+              - column: { name: description, type: VARCHAR(120) }
+              - column: { name: on_balance_debt, type: "DECIMAL(20,2)" }
+              - column: { name: guarantee_balance, type: "DECIMAL(20,2)" }
+              - column: { name: risk_classified_debt, type: "DECIMAL(20,2)" }
+              - column: { name: vamc_sold_debt, type: "DECIMAL(20,2)" }
+              - column: { name: total_credit_balance, type: "DECIMAL(20,2)" }
+              - column: { name: debt_group, type: VARCHAR(20) }
+              - column: { name: audit_scope, type: VARCHAR(120) }
+              - column: { name: auditor_code, type: VARCHAR(50) }
+              - column: { name: sample_reason, type: VARCHAR(50) }
+              - column: { name: note, type: VARCHAR(120) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_cm_td1
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_cm_td1_tenant
+        - addUniqueConstraint:
+            tableName: audit_cm_td1
+            columnNames: tenant_id, branch_code, audit_date, customer_name
+            constraintName: uk_audit_cm_td1_tenant_branch_date_customer

@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Ket qua kiem toan DVCNT the (CM_NTD13) =====================
+  - changeSet:
+      id: 091-1-permission-catalog-audit-cm-ntd13
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "84af97cb-4fc7-4adf-83b7-f0eb77e58940" }
+              - column: { name: code, value: "AUDIT.CM_NTD13.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem ket qua kiem toan don vi chap nhan the" }
+              - column: { name: resource_label, value: "Kết quả kiểm toán ĐVCNT thẻ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "9ca4d38f-3051-426e-a80c-d1a4791ac183" }
+              - column: { name: code, value: "AUDIT.CM_NTD13.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi ket qua kiem toan don vi chap nhan the" }
+              - column: { name: resource_label, value: "Kết quả kiểm toán ĐVCNT thẻ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1a2b5a34-cde9-4da8-918f-97e706374fa2" }
+              - column: { name: code, value: "AUDIT.CM_NTD13.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua ket qua kiem toan don vi chap nhan the" }
+              - column: { name: resource_label, value: "Kết quả kiểm toán ĐVCNT thẻ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "433c09f4-a8ac-4bb2-b640-a1e32a000286" }
+              - column: { name: code, value: "AUDIT.CM_NTD13.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa ket qua kiem toan don vi chap nhan the" }
+              - column: { name: resource_label, value: "Kết quả kiểm toán ĐVCNT thẻ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1859e5eb-36d1-4b2b-a82d-70099726abd6" }
+              - column: { name: code, value: "AUDIT.CM_NTD13.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu ket qua kiem toan don vi chap nhan the" }
+              - column: { name: resource_label, value: "Kết quả kiểm toán ĐVCNT thẻ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "3a2df464-34cc-468b-b500-dc2dfda74360" }
+              - column: { name: code, value: "AUDIT.CM_NTD13.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu ket qua kiem toan don vi chap nhan the" }
+              - column: { name: resource_label, value: "Kết quả kiểm toán ĐVCNT thẻ" }

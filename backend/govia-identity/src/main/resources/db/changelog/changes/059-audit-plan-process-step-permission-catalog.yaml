@@ -1,0 +1,109 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Danh muc Buoc quy trinh tong hop =====================
+  - changeSet:
+      id: 059-1-permission-catalog-audit-process-step-summary
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "85e52a0a-1b9c-4cc1-b314-512c2c4303bd" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc buoc quy trinh tong hop" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "e8fe5e15-aaba-435b-a9c0-3ebe9e533510" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi danh muc buoc quy trinh tong hop" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "3d957259-31ad-44dc-83e2-a8d0beef4ed4" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua danh muc buoc quy trinh tong hop" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "db2797c4-66a4-4dbc-a43e-21f197571861" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa danh muc buoc quy trinh tong hop" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "88f74145-daca-4fb3-8f68-30ec116d184d" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu danh muc buoc quy trinh tong hop" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a31299fc-6890-410e-9c82-e1d85b0ca927" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu danh muc buoc quy trinh tong hop" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp" }
+
+  # ===================== PERMISSION CATALOG: Danh muc Buoc quy trinh chi tiet =====================
+  - changeSet:
+      id: 059-2-permission-catalog-audit-process-step-detail
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "0bb5ce8d-29a0-4fb1-9fb6-8da551a2c9d4" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_DETAIL.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc buoc quy trinh chi tiet" }
+              - column: { name: resource_label, value: "Bước quy trình chi tiết" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "99deb713-0339-4b1e-bd76-79e6c81d4bfd" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_DETAIL.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi danh muc buoc quy trinh chi tiet" }
+              - column: { name: resource_label, value: "Bước quy trình chi tiết" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "16764f9a-3cb4-4773-855f-010e446d27e9" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_DETAIL.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua danh muc buoc quy trinh chi tiet" }
+              - column: { name: resource_label, value: "Bước quy trình chi tiết" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "f995fb72-d3bd-41bb-bb7b-71e32a3559e7" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_DETAIL.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa danh muc buoc quy trinh chi tiet" }
+              - column: { name: resource_label, value: "Bước quy trình chi tiết" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "885ba598-4324-4d17-9503-9f44188ce5aa" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_DETAIL.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu danh muc buoc quy trinh chi tiet" }
+              - column: { name: resource_label, value: "Bước quy trình chi tiết" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c52ac3f0-dfbe-4eee-a72b-070b3707935b" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_DETAIL.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu danh muc buoc quy trinh chi tiet" }
+              - column: { name: resource_label, value: "Bước quy trình chi tiết" }

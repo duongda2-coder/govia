@@ -1,0 +1,18 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Cong menu "Lap ke hoach / Danh muc" =====================
+  # Quyen nay chi de dieu khien viec hien/an muc menu cha "Lap ke hoach / Danh muc" tren FE
+  # (giong AUDIT.MASTER_DATA.VIEW cho nhom "Danh muc" hien co) - CRUD tung man hinh con van do
+  # cac quyen rieng (AUDIT.WORK_ITEM.*, AUDIT.BRANCH_STAFF.*, ...) kiem soat.
+  - changeSet:
+      id: 062-1-permission-catalog-audit-plan-master-data-gate
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1e55e9ca-f534-4db7-baaf-807d0c538ff2" }
+              - column: { name: code, value: "AUDIT.PLAN_MASTER_DATA.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem nhom man hinh Lap ke hoach / Danh muc" }
+              - column: { name: resource_label, value: "Lập kế hoạch / Danh mục" }

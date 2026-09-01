@@ -1,0 +1,25 @@
+package com.govia.audit.cmntd14.dto;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.UUID;
+
+public record AuditCmNtd14Response(
+        UUID id,
+        String branchCode,
+        LocalDate attendanceDate,
+        String staffCode,
+        String staffName,
+        String attendanceCode,
+        String description,
+        BigDecimal matchedTransactionCount,
+        BigDecimal unmatchedTransactionCount,
+        BigDecimal adjustedTransactionCount,
+        String userCode,
+        String note,
+        String sampleCode,
+        String sampleReason,
+        String auditResult,
+        boolean active
+) {
+}

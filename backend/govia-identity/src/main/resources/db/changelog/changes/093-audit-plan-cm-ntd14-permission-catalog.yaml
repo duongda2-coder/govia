@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Danh sach chon mau User Ipcas cham cong (CM_NTD14) =====================
+  - changeSet:
+      id: 093-1-permission-catalog-audit-cm-ntd14
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6e5579d7-99e9-4f00-8993-05d15dbdeb78" }
+              - column: { name: code, value: "AUDIT.CM_NTD14.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh sach chon mau User Ipcas cham cong" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu User Ipcas chấm công" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b7eae952-2c3f-4bfe-942b-3a2010380154" }
+              - column: { name: code, value: "AUDIT.CM_NTD14.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi ban ghi chon mau cham cong" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu User Ipcas chấm công" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d3aaafd1-3c88-475d-9267-77347d0c7325" }
+              - column: { name: code, value: "AUDIT.CM_NTD14.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua ban ghi chon mau cham cong" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu User Ipcas chấm công" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "78422b2a-a27c-47c7-b950-22923cc536a2" }
+              - column: { name: code, value: "AUDIT.CM_NTD14.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa ban ghi chon mau cham cong" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu User Ipcas chấm công" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "da56592c-cee4-4a87-9fb7-69de564c45b9" }
+              - column: { name: code, value: "AUDIT.CM_NTD14.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu chon mau cham cong" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu User Ipcas chấm công" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "8bf2e6b0-609c-4d8f-90f0-f000490c9db1" }
+              - column: { name: code, value: "AUDIT.CM_NTD14.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu chon mau cham cong" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu User Ipcas chấm công" }

@@ -1,0 +1,41 @@
+databaseChangeLog:
+
+  # ===================== Danh muc "Loai ton tai sai sot" (sheet ZTC_TTSS, bang ZTB_TTSS) =====================
+  - changeSet:
+      id: 056-1-audit-plan-exception-type-schema
+      author: govia
+      comment: "Tao bang audit_exception_type"
+      changes:
+        - createTable:
+            tableName: audit_exception_type
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: code, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: name, type: VARCHAR(500), constraints: { nullable: false } }
+              - column: { name: category, type: VARCHAR(20) }
+              - column: { name: impact_level, type: VARCHAR(20) }
+              - column: { name: classification_basis, type: VARCHAR(255) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_exception_type
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_exception_type_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_exception_type
+            baseColumnNames: business_segment_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_exception_type_business_segment
+        - addUniqueConstraint:
+            tableName: audit_exception_type
+            columnNames: tenant_id, code
+            constraintName: uk_audit_exception_type_tenant_code

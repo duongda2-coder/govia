@@ -26,6 +26,7 @@
     "admin": "System Administration",
     "roles": "Roles & Permissions",
     "accounts": "User Accounts",
+    "activityLog": "Activity Log",
     "workflow": "Workflow",
     "workflowTasks": "My Tasks",
     "workflowInstances": "Running Processes",
@@ -40,6 +41,31 @@
     "auditMdYear": "Year Catalog",
     "auditMdBusinessSegment": "Business Segment Catalog",
     "auditMdUnitType": "Unit Type Catalog",
+    "auditPlan": "Planning",
+    "auditPlanMasterData": "Master Data",
+    "auditPlanMdBranchStaff": "Branch Staff Position",
+    "auditPlanMdWorkItem": "Audit Work Item",
+    "auditPlanMdExceptionType": "Exception Type",
+    "auditPlanMdRecommendationType": "Recommendation Type",
+    "auditPlanMdProcessStepSummary": "Process Step Summary",
+    "auditPlanMdProcessStepDetail": "Process Step Detail",
+    "auditPlanMdExceptionMapping": "Exception Mapping",
+    "auditPlanExecution": "Audit Execution",
+    "auditPlanExecCmTd1": "Credit Sample Customer List",
+    "auditPlanExecCmTd2": "Cancelled/Backdated Entry Results",
+    "auditPlanExecCmNtd1": "TCKT Entry Sample List",
+    "auditPlanExecCmNtd2": "Deposit Transaction Sample List",
+    "auditPlanExecCmNtd3": "Institutional Depositor Sample List",
+    "auditPlanExecCmNtd4": "LC/Collection Sample List",
+    "auditPlanExecCmNtd6": "IPCAS/AD User & IT KPI Sample List",
+    "auditPlanExecCmNtd7": "XDCB Project Records Sample List",
+    "auditPlanExecCmNtd8": "Large-Value/No-Account Sample List",
+    "auditPlanExecCmNtd9": "First-Time Customer Sample List",
+    "auditPlanExecCmNtd10": "Card Issuance Audit Results",
+    "auditPlanExecCmNtd11": "Foreign Remittance & Forex Transactions",
+    "auditPlanExecCmNtd12": "TCKT Entry Sample List (Card)",
+    "auditPlanExecCmNtd13": "Merchant Unit Audit Results",
+    "auditPlanExecCmNtd14": "IPCAS Attendance Sample List",
     "riskScoring": "Risk Scoring",
     "riskScoringMasterData": "Master Data CDRR",
     "riskScoringGroups": "Criteria Groups",
@@ -550,7 +576,8 @@
       "DEPARTMENT": "Audit Department Catalog",
       "YEAR": "Year Catalog",
       "BUSINESS_SEGMENT": "Business Segment Catalog",
-      "UNIT_TYPE": "Unit Type Catalog"
+      "UNIT_TYPE": "Unit Type Catalog",
+      "RECOMMENDATION_TYPE": "Recommendation Type Catalog"
     },
     "columns": {
       "code": "Code",
@@ -644,6 +671,537 @@
       "editTitle": "Edit Control Point"
     },
     "deleteConfirmTitle": "Delete this control point?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditWorkItem": {
+    "title": "Audit Work Item Catalog",
+    "columns": {
+      "phase": "Phase",
+      "businessSegment": "Business Segment",
+      "code": "Work Item Code",
+      "name": "Work Item Name",
+      "applicableYear": "Year",
+      "workSetCode": "Work Set Code",
+      "workType": "Work Type"
+    },
+    "phase": {
+      "PREPARATION": "Preparation",
+      "EXECUTION": "Execution",
+      "CLOSING": "Closing"
+    },
+    "form": {
+      "createTitle": "Add Work Item",
+      "editTitle": "Edit Work Item"
+    },
+    "deleteConfirmTitle": "Delete this work item?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditBranchStaff": {
+    "title": "Branch Staff Position Catalog",
+    "columns": {
+      "branchCode": "Branch Code",
+      "staffName": "Staff Name",
+      "position": "Position",
+      "priority": "Priority",
+      "note": "Note"
+    },
+    "form": {
+      "createTitle": "Add Branch Staff Position",
+      "editTitle": "Edit Branch Staff Position"
+    },
+    "deleteConfirmTitle": "Delete this branch staff position?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditCmTd1": {
+    "title": "Credit Sample Selection Customer List",
+    "columns": {
+      "branchCode": "Branch code",
+      "auditDate": "Audit date",
+      "customerCode": "Customer code",
+      "customerName": "Customer name",
+      "approvedAmount": "Approved loan/guarantee amount",
+      "loanPurpose": "Loan purpose",
+      "description": "Description",
+      "onBalanceDebt": "On-balance debt",
+      "guaranteeBalance": "Guarantee/LC balance",
+      "riskClassifiedDebt": "Risk-classified debt",
+      "vamcSoldDebt": "Debt sold to VAMC",
+      "totalCreditBalance": "Total credit balance",
+      "debtGroup": "Debt group",
+      "auditScope": "Audit scope",
+      "auditorCode": "Auditor",
+      "sampleReason": "Sample reason",
+      "note": "Note"
+    },
+    "form": {
+      "createTitle": "Add credit sample customer",
+      "editTitle": "Edit credit sample customer"
+    },
+    "deleteConfirmTitle": "Delete this sample customer?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Delete failed",
+      "saveError": "Save failed"
+    }
+  },
+  "activityLog": {
+    "title": "Activity Log",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "columns": {
+      "performedAt": "Time",
+      "performedBy": "Performed by",
+      "action": "Action",
+      "entityName": "Entity",
+      "detail": "Detail",
+      "entityId": "Entity ID"
+    },
+    "action": {
+      "CREATE": "Create",
+      "UPDATE": "Update",
+      "DELETE": "Delete",
+      "LOGIN": "Login",
+      "LOGOUT": "Logout",
+      "EXPORT": "Export",
+      "APPROVE": "Approve",
+      "REJECT": "Reject"
+    },
+    "messages": {
+      "loadError": "Failed to load data"
+    }
+  },
+  "auditCmTd2": {
+    "title": "Audit Results for Sampled Cancelled/Backdated Entries",
+    "columns": {
+      "branchCode": "Branch code",
+      "transactionDate": "Transaction date",
+      "valueDate": "Value date",
+      "postingUser": "Posting user",
+      "entryNumber": "Entry number",
+      "customerCode": "Customer code",
+      "customerName": "Customer name",
+      "disbursementNumber": "Disbursement number",
+      "businessCode": "Business code",
+      "transactionStatus": "Transaction status",
+      "currency": "Currency",
+      "debitAmount": "Debit amount",
+      "creditAmount": "Credit amount",
+      "accountNumber": "Account number",
+      "postingDateDiff": "Posting date difference",
+      "ipcasReviewResult": "IPCAS review result",
+      "documentCheckResult": "Document check result"
+    },
+    "form": { "createTitle": "Add sampled entry", "editTitle": "Edit sampled entry" },
+    "deleteConfirmTitle": "Delete this sampled entry?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd1": {
+    "title": "List of Sampled TCKT Accounting Entries",
+    "columns": {
+      "branchCode": "Branch code",
+      "transactionDate": "Transaction date",
+      "postingUser": "Posting user",
+      "entryNumber": "Entry number",
+      "debitAmount": "Debit amount",
+      "creditAmount": "Credit amount",
+      "transactionStatus": "Transaction status",
+      "currency": "Currency",
+      "accountNumber": "Account number",
+      "content": "Content",
+      "sampleReason": "Sample reason",
+      "auditResult": "Audit result",
+      "recommendationType": "Recommendation type",
+      "transactionStaff": "Transaction staff",
+      "controlUser": "Control user",
+      "controlStaff": "Control staff",
+      "controlStaffTitle": "Control staff title",
+      "workType": "Work type"
+    },
+    "form": { "createTitle": "Add sampled TCKT entry", "editTitle": "Edit sampled TCKT entry" },
+    "deleteConfirmTitle": "Delete this sampled entry?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd2": {
+    "title": "Deposit Mobilization (HĐV) Transaction Sample List",
+    "columns": {
+      "branchCode": "Branch code",
+      "transactionDate": "Transaction date",
+      "valueDate": "Value date",
+      "postingUser": "Posting user",
+      "entryNumber": "Entry number",
+      "currency": "Currency",
+      "amount": "Amount",
+      "accountNumber": "Account number",
+      "bookNumber": "Book number",
+      "transactionType": "Transaction type",
+      "transactionStatus": "Transaction status",
+      "auditResult": "Audit result",
+      "recommendationType": "Recommendation type",
+      "transactionStaff": "Transaction staff",
+      "controlUser": "Control user",
+      "controlStaff": "Control staff",
+      "controlStaffTitle": "Control staff title"
+    },
+    "form": { "createTitle": "Add sampled transaction", "editTitle": "Edit sampled transaction" },
+    "deleteConfirmTitle": "Delete this sampled transaction?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd3": {
+    "title": "Institutional Depositor Customer Sample List (HĐV)",
+    "columns": {
+      "branchCode": "Branch code",
+      "transactionDate": "Transaction date",
+      "customerCode": "Customer code",
+      "customerName": "Customer name",
+      "customerAddress": "Customer address",
+      "accountNumber": "Account number",
+      "currency": "Currency",
+      "originalCurrencyBalance": "Original currency balance",
+      "convertedBalance": "Converted balance",
+      "auditResult": "Audit result",
+      "recommendationType": "Recommendation type",
+      "transactionStaff": "Transaction staff",
+      "controlUser": "Control user",
+      "controlStaff": "Control staff",
+      "controlStaffTitle": "Control staff title"
+    },
+    "form": { "createTitle": "Add sampled depositor", "editTitle": "Edit sampled depositor" },
+    "deleteConfirmTitle": "Delete this sampled customer?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd4": {
+    "title": "LC and International Payment (TTQT) Collection Sample List",
+    "columns": {
+      "branchCode": "Branch code",
+      "referenceNumber": "Reference number",
+      "openDate": "Open date",
+      "customerCode": "Customer code",
+      "customerName": "Customer name",
+      "amount": "Amount",
+      "beneficiary": "Beneficiary",
+      "auditResult": "Audit result",
+      "recommendationType": "Recommendation type",
+      "transactionStaff": "Transaction staff",
+      "controlUser": "Control user",
+      "controlStaff": "Control staff",
+      "controlStaffTitle": "Control staff title"
+    },
+    "form": { "createTitle": "Add sampled LC/collection", "editTitle": "Edit sampled LC/collection" },
+    "deleteConfirmTitle": "Delete this sampled record?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd6": {
+    "title": "IPCAS/AD User and IT KPI Sample List",
+    "columns": {
+      "branchCode": "Branch code",
+      "staffCode": "Staff code",
+      "staffName": "Staff name",
+      "ipcasUser": "IPCAS user",
+      "adUser": "AD user",
+      "securityDevice": "Security device",
+      "sampleReason": "Sample reason",
+      "sampleCode": "Sample code",
+      "auditResult": "Audit result"
+    },
+    "form": { "createTitle": "Add sampled IPCAS/AD user", "editTitle": "Edit sampled IPCAS/AD user" },
+    "deleteConfirmTitle": "Delete this sampled record?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd7": {
+    "title": "Capital Construction (XDCB) Project Records Sample List",
+    "columns": {
+      "branchCode": "Branch code",
+      "constructionCode": "Project code",
+      "constructionName": "Project name",
+      "content": "Content",
+      "documentType": "Document type",
+      "completenessAssessment": "Completeness assessment",
+      "assessment": "Assessment",
+      "auditResult": "Audit result"
+    },
+    "form": { "createTitle": "Add sampled project record", "editTitle": "Edit sampled project record" },
+    "deleteConfirmTitle": "Delete this sampled record?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd8": {
+    "title": "Large-Value and No-Account Transaction Customer Sample List",
+    "columns": {
+      "branchCode": "Branch code",
+      "transactionDate": "Transaction date",
+      "referenceNumber": "Reference number",
+      "postingUser": "Posting user",
+      "entryNumber": "Entry number",
+      "amount": "Amount",
+      "currency": "Currency",
+      "orderingParty": "Ordering party",
+      "beneficiaryParty": "Beneficiary party",
+      "beneficiaryAccount": "Beneficiary account",
+      "sampleReason": "Sample reason",
+      "auditResult": "Audit result",
+      "recommendationType": "Recommendation type",
+      "transactionStaff": "Transaction staff",
+      "controlUser": "Control user",
+      "controlStaff": "Control staff",
+      "controlStaffTitle": "Control staff title"
+    },
+    "form": { "createTitle": "Add sampled customer", "editTitle": "Edit sampled customer" },
+    "deleteConfirmTitle": "Delete this sampled record?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd9": {
+    "title": "First-Time Bank-Service Customer Sample List",
+    "columns": {
+      "branchCode": "Branch code",
+      "transactionDate": "Transaction date",
+      "postingUser": "Posting user",
+      "customerCode": "Customer code",
+      "customerName": "Customer name",
+      "idNumber": "ID/Passport number",
+      "customerType": "Customer type",
+      "transactionContent": "Transaction content",
+      "sampleReason": "Sample reason",
+      "auditResult": "Audit result",
+      "recommendationType": "Recommendation type",
+      "transactionStaff": "Transaction staff",
+      "controlUser": "Control user",
+      "controlStaff": "Control staff",
+      "controlStaffTitle": "Control staff title"
+    },
+    "form": { "createTitle": "Add sampled customer", "editTitle": "Edit sampled customer" },
+    "deleteConfirmTitle": "Delete this sampled customer?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd10": {
+    "title": "Card Issuance File Audit Results",
+    "columns": {
+      "branchCode": "Branch code",
+      "issueDate": "Issue date",
+      "customerCode": "Customer code",
+      "customerName": "Customer name",
+      "accountNumber": "Account number",
+      "cardTier": "Card tier",
+      "issuingUser": "Issuing user",
+      "issuanceFee": "Issuance/reissuance fee",
+      "issuanceType": "Issuance type",
+      "issuanceOccurrence": "Issuance occurrence",
+      "sampleReason": "Sample reason",
+      "auditResult": "Audit result",
+      "recommendationType": "Recommendation type",
+      "transactionStaff": "Transaction staff",
+      "controlUser": "Control user",
+      "controlStaff": "Control staff",
+      "controlStaffTitle": "Control staff title"
+    },
+    "issuanceTypeOptions": { "fast": "Fast issuance", "normal": "Normal issuance" },
+    "issuanceOccurrenceOptions": { "first": "First issuance", "reissue": "Reissuance" },
+    "form": { "createTitle": "Add sampled card record", "editTitle": "Edit sampled card record" },
+    "deleteConfirmTitle": "Delete this sampled card record?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd11": {
+    "title": "Foreign Remittance and Forex Trading Transactions",
+    "columns": {
+      "branchCode": "Branch code",
+      "referenceNumber": "Reference number",
+      "customerCode": "Customer code",
+      "customerName": "Customer name",
+      "transactionDate": "Transaction date",
+      "currency": "Currency",
+      "amount": "Amount",
+      "sampleReason": "Sample reason",
+      "auditResult": "Audit result",
+      "recommendationType": "Recommendation type",
+      "transactionStaff": "Transaction staff",
+      "controlUser": "Control user",
+      "controlStaff": "Control staff",
+      "controlStaffTitle": "Control staff title"
+    },
+    "form": { "createTitle": "Add sampled transaction", "editTitle": "Edit sampled transaction" },
+    "deleteConfirmTitle": "Delete this sampled transaction?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd12": {
+    "title": "List of Sampled TCKT Accounting Entries (Card Operations)",
+    "columns": {
+      "branchCode": "Branch code",
+      "transactionDate": "Transaction date",
+      "postingUser": "Posting user",
+      "entryNumber": "Entry number",
+      "debitAmount": "Debit amount",
+      "creditAmount": "Credit amount",
+      "transactionStatus": "Transaction status",
+      "currency": "Currency",
+      "accountNumber": "Account number",
+      "content": "Content",
+      "sampleReason": "Sample reason",
+      "auditResult": "Audit result",
+      "recommendationType": "Recommendation type",
+      "transactionStaff": "Transaction staff",
+      "controlUser": "Control user",
+      "controlStaff": "Control staff",
+      "controlStaffTitle": "Control staff title"
+    },
+    "form": { "createTitle": "Add sampled TCKT entry", "editTitle": "Edit sampled TCKT entry" },
+    "deleteConfirmTitle": "Delete this sampled entry?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd13": {
+    "title": "Card-Accepting Merchant Unit Audit Results (07D)",
+    "columns": {
+      "branchCode": "Branch code",
+      "occurrenceDate": "Occurrence date",
+      "merchantId": "Merchant ID",
+      "merchantAccountNumber": "Merchant account number",
+      "businessRegistrationName": "Business registration name",
+      "status": "Status",
+      "sampleReason": "Sample reason",
+      "auditResult": "Audit result",
+      "recommendationType": "Recommendation type",
+      "transactionStaff": "Transaction staff",
+      "controlUser": "Control user",
+      "controlStaff": "Control staff",
+      "controlStaffTitle": "Control staff title"
+    },
+    "form": { "createTitle": "Add sampled merchant unit", "editTitle": "Edit sampled merchant unit" },
+    "deleteConfirmTitle": "Delete this sampled record?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditCmNtd14": {
+    "title": "IPCAS User Attendance Sample List (08C)",
+    "columns": {
+      "branchCode": "Branch code",
+      "attendanceDate": "Attendance date",
+      "staffCode": "Staff code",
+      "staffName": "Staff name",
+      "attendanceCode": "Attendance code",
+      "description": "Description",
+      "matchedTransactionCount": "Matched transaction count",
+      "unmatchedTransactionCount": "Unmatched transaction count",
+      "adjustedTransactionCount": "Adjusted transaction count",
+      "userCode": "User",
+      "note": "Note",
+      "sampleCode": "Sample code",
+      "sampleReason": "Sample reason",
+      "auditResult": "Audit result"
+    },
+    "form": { "createTitle": "Add sampled attendance record", "editTitle": "Edit sampled attendance record" },
+    "deleteConfirmTitle": "Delete this sampled record?",
+    "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
+  },
+  "auditExceptionType": {
+    "title": "Exception Type Catalog",
+    "columns": {
+      "businessSegment": "Business Segment",
+      "code": "Exception Code",
+      "name": "Exception Name",
+      "category": "Exception Category",
+      "impactLevel": "Impact Level",
+      "classificationBasis": "Classification Basis"
+    },
+    "category": {
+      "RISK_MANAGEMENT": "Risk Management",
+      "INTERNAL_CONTROL": "Internal Control"
+    },
+    "level": {
+      "HIGH": "High",
+      "MEDIUM": "Medium",
+      "LOW": "Low"
+    },
+    "form": {
+      "createTitle": "Add Exception Type",
+      "editTitle": "Edit Exception Type"
+    },
+    "deleteConfirmTitle": "Delete this exception type?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditProcessStepSummary": {
+    "title": "Process Step Summary Catalog",
+    "columns": {
+      "businessSegment": "Business Segment",
+      "code": "Process Step Summary Code",
+      "name": "Process Step Summary Name",
+      "workItem": "Work Item"
+    },
+    "form": {
+      "createTitle": "Add Process Step Summary",
+      "editTitle": "Edit Process Step Summary"
+    },
+    "deleteConfirmTitle": "Delete this process step summary?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditProcessStepDetail": {
+    "title": "Process Step Detail Catalog",
+    "columns": {
+      "businessSegment": "Business Segment",
+      "processStepSummary": "Process Step Summary",
+      "controlPoint": "Control Point",
+      "code": "Process Step Detail Code"
+    },
+    "form": {
+      "createTitle": "Add Process Step Detail",
+      "editTitle": "Edit Process Step Detail"
+    },
+    "deleteConfirmTitle": "Delete this process step detail?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditExceptionMapping": {
+    "title": "Exception Mapping Catalog",
+    "columns": {
+      "businessSegment": "Business Segment",
+      "processStepDetail": "Process Step Detail Code",
+      "exceptionTypeCode": "Exception Code",
+      "exceptionTypeName": "Exception Name"
+    },
+    "form": {
+      "createTitle": "Add Exception Mapping",
+      "editTitle": "Edit Exception Mapping"
+    },
+    "deleteConfirmTitle": "Delete this exception mapping?",
     "messages": {
       "loadError": "Failed to load data",
       "createSuccess": "Created",

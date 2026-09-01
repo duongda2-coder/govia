@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Danh sach chon mau KH giao dich so tien lon va khong co TK (CM_NTD8) =====================
+  - changeSet:
+      id: 081-1-permission-catalog-audit-cm-ntd8
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "4e2276c9-9f68-46ed-96a3-ef6962117de6" }
+              - column: { name: code, value: "AUDIT.CM_NTD8.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh sach chon mau KH giao dich so tien lon va khong co TK" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu khách hàng giao dịch số tiền lớn và không có TK" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "da081f2a-75ab-4da6-b0e0-a5d34dc21040" }
+              - column: { name: code, value: "AUDIT.CM_NTD8.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi ban ghi chon mau KH giao dich so tien lon va khong co TK" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu khách hàng giao dịch số tiền lớn và không có TK" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "638b0ec7-23ee-4df6-a34d-6ff43d99d8b1" }
+              - column: { name: code, value: "AUDIT.CM_NTD8.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua ban ghi chon mau KH giao dich so tien lon va khong co TK" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu khách hàng giao dịch số tiền lớn và không có TK" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2e32992-358c-43a5-8e79-b26b2444824c" }
+              - column: { name: code, value: "AUDIT.CM_NTD8.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa ban ghi chon mau KH giao dich so tien lon va khong co TK" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu khách hàng giao dịch số tiền lớn và không có TK" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "239a904d-e2b7-4841-b385-0c38fd2ff895" }
+              - column: { name: code, value: "AUDIT.CM_NTD8.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu chon mau KH giao dich so tien lon va khong co TK" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu khách hàng giao dịch số tiền lớn và không có TK" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "cd4ef667-a808-471f-b8f1-478974511ad5" }
+              - column: { name: code, value: "AUDIT.CM_NTD8.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu chon mau KH giao dich so tien lon va khong co TK" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu khách hàng giao dịch số tiền lớn và không có TK" }

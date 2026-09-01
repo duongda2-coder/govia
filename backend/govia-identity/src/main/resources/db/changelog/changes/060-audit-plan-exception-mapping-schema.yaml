@@ -1,0 +1,50 @@
+databaseChangeLog:
+
+  # ===================== Danh muc "Mapping ton tai sai sot" (sheet ZTC_TTSS_MAP) =====================
+  - changeSet:
+      id: 060-1-audit-plan-exception-mapping-schema
+      author: govia
+      comment: "Tao bang audit_exception_mapping"
+      changes:
+        - createTable:
+            tableName: audit_exception_mapping
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: process_step_detail_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: exception_type_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_exception_mapping
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_exception_mapping_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_exception_mapping
+            baseColumnNames: business_segment_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_exception_mapping_business_segment
+        - addForeignKeyConstraint:
+            baseTableName: audit_exception_mapping
+            baseColumnNames: process_step_detail_id
+            referencedTableName: audit_process_step_detail
+            referencedColumnNames: id
+            constraintName: fk_audit_exception_mapping_process_step_detail
+        - addForeignKeyConstraint:
+            baseTableName: audit_exception_mapping
+            baseColumnNames: exception_type_id
+            referencedTableName: audit_exception_type
+            referencedColumnNames: id
+            constraintName: fk_audit_exception_mapping_exception_type
+        - addUniqueConstraint:
+            tableName: audit_exception_mapping
+            columnNames: tenant_id, process_step_detail_id, exception_type_id
+            constraintName: uk_audit_exception_mapping_tenant_detail_type

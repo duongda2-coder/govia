@@ -9,12 +9,34 @@ import { PositionCatalogPage } from "./pages/People/PositionCatalogPage";
 import { OrganizationUnitListPage } from "./pages/People/OrganizationUnitListPage";
 import { RoleListPage } from "./pages/Admin/RoleListPage";
 import { AccountListPage } from "./pages/Admin/AccountListPage";
+import { ActivityLogPage } from "./pages/Admin/ActivityLogPage";
 import { TaskInbox } from "./pages/Workflow/TaskInbox";
 import { ProcessInstances } from "./pages/Workflow/ProcessInstances";
 import { ApprovalMatrixPage } from "./pages/Workflow/ApprovalMatrixPage";
 import { MasterDataGroupPage } from "./pages/Audit/MasterDataGroupPage";
 import { DocumentLibraryPage } from "./pages/Audit/DocumentLibrary/DocumentLibraryPage";
 import { ControlPointPage } from "./pages/Audit/ControlPoint/ControlPointPage";
+import { WorkItemPage } from "./pages/Audit/Plan/WorkItemPage";
+import { BranchStaffPage } from "./pages/Audit/Plan/BranchStaffPage";
+import { ExceptionTypePage } from "./pages/Audit/Plan/ExceptionTypePage";
+import { ProcessStepSummaryPage } from "./pages/Audit/Plan/ProcessStepSummaryPage";
+import { ProcessStepDetailPage } from "./pages/Audit/Plan/ProcessStepDetailPage";
+import { ExceptionMappingPage } from "./pages/Audit/Plan/ExceptionMappingPage";
+import { CmTd1Page } from "./pages/Audit/Plan/Execution/CmTd1Page";
+import { CmTd2Page } from "./pages/Audit/Plan/Execution/CmTd2Page";
+import { CmNtd1Page } from "./pages/Audit/Plan/Execution/CmNtd1Page";
+import { CmNtd2Page } from "./pages/Audit/Plan/Execution/CmNtd2Page";
+import { CmNtd3Page } from "./pages/Audit/Plan/Execution/CmNtd3Page";
+import { CmNtd4Page } from "./pages/Audit/Plan/Execution/CmNtd4Page";
+import { CmNtd6Page } from "./pages/Audit/Plan/Execution/CmNtd6Page";
+import { CmNtd7Page } from "./pages/Audit/Plan/Execution/CmNtd7Page";
+import { CmNtd8Page } from "./pages/Audit/Plan/Execution/CmNtd8Page";
+import { CmNtd9Page } from "./pages/Audit/Plan/Execution/CmNtd9Page";
+import { CmNtd10Page } from "./pages/Audit/Plan/Execution/CmNtd10Page";
+import { CmNtd11Page } from "./pages/Audit/Plan/Execution/CmNtd11Page";
+import { CmNtd12Page } from "./pages/Audit/Plan/Execution/CmNtd12Page";
+import { CmNtd13Page } from "./pages/Audit/Plan/Execution/CmNtd13Page";
+import { CmNtd14Page } from "./pages/Audit/Plan/Execution/CmNtd14Page";
 import { RiskScoringGroupsPage } from "./pages/Audit/RiskScoring/RiskScoringGroupsPage";
 import { RiskScoringCriteriaPage } from "./pages/Audit/RiskScoring/RiskScoringCriteriaPage";
 import { RiskScoringWeightPage } from "./pages/Audit/RiskScoring/RiskScoringWeightPage";
@@ -63,6 +85,7 @@ function App() {
           <Route path="people/org-units" element={<OrganizationUnitListPage />} />
           <Route path="admin/roles" element={<RoleListPage />} />
           <Route path="admin/accounts" element={<AccountListPage />} />
+          <Route path="admin/activity-log" element={<ActivityLogPage />} />
           <Route path="workflow/tasks" element={<TaskInbox />} />
           <Route path="workflow/instances" element={<ProcessInstances />} />
           <Route path="workflow/approval-matrix" element={<ApprovalMatrixPage />} />
@@ -74,6 +97,31 @@ function App() {
           <Route path="audit/master-data/year" element={<MasterDataGroupPage group="YEAR" title={t("auditMasterData.groups.YEAR")} />} />
           <Route path="audit/master-data/business-segment" element={<MasterDataGroupPage group="BUSINESS_SEGMENT" title={t("auditMasterData.groups.BUSINESS_SEGMENT")} />} />
           <Route path="audit/master-data/unit-type" element={<MasterDataGroupPage group="UNIT_TYPE" title={t("auditMasterData.groups.UNIT_TYPE")} />} />
+          <Route path="audit/plan/master-data/work-item" element={<WorkItemPage />} />
+          <Route path="audit/plan/master-data/branch-staff" element={<BranchStaffPage />} />
+          <Route path="audit/plan/master-data/exception-type" element={<ExceptionTypePage />} />
+          <Route
+            path="audit/plan/master-data/recommendation-type"
+            element={<MasterDataGroupPage group="RECOMMENDATION_TYPE" title={t("auditMasterData.groups.RECOMMENDATION_TYPE")} />}
+          />
+          <Route path="audit/plan/master-data/process-step-summary" element={<ProcessStepSummaryPage />} />
+          <Route path="audit/plan/master-data/process-step-detail" element={<ProcessStepDetailPage />} />
+          <Route path="audit/plan/master-data/exception-mapping" element={<ExceptionMappingPage />} />
+          <Route path="audit/plan/execution/cm-td1" element={<CmTd1Page />} />
+          <Route path="audit/plan/execution/cm-td2" element={<CmTd2Page />} />
+          <Route path="audit/plan/execution/cm-ntd1" element={<CmNtd1Page />} />
+          <Route path="audit/plan/execution/cm-ntd2" element={<CmNtd2Page />} />
+          <Route path="audit/plan/execution/cm-ntd3" element={<CmNtd3Page />} />
+          <Route path="audit/plan/execution/cm-ntd4" element={<CmNtd4Page />} />
+          <Route path="audit/plan/execution/cm-ntd6" element={<CmNtd6Page />} />
+          <Route path="audit/plan/execution/cm-ntd7" element={<CmNtd7Page />} />
+          <Route path="audit/plan/execution/cm-ntd8" element={<CmNtd8Page />} />
+          <Route path="audit/plan/execution/cm-ntd9" element={<CmNtd9Page />} />
+          <Route path="audit/plan/execution/cm-ntd10" element={<CmNtd10Page />} />
+          <Route path="audit/plan/execution/cm-ntd11" element={<CmNtd11Page />} />
+          <Route path="audit/plan/execution/cm-ntd12" element={<CmNtd12Page />} />
+          <Route path="audit/plan/execution/cm-ntd13" element={<CmNtd13Page />} />
+          <Route path="audit/plan/execution/cm-ntd14" element={<CmNtd14Page />} />
           <Route path="audit/risk-scoring/master-data/groups" element={<RiskScoringGroupsPage />} />
           <Route path="audit/risk-scoring/master-data/criteria" element={<RiskScoringCriteriaPage />} />
           <Route path="audit/risk-scoring/master-data/weight" element={<RiskScoringWeightPage />} />

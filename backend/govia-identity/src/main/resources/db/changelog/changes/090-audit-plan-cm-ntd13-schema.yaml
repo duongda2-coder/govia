@@ -1,0 +1,42 @@
+databaseChangeLog:
+
+  # ===================== "Thuc hien kiem toan": Ket qua kiem toan don vi chap nhan the (sheet ZTC_CM_NTD13, phu luc 07D/BKS-KTNB) =====================
+  - changeSet:
+      id: 090-1-audit-plan-cm-ntd13-schema
+      author: govia
+      comment: "Tao bang audit_cm_ntd13"
+      changes:
+        - createTable:
+            tableName: audit_cm_ntd13
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: branch_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: occurrence_date, type: DATE, constraints: { nullable: false } }
+              - column: { name: merchant_id, type: VARCHAR(20) }
+              - column: { name: merchant_account_number, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: business_registration_name, type: VARCHAR(120), constraints: { nullable: false } }
+              - column: { name: status, type: VARCHAR(20) }
+              - column: { name: sample_reason, type: VARCHAR(50) }
+              - column: { name: audit_result, type: VARCHAR(200) }
+              - column: { name: recommendation_type, type: VARCHAR(120) }
+              - column: { name: transaction_staff, type: VARCHAR(120) }
+              - column: { name: control_user, type: VARCHAR(120) }
+              - column: { name: control_staff, type: VARCHAR(120) }
+              - column: { name: control_staff_title, type: VARCHAR(120) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_cm_ntd13
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_cm_ntd13_tenant
+        - addUniqueConstraint:
+            tableName: audit_cm_ntd13
+            columnNames: tenant_id, branch_code, occurrence_date, merchant_account_number, business_registration_name
+            constraintName: uk_audit_cm_ntd13_tenant_branch_date_acct_biz

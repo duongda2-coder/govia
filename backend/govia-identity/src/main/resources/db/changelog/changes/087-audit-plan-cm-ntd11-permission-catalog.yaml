@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Chuyen tien nguoi nuoc ngoai/KD ngoai te (CM_NTD11) =====================
+  - changeSet:
+      id: 087-1-permission-catalog-audit-cm-ntd11
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b9110e7b-d001-4a35-bb22-a3e5644aec9d" }
+              - column: { name: code, value: "AUDIT.CM_NTD11.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem giao dich chuyen tien nguoi nuoc ngoai va KD ngoai te" }
+              - column: { name: resource_label, value: "Chuyển tiền người nước ngoài, KD ngoại tệ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c088af21-72d9-4bf0-8519-ed8e0f25944b" }
+              - column: { name: code, value: "AUDIT.CM_NTD11.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi giao dich chuyen tien nguoi nuoc ngoai va KD ngoai te" }
+              - column: { name: resource_label, value: "Chuyển tiền người nước ngoài, KD ngoại tệ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "f2eedfd5-b01d-4419-8553-9a0357ed870c" }
+              - column: { name: code, value: "AUDIT.CM_NTD11.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua giao dich chuyen tien nguoi nuoc ngoai va KD ngoai te" }
+              - column: { name: resource_label, value: "Chuyển tiền người nước ngoài, KD ngoại tệ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "f9331b23-6277-4917-8f4a-c5cbfbee856c" }
+              - column: { name: code, value: "AUDIT.CM_NTD11.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa giao dich chuyen tien nguoi nuoc ngoai va KD ngoai te" }
+              - column: { name: resource_label, value: "Chuyển tiền người nước ngoài, KD ngoại tệ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1d54cb78-e07a-4f13-9a51-7ddbe5934710" }
+              - column: { name: code, value: "AUDIT.CM_NTD11.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu giao dich chuyen tien nguoi nuoc ngoai va KD ngoai te" }
+              - column: { name: resource_label, value: "Chuyển tiền người nước ngoài, KD ngoại tệ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "9cf0c02c-c4b1-47a7-9068-74024ef0d1cf" }
+              - column: { name: code, value: "AUDIT.CM_NTD11.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu giao dich chuyen tien nguoi nuoc ngoai va KD ngoai te" }
+              - column: { name: resource_label, value: "Chuyển tiền người nước ngoài, KD ngoại tệ" }

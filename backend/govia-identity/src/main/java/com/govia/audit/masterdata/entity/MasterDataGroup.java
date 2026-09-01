@@ -8,7 +8,8 @@ public enum MasterDataGroup {
     DEPARTMENT("Bộ phận KT"),
     YEAR("Năm"),
     BUSINESS_SEGMENT("Mảng nghiệp vụ"),
-    UNIT_TYPE("Loại đơn vị");
+    UNIT_TYPE("Loại đơn vị"),
+    RECOMMENDATION_TYPE("Loại kiến nghị");
 
     private final String label;
 

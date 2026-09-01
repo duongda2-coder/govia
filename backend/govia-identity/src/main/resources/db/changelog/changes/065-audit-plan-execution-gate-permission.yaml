@@ -1,0 +1,18 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Cong menu "Lap ke hoach / Thuc hien kiem toan" =====================
+  # Quyen nay chi de dieu khien viec hien/an muc menu cha "Lap ke hoach / Thuc hien kiem toan" tren FE
+  # (giong AUDIT.PLAN_MASTER_DATA.VIEW cho nhom "Danh muc") - CRUD tung man hinh con (15 sheet
+  # ZTC_CM_TD1/TD2/NTD1-NTD14) van do cac quyen rieng (AUDIT.CM_TD1.*, AUDIT.CM_NTD1.*, ...) kiem soat.
+  - changeSet:
+      id: 065-1-permission-catalog-audit-plan-execution-gate
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a3a3fecd-573c-415b-9caa-a7ab8ea01947" }
+              - column: { name: code, value: "AUDIT.PLAN_EXECUTION.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem nhom man hinh Lap ke hoach / Thuc hien kiem toan" }
+              - column: { name: resource_label, value: "Lập kế hoạch / Thực hiện kiểm toán" }

@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Danh muc Cong viec kiem toan =====================
+  - changeSet:
+      id: 053-1-permission-catalog-audit-work-item
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "ef7ea77d-3e50-4b0d-8998-e866d1b4debc" }
+              - column: { name: code, value: "AUDIT.WORK_ITEM.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc cong viec kiem toan" }
+              - column: { name: resource_label, value: "Công việc kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "3097097c-5091-4b1d-b97b-5e1c74e5a034" }
+              - column: { name: code, value: "AUDIT.WORK_ITEM.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi danh muc cong viec kiem toan" }
+              - column: { name: resource_label, value: "Công việc kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "113013a1-5690-4f98-ae78-524ad1fcacb8" }
+              - column: { name: code, value: "AUDIT.WORK_ITEM.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua danh muc cong viec kiem toan" }
+              - column: { name: resource_label, value: "Công việc kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "28d6db5e-986a-4eb6-873a-4c9b764cbe89" }
+              - column: { name: code, value: "AUDIT.WORK_ITEM.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa danh muc cong viec kiem toan" }
+              - column: { name: resource_label, value: "Công việc kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "f185b755-a63a-4107-8931-200ebec42142" }
+              - column: { name: code, value: "AUDIT.WORK_ITEM.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu danh muc cong viec kiem toan" }
+              - column: { name: resource_label, value: "Công việc kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6f592226-cb47-49e9-a34a-b1653de84d9d" }
+              - column: { name: code, value: "AUDIT.WORK_ITEM.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu danh muc cong viec kiem toan" }
+              - column: { name: resource_label, value: "Công việc kiểm toán" }

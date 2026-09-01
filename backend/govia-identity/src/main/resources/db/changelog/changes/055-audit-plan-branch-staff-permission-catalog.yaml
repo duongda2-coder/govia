@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Danh muc Chuc danh can bo chi nhanh =====================
+  - changeSet:
+      id: 055-1-permission-catalog-audit-branch-staff
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "fc7e30e7-4dbe-4c7c-bf20-eea133e7e51d" }
+              - column: { name: code, value: "AUDIT.BRANCH_STAFF.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc chuc danh can bo chi nhanh" }
+              - column: { name: resource_label, value: "Chức danh cán bộ chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "7b265547-d531-4288-ab60-25a2b1d8ab18" }
+              - column: { name: code, value: "AUDIT.BRANCH_STAFF.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi danh muc chuc danh can bo chi nhanh" }
+              - column: { name: resource_label, value: "Chức danh cán bộ chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "f5fce026-8964-47dc-9f1a-e4b6cc72426b" }
+              - column: { name: code, value: "AUDIT.BRANCH_STAFF.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua danh muc chuc danh can bo chi nhanh" }
+              - column: { name: resource_label, value: "Chức danh cán bộ chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "190a5c63-aa4f-4330-b755-1f89ac913001" }
+              - column: { name: code, value: "AUDIT.BRANCH_STAFF.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa danh muc chuc danh can bo chi nhanh" }
+              - column: { name: resource_label, value: "Chức danh cán bộ chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "83e7d2ab-5568-48a5-a191-d9bd3602d83d" }
+              - column: { name: code, value: "AUDIT.BRANCH_STAFF.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu danh muc chuc danh can bo chi nhanh" }
+              - column: { name: resource_label, value: "Chức danh cán bộ chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "67b0c849-43e3-45f2-8872-49a12ee2c996" }
+              - column: { name: code, value: "AUDIT.BRANCH_STAFF.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu danh muc chuc danh can bo chi nhanh" }
+              - column: { name: resource_label, value: "Chức danh cán bộ chi nhánh" }

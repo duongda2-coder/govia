@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Danh cac but toan chon mau TCKT (CM_NTD12) =====================
+  - changeSet:
+      id: 089-1-permission-catalog-audit-cm-ntd12
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "59944d98-bf79-4e91-b615-92ca7f021cfb" }
+              - column: { name: code, value: "AUDIT.CM_NTD12.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh cac but toan chon mau TCKT" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu TCKT" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "dd120f34-0ccc-4b5e-a1b3-b7ae2fc878d3" }
+              - column: { name: code, value: "AUDIT.CM_NTD12.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi but toan chon mau TCKT" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu TCKT" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "23f0df34-e06e-4550-8c43-fe70ed11fb58" }
+              - column: { name: code, value: "AUDIT.CM_NTD12.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua but toan chon mau TCKT" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu TCKT" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "06ec75cd-9015-463a-a8ce-1f04a32b6771" }
+              - column: { name: code, value: "AUDIT.CM_NTD12.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa but toan chon mau TCKT" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu TCKT" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "865ab5f9-5d1d-4bdb-a191-d094d65d56e4" }
+              - column: { name: code, value: "AUDIT.CM_NTD12.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu but toan chon mau TCKT" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu TCKT" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "dee56f84-66ba-464d-81bf-ce05f4a445f0" }
+              - column: { name: code, value: "AUDIT.CM_NTD12.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu but toan chon mau TCKT" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu TCKT" }

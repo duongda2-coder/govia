@@ -1,0 +1,46 @@
+databaseChangeLog:
+
+  # ===================== "Thuc hien kiem toan": Ket qua kiem toan chon mau cac but toan giao dich huy, lui ngay (sheet ZTC_CM_TD2, phu luc 02G/BKS-KTNB) =====================
+  - changeSet:
+      id: 066-1-audit-plan-cm-td2-schema
+      author: govia
+      comment: "Tao bang audit_cm_td2"
+      changes:
+        - createTable:
+            tableName: audit_cm_td2
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: branch_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: transaction_date, type: DATE, constraints: { nullable: false } }
+              - column: { name: value_date, type: DATE, constraints: { nullable: false } }
+              - column: { name: posting_user, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: entry_number, type: "DECIMAL(20,2)" }
+              - column: { name: customer_code, type: VARCHAR(50) }
+              - column: { name: customer_name, type: VARCHAR(200), constraints: { nullable: false } }
+              - column: { name: disbursement_number, type: VARCHAR(20) }
+              - column: { name: business_code, type: VARCHAR(20) }
+              - column: { name: transaction_status, type: VARCHAR(50) }
+              - column: { name: currency, type: VARCHAR(3) }
+              - column: { name: debit_amount, type: "DECIMAL(20,2)" }
+              - column: { name: credit_amount, type: "DECIMAL(20,2)" }
+              - column: { name: account_number, type: VARCHAR(10) }
+              - column: { name: posting_date_diff, type: "DECIMAL(20,2)" }
+              - column: { name: ipcas_review_result, type: VARCHAR(120) }
+              - column: { name: document_check_result, type: VARCHAR(120) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_cm_td2
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_cm_td2_tenant
+        - addUniqueConstraint:
+            tableName: audit_cm_td2
+            columnNames: tenant_id, branch_code, transaction_date, posting_user, customer_name
+            constraintName: uk_audit_cm_td2_tenant_branch_date_user_customer

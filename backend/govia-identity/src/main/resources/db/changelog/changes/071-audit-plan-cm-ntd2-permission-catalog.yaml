@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Chon mau giao dich HDV (CM_NTD2) =====================
+  - changeSet:
+      id: 071-1-permission-catalog-audit-cm-ntd2
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b733829d-5732-45b4-a55b-49aef39a788d" }
+              - column: { name: code, value: "AUDIT.CM_NTD2.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh sach chon mau giao dich HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu giao dịch HĐV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "fd2be179-4780-4c81-87ae-2e72f058f3fe" }
+              - column: { name: code, value: "AUDIT.CM_NTD2.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi ban ghi chon mau giao dich HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu giao dịch HĐV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "df0d3b6d-ab69-4981-a912-506e6e611722" }
+              - column: { name: code, value: "AUDIT.CM_NTD2.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua ban ghi chon mau giao dich HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu giao dịch HĐV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6bd5b523-1aaf-473d-ab30-c901782ef32b" }
+              - column: { name: code, value: "AUDIT.CM_NTD2.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa ban ghi chon mau giao dich HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu giao dịch HĐV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d4dcb0c5-e11b-4038-93e4-687acec7f658" }
+              - column: { name: code, value: "AUDIT.CM_NTD2.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu chon mau giao dich HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu giao dịch HĐV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "ff8a2616-f07c-41ea-9e4c-b94e74af5879" }
+              - column: { name: code, value: "AUDIT.CM_NTD2.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu chon mau giao dich HDV" }
+              - column: { name: resource_label, value: "Chọn mẫu giao dịch HĐV" }

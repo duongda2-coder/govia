@@ -16,6 +16,7 @@ export const MENU_ROUTES: Record<string, string> = {
   "people-org-units": "/people/org-units",
   "admin-roles": "/admin/roles",
   "admin-accounts": "/admin/accounts",
+  "admin-activity-log": "/admin/activity-log",
   "workflow-tasks": "/workflow/tasks",
   "workflow-instances": "/workflow/instances",
   "workflow-approval-matrix": "/workflow/approval-matrix",
@@ -27,6 +28,29 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-md-year": "/audit/master-data/year",
   "audit-md-business-segment": "/audit/master-data/business-segment",
   "audit-md-unit-type": "/audit/master-data/unit-type",
+  "audit-plan-md-branch-staff": "/audit/plan/master-data/branch-staff",
+  "audit-plan-md-work-item": "/audit/plan/master-data/work-item",
+  "audit-plan-md-exception-type": "/audit/plan/master-data/exception-type",
+  "audit-plan-md-control-point": "/audit/master-data/control-point",
+  "audit-plan-md-recommendation-type": "/audit/plan/master-data/recommendation-type",
+  "audit-plan-md-process-step-summary": "/audit/plan/master-data/process-step-summary",
+  "audit-plan-md-process-step-detail": "/audit/plan/master-data/process-step-detail",
+  "audit-plan-md-exception-mapping": "/audit/plan/master-data/exception-mapping",
+  "audit-plan-exec-cm-td1": "/audit/plan/execution/cm-td1",
+  "audit-plan-exec-cm-td2": "/audit/plan/execution/cm-td2",
+  "audit-plan-exec-cm-ntd1": "/audit/plan/execution/cm-ntd1",
+  "audit-plan-exec-cm-ntd2": "/audit/plan/execution/cm-ntd2",
+  "audit-plan-exec-cm-ntd3": "/audit/plan/execution/cm-ntd3",
+  "audit-plan-exec-cm-ntd4": "/audit/plan/execution/cm-ntd4",
+  "audit-plan-exec-cm-ntd6": "/audit/plan/execution/cm-ntd6",
+  "audit-plan-exec-cm-ntd7": "/audit/plan/execution/cm-ntd7",
+  "audit-plan-exec-cm-ntd8": "/audit/plan/execution/cm-ntd8",
+  "audit-plan-exec-cm-ntd9": "/audit/plan/execution/cm-ntd9",
+  "audit-plan-exec-cm-ntd10": "/audit/plan/execution/cm-ntd10",
+  "audit-plan-exec-cm-ntd11": "/audit/plan/execution/cm-ntd11",
+  "audit-plan-exec-cm-ntd12": "/audit/plan/execution/cm-ntd12",
+  "audit-plan-exec-cm-ntd13": "/audit/plan/execution/cm-ntd13",
+  "audit-plan-exec-cm-ntd14": "/audit/plan/execution/cm-ntd14",
   "audit-rs-groups": "/audit/risk-scoring/master-data/groups",
   "audit-rs-criteria": "/audit/risk-scoring/master-data/criteria",
   "audit-rs-weight": "/audit/risk-scoring/master-data/weight",
@@ -100,12 +124,16 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
   ]);
 
   const canViewAuditMasterData = hasPermission("AUDIT.MASTER_DATA.VIEW");
+  const canViewAuditPlan = hasPermission("AUDIT.PLAN_MASTER_DATA.VIEW");
+  const canViewAuditPlanExecution = hasPermission("AUDIT.PLAN_EXECUTION.VIEW");
   const canViewRiskScoring = hasPermission("AUDIT.RISK_SCORING.VIEW");
   const canViewRiskScoringExec = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
   const canViewFindings = hasPermission("AUDIT.FINDING.VIEW");
 
   const auditGroupLabel = t("menu.audit");
   const auditMdGroupLabel = `${auditGroupLabel} / ${t("menu.auditMasterData")}`;
+  const auditPlanMdGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanMasterData")}`;
+  const auditPlanExecGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanExecution")}`;
   const auditRsGroupLabel = `${auditGroupLabel} / ${t("menu.riskScoring")} / ${t("menu.riskScoringMasterData")}`;
   const auditRseGroupLabel = `${auditGroupLabel} / ${t("menu.riskScoring")} / ${t("menu.riskScoringExec")}`;
 
@@ -164,8 +192,48 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
         },
       ]),
     },
-    // Ke hoach (Audit Plan/Universe) va Thuc hien (Work Program/Finding...) se them vao day
-    // khi tung phan thuc su co man hinh, cung cap voi "audit-master-data".
+    canViewAuditPlan && {
+      key: "audit-plan",
+      label: menuLabel(t("menu.auditPlan")),
+      children: dropNulls([
+        {
+          key: "audit-plan-master-data",
+          label: menuLabel(t("menu.auditPlanMasterData")),
+          children: [
+            leaf("audit-plan-md-branch-staff", t("menu.auditPlanMdBranchStaff"), auditPlanMdGroupLabel),
+            leaf("audit-plan-md-work-item", t("menu.auditPlanMdWorkItem"), auditPlanMdGroupLabel),
+            leaf("audit-plan-md-exception-type", t("menu.auditPlanMdExceptionType"), auditPlanMdGroupLabel),
+            leaf("audit-plan-md-control-point", t("menu.auditMdControlPoint"), auditPlanMdGroupLabel),
+            leaf("audit-plan-md-recommendation-type", t("menu.auditPlanMdRecommendationType"), auditPlanMdGroupLabel),
+            leaf("audit-plan-md-process-step-summary", t("menu.auditPlanMdProcessStepSummary"), auditPlanMdGroupLabel),
+            leaf("audit-plan-md-process-step-detail", t("menu.auditPlanMdProcessStepDetail"), auditPlanMdGroupLabel),
+            leaf("audit-plan-md-exception-mapping", t("menu.auditPlanMdExceptionMapping"), auditPlanMdGroupLabel),
+          ],
+        },
+        canViewAuditPlanExecution && {
+          key: "audit-plan-execution",
+          label: menuLabel(t("menu.auditPlanExecution")),
+          children: dropNulls([
+            // 15 sheet ZTC_CM_TD1/TD2/NTD1-NTD14 - moi sheet 1 muc menu/route rieng (giong Danh muc).
+            hasPermission("AUDIT.CM_TD1.VIEW") && leaf("audit-plan-exec-cm-td1", t("menu.auditPlanExecCmTd1"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_TD2.VIEW") && leaf("audit-plan-exec-cm-td2", t("menu.auditPlanExecCmTd2"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD1.VIEW") && leaf("audit-plan-exec-cm-ntd1", t("menu.auditPlanExecCmNtd1"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD2.VIEW") && leaf("audit-plan-exec-cm-ntd2", t("menu.auditPlanExecCmNtd2"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD3.VIEW") && leaf("audit-plan-exec-cm-ntd3", t("menu.auditPlanExecCmNtd3"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD4.VIEW") && leaf("audit-plan-exec-cm-ntd4", t("menu.auditPlanExecCmNtd4"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD6.VIEW") && leaf("audit-plan-exec-cm-ntd6", t("menu.auditPlanExecCmNtd6"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD7.VIEW") && leaf("audit-plan-exec-cm-ntd7", t("menu.auditPlanExecCmNtd7"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD8.VIEW") && leaf("audit-plan-exec-cm-ntd8", t("menu.auditPlanExecCmNtd8"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD9.VIEW") && leaf("audit-plan-exec-cm-ntd9", t("menu.auditPlanExecCmNtd9"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD10.VIEW") && leaf("audit-plan-exec-cm-ntd10", t("menu.auditPlanExecCmNtd10"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD11.VIEW") && leaf("audit-plan-exec-cm-ntd11", t("menu.auditPlanExecCmNtd11"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD12.VIEW") && leaf("audit-plan-exec-cm-ntd12", t("menu.auditPlanExecCmNtd12"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD13.VIEW") && leaf("audit-plan-exec-cm-ntd13", t("menu.auditPlanExecCmNtd13"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD14.VIEW") && leaf("audit-plan-exec-cm-ntd14", t("menu.auditPlanExecCmNtd14"), auditPlanExecGroupLabel),
+          ]),
+        },
+      ]),
+    },
   ]);
 
   const adminGroupLabel = t("menu.admin");
@@ -182,6 +250,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
       children: [
         leaf("admin-roles", t("menu.roles"), adminGroupLabel),
         leaf("admin-accounts", t("menu.accounts"), adminGroupLabel),
+        leaf("admin-activity-log", t("menu.activityLog"), adminGroupLabel),
       ],
     },
   ]);

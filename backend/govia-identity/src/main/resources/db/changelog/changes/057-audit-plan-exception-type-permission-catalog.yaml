@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Danh muc Loai ton tai sai sot =====================
+  - changeSet:
+      id: 057-1-permission-catalog-audit-exception-type
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "9f158cde-3972-4ad5-9d76-07390f6cc794" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_TYPE.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc loai ton tai sai sot" }
+              - column: { name: resource_label, value: "Loại tồn tại sai sót" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "78062df1-38d5-48c0-8d5b-6ffbf9efa564" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_TYPE.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi danh muc loai ton tai sai sot" }
+              - column: { name: resource_label, value: "Loại tồn tại sai sót" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "3428bc3d-8815-4d04-8c11-bc387adae4de" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_TYPE.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua danh muc loai ton tai sai sot" }
+              - column: { name: resource_label, value: "Loại tồn tại sai sót" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1cce3c18-7879-4c1f-a1a3-ee7cafb29e2b" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_TYPE.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa danh muc loai ton tai sai sot" }
+              - column: { name: resource_label, value: "Loại tồn tại sai sót" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "3597cc5a-0adf-4cb6-9c4b-1b6eb80921b5" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_TYPE.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu danh muc loai ton tai sai sot" }
+              - column: { name: resource_label, value: "Loại tồn tại sai sót" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "2c3ddd3f-d8bf-4dad-ae8a-948dcedc2c0c" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_TYPE.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu danh muc loai ton tai sai sot" }
+              - column: { name: resource_label, value: "Loại tồn tại sai sót" }

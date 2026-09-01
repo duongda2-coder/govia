@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Danh sach KH chon mau tin dung (CM_TD1) =====================
+  - changeSet:
+      id: 064-1-permission-catalog-audit-cm-td1
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "2c6b0da1-bacc-46b5-8d71-2f7eba834a91" }
+              - column: { name: code, value: "AUDIT.CM_TD1.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh sach khach hang chon mau tin dung" }
+              - column: { name: resource_label, value: "Danh sách KH chọn mẫu tín dụng" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "3b8b8192-5ace-4a02-a426-9d8fcd7e3ca6" }
+              - column: { name: code, value: "AUDIT.CM_TD1.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi khach hang chon mau tin dung" }
+              - column: { name: resource_label, value: "Danh sách KH chọn mẫu tín dụng" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "854f1387-62a0-4434-8e30-1f35fef5f823" }
+              - column: { name: code, value: "AUDIT.CM_TD1.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua khach hang chon mau tin dung" }
+              - column: { name: resource_label, value: "Danh sách KH chọn mẫu tín dụng" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "f7d8e8cc-0887-405a-8d2a-d49ab8b19861" }
+              - column: { name: code, value: "AUDIT.CM_TD1.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa khach hang chon mau tin dung" }
+              - column: { name: resource_label, value: "Danh sách KH chọn mẫu tín dụng" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a2f587e1-398d-43e2-b5e8-ad2c6c18382b" }
+              - column: { name: code, value: "AUDIT.CM_TD1.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu khach hang chon mau tin dung" }
+              - column: { name: resource_label, value: "Danh sách KH chọn mẫu tín dụng" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c3119043-8800-4a8c-9ddb-79f79f14013e" }
+              - column: { name: code, value: "AUDIT.CM_TD1.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu khach hang chon mau tin dung" }
+              - column: { name: resource_label, value: "Danh sách KH chọn mẫu tín dụng" }

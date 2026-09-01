@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Danh sach chon mau KH lan dau (CM_NTD9) =====================
+  - changeSet:
+      id: 083-1-permission-catalog-audit-cm-ntd9
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "cbe04cbc-c434-4f3c-870f-826e30c42e59" }
+              - column: { name: code, value: "AUDIT.CM_NTD9.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh sach chon mau khach hang lan dau" }
+              - column: { name: resource_label, value: "Chọn mẫu KH lần đầu sử dụng dịch vụ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "123ae70b-5248-4e1e-b7b0-98439c79ecd8" }
+              - column: { name: code, value: "AUDIT.CM_NTD9.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi chon mau khach hang lan dau" }
+              - column: { name: resource_label, value: "Chọn mẫu KH lần đầu sử dụng dịch vụ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "f1fa6500-4ee9-4584-944e-c66bf82cc96c" }
+              - column: { name: code, value: "AUDIT.CM_NTD9.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua chon mau khach hang lan dau" }
+              - column: { name: resource_label, value: "Chọn mẫu KH lần đầu sử dụng dịch vụ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "20c45985-d5a2-4139-9d3d-076989bc553c" }
+              - column: { name: code, value: "AUDIT.CM_NTD9.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa chon mau khach hang lan dau" }
+              - column: { name: resource_label, value: "Chọn mẫu KH lần đầu sử dụng dịch vụ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "78da9410-728a-4ec3-8127-a52525f65e3b" }
+              - column: { name: code, value: "AUDIT.CM_NTD9.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu chon mau khach hang lan dau" }
+              - column: { name: resource_label, value: "Chọn mẫu KH lần đầu sử dụng dịch vụ" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "4919f502-7489-432b-b554-deba2ab645c0" }
+              - column: { name: code, value: "AUDIT.CM_NTD9.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu chon mau khach hang lan dau" }
+              - column: { name: resource_label, value: "Chọn mẫu KH lần đầu sử dụng dịch vụ" }

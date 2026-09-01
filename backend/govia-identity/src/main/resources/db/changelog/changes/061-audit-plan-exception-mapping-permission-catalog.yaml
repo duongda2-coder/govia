@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Danh muc Mapping ton tai sai sot =====================
+  - changeSet:
+      id: 061-1-permission-catalog-audit-exception-mapping
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "f331c33e-570a-4a0f-a430-081906b97512" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_MAPPING.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc mapping ton tai sai sot" }
+              - column: { name: resource_label, value: "Mapping tồn tại sai sót" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c37cfceb-139e-4dbd-9e37-caf462943182" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_MAPPING.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi danh muc mapping ton tai sai sot" }
+              - column: { name: resource_label, value: "Mapping tồn tại sai sót" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "ad12888f-bd74-4940-9785-2fbe137dedb8" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_MAPPING.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua danh muc mapping ton tai sai sot" }
+              - column: { name: resource_label, value: "Mapping tồn tại sai sót" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "41f39c23-d2a2-4d26-9887-45b067c82ddd" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_MAPPING.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa danh muc mapping ton tai sai sot" }
+              - column: { name: resource_label, value: "Mapping tồn tại sai sót" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "28e38a18-bd92-4f4d-ac8e-1d4ce7280001" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_MAPPING.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu danh muc mapping ton tai sai sot" }
+              - column: { name: resource_label, value: "Mapping tồn tại sai sót" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c8ba173e-66f2-48d6-b93b-01515b776614" }
+              - column: { name: code, value: "AUDIT.EXCEPTION_MAPPING.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu danh muc mapping ton tai sai sot" }
+              - column: { name: resource_label, value: "Mapping tồn tại sai sót" }

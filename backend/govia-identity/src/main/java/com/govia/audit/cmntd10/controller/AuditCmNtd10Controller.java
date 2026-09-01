@@ -1,0 +1,86 @@
+package com.govia.audit.cmntd10.controller;
+
+import com.govia.audit.cmntd10.dto.AuditCmNtd10Request;
+import com.govia.audit.cmntd10.dto.AuditCmNtd10Response;
+import com.govia.audit.cmntd10.service.AuditCmNtd10Service;
+import com.govia.core.export.ImportResult;
+import com.govia.core.web.ApiResponse;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.UUID;
+
+/** Man hinh "Ket qua kiem toan ho so phat hanh the" (sheet ZTC_CM_NTD10, xem AuditCmNtd10Service). */
+@RestController
+@RequestMapping("/api/audit/plan/execution/cm-ntd10")
+public class AuditCmNtd10Controller {
+
+    private final AuditCmNtd10Service service;
+
+    public AuditCmNtd10Controller(AuditCmNtd10Service service) {
+        this.service = service;
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('PERM_AUDIT.CM_NTD10.VIEW')")
+    public ApiResponse<List<AuditCmNtd10Response>> list() {
+        return ApiResponse.ok(service.list());
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAuthority('PERM_AUDIT.CM_NTD10.CREATE')")
+    public ApiResponse<AuditCmNtd10Response> create(@Valid @RequestBody AuditCmNtd10Request request) {
+        return ApiResponse.ok(service.create(request));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.CM_NTD10.EDIT')")
+    public ApiResponse<AuditCmNtd10Response> update(@PathVariable UUID id, @Valid @RequestBody AuditCmNtd10Request request) {
+        return ApiResponse.ok(service.update(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.CM_NTD10.DELETE')")
+    public ApiResponse<Void> delete(@PathVariable UUID id) {
+        service.delete(id);
+        return ApiResponse.ok(null);
+    }
+
+    @GetMapping("/export/excel")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.CM_NTD10.EXPORT')")
+    public ResponseEntity<byte[]> exportExcel() {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"audit_cm_ntd10.xlsx\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(service.exportExcel());
+    }
+
+    @GetMapping("/export/word")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.CM_NTD10.EXPORT')")
+    public ResponseEntity<byte[]> exportWord() {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"audit_cm_ntd10.docx\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+                .body(service.exportWord());
+    }
+
+    @PostMapping("/import")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.CM_NTD10.IMPORT')")
+    public ApiResponse<ImportResult> importExcel(@RequestParam("file") MultipartFile file) {
+        return ApiResponse.ok(service.importFromExcel(file));
+    }
+}

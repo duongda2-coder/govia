@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Danh sach chon mau ho so cong trinh XDCB (CM_NTD7) =====================
+  - changeSet:
+      id: 079-1-permission-catalog-audit-cm-ntd7
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "44fe2d09-7ee2-4f8e-bb2f-17ddecaf61b5" }
+              - column: { name: code, value: "AUDIT.CM_NTD7.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh sach chon mau ho so cong trinh XDCB" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu hồ sơ công trình XDCB" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6731a625-98e6-4933-9194-2552c3cfcf75" }
+              - column: { name: code, value: "AUDIT.CM_NTD7.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi ban ghi chon mau ho so cong trinh XDCB" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu hồ sơ công trình XDCB" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b656a39f-d681-4f9b-82a2-f6830284327f" }
+              - column: { name: code, value: "AUDIT.CM_NTD7.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua ban ghi chon mau ho so cong trinh XDCB" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu hồ sơ công trình XDCB" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d5935612-2597-4c7a-b993-6ed744fc2f29" }
+              - column: { name: code, value: "AUDIT.CM_NTD7.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa ban ghi chon mau ho so cong trinh XDCB" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu hồ sơ công trình XDCB" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "646d4a6f-b5f7-43ee-8c46-3d5d03b0ecb6" }
+              - column: { name: code, value: "AUDIT.CM_NTD7.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu chon mau ho so cong trinh XDCB" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu hồ sơ công trình XDCB" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "54c80df9-a658-43a4-a64d-7396aa34f856" }
+              - column: { name: code, value: "AUDIT.CM_NTD7.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu chon mau ho so cong trinh XDCB" }
+              - column: { name: resource_label, value: "Danh sách chọn mẫu hồ sơ công trình XDCB" }
