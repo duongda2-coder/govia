@@ -1,5 +1,9 @@
 server:
   port: ${PORT:8081}   # Render (va nhieu host khac) inject PORT luc runtime
+  max-http-header-size: 65536   # Tomcat mac dinh 8KB - JWT nhung het permission cua SUPER_ADMIN da ~7.6KB,
+                                 # cong them header trinh duyet that (Accept, Origin, Sec-Fetch-*...) vuot 8KB
+                                 # va bi Tomcat tu choi truoc khi toi Spring (400 Bad Request, khong qua duoc
+                                 # GlobalExceptionHandler nen loi tra ve la trang HTML mac dinh cua Tomcat).
 
 spring:
   application:

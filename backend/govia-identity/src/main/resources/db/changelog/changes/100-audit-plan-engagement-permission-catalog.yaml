@@ -1,0 +1,95 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Lap ke hoach - Khoi tao va quan ly cuoc kiem toan (CKT) =====================
+  - changeSet:
+      id: 100-1-permission-catalog-audit-plan-engagement
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b01-100000000001" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh sach/chi tiet cuoc kiem toan (CKT)" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Khởi tạo cuộc kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b01-100000000002" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Tao moi cuoc kiem toan (CKT)" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Khởi tạo cuộc kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b01-100000000003" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua cuoc kiem toan (CKT)" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Khởi tạo cuộc kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b01-100000000004" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa cuoc kiem toan (CKT)" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Khởi tạo cuộc kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b01-100000000005" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu cuoc kiem toan (CKT)" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Khởi tạo cuộc kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b01-100000000006" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu cuoc kiem toan (CKT)" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Khởi tạo cuộc kiểm toán" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b02-100000000001" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT_TEAM.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem nhom/thanh vien/phan cong cua cuoc kiem toan" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Nhóm & phân công CKT" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b02-100000000002" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT_TEAM.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them nhom/thanh vien/phan cong cong viec cho CKT" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Nhóm & phân công CKT" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b02-100000000003" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT_TEAM.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua nhom/thay doi can bo cua CKT" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Nhóm & phân công CKT" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b02-100000000004" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT_TEAM.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa nhom/thanh vien/phan cong cua CKT" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Nhóm & phân công CKT" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b02-100000000005" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT_TEAM.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu nhom/thanh vien/phan cong cua CKT" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Nhóm & phân công CKT" }

@@ -1,0 +1,228 @@
+databaseChangeLog:
+
+  # ===================== "Lap ke hoach": Khoi tao va quan ly cuoc kiem toan (CKT) - file "Tao CKT.xlsx", sheet "khoi tao" + "quan ly DKT" =====================
+  - changeSet:
+      id: 099-1-audit-engagement-schema
+      author: govia
+      comment: "Tao bang audit_engagement (CKT)"
+      changes:
+        - createTable:
+            tableName: audit_engagement
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(30), constraints: { nullable: false } }
+              - column: { name: audit_object_unit_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: engagement_year, type: INT, constraints: { nullable: false } }
+              - column: { name: expected_month, type: INT, constraints: { nullable: false } }
+              - column: { name: decision_date, type: DATE, constraints: { nullable: false } }
+              - column: { name: team_lead_employee_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: decision_number, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: status, type: VARCHAR(20), defaultValue: DRAFT, constraints: { nullable: false } }
+              - column: { name: risk_rank, type: VARCHAR(20) }
+              - column: { name: name, type: VARCHAR(255) }
+              - column: { name: objective, type: VARCHAR(4000) }
+              - column: { name: scope, type: VARCHAR(4000) }
+              - column: { name: planning_start_date, type: DATE }
+              - column: { name: planning_end_date, type: DATE }
+              - column: { name: fieldwork_start_date, type: DATE }
+              - column: { name: fieldwork_end_date, type: DATE }
+              - column: { name: report_start_date, type: DATE }
+              - column: { name: report_end_date, type: DATE }
+              - column: { name: info_collection_start, type: TIMESTAMP }
+              - column: { name: info_collection_end, type: TIMESTAMP }
+              - column: { name: sample_request_start, type: TIMESTAMP }
+              - column: { name: sample_request_end, type: TIMESTAMP }
+              - column: { name: report_plan_start, type: TIMESTAMP }
+              - column: { name: report_plan_end, type: TIMESTAMP }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement
+            baseColumnNames: audit_object_unit_id
+            referencedTableName: risk_score_audit_object_unit
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_object_unit
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement
+            baseColumnNames: team_lead_employee_id
+            referencedTableName: employee
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_team_lead
+        - addUniqueConstraint:
+            tableName: audit_engagement
+            columnNames: tenant_id, code
+            constraintName: uk_audit_engagement_tenant_code
+
+  - changeSet:
+      id: 099-2-audit-engagement-related-unit-schema
+      author: govia
+      comment: "Tao bang audit_engagement_related_unit (Don vi lien quan)"
+      changes:
+        - createTable:
+            tableName: audit_engagement_related_unit
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_engagement_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_unit_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_related_unit
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_related_unit_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_related_unit
+            baseColumnNames: audit_engagement_id
+            referencedTableName: audit_engagement
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_related_unit_engagement
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_related_unit
+            baseColumnNames: audit_object_unit_id
+            referencedTableName: risk_score_audit_object_unit
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_related_unit_object_unit
+        - addUniqueConstraint:
+            tableName: audit_engagement_related_unit
+            columnNames: audit_engagement_id, audit_object_unit_id
+            constraintName: uk_audit_engagement_related_unit_pair
+
+  - changeSet:
+      id: 099-3-audit-engagement-group-schema
+      author: govia
+      comment: "Tao bang audit_engagement_group (Nhom)"
+      changes:
+        - createTable:
+            tableName: audit_engagement_group
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_engagement_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: group_code, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: leader_employee_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_group
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_group_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_group
+            baseColumnNames: audit_engagement_id
+            referencedTableName: audit_engagement
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_group_engagement
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_group
+            baseColumnNames: leader_employee_id
+            referencedTableName: employee
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_group_leader
+        - addUniqueConstraint:
+            tableName: audit_engagement_group
+            columnNames: audit_engagement_id, group_code
+            constraintName: uk_audit_engagement_group_code
+
+  - changeSet:
+      id: 099-4-audit-engagement-group-member-schema
+      author: govia
+      comment: "Tao bang audit_engagement_group_member (Thanh vien nhom)"
+      changes:
+        - createTable:
+            tableName: audit_engagement_group_member
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: group_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: employee_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: business_segment_1_id, type: UUID }
+              - column: { name: business_segment_2_id, type: UUID }
+              - column: { name: business_segment_3_id, type: UUID }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_group_member
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_group_member_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_group_member
+            baseColumnNames: group_id
+            referencedTableName: audit_engagement_group
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_group_member_group
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_group_member
+            baseColumnNames: employee_id
+            referencedTableName: employee
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_group_member_employee
+        - addUniqueConstraint:
+            tableName: audit_engagement_group_member
+            columnNames: group_id, employee_id
+            constraintName: uk_audit_engagement_group_member_pair
+
+  - changeSet:
+      id: 099-5-audit-engagement-assignment-schema
+      author: govia
+      comment: "Tao bang audit_engagement_assignment (Phan cong nghiep vu cho thanh vien)"
+      changes:
+        - createTable:
+            tableName: audit_engagement_assignment
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: group_member_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: work_item_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_assignment
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_assignment_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_assignment
+            baseColumnNames: group_member_id
+            referencedTableName: audit_engagement_group_member
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_assignment_member
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_assignment
+            baseColumnNames: work_item_id
+            referencedTableName: audit_work_item
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_assignment_work_item
+        - addUniqueConstraint:
+            tableName: audit_engagement_assignment
+            columnNames: group_member_id, work_item_id
+            constraintName: uk_audit_engagement_assignment_pair

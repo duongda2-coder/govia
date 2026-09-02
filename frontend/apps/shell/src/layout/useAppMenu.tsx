@@ -36,6 +36,7 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-plan-md-process-step-summary": "/audit/plan/master-data/process-step-summary",
   "audit-plan-md-process-step-detail": "/audit/plan/master-data/process-step-detail",
   "audit-plan-md-exception-mapping": "/audit/plan/master-data/exception-mapping",
+  "audit-plan-engagement-index": "/audit/plan/engagement",
   "audit-plan-exec-cm-td1": "/audit/plan/execution/cm-td1",
   "audit-plan-exec-cm-td2": "/audit/plan/execution/cm-td2",
   "audit-plan-exec-cm-ntd1": "/audit/plan/execution/cm-ntd1",
@@ -126,6 +127,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
   const canViewAuditMasterData = hasPermission("AUDIT.MASTER_DATA.VIEW");
   const canViewAuditPlan = hasPermission("AUDIT.PLAN_MASTER_DATA.VIEW");
   const canViewAuditPlanExecution = hasPermission("AUDIT.PLAN_EXECUTION.VIEW");
+  const canViewAuditPlanEngagement = hasPermission("AUDIT.PLAN_ENGAGEMENT.VIEW");
   const canViewRiskScoring = hasPermission("AUDIT.RISK_SCORING.VIEW");
   const canViewRiskScoringExec = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
   const canViewFindings = hasPermission("AUDIT.FINDING.VIEW");
@@ -133,6 +135,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
   const auditGroupLabel = t("menu.audit");
   const auditMdGroupLabel = `${auditGroupLabel} / ${t("menu.auditMasterData")}`;
   const auditPlanMdGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanMasterData")}`;
+  const auditPlanEngagementGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanEngagement")}`;
   const auditPlanExecGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanExecution")}`;
   const auditRsGroupLabel = `${auditGroupLabel} / ${t("menu.riskScoring")} / ${t("menu.riskScoringMasterData")}`;
   const auditRseGroupLabel = `${auditGroupLabel} / ${t("menu.riskScoring")} / ${t("menu.riskScoringExec")}`;
@@ -209,6 +212,11 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
             leaf("audit-plan-md-process-step-detail", t("menu.auditPlanMdProcessStepDetail"), auditPlanMdGroupLabel),
             leaf("audit-plan-md-exception-mapping", t("menu.auditPlanMdExceptionMapping"), auditPlanMdGroupLabel),
           ],
+        },
+        canViewAuditPlanEngagement && {
+          key: "audit-plan-engagement",
+          label: menuLabel(t("menu.auditPlanEngagement")),
+          children: [leaf("audit-plan-engagement-index", t("menu.auditPlanEngagementIndex"), auditPlanEngagementGroupLabel)],
         },
         canViewAuditPlanExecution && {
           key: "audit-plan-execution",

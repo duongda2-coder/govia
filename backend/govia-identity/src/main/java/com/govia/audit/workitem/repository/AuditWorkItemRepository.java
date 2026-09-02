@@ -11,4 +11,7 @@ public interface AuditWorkItemRepository extends JpaRepository<AuditWorkItem, UU
     List<AuditWorkItem> findByTenantIdOrderByCodeAsc(UUID tenantId);
 
     Optional<AuditWorkItem> findByTenantIdAndCode(UUID tenantId, String code);
+
+    /** Dung de tinh "cong viec du dieu kien" cua 1 thanh vien nhom, theo cac nghiep vu 1/2/3 duoc giao. */
+    List<AuditWorkItem> findByTenantIdAndActiveTrueAndBusinessSegmentIdIn(UUID tenantId, List<UUID> businessSegmentIds);
 }
