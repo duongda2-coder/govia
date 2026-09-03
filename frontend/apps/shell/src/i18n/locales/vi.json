@@ -41,6 +41,8 @@
     "auditMdYear": "Danh mục Năm",
     "auditMdBusinessSegment": "Danh mục Mảng nghiệp vụ",
     "auditMdUnitType": "Danh mục Loại đơn vị",
+    "auditMdEmployeeCapability": "Danh mục Khả năng đảm nhận lĩnh vực NV",
+    "auditMdAppendix": "Danh mục Quản lý phụ lục",
     "auditPlan": "Lập kế hoạch",
     "auditPlanMasterData": "Danh mục",
     "auditPlanMdBranchStaff": "Chức danh cán bộ chi nhánh",
@@ -53,21 +55,21 @@
     "auditPlanEngagement": "Lập kế hoạch",
     "auditPlanEngagementIndex": "Khởi tạo & Quản lý cuộc kiểm toán",
     "auditPlanExecution": "Thực hiện kiểm toán",
-    "auditPlanExecCmTd1": "DS KH chọn mẫu tín dụng - TD1",
-    "auditPlanExecCmTd2": "KQ chọn mẫu BT hủy/lùi ngày",
-    "auditPlanExecCmNtd1": "DS BT chọn mẫu TCKT",
-    "auditPlanExecCmNtd2": "DS chọn mẫu GD HĐV",
-    "auditPlanExecCmNtd3": "DS chọn mẫu KH tổ chức HĐV",
-    "auditPlanExecCmNtd4": "DS chọn mẫu LC/nhờ thu TTQT",
-    "auditPlanExecCmNtd6": "DS chọn mẫu User Ipcas AD/KPI CNTT",
-    "auditPlanExecCmNtd7": "DS chọn mẫu hồ sơ công trình XDCB",
-    "auditPlanExecCmNtd8": "DS chọn mẫu KH GD lớn/không TK",
-    "auditPlanExecCmNtd9": "DS chọn mẫu KH lần đầu GD",
-    "auditPlanExecCmNtd10": "KQ kiểm toán hồ sơ phát hành thẻ",
-    "auditPlanExecCmNtd11": "GD chuyển tiền NN & KD ngoại tệ",
-    "auditPlanExecCmNtd12": "DS BT chọn mẫu TCKT (thẻ)",
-    "auditPlanExecCmNtd13": "KQ kiểm toán ĐV chấp nhận thẻ",
-    "auditPlanExecCmNtd14": "DS chọn mẫu User Ipcas chấm công",
+    "auditPlanExecCmTd1": "02L/BKS-KTNB (TD1)",
+    "auditPlanExecCmTd2": "02G/BKS-KTNB (TD2)",
+    "auditPlanExecCmNtd1": "04C/BKS-KTNB (NTD1)",
+    "auditPlanExecCmNtd2": "03E/BKS-KTNB (NTD2)",
+    "auditPlanExecCmNtd3": "03E/BKS-KTNB (NTD3)",
+    "auditPlanExecCmNtd4": "06B/BKS-KTNB (NTD4)",
+    "auditPlanExecCmNtd6": "08B/BKS-KTNB (NTD6)",
+    "auditPlanExecCmNtd7": "09B/BKS-KTNB (NTD7)",
+    "auditPlanExecCmNtd8": "13B/BKS-KTNB (NTD8)",
+    "auditPlanExecCmNtd9": "13A/BKS-KTNB (NTD9)",
+    "auditPlanExecCmNtd10": "07B/BKS-KTNB (NTD10)",
+    "auditPlanExecCmNtd11": "06C/BKS-KTNB (NTD11)",
+    "auditPlanExecCmNtd12": "07F/BKS-KTNB (NTD12)",
+    "auditPlanExecCmNtd13": "07D/BKS-KTNB (NTD13)",
+    "auditPlanExecCmNtd14": "08C/BKS-KTNB (NTD14)",
     "riskScoring": "Chấm điểm rủi ro",
     "riskScoringMasterData": "Master Data CDRR",
     "riskScoringGroups": "Nhóm chỉ tiêu",
@@ -160,7 +162,8 @@
     "export": "Xuất dữ liệu",
     "module": "Module",
     "noPermission": "Bạn không có quyền truy cập màn hình này. Liên hệ quản trị viên để được cấp quyền.",
-    "deleteConfirmTitleCount": "Xóa {{count}} mục đã chọn?"
+    "deleteConfirmTitleCount": "Xóa {{count}} mục đã chọn?",
+    "actions": "Thao tác"
   },
   "attachment": {
     "upload": "Tải lên tệp đính kèm",
@@ -694,6 +697,64 @@
       "saveError": "Lưu thất bại"
     }
   },
+  "auditAppendix": {
+    "title": "Danh mục Quản lý phụ lục",
+    "columns": {
+      "appendixCode": "Mã phụ lục",
+      "sampleType": "Loại mẫu chọn",
+      "businessSegment": "Mảng nghiệp vụ",
+      "note": "Ghi chú"
+    },
+    "form": {
+      "createTitle": "Thêm phụ lục",
+      "editTitle": "Sửa phụ lục"
+    },
+    "deleteConfirmTitle": "Xóa phụ lục này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditEmployeeCapability": {
+    "title": "Khai báo khả năng đảm nhận lĩnh vực của nhân viên",
+    "description": "Danh sách lấy toàn bộ nhân viên từ Danh mục Nhân viên. Tích chọn lĩnh vực/vai trò nhân viên có thể đảm nhận rồi bấm \"Lưu thay đổi\"; bấm \"Phê duyệt\" để xác nhận dòng đã khai báo đúng.",
+    "saveChanges": "Lưu thay đổi",
+    "approve": "Phê duyệt",
+    "columns": {
+      "fullName": "Tên cán bộ",
+      "username": "User Name",
+      "theCapable": "Thẻ",
+      "qtdhCapable": "QTĐH",
+      "hdvCapable": "HĐV",
+      "tcktCapable": "TCKT",
+      "cnttCapable": "CNTT",
+      "ttkqCapable": "TTKQ",
+      "pcrtCapable": "PCRT",
+      "ttqtCapable": "TTQT",
+      "xdcbCapable": "XDCB",
+      "tdCapable": "TD",
+      "truongDoanCapable": "Trưởng đoàn",
+      "truongNhomCapable": "Trưởng nhóm",
+      "toGiamSatCapable": "Tổ giám sát",
+      "dgclCapable": "Thực hiện ĐGCL",
+      "enteredBy": "User nhập",
+      "updatedAt": "Ngày update",
+      "approved": "Phê duyệt",
+      "approvedBy": "User phê duyệt",
+      "approvedAt": "Ngày phê duyệt"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "saveSuccess": "Đã lưu thay đổi",
+      "saveError": "Lưu thất bại",
+      "approveSuccess": "Đã phê duyệt",
+      "approveError": "Phê duyệt thất bại"
+    }
+  },
   "auditWorkItem": {
     "title": "Danh mục Công việc kiểm toán",
     "columns": {
@@ -851,9 +912,15 @@
       "saveError": "Lưu thất bại"
     }
   },
+  "auditPlanExecution": {
+    "engagementFilter": "Mã cuộc kiểm toán",
+    "selectEngagement": "Chọn cuộc kiểm toán để xem/nhập dữ liệu"
+  },
   "auditCmTd1": {
-    "title": "Danh sách khách hàng chọn mẫu tín dụng",
+    "title": "02L/BKS-KTNB (TD1)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "auditDate": "Thời điểm kiểm toán",
       "customerCode": "Mã khách hàng",
@@ -913,8 +980,10 @@
     }
   },
   "auditCmTd2": {
-    "title": "Kết quả kiểm toán chọn mẫu các bút toán giao dịch hủy, lùi ngày",
+    "title": "02G/BKS-KTNB (TD2)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "transactionDate": "Ngày giao dịch thực tế",
       "valueDate": "Ngày giá trị",
@@ -945,8 +1014,10 @@
     }
   },
   "auditCmNtd1": {
-    "title": "Danh sách các bút toán chọn mẫu TCKT",
+    "title": "04C/BKS-KTNB (NTD1)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "transactionDate": "Ngày giao dịch thực tế",
       "postingUser": "User hạch toán",
@@ -978,8 +1049,10 @@
     }
   },
   "auditCmNtd2": {
-    "title": "Danh sách chọn mẫu giao dịch về nghiệp vụ HĐV",
+    "title": "03E/BKS-KTNB (NTD2)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "transactionDate": "Ngày giao dịch thực tế",
       "valueDate": "Ngày giá trị",
@@ -1010,8 +1083,10 @@
     }
   },
   "auditCmNtd3": {
-    "title": "Danh sách chọn mẫu khách hàng tổ chức tiền gửi HĐV",
+    "title": "03E/BKS-KTNB (NTD3)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "transactionDate": "Ngày giao dịch thực tế",
       "customerCode": "Mã Khách hàng",
@@ -1040,8 +1115,10 @@
     }
   },
   "auditCmNtd4": {
-    "title": "Danh sách chọn mẫu LC và nhờ thu TTQT",
+    "title": "06B/BKS-KTNB (NTD4)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "referenceNumber": "Số tham chiếu",
       "openDate": "Ngày mở",
@@ -1068,8 +1145,10 @@
     }
   },
   "auditCmNtd6": {
-    "title": "Danh sách chọn mẫu User Ipcas AD, KPI CNTT",
+    "title": "08B/BKS-KTNB (NTD6)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "staffCode": "Mã cán bộ",
       "staffName": "Tên cán bộ",
@@ -1092,8 +1171,10 @@
     }
   },
   "auditCmNtd7": {
-    "title": "Danh sách chọn mẫu hồ sơ công trình XDCB",
+    "title": "09B/BKS-KTNB (NTD7)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "constructionCode": "Mã CT",
       "constructionName": "Tên Công trình",
@@ -1115,8 +1196,10 @@
     }
   },
   "auditCmNtd8": {
-    "title": "Danh sách chọn mẫu khách hàng giao dịch số tiền lớn và không có TK",
+    "title": "13B/BKS-KTNB (NTD8)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "transactionDate": "Ngày giao dịch thực tế",
       "referenceNumber": "Số tham chiếu",
@@ -1147,8 +1230,10 @@
     }
   },
   "auditCmNtd9": {
-    "title": "Danh sách chọn mẫu khách hàng lần đầu sử dụng dịch vụ của NH",
+    "title": "13A/BKS-KTNB (NTD9)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "transactionDate": "Ngày giao dịch thực tế",
       "postingUser": "User hạch toán",
@@ -1177,8 +1262,10 @@
     }
   },
   "auditCmNtd10": {
-    "title": "Kết quả kiểm toán hồ sơ phát hành thẻ",
+    "title": "07B/BKS-KTNB (NTD10)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "issueDate": "Ngày phát hành",
       "customerCode": "Mã Khách hàng",
@@ -1211,8 +1298,10 @@
     }
   },
   "auditCmNtd11": {
-    "title": "Giao dịch chuyển tiền với Người nước ngoài và Kinh doanh ngoại tệ",
+    "title": "06C/BKS-KTNB (NTD11)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "referenceNumber": "Số tham chiếu",
       "customerCode": "Mã Khách hàng",
@@ -1240,8 +1329,10 @@
     }
   },
   "auditCmNtd12": {
-    "title": "Danh sách các bút toán chọn mẫu TCKT (nghiệp vụ thẻ)",
+    "title": "07F/BKS-KTNB (NTD12)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "transactionDate": "Ngày giao dịch thực tế",
       "postingUser": "User hạch toán",
@@ -1272,8 +1363,10 @@
     }
   },
   "auditCmNtd13": {
-    "title": "Kết quả kiểm toán đơn vị chấp nhận thẻ (07D)",
+    "title": "07D/BKS-KTNB (NTD13)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "occurrenceDate": "Ngày phát sinh",
       "merchantId": "Mechant ID",
@@ -1300,8 +1393,10 @@
     }
   },
   "auditCmNtd14": {
-    "title": "Danh sách chọn mẫu User Ipcas chấm công (08C)",
+    "title": "08C/BKS-KTNB (NTD14)",
     "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
       "branchCode": "Mã chi nhánh",
       "attendanceDate": "Ngày chấm công",
       "staffCode": "Mã cán bộ",

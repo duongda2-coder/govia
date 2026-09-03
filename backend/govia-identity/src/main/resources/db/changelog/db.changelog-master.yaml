@@ -284,3 +284,18 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/100-audit-plan-engagement-permission-catalog.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/101-audit-employee-capability-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/102-audit-employee-capability-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/103-audit-appendix-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/104-audit-appendix-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/105-audit-cm-execution-engagement-link.yaml
+      relativeToChangelogFile: false

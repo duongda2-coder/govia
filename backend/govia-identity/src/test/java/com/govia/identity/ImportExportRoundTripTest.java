@@ -115,6 +115,69 @@ class ImportExportRoundTripTest {
     }
 
     @Test
+    void importEmployees_withUsernameColumn_createsLoginAccountWithTempPassword() throws Exception {
+        employeeService.create(new EmployeeRequest("RT-EMP-USR-01", "Nguyen Van Username", null, null,
+                null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null));
+
+        byte[] excel = employeeService.exportExcel(
+                new EmployeeFilter(null, null, "RT-EMP-USR-01", null, null, null, null, null, null, null));
+        byte[] edited = editExportedRow(excel, "Ma NV", "RT-EMP-USR-01", "RT-EMP-USR-02", "Ten dang nhap", "rt.emp.usr.02");
+
+        MockMultipartFile file = new MockMultipartFile("file", "employees.xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", edited);
+
+        ImportResult result = employeeService.importFromExcel(file);
+
+        assertThat(result.failureCount()).isZero();
+        assertThat(result.successCount()).isEqualTo(1);
+        assertThat(result.notices()).anyMatch(n -> n.contains("rt.emp.usr.02") && n.contains("RT-EMP-USR-02"));
+
+        var page = employeeService.list(
+                new EmployeeFilter(null, null, "RT-EMP-USR-02", null, null, null, null, null, null, null),
+                PageRequest.of(0, 10));
+        assertThat(page.getContent()).hasSize(1);
+        assertThat(page.getContent().get(0).username()).isEqualTo("rt.emp.usr.02");
+    }
+
+    /**
+     * Doc file Excel da xuat, tim dong du lieu dau tien co gia tri oldKeyValue o cot keyHeader, doi gia tri
+     * cot do sang newKeyValue va cot targetHeader sang newTargetValue - dung de gia lap 1 file import da duoc
+     * nguoi dung sua tay tu file mau xuat ra.
+     */
+    private byte[] editExportedRow(byte[] excel, String keyHeader, String oldKeyValue, String newKeyValue,
+                                    String targetHeader, String newTargetValue) throws Exception {
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(excel))) {
+            Sheet sheet = workbook.getSheetAt(0);
+            Row header = sheet.getRow(0);
+            int keyCol = -1;
+            int targetCol = -1;
+            for (var cell : header) {
+                String text = cell.getStringCellValue();
+                if (keyHeader.equals(text)) keyCol = cell.getColumnIndex();
+                if (targetHeader.equals(text)) targetCol = cell.getColumnIndex();
+            }
+            assertThat(keyCol).isNotEqualTo(-1);
+            assertThat(targetCol).isNotEqualTo(-1);
+
+            DataFormatter formatter = new DataFormatter();
+            for (int r = 1; r <= sheet.getLastRowNum(); r++) {
+                Row row = sheet.getRow(r);
+                if (row == null) continue;
+                if (oldKeyValue.equals(formatter.formatCellValue(row.getCell(keyCol)))) {
+                    row.getCell(keyCol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(newKeyValue);
+                    row.getCell(targetCol, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK).setCellValue(newTargetValue);
+                    break;
+                }
+            }
+
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            workbook.write(out);
+            return out.toByteArray();
+        }
+    }
+
+    @Test
     void exportThenImportRolePermissions_overwritesTargetRoleExactly() {
         RoleResponse source = roleService.create(new RoleRequest("RT-ROLE-01", "RoundTrip Source", null));
         roleService.setPermissionCodes(source.id(),

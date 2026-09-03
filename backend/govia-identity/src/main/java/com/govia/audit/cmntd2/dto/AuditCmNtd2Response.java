@@ -6,6 +6,14 @@ import java.util.UUID;
 
 public record AuditCmNtd2Response(
         UUID id,
+        UUID engagementId,
+        String engagementCode,
+        UUID assignedEmployeeId,
+        String assignedEmployeeCode,
+        String assignedUsername,
+        UUID processStepSummaryId,
+        String processStepSummaryCode,
+        String processStepSummaryName,
         String branchCode,
         LocalDate transactionDate,
         LocalDate valueDate,

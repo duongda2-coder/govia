@@ -3,6 +3,14 @@ import { httpClient } from "./client";
 
 export interface AuditCmNtd9Item {
   id: string;
+  engagementId: string | null;
+  engagementCode: string | null;
+  assignedEmployeeId: string | null;
+  assignedEmployeeCode: string | null;
+  assignedUsername: string | null;
+  processStepSummaryId: string | null;
+  processStepSummaryCode: string | null;
+  processStepSummaryName: string | null;
   branchCode: string;
   transactionDate: string;
   postingUser: string;
@@ -22,6 +30,9 @@ export interface AuditCmNtd9Item {
 }
 
 export interface AuditCmNtd9Request {
+  engagementId: string;
+  assignedEmployeeId: string | null;
+  processStepSummaryId: string | null;
   branchCode: string;
   transactionDate: string;
   postingUser: string;
@@ -42,8 +53,8 @@ export interface AuditCmNtd9Request {
 
 const BASE = "/api/audit/plan/execution/cm-ntd9";
 
-export async function listAuditCmNtd9(): Promise<AuditCmNtd9Item[]> {
-  const res = await httpClient.get<ApiResponse<AuditCmNtd9Item[]>>(BASE);
+export async function listAuditCmNtd9(engagementId: string): Promise<AuditCmNtd9Item[]> {
+  const res = await httpClient.get<ApiResponse<AuditCmNtd9Item[]>>(BASE, { params: { engagementId } });
   return res.data.data;
 }
 
@@ -61,17 +72,18 @@ export async function deleteAuditCmNtd9(id: string): Promise<void> {
   await httpClient.delete(`${BASE}/${id}`);
 }
 
-export async function importAuditCmNtd9(file: File): Promise<ImportResult> {
+export async function importAuditCmNtd9(engagementId: string, file: File): Promise<ImportResult> {
   const formData = new FormData();
   formData.append("file", file);
   const res = await httpClient.post<ApiResponse<ImportResult>>(`${BASE}/import`, formData, {
+    params: { engagementId },
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data.data;
 }
 
-export async function exportAuditCmNtd9(kind: "excel" | "word"): Promise<void> {
-  const res = await httpClient.get(`${BASE}/export/${kind}`, { responseType: "blob" });
+export async function exportAuditCmNtd9(kind: "excel" | "word", engagementId: string): Promise<void> {
+  const res = await httpClient.get(`${BASE}/export/${kind}`, { params: { engagementId }, responseType: "blob" });
   const blobUrl = window.URL.createObjectURL(res.data as Blob);
   const link = document.createElement("a");
   link.href = blobUrl;

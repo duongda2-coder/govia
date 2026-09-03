@@ -1,0 +1,39 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Danh muc Khai bao kha nang dam nhan linh vuc cua NV =====================
+  - changeSet:
+      id: 102-1-permission-catalog-audit-employee-capability
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c7d8e9f0-1020-4a11-8d01-102000000001" }
+              - column: { name: code, value: "AUDIT.EMPLOYEE_CAPABILITY.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc kha nang dam nhan linh vuc cua nhan vien" }
+              - column: { name: resource_label, value: "Khả năng đảm nhận lĩnh vực NV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c7d8e9f0-1020-4a11-8d01-102000000002" }
+              - column: { name: code, value: "AUDIT.EMPLOYEE_CAPABILITY.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua/Phe duyet kha nang dam nhan linh vuc cua nhan vien" }
+              - column: { name: resource_label, value: "Khả năng đảm nhận lĩnh vực NV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c7d8e9f0-1020-4a11-8d01-102000000003" }
+              - column: { name: code, value: "AUDIT.EMPLOYEE_CAPABILITY.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu kha nang dam nhan linh vuc cua nhan vien" }
+              - column: { name: resource_label, value: "Khả năng đảm nhận lĩnh vực NV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c7d8e9f0-1020-4a11-8d01-102000000004" }
+              - column: { name: code, value: "AUDIT.EMPLOYEE_CAPABILITY.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu kha nang dam nhan linh vuc cua nhan vien" }
+              - column: { name: resource_label, value: "Khả năng đảm nhận lĩnh vực NV" }

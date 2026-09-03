@@ -28,6 +28,8 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-md-year": "/audit/master-data/year",
   "audit-md-business-segment": "/audit/master-data/business-segment",
   "audit-md-unit-type": "/audit/master-data/unit-type",
+  "audit-md-employee-capability": "/audit/master-data/employee-capability",
+  "audit-md-appendix": "/audit/master-data/appendix",
   "audit-plan-md-branch-staff": "/audit/plan/master-data/branch-staff",
   "audit-plan-md-work-item": "/audit/plan/master-data/work-item",
   "audit-plan-md-exception-type": "/audit/plan/master-data/exception-type",
@@ -153,6 +155,8 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
         leaf("audit-md-year", t("menu.auditMdYear"), auditMdGroupLabel),
         leaf("audit-md-business-segment", t("menu.auditMdBusinessSegment"), auditMdGroupLabel),
         leaf("audit-md-unit-type", t("menu.auditMdUnitType"), auditMdGroupLabel),
+        leaf("audit-md-employee-capability", t("menu.auditMdEmployeeCapability"), auditMdGroupLabel),
+        leaf("audit-md-appendix", t("menu.auditMdAppendix"), auditMdGroupLabel),
       ],
     },
     (canViewRiskScoring || canViewRiskScoringExec) && {

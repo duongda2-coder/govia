@@ -1,0 +1,39 @@
+databaseChangeLog:
+
+  # ===================== Danh muc "Quan ly phu luc" (sheet ZTC_phuluc, bang ZTB_phuluc) =====================
+  - changeSet:
+      id: 103-1-audit-appendix-schema
+      author: govia
+      comment: "Tao bang audit_appendix"
+      changes:
+        - createTable:
+            tableName: audit_appendix
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: sample_type, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: appendix_code, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: note, type: VARCHAR(100) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_appendix
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_appendix_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_appendix
+            baseColumnNames: business_segment_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_appendix_business_segment
+        - addUniqueConstraint:
+            tableName: audit_appendix
+            columnNames: tenant_id, appendix_code
+            constraintName: uk_audit_appendix_tenant_code

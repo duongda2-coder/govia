@@ -17,6 +17,7 @@ export interface ImportResult {
   successCount: number;
   failureCount: number;
   errors: { row: number; message: string }[];
+  notices?: string[];
 }
 
 /**
@@ -137,6 +138,15 @@ export function StandardToolbar(props: StandardToolbarProps) {
             <Typography.Paragraph>
               {t("common.importSummary", { success: result.successCount, failure: result.failureCount })}
             </Typography.Paragraph>
+            {!!result.notices?.length && (
+              <List
+                size="small"
+                bordered
+                dataSource={result.notices}
+                style={{ maxHeight: 300, overflowY: "auto", marginBottom: result.errors.length > 0 ? 16 : 0 }}
+                renderItem={(notice) => <List.Item>{notice}</List.Item>}
+              />
+            )}
             {result.errors.length > 0 && (
               <List
                 size="small"

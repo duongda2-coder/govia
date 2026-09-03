@@ -12,6 +12,8 @@ import java.util.UUID;
 public interface AuditCmNtd1Repository extends JpaRepository<AuditCmNtd1, UUID> {
     List<AuditCmNtd1> findByTenantIdOrderByCreatedAtAsc(UUID tenantId);
 
+    List<AuditCmNtd1> findByTenantIdAndEngagementIdOrderByCreatedAtAsc(UUID tenantId, UUID engagementId);
+
     Optional<AuditCmNtd1> findByTenantIdAndBranchCodeAndTransactionDateAndPostingUserAndEntryNumber(
             UUID tenantId, String branchCode, LocalDate transactionDate, String postingUser, BigDecimal entryNumber);
 }

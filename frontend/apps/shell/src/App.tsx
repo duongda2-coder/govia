@@ -16,6 +16,8 @@ import { ApprovalMatrixPage } from "./pages/Workflow/ApprovalMatrixPage";
 import { MasterDataGroupPage } from "./pages/Audit/MasterDataGroupPage";
 import { DocumentLibraryPage } from "./pages/Audit/DocumentLibrary/DocumentLibraryPage";
 import { ControlPointPage } from "./pages/Audit/ControlPoint/ControlPointPage";
+import { EmployeeCapabilityPage } from "./pages/Audit/EmployeeCapability/EmployeeCapabilityPage";
+import { AppendixPage } from "./pages/Audit/Appendix/AppendixPage";
 import { WorkItemPage } from "./pages/Audit/Plan/WorkItemPage";
 import { BranchStaffPage } from "./pages/Audit/Plan/BranchStaffPage";
 import { ExceptionTypePage } from "./pages/Audit/Plan/ExceptionTypePage";
@@ -98,6 +100,8 @@ function App() {
           <Route path="audit/master-data/year" element={<MasterDataGroupPage group="YEAR" title={t("auditMasterData.groups.YEAR")} />} />
           <Route path="audit/master-data/business-segment" element={<MasterDataGroupPage group="BUSINESS_SEGMENT" title={t("auditMasterData.groups.BUSINESS_SEGMENT")} />} />
           <Route path="audit/master-data/unit-type" element={<MasterDataGroupPage group="UNIT_TYPE" title={t("auditMasterData.groups.UNIT_TYPE")} />} />
+          <Route path="audit/master-data/employee-capability" element={<EmployeeCapabilityPage />} />
+          <Route path="audit/master-data/appendix" element={<AppendixPage />} />
           <Route path="audit/plan/master-data/work-item" element={<WorkItemPage />} />
           <Route path="audit/plan/master-data/branch-staff" element={<BranchStaffPage />} />
           <Route path="audit/plan/master-data/exception-type" element={<ExceptionTypePage />} />

@@ -70,7 +70,7 @@ export function AuditEngagementGroupsDrawer(props: AuditEngagementGroupsDrawerPr
   }, [open, load]);
 
   const usedCodes = new Set(items.map((g) => g.groupCode));
-  const teamLeadCapableEmployees = employees.filter((e) => e.teamLeadCapable);
+  const groupLeaderCapableEmployees = employees.filter((e) => e.truongNhomCapable);
 
   const openCreate = () => {
     form.resetFields();
@@ -173,7 +173,7 @@ export function AuditEngagementGroupsDrawer(props: AuditEngagementGroupsDrawerPr
               <Select
                 showSearch
                 optionFilterProp="label"
-                options={teamLeadCapableEmployees.map((e) => ({ value: e.id, label: `${e.fullName} (${e.employeeCode})` }))}
+                options={groupLeaderCapableEmployees.map((e) => ({ value: e.id, label: `${e.fullName} (${e.employeeCode})` }))}
               />
             </Form.Item>
           </Form>

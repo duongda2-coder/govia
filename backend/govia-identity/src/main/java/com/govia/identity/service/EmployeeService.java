@@ -55,6 +55,7 @@ public class EmployeeService {
     private final WordExportService wordExportService;
     private final ExcelImportService excelImportService;
     private final EmployeeApprovalService employeeApprovalService;
+    private final UserAccountService userAccountService;
 
     public EmployeeService(EmployeeRepository repository,
                             OrganizationUnitRepository orgUnitRepository,
@@ -64,7 +65,8 @@ public class EmployeeService {
                             ExcelExportService excelExportService,
                             WordExportService wordExportService,
                             ExcelImportService excelImportService,
-                            EmployeeApprovalService employeeApprovalService) {
+                            EmployeeApprovalService employeeApprovalService,
+                            UserAccountService userAccountService) {
         this.repository = repository;
         this.orgUnitRepository = orgUnitRepository;
         this.userAccountRepository = userAccountRepository;
@@ -74,6 +76,7 @@ public class EmployeeService {
         this.wordExportService = wordExportService;
         this.excelImportService = excelImportService;
         this.employeeApprovalService = employeeApprovalService;
+        this.userAccountService = userAccountService;
     }
 
     @Transactional(readOnly = true)
@@ -202,7 +205,11 @@ public class EmployeeService {
      * Import Excel theo dung mau da xuat (exportColumns): Don vi/Chuc danh tham chieu theo TEN
      * (khop khong phan biet hoa thuong voi du lieu da co san), Trang thai ghi dung ma enum
      * (ACTIVE/ON_LEAVE/TERMINATED), bo trong se mac dinh ACTIVE. Tung dong loi duoc bao rieng,
-     * khong lam hong ca file.
+     * khong lam hong ca file. Cot "Ten dang nhap" (neu co gia tri) se duoc dung de TAO LUON tai
+     * khoan dang nhap cho nhan vien do, voi mat khau ngau nhien - vi file import (dung mau xuat)
+     * khong co cot mat khau nen khong the tu dat mat khau nguoi dung. Mat khau tam duoc tra ve
+     * trong "notices" cua ImportResult de admin gui lai cho nhan vien doi. Neu tao tai khoan that
+     * bai (vd trung ten dang nhap) thi nhan vien VAN duoc tao, chi rieng dong do bao loi tai khoan.
      */
     @Transactional
     public ImportResult importFromExcel(MultipartFile file) {
@@ -216,6 +223,7 @@ public class EmployeeService {
 
         int success = 0;
         List<ImportResult.ImportRowError> errors = new ArrayList<>();
+        List<String> notices = new ArrayList<>();
         for (int i = 0; i < rows.size(); i++) {
             int rowNumber = i + 2;
             Map<String, String> row = rows.get(i);
@@ -236,6 +244,18 @@ public class EmployeeService {
                 if (status != EmployeeStatus.ACTIVE) {
                     changeStatus(created.id(), status);
                 }
+
+                String username = emptyToNull(row.get("username"));
+                if (username != null) {
+                    try {
+                        String tempPassword = userAccountService.createForEmployeeWithGeneratedPassword(created.id(), username);
+                        notices.add("Dong " + rowNumber + ": da tao tai khoan dang nhap \"" + username
+                                + "\" cho " + employeeCode.trim() + " - mat khau tam: " + tempPassword);
+                    } catch (BusinessException e) {
+                        errors.add(new ImportResult.ImportRowError(rowNumber,
+                                "Da tao nhan vien nhung khong tao duoc tai khoan dang nhap: " + e.getMessage()));
+                    }
+                }
                 success++;
             } catch (BusinessException e) {
                 errors.add(new ImportResult.ImportRowError(rowNumber, e.getMessage()));
@@ -244,7 +264,7 @@ public class EmployeeService {
 
         auditLogService.record("Employee", null, AuditAction.CREATE,
                 "Import Excel nhan vien: " + success + " thanh cong, " + errors.size() + " loi");
-        return new ImportResult(success, errors.size(), errors);
+        return new ImportResult(success, errors.size(), errors, notices);
     }
 
     private UUID resolveOrgUnitIdByName(UUID tenantId, String name) {

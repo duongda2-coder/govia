@@ -1,19 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Button, Col, DatePicker, Divider, Form, Input, InputNumber, Row, Select, Space, Table, Typography } from "antd";
-import type { TableProps } from "antd";
-import { DeleteOutlined, PlusOutlined, SaveOutlined } from "@ant-design/icons";
+import { App, Button, Col, DatePicker, Divider, Form, Input, InputNumber, Row, Select, Space, Typography } from "antd";
+import { SaveOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { AttachmentPanel } from "@govia/ui-kit";
 import { httpClient } from "../../../../api/client";
 import {
-  addRelatedUnit,
   createAuditEngagement,
-  deleteRelatedUnit,
-  listRelatedUnits,
   updateAuditEngagement,
   type AuditEngagementItem,
-  type AuditEngagementRelatedUnitItem,
   type AuditEngagementRequest,
   type AuditEngagementStatus,
   type AuditObjectUnitOption,
@@ -77,21 +72,8 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
   const [selectedUnitType, setSelectedUnitType] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
 
-  const [relatedUnits, setRelatedUnits] = useState<AuditEngagementRelatedUnitItem[]>([]);
-  const [relatedUnitType, setRelatedUnitType] = useState<string | undefined>(undefined);
-  const [relatedUnitId, setRelatedUnitId] = useState<string | undefined>(undefined);
-  const [addingRelatedUnit, setAddingRelatedUnit] = useState(false);
-
   const unitTypes = Array.from(new Set(auditObjectUnits.map((u) => u.unitType))).sort();
   const unitsForType = (type: string | undefined) => (type ? auditObjectUnits.filter((u) => u.unitType === type) : []);
-
-  const loadRelatedUnits = useCallback(async (engagementId: string) => {
-    try {
-      setRelatedUnits(await listRelatedUnits(engagementId));
-    } catch {
-      message.error(t("auditEngagement.messages.loadError"));
-    }
-  }, [message, t]);
 
   useEffect(() => {
     if (engagement) {
@@ -123,12 +105,10 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
         reportPlanStart: engagement.reportPlanStart ? dayjs(engagement.reportPlanStart) : undefined,
         reportPlanEnd: engagement.reportPlanEnd ? dayjs(engagement.reportPlanEnd) : undefined,
       });
-      loadRelatedUnits(engagement.id);
     } else {
       form.resetFields();
       form.setFieldsValue({ year: dayjs().year(), status: "DRAFT" });
       setSelectedUnitType(undefined);
-      setRelatedUnits([]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engagement, auditObjectUnits]);
@@ -195,48 +175,6 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [readOnly, handleSubmit]);
-
-  const handleAddRelatedUnit = async () => {
-    if (!engagement || !relatedUnitId) return;
-    setAddingRelatedUnit(true);
-    try {
-      await addRelatedUnit(engagement.id, relatedUnitId);
-      message.success(t("auditEngagement.messages.relatedUnitAddSuccess"));
-      setRelatedUnitType(undefined);
-      setRelatedUnitId(undefined);
-      await loadRelatedUnits(engagement.id);
-    } catch {
-      message.error(t("auditEngagement.messages.saveError"));
-    } finally {
-      setAddingRelatedUnit(false);
-    }
-  };
-
-  const handleDeleteRelatedUnit = async (rowId: string) => {
-    if (!engagement) return;
-    try {
-      await deleteRelatedUnit(engagement.id, rowId);
-      message.success(t("common.deleteSuccess"));
-      await loadRelatedUnits(engagement.id);
-    } catch {
-      message.error(t("auditEngagement.messages.saveError"));
-    }
-  };
-
-  const relatedUnitColumns: TableProps<AuditEngagementRelatedUnitItem>["columns"] = [
-    { title: t("auditEngagement.form.relatedUnitCode"), dataIndex: "auditObjectUnitCode", width: 140 },
-    { title: t("auditEngagement.form.relatedUnitType"), dataIndex: "unitType", width: 140 },
-    { title: t("auditEngagement.form.relatedUnitName"), dataIndex: "auditObjectUnitName" },
-    {
-      title: "",
-      key: "actions",
-      width: 60,
-      render: (_v, row) =>
-        !readOnly && (
-          <Button size="small" danger type="text" icon={<DeleteOutlined />} onClick={() => handleDeleteRelatedUnit(row.id)} />
-        ),
-    },
-  ];
 
   return (
     <div>
@@ -321,21 +259,26 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
               <Select
                 showSearch
                 optionFilterProp="label"
-                options={employees.filter((e) => e.username).map((e) => ({ value: e.id, label: `${e.fullName} (${e.username})` }))}
+                // Luon giu lai lua chon hien tai cua CKT (co the la nhan vien chua/khong con duoc
+                // tick "Truong doan" o danh muc Kha nang dam nhan linh vuc) de khong lam "mat" gia
+                // tri da luu khi mo lai form Sua - chi rang buoc lua chon MOI theo dung kha nang.
+                options={employees
+                  .filter((e) => e.truongDoanCapable || e.id === engagement?.teamLeadEmployeeId)
+                  .map((e) => ({ value: e.id, label: `${e.fullName} (${e.employeeCode})` }))}
               />
             </Form.Item>
           </Col>
-          <Col span={8}>
+          <Col span={16}>
             <Form.Item name="decisionNumber" label={t("auditEngagement.columns.decisionNumber")} rules={[{ required: true }]}>
               <Input maxLength={50} />
             </Form.Item>
           </Col>
-          <Col span={8}>
-            <Form.Item name="status" label={t("auditEngagement.columns.status")}>
-              <Select options={STATUSES.map((v) => ({ value: v, label: t(`auditEngagement.status.${v}`) }))} />
-            </Form.Item>
-          </Col>
         </Row>
+        {/* "Trang thai dot kiem toan" bo khoi form theo yeu cau - van giu gia tri hien tai (mac dinh
+            DRAFT khi tao moi) de KHONG lam mat/reset trang thai cua CKT dang o buoc sau khi Sua. */}
+        <Form.Item name="status" hidden>
+          <Select options={STATUSES.map((v) => ({ value: v, label: t(`auditEngagement.status.${v}`) }))} />
+        </Form.Item>
         <Row gutter={16}>
           <Col span={8}>
             <Form.Item name="riskRank" label={t("auditEngagement.columns.riskRank")}>
@@ -431,57 +374,6 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
           </Col>
         </Row>
       </Form>
-
-      <Divider orientation="left" plain>{t("auditEngagement.form.sectionRelatedUnits")}</Divider>
-      {engagement ? (
-        <>
-          {!readOnly && (
-            <Row gutter={16} align="bottom" style={{ marginBottom: 12 }}>
-              <Col span={8}>
-                <Typography.Text type="secondary">{t("auditEngagement.columns.unitType")}</Typography.Text>
-                <Select
-                  style={{ width: "100%" }}
-                  showSearch
-                  value={relatedUnitType}
-                  options={unitTypes.map((v) => ({ value: v, label: v }))}
-                  onChange={(v: string) => {
-                    setRelatedUnitType(v);
-                    setRelatedUnitId(undefined);
-                  }}
-                />
-              </Col>
-              <Col span={10}>
-                <Typography.Text type="secondary">{t("auditEngagement.form.relatedUnitBranch")}</Typography.Text>
-                <Select
-                  style={{ width: "100%" }}
-                  showSearch
-                  disabled={!relatedUnitType}
-                  optionFilterProp="label"
-                  value={relatedUnitId}
-                  options={unitsForType(relatedUnitType).map((u) => ({ value: u.id, label: `${u.code} - ${u.name}` }))}
-                  onChange={(v: string) => setRelatedUnitId(v)}
-                />
-              </Col>
-              <Col span={6}>
-                <Space>
-                  <Button icon={<PlusOutlined />} loading={addingRelatedUnit} disabled={!relatedUnitId} onClick={handleAddRelatedUnit}>
-                    {t("common.add")}
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-          )}
-          <Table<AuditEngagementRelatedUnitItem>
-            size="small"
-            rowKey="id"
-            pagination={false}
-            columns={relatedUnitColumns}
-            dataSource={relatedUnits}
-          />
-        </>
-      ) : (
-        <Typography.Text type="secondary">{t("auditEngagement.form.relatedUnitsNeedsSave")}</Typography.Text>
-      )}
 
       <Divider orientation="left" plain>{t("auditEngagement.form.sectionAttachment")}</Divider>
       {engagement ? (

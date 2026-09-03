@@ -84,7 +84,8 @@ export interface EmployeeOption {
   employeeCode: string;
   fullName: string;
   username: string | null;
-  teamLeadCapable: boolean;
+  truongDoanCapable: boolean;
+  truongNhomCapable: boolean;
 }
 
 const BASE = "/api/audit/plan/engagement";

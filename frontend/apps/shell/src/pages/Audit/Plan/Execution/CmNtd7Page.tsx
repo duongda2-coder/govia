@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Col, Form, Input, Modal, Result, Row, Switch, Typography } from "antd";
+import { App, Col, Form, Input, Modal, Result, Row, Select, Space, Switch, Typography } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
@@ -13,9 +13,13 @@ import {
   type AuditCmNtd7Item,
   type AuditCmNtd7Request,
 } from "../../../../api/auditCmNtd7";
+import { listAuditEngagements, listEmployeeOptions, type AuditEngagementItem, type EmployeeOption } from "../../../../api/auditEngagement";
+import { listAuditProcessStepSummaries, type AuditProcessStepSummaryItem } from "../../../../api/auditProcessStep";
 import { useAuth } from "../../../../auth/AuthContext";
 
 interface FormValues {
+  assignedEmployeeId?: string;
+  processStepSummaryId?: string;
   branchCode: string;
   constructionCode: string;
   constructionName?: string;
@@ -50,20 +54,36 @@ export function CmNtd7Page() {
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm<FormValues>();
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      setItems(await listAuditCmNtd7());
-    } catch {
-      message.error(t("auditCmNtd7.messages.loadError"));
-    } finally {
-      setLoading(false);
-    }
-  }, [message, t]);
+  const [engagements, setEngagements] = useState<AuditEngagementItem[]>([]);
+  const [engagementId, setEngagementId] = useState<string | undefined>(undefined);
+  const [employees, setEmployees] = useState<EmployeeOption[]>([]);
+  const [processStepSummaries, setProcessStepSummaries] = useState<AuditProcessStepSummaryItem[]>([]);
 
   useEffect(() => {
-    if (canView) load();
-  }, [canView, load]);
+    if (!canView) return;
+    listAuditEngagements().then(setEngagements).catch(() => setEngagements([]));
+    listEmployeeOptions().then(setEmployees).catch(() => setEmployees([]));
+    listAuditProcessStepSummaries().then(setProcessStepSummaries).catch(() => setProcessStepSummaries([]));
+  }, [canView]);
+
+  const load = useCallback(
+    async (selectedEngagementId: string) => {
+      setLoading(true);
+      try {
+        setItems(await listAuditCmNtd7(selectedEngagementId));
+      } catch {
+        message.error(t("auditCmNtd7.messages.loadError"));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [message, t],
+  );
+
+  useEffect(() => {
+    if (canView && engagementId) load(engagementId);
+    if (!engagementId) setItems([]);
+  }, [canView, engagementId, load]);
 
   const openCreate = () => {
     setEditing(null);
@@ -77,6 +97,8 @@ export function CmNtd7Page() {
     if (!target) return;
     setEditing(target);
     form.setFieldsValue({
+      assignedEmployeeId: target.assignedEmployeeId ?? undefined,
+      processStepSummaryId: target.processStepSummaryId ?? undefined,
       branchCode: target.branchCode,
       constructionCode: target.constructionCode,
       constructionName: target.constructionName ?? undefined,
@@ -97,9 +119,13 @@ export function CmNtd7Page() {
     } catch {
       return;
     }
+    if (!engagementId) return;
     setSubmitting(true);
     try {
       const request: AuditCmNtd7Request = {
+        engagementId,
+        assignedEmployeeId: values.assignedEmployeeId ?? null,
+        processStepSummaryId: values.processStepSummaryId ?? null,
         branchCode: values.branchCode,
         constructionCode: values.constructionCode,
         constructionName: values.constructionName ?? null,
@@ -119,7 +145,7 @@ export function CmNtd7Page() {
       }
       setModalOpen(false);
       setSelected([]);
-      await load();
+      await load(engagementId);
     } catch {
       message.error(t("auditCmNtd7.messages.saveError"));
     } finally {
@@ -139,7 +165,7 @@ export function CmNtd7Page() {
           await Promise.all(selected.map((item) => deleteAuditCmNtd7(item.id)));
           message.success(t("auditCmNtd7.messages.deleteSuccess"));
           setSelected([]);
-          await load();
+          if (engagementId) await load(engagementId);
         } catch {
           message.error(t("auditCmNtd7.messages.deleteError"));
         }
@@ -148,6 +174,8 @@ export function CmNtd7Page() {
   };
 
   const columns: TableProps<AuditCmNtd7Item>["columns"] = [
+    { title: t("auditCmNtd7.columns.assignedUsername"), dataIndex: "assignedUsername", width: 150, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd7.columns.processStepSummaryCode"), dataIndex: "processStepSummaryCode", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd7.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
     { title: t("auditCmNtd7.columns.constructionCode"), width: 130, ...getSearchColumnProps("constructionCode", searchLabels) },
     { title: t("auditCmNtd7.columns.constructionName"), dataIndex: "constructionName", render: (v: string | null) => v ?? "-" },
@@ -172,25 +200,38 @@ export function CmNtd7Page() {
   return (
     <div>
       <Typography.Title level={4}>{t("auditCmNtd7.title")}</Typography.Title>
+      <Space style={{ marginBottom: 16 }}>
+        <Typography.Text>{t("auditPlanExecution.engagementFilter")}</Typography.Text>
+        <Select
+          style={{ width: 220 }}
+          showSearch
+          optionFilterProp="label"
+          placeholder={t("auditPlanExecution.selectEngagement")}
+          options={engagements.map((e) => ({ value: e.id, label: e.code }))}
+          value={engagementId}
+          onChange={setEngagementId}
+          allowClear
+        />
+      </Space>
       <CrudTable<AuditCmNtd7Item>
         tableId="audit.plan.execution.cmNtd7"
         columns={columns}
         dataSource={items}
         rowKey="id"
         loading={loading}
-        onAdd={canCreate ? openCreate : undefined}
+        onAdd={canCreate && engagementId ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length === 0}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
-        onExportExcel={canExport ? () => exportAuditCmNtd7("excel") : undefined}
-        onExportWord={canExport ? () => exportAuditCmNtd7("word") : undefined}
+        onExportExcel={canExport && engagementId ? () => exportAuditCmNtd7("excel", engagementId) : undefined}
+        onExportWord={canExport && engagementId ? () => exportAuditCmNtd7("word", engagementId) : undefined}
         onImport={
-          canImport
+          canImport && engagementId
             ? async (file) => {
-                const result = await importAuditCmNtd7(file);
-                await load();
+                const result = await importAuditCmNtd7(engagementId, file);
+                await load(engagementId);
                 return result;
               }
             : undefined
@@ -207,6 +248,28 @@ export function CmNtd7Page() {
         width={680}
       >
         <Form<FormValues> form={form} layout="vertical">
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="assignedEmployeeId" label={t("auditCmNtd7.columns.assignedUsername")}>
+                <Select
+                  allowClear
+                  showSearch
+                  optionFilterProp="label"
+                  options={employees.filter((e) => e.username).map((e) => ({ value: e.id, label: `${e.fullName} (${e.username})` }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="processStepSummaryId" label={t("auditCmNtd7.columns.processStepSummaryCode")}>
+                <Select
+                  allowClear
+                  showSearch
+                  optionFilterProp="label"
+                  options={processStepSummaries.map((s) => ({ value: s.id, label: `${s.code} - ${s.name}` }))}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="branchCode" label={t("auditCmNtd7.columns.branchCode")} rules={[{ required: true }]}>

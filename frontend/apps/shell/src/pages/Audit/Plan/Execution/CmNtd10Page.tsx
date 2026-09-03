@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Col, DatePicker, Form, Input, InputNumber, Modal, Result, Row, Select, Switch, Typography } from "antd";
+import { App, Col, DatePicker, Form, Input, InputNumber, Modal, Result, Row, Select, Space, Switch, Typography } from "antd";
 import type { TableProps } from "antd";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
@@ -14,9 +14,13 @@ import {
   type AuditCmNtd10Item,
   type AuditCmNtd10Request,
 } from "../../../../api/auditCmNtd10";
+import { listAuditEngagements, listEmployeeOptions, type AuditEngagementItem, type EmployeeOption } from "../../../../api/auditEngagement";
+import { listAuditProcessStepSummaries, type AuditProcessStepSummaryItem } from "../../../../api/auditProcessStep";
 import { useAuth } from "../../../../auth/AuthContext";
 
 interface FormValues {
+  assignedEmployeeId?: string;
+  processStepSummaryId?: string;
   branchCode: string;
   issueDate: dayjs.Dayjs;
   customerCode?: string;
@@ -74,20 +78,36 @@ export function CmNtd10Page() {
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm<FormValues>();
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      setItems(await listAuditCmNtd10());
-    } catch {
-      message.error(t("auditCmNtd10.messages.loadError"));
-    } finally {
-      setLoading(false);
-    }
-  }, [message, t]);
+  const [engagements, setEngagements] = useState<AuditEngagementItem[]>([]);
+  const [engagementId, setEngagementId] = useState<string | undefined>(undefined);
+  const [employees, setEmployees] = useState<EmployeeOption[]>([]);
+  const [processStepSummaries, setProcessStepSummaries] = useState<AuditProcessStepSummaryItem[]>([]);
 
   useEffect(() => {
-    if (canView) load();
-  }, [canView, load]);
+    if (!canView) return;
+    listAuditEngagements().then(setEngagements).catch(() => setEngagements([]));
+    listEmployeeOptions().then(setEmployees).catch(() => setEmployees([]));
+    listAuditProcessStepSummaries().then(setProcessStepSummaries).catch(() => setProcessStepSummaries([]));
+  }, [canView]);
+
+  const load = useCallback(
+    async (selectedEngagementId: string) => {
+      setLoading(true);
+      try {
+        setItems(await listAuditCmNtd10(selectedEngagementId));
+      } catch {
+        message.error(t("auditCmNtd10.messages.loadError"));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [message, t],
+  );
+
+  useEffect(() => {
+    if (canView && engagementId) load(engagementId);
+    if (!engagementId) setItems([]);
+  }, [canView, engagementId, load]);
 
   const openCreate = () => {
     setEditing(null);
@@ -101,6 +121,8 @@ export function CmNtd10Page() {
     if (!target) return;
     setEditing(target);
     form.setFieldsValue({
+      assignedEmployeeId: target.assignedEmployeeId ?? undefined,
+      processStepSummaryId: target.processStepSummaryId ?? undefined,
       branchCode: target.branchCode,
       issueDate: dayjs(target.issueDate),
       customerCode: target.customerCode ?? undefined,
@@ -130,9 +152,13 @@ export function CmNtd10Page() {
     } catch {
       return;
     }
+    if (!engagementId) return;
     setSubmitting(true);
     try {
       const request: AuditCmNtd10Request = {
+        engagementId,
+        assignedEmployeeId: values.assignedEmployeeId ?? null,
+        processStepSummaryId: values.processStepSummaryId ?? null,
         branchCode: values.branchCode,
         issueDate: values.issueDate.format("YYYY-MM-DD"),
         customerCode: values.customerCode ?? null,
@@ -161,7 +187,7 @@ export function CmNtd10Page() {
       }
       setModalOpen(false);
       setSelected([]);
-      await load();
+      await load(engagementId);
     } catch {
       message.error(t("auditCmNtd10.messages.saveError"));
     } finally {
@@ -181,7 +207,7 @@ export function CmNtd10Page() {
           await Promise.all(selected.map((item) => deleteAuditCmNtd10(item.id)));
           message.success(t("auditCmNtd10.messages.deleteSuccess"));
           setSelected([]);
-          await load();
+          if (engagementId) await load(engagementId);
         } catch {
           message.error(t("auditCmNtd10.messages.deleteError"));
         }
@@ -192,6 +218,8 @@ export function CmNtd10Page() {
   const money = (v: number | null) => (v == null ? "-" : numberFormatter.format(v));
 
   const columns: TableProps<AuditCmNtd10Item>["columns"] = [
+    { title: t("auditCmNtd10.columns.assignedUsername"), dataIndex: "assignedUsername", width: 150, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd10.columns.processStepSummaryCode"), dataIndex: "processStepSummaryCode", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd10.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
     { title: t("auditCmNtd10.columns.issueDate"), dataIndex: "issueDate", width: 120 },
     { title: t("auditCmNtd10.columns.customerCode"), dataIndex: "customerCode", width: 140, render: (v: string | null) => v ?? "-" },
@@ -225,25 +253,38 @@ export function CmNtd10Page() {
   return (
     <div>
       <Typography.Title level={4}>{t("auditCmNtd10.title")}</Typography.Title>
+      <Space style={{ marginBottom: 16 }}>
+        <Typography.Text>{t("auditPlanExecution.engagementFilter")}</Typography.Text>
+        <Select
+          style={{ width: 220 }}
+          showSearch
+          optionFilterProp="label"
+          placeholder={t("auditPlanExecution.selectEngagement")}
+          options={engagements.map((e) => ({ value: e.id, label: e.code }))}
+          value={engagementId}
+          onChange={setEngagementId}
+          allowClear
+        />
+      </Space>
       <CrudTable<AuditCmNtd10Item>
         tableId="audit.plan.execution.cmNtd10"
         columns={columns}
         dataSource={items}
         rowKey="id"
         loading={loading}
-        onAdd={canCreate ? openCreate : undefined}
+        onAdd={canCreate && engagementId ? openCreate : undefined}
         onEdit={canEdit ? openEdit : undefined}
         editDisabled={selected.length !== 1}
         onDelete={canDelete ? handleDelete : undefined}
         deleteDisabled={selected.length === 0}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
-        onExportExcel={canExport ? () => exportAuditCmNtd10("excel") : undefined}
-        onExportWord={canExport ? () => exportAuditCmNtd10("word") : undefined}
+        onExportExcel={canExport && engagementId ? () => exportAuditCmNtd10("excel", engagementId) : undefined}
+        onExportWord={canExport && engagementId ? () => exportAuditCmNtd10("word", engagementId) : undefined}
         onImport={
-          canImport
+          canImport && engagementId
             ? async (file) => {
-                const result = await importAuditCmNtd10(file);
-                await load();
+                const result = await importAuditCmNtd10(engagementId, file);
+                await load(engagementId);
                 return result;
               }
             : undefined
@@ -257,9 +298,31 @@ export function CmNtd10Page() {
         onOk={handleSubmit}
         confirmLoading={submitting}
         destroyOnClose
-        width={760}
+        width={800}
       >
         <Form<FormValues> form={form} layout="vertical">
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="assignedEmployeeId" label={t("auditCmNtd10.columns.assignedUsername")}>
+                <Select
+                  allowClear
+                  showSearch
+                  optionFilterProp="label"
+                  options={employees.filter((e) => e.username).map((e) => ({ value: e.id, label: `${e.fullName} (${e.username})` }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="processStepSummaryId" label={t("auditCmNtd10.columns.processStepSummaryCode")}>
+                <Select
+                  allowClear
+                  showSearch
+                  optionFilterProp="label"
+                  options={processStepSummaries.map((s) => ({ value: s.id, label: `${s.code} - ${s.name}` }))}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
           <Row gutter={16}>
             <Col span={8}>
               <Form.Item name="branchCode" label={t("auditCmNtd10.columns.branchCode")} rules={[{ required: true }]}>

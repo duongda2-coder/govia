@@ -1,0 +1,228 @@
+databaseChangeLog:
+
+  # ===================== "Thuc hien kiem toan": them lien ket Cuoc kiem toan + Nguoi duoc phan cong
+  # + Ma BQT_TH cho ca 15 man hinh chon mau (CM_TD1/TD2, CM_NTD1-14, khong co NTD5) =====================
+  - changeSet:
+      id: 105-1-audit-cm-td1-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_td1"
+      changes:
+        - addColumn:
+            tableName: audit_cm_td1
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_td1, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_td1_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_td1, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_td1_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_td1, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_td1_step_summary }
+
+  - changeSet:
+      id: 105-2-audit-cm-td2-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_td2"
+      changes:
+        - addColumn:
+            tableName: audit_cm_td2
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_td2, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_td2_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_td2, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_td2_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_td2, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_td2_step_summary }
+
+  - changeSet:
+      id: 105-3-audit-cm-ntd1-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd1"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd1
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd1, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd1_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd1, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd1_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd1, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd1_step_summary }
+
+  - changeSet:
+      id: 105-4-audit-cm-ntd2-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd2"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd2
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd2, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd2_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd2, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd2_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd2, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd2_step_summary }
+
+  - changeSet:
+      id: 105-5-audit-cm-ntd3-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd3"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd3
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd3, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd3_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd3, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd3_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd3, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd3_step_summary }
+
+  - changeSet:
+      id: 105-6-audit-cm-ntd4-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd4"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd4
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd4, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd4_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd4, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd4_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd4, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd4_step_summary }
+
+  - changeSet:
+      id: 105-7-audit-cm-ntd6-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd6"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd6
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd6, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd6_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd6, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd6_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd6, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd6_step_summary }
+
+  - changeSet:
+      id: 105-8-audit-cm-ntd7-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd7"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd7
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd7, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd7_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd7, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd7_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd7, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd7_step_summary }
+
+  - changeSet:
+      id: 105-9-audit-cm-ntd8-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd8"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd8
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd8, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd8_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd8, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd8_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd8, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd8_step_summary }
+
+  - changeSet:
+      id: 105-10-audit-cm-ntd9-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd9"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd9
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd9, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd9_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd9, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd9_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd9, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd9_step_summary }
+
+  - changeSet:
+      id: 105-11-audit-cm-ntd10-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd10"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd10
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd10, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd10_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd10, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd10_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd10, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd10_step_summary }
+
+  - changeSet:
+      id: 105-12-audit-cm-ntd11-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd11"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd11
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd11, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd11_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd11, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd11_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd11, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd11_step_summary }
+
+  - changeSet:
+      id: 105-13-audit-cm-ntd12-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd12"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd12
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd12, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd12_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd12, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd12_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd12, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd12_step_summary }
+
+  - changeSet:
+      id: 105-14-audit-cm-ntd13-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd13"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd13
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd13, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd13_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd13, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd13_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd13, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd13_step_summary }
+
+  - changeSet:
+      id: 105-15-audit-cm-ntd14-engagement-link
+      author: govia
+      comment: "Them engagement_id/assigned_employee_id/process_step_summary_id vao audit_cm_ntd14"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd14
+            columns:
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd14, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd14_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd14, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd14_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd14, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd14_step_summary }

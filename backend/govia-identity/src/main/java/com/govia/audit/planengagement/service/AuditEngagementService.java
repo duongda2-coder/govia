@@ -9,6 +9,8 @@ import com.govia.audit.planengagement.dto.EmployeeOption;
 import com.govia.audit.planengagement.entity.AuditEngagement;
 import com.govia.audit.planengagement.entity.AuditEngagementRelatedUnit;
 import com.govia.audit.planengagement.entity.AuditEngagementStatus;
+import com.govia.audit.employeecapability.entity.AuditEmployeeCapability;
+import com.govia.audit.employeecapability.repository.AuditEmployeeCapabilityRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementGroupRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRelatedUnitRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRepository;
@@ -57,6 +59,7 @@ public class AuditEngagementService {
     private final AuditObjectUnitRepository auditObjectUnitRepository;
     private final EmployeeRepository employeeRepository;
     private final UserAccountRepository userAccountRepository;
+    private final AuditEmployeeCapabilityRepository employeeCapabilityRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
@@ -64,7 +67,8 @@ public class AuditEngagementService {
 
     public AuditEngagementService(AuditEngagementRepository repository, AuditEngagementRelatedUnitRepository relatedUnitRepository,
                                    AuditEngagementGroupRepository groupRepository, AuditObjectUnitRepository auditObjectUnitRepository,
-                                   EmployeeRepository employeeRepository, UserAccountRepository userAccountRepository, AuditLogService auditLogService,
+                                   EmployeeRepository employeeRepository, UserAccountRepository userAccountRepository,
+                                   AuditEmployeeCapabilityRepository employeeCapabilityRepository, AuditLogService auditLogService,
                                    ExcelExportService excelExportService, WordExportService wordExportService,
                                    ExcelImportService excelImportService) {
         this.repository = repository;
@@ -73,6 +77,7 @@ public class AuditEngagementService {
         this.auditObjectUnitRepository = auditObjectUnitRepository;
         this.employeeRepository = employeeRepository;
         this.userAccountRepository = userAccountRepository;
+        this.employeeCapabilityRepository = employeeCapabilityRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
@@ -92,8 +97,15 @@ public class AuditEngagementService {
         List<Employee> employees = employeeRepository.findByTenantIdOrderByFullNameAsc(tenantId);
         Map<UUID, String> usernames = userAccountRepository.findByEmployeeIdIn(employees.stream().map(Employee::getId).toList()).stream()
                 .collect(Collectors.toMap(UserAccount::getEmployeeId, UserAccount::getUsername, (a, b) -> a));
+        Map<UUID, AuditEmployeeCapability> capabilities = employeeCapabilityRepository.findByTenantId(tenantId).stream()
+                .collect(Collectors.toMap(AuditEmployeeCapability::getEmployeeId, c -> c));
         return employees.stream()
-                .map(e -> new EmployeeOption(e.getId(), e.getEmployeeCode(), e.getFullName(), usernames.get(e.getId()), e.isTeamLeadCapable()))
+                .map(e -> {
+                    AuditEmployeeCapability capability = capabilities.get(e.getId());
+                    boolean truongDoan = capability != null && capability.isTruongDoanCapable();
+                    boolean truongNhom = capability != null && capability.isTruongNhomCapable();
+                    return new EmployeeOption(e.getId(), e.getEmployeeCode(), e.getFullName(), usernames.get(e.getId()), truongDoan, truongNhom);
+                })
                 .toList();
     }
 

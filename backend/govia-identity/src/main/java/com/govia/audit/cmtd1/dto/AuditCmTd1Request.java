@@ -6,8 +6,12 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record AuditCmTd1Request(
+        @NotNull UUID engagementId,
+        UUID assignedEmployeeId,
+        UUID processStepSummaryId,
         @NotBlank @Size(max = 10) String branchCode,
         @NotNull LocalDate auditDate,
         @Size(max = 50) String customerCode,

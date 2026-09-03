@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 /** Man hinh "Danh cac but toan chon mau TCKT" (sheet ZTC_CM_NTD12, phu luc 07F/BKS-KTNB) - trong
  * nhom "Thuc hien kiem toan" cua "Lap ke hoach", module Kiem toan noi bo. Cac cot kieu "List" tham
@@ -17,12 +18,26 @@ import java.time.LocalDate;
  * AuditBranchStaff.branchCode. Cot "Noi dung" ghi Type = "number" trong sheet nhung vi du la text
  * ("ABC") - trai voi Type, nen duoc luu la String theo vi du (xem quy tac spec-inconsistency).
  * Cot "Kết quả kiểm toán" co Type "Link" (link tu ziaexe > Thuc hien > Phat hien) - van luu String
- * tu do, khong FK. */
+ * tu do, khong FK. engagementId/assignedEmployeeId/processStepSummaryId them sau de loc theo Cuoc
+ * kiem toan (giong bo loc Nam ben Cham diem rui ro) + theo doi nguoi phu trach. */
 @Getter
 @Setter
 @Entity
 @Table(name = "audit_cm_ntd12")
 public class AuditCmNtd12 extends BaseEntity {
+
+    /** "Ma cuoc kiem toan" - dong nay thuoc ve dot thuc hien kiem toan nao. */
+    @Column(name = "engagement_id", columnDefinition = "uuid")
+    private UUID engagementId;
+
+    /** "Nguoi duoc phan cong" - link toi Employee (KHONG qua he thong Nhom/Phan cong cua man hinh
+     * Khoi tao doan kiem toan, chi la 1 o chon nhan vien don gian tren chinh dong du lieu nay). */
+    @Column(name = "assigned_employee_id", columnDefinition = "uuid")
+    private UUID assignedEmployeeId;
+
+    /** "Ma BQT_TH" - link toi AuditProcessStepSummary (danh muc "Buoc quy trinh tong hop", sheet ZTB_BQT_TH). */
+    @Column(name = "process_step_summary_id", columnDefinition = "uuid")
+    private UUID processStepSummaryId;
 
     @Column(name = "branch_code", nullable = false, length = 10)
     private String branchCode;

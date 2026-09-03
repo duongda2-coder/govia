@@ -37,8 +37,8 @@ public class AuditCmNtd1Controller {
 
     @GetMapping
     @PreAuthorize("hasAuthority('PERM_AUDIT.CM_NTD1.VIEW')")
-    public ApiResponse<List<AuditCmNtd1Response>> list() {
-        return ApiResponse.ok(service.list());
+    public ApiResponse<List<AuditCmNtd1Response>> list(@RequestParam UUID engagementId) {
+        return ApiResponse.ok(service.list(engagementId));
     }
 
     @PostMapping
@@ -62,25 +62,25 @@ public class AuditCmNtd1Controller {
 
     @GetMapping("/export/excel")
     @PreAuthorize("hasAuthority('PERM_AUDIT.CM_NTD1.EXPORT')")
-    public ResponseEntity<byte[]> exportExcel() {
+    public ResponseEntity<byte[]> exportExcel(@RequestParam UUID engagementId) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"audit_cm_ntd1.xlsx\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(service.exportExcel());
+                .body(service.exportExcel(engagementId));
     }
 
     @GetMapping("/export/word")
     @PreAuthorize("hasAuthority('PERM_AUDIT.CM_NTD1.EXPORT')")
-    public ResponseEntity<byte[]> exportWord() {
+    public ResponseEntity<byte[]> exportWord(@RequestParam UUID engagementId) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"audit_cm_ntd1.docx\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
-                .body(service.exportWord());
+                .body(service.exportWord(engagementId));
     }
 
     @PostMapping("/import")
     @PreAuthorize("hasAuthority('PERM_AUDIT.CM_NTD1.IMPORT')")
-    public ApiResponse<ImportResult> importExcel(@RequestParam("file") MultipartFile file) {
-        return ApiResponse.ok(service.importFromExcel(file));
+    public ApiResponse<ImportResult> importExcel(@RequestParam UUID engagementId, @RequestParam("file") MultipartFile file) {
+        return ApiResponse.ok(service.importFromExcel(engagementId, file));
     }
 }

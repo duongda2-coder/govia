@@ -5,8 +5,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record AuditCmNtd13Request(
+        @NotNull UUID engagementId,
+        UUID assignedEmployeeId,
+        UUID processStepSummaryId,
         @NotBlank @Size(max = 10) String branchCode,
         @NotNull LocalDate occurrenceDate,
         @Size(max = 20) String merchantId,

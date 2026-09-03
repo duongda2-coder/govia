@@ -41,6 +41,8 @@
     "auditMdYear": "Year Catalog",
     "auditMdBusinessSegment": "Business Segment Catalog",
     "auditMdUnitType": "Unit Type Catalog",
+    "auditMdEmployeeCapability": "Employee Capability Catalog",
+    "auditMdAppendix": "Appendix Management Catalog",
     "auditPlan": "Planning",
     "auditPlanMasterData": "Master Data",
     "auditPlanMdBranchStaff": "Branch Staff Position",
@@ -53,21 +55,21 @@
     "auditPlanEngagement": "Engagement Planning",
     "auditPlanEngagementIndex": "Create & Manage Audit Engagements",
     "auditPlanExecution": "Audit Execution",
-    "auditPlanExecCmTd1": "Credit Sample Customer List",
-    "auditPlanExecCmTd2": "Cancelled/Backdated Entry Results",
-    "auditPlanExecCmNtd1": "TCKT Entry Sample List",
-    "auditPlanExecCmNtd2": "Deposit Transaction Sample List",
-    "auditPlanExecCmNtd3": "Institutional Depositor Sample List",
-    "auditPlanExecCmNtd4": "LC/Collection Sample List",
-    "auditPlanExecCmNtd6": "IPCAS/AD User & IT KPI Sample List",
-    "auditPlanExecCmNtd7": "XDCB Project Records Sample List",
-    "auditPlanExecCmNtd8": "Large-Value/No-Account Sample List",
-    "auditPlanExecCmNtd9": "First-Time Customer Sample List",
-    "auditPlanExecCmNtd10": "Card Issuance Audit Results",
-    "auditPlanExecCmNtd11": "Foreign Remittance & Forex Transactions",
-    "auditPlanExecCmNtd12": "TCKT Entry Sample List (Card)",
-    "auditPlanExecCmNtd13": "Merchant Unit Audit Results",
-    "auditPlanExecCmNtd14": "IPCAS Attendance Sample List",
+    "auditPlanExecCmTd1": "02L/BKS-KTNB (TD1)",
+    "auditPlanExecCmTd2": "02G/BKS-KTNB (TD2)",
+    "auditPlanExecCmNtd1": "04C/BKS-KTNB (NTD1)",
+    "auditPlanExecCmNtd2": "03E/BKS-KTNB (NTD2)",
+    "auditPlanExecCmNtd3": "03E/BKS-KTNB (NTD3)",
+    "auditPlanExecCmNtd4": "06B/BKS-KTNB (NTD4)",
+    "auditPlanExecCmNtd6": "08B/BKS-KTNB (NTD6)",
+    "auditPlanExecCmNtd7": "09B/BKS-KTNB (NTD7)",
+    "auditPlanExecCmNtd8": "13B/BKS-KTNB (NTD8)",
+    "auditPlanExecCmNtd9": "13A/BKS-KTNB (NTD9)",
+    "auditPlanExecCmNtd10": "07B/BKS-KTNB (NTD10)",
+    "auditPlanExecCmNtd11": "06C/BKS-KTNB (NTD11)",
+    "auditPlanExecCmNtd12": "07F/BKS-KTNB (NTD12)",
+    "auditPlanExecCmNtd13": "07D/BKS-KTNB (NTD13)",
+    "auditPlanExecCmNtd14": "08C/BKS-KTNB (NTD14)",
     "riskScoring": "Risk Scoring",
     "riskScoringMasterData": "Master Data CDRR",
     "riskScoringGroups": "Criteria Groups",
@@ -160,7 +162,8 @@
     "export": "Export",
     "module": "Module",
     "noPermission": "You do not have permission to access this screen. Contact your administrator to be granted access.",
-    "deleteConfirmTitleCount": "Delete {{count}} selected items?"
+    "deleteConfirmTitleCount": "Delete {{count}} selected items?",
+    "actions": "Actions"
   },
   "attachment": {
     "upload": "Upload attachment",
@@ -694,6 +697,64 @@
       "saveError": "Failed to save"
     }
   },
+  "auditAppendix": {
+    "title": "Appendix Management Catalog",
+    "columns": {
+      "appendixCode": "Appendix Code",
+      "sampleType": "Sample Selection Type",
+      "businessSegment": "Business Segment",
+      "note": "Note"
+    },
+    "form": {
+      "createTitle": "Add Appendix",
+      "editTitle": "Edit Appendix"
+    },
+    "deleteConfirmTitle": "Delete this appendix?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditEmployeeCapability": {
+    "title": "Employee Business Segment Capability Declaration",
+    "description": "The list pulls every employee from the Employee Catalog. Tick the segments/roles an employee can take on, then click \"Save Changes\"; click \"Approve\" to confirm a row was declared correctly.",
+    "saveChanges": "Save Changes",
+    "approve": "Approve",
+    "columns": {
+      "fullName": "Full Name",
+      "username": "User Name",
+      "theCapable": "Card",
+      "qtdhCapable": "QTĐH",
+      "hdvCapable": "HĐV",
+      "tcktCapable": "TCKT",
+      "cnttCapable": "CNTT",
+      "ttkqCapable": "TTKQ",
+      "pcrtCapable": "PCRT",
+      "ttqtCapable": "TTQT",
+      "xdcbCapable": "XDCB",
+      "tdCapable": "TD",
+      "truongDoanCapable": "Team Lead",
+      "truongNhomCapable": "Group Lead",
+      "toGiamSatCapable": "Supervision Team",
+      "dgclCapable": "Quality Assessment",
+      "enteredBy": "Entered By",
+      "updatedAt": "Updated At",
+      "approved": "Approved",
+      "approvedBy": "Approved By",
+      "approvedAt": "Approved At"
+    },
+    "messages": {
+      "loadError": "Failed to load data",
+      "saveSuccess": "Changes saved",
+      "saveError": "Failed to save",
+      "approveSuccess": "Approved",
+      "approveError": "Failed to approve"
+    }
+  },
   "auditWorkItem": {
     "title": "Audit Work Item Catalog",
     "columns": {
@@ -851,9 +912,15 @@
       "saveError": "Failed to save"
     }
   },
+  "auditPlanExecution": {
+    "engagementFilter": "Engagement Code",
+    "selectEngagement": "Select an audit engagement to view/enter data"
+  },
   "auditCmTd1": {
-    "title": "Credit Sample Selection Customer List",
+    "title": "02L/BKS-KTNB (TD1)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "auditDate": "Audit date",
       "customerCode": "Customer code",
@@ -913,8 +980,10 @@
     }
   },
   "auditCmTd2": {
-    "title": "Audit Results for Sampled Cancelled/Backdated Entries",
+    "title": "02G/BKS-KTNB (TD2)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "transactionDate": "Transaction date",
       "valueDate": "Value date",
@@ -938,8 +1007,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd1": {
-    "title": "List of Sampled TCKT Accounting Entries",
+    "title": "04C/BKS-KTNB (NTD1)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "transactionDate": "Transaction date",
       "postingUser": "Posting user",
@@ -964,8 +1035,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd2": {
-    "title": "Deposit Mobilization (HĐV) Transaction Sample List",
+    "title": "03E/BKS-KTNB (NTD2)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "transactionDate": "Transaction date",
       "valueDate": "Value date",
@@ -989,8 +1062,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd3": {
-    "title": "Institutional Depositor Customer Sample List (HĐV)",
+    "title": "03E/BKS-KTNB (NTD3)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "transactionDate": "Transaction date",
       "customerCode": "Customer code",
@@ -1012,8 +1087,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd4": {
-    "title": "LC and International Payment (TTQT) Collection Sample List",
+    "title": "06B/BKS-KTNB (NTD4)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "referenceNumber": "Reference number",
       "openDate": "Open date",
@@ -1033,8 +1110,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd6": {
-    "title": "IPCAS/AD User and IT KPI Sample List",
+    "title": "08B/BKS-KTNB (NTD6)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "staffCode": "Staff code",
       "staffName": "Staff name",
@@ -1050,8 +1129,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd7": {
-    "title": "Capital Construction (XDCB) Project Records Sample List",
+    "title": "09B/BKS-KTNB (NTD7)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "constructionCode": "Project code",
       "constructionName": "Project name",
@@ -1066,8 +1147,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd8": {
-    "title": "Large-Value and No-Account Transaction Customer Sample List",
+    "title": "13B/BKS-KTNB (NTD8)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "transactionDate": "Transaction date",
       "referenceNumber": "Reference number",
@@ -1091,8 +1174,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd9": {
-    "title": "First-Time Bank-Service Customer Sample List",
+    "title": "13A/BKS-KTNB (NTD9)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "transactionDate": "Transaction date",
       "postingUser": "Posting user",
@@ -1114,8 +1199,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd10": {
-    "title": "Card Issuance File Audit Results",
+    "title": "07B/BKS-KTNB (NTD10)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "issueDate": "Issue date",
       "customerCode": "Customer code",
@@ -1141,8 +1228,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd11": {
-    "title": "Foreign Remittance and Forex Trading Transactions",
+    "title": "06C/BKS-KTNB (NTD11)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "referenceNumber": "Reference number",
       "customerCode": "Customer code",
@@ -1163,8 +1252,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd12": {
-    "title": "List of Sampled TCKT Accounting Entries (Card Operations)",
+    "title": "07F/BKS-KTNB (NTD12)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "transactionDate": "Transaction date",
       "postingUser": "Posting user",
@@ -1188,8 +1279,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd13": {
-    "title": "Card-Accepting Merchant Unit Audit Results (07D)",
+    "title": "07D/BKS-KTNB (NTD13)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "occurrenceDate": "Occurrence date",
       "merchantId": "Merchant ID",
@@ -1209,8 +1302,10 @@
     "messages": { "loadError": "Failed to load data", "createSuccess": "Created", "updateSuccess": "Updated", "deleteSuccess": "Deleted", "deleteError": "Delete failed", "saveError": "Save failed" }
   },
   "auditCmNtd14": {
-    "title": "IPCAS User Attendance Sample List (08C)",
+    "title": "08C/BKS-KTNB (NTD14)",
     "columns": {
+      "assignedUsername": "Assigned Username",
+      "processStepSummaryCode": "Process Step Code",
       "branchCode": "Branch code",
       "attendanceDate": "Attendance date",
       "staffCode": "Staff code",

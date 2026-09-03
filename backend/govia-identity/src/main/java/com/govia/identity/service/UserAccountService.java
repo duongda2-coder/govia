@@ -24,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,9 @@ import java.util.UUID;
 /** Tao tai khoan dang nhap gan voi 1 Employee - dung tu man hinh nhan su (them nhan vien + cap tai khoan cung luc). */
 @Service
 public class UserAccountService {
+
+    private static final SecureRandom TEMP_PASSWORD_RANDOM = new SecureRandom();
+    private static final String TEMP_PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
 
     private final UserAccountRepository userAccountRepository;
     private final EmployeeRepository employeeRepository;
@@ -82,6 +86,26 @@ public class UserAccountService {
 
         auditLogService.record("UserAccount", employee.getId(), AuditAction.CREATE,
                 "Tao tai khoan dang nhap \"" + request.username() + "\" cho nhan vien " + employee.getEmployeeCode());
+    }
+
+    /**
+     * Tao tai khoan dang nhap voi mat khau ngau nhien - dung khi import Excel nhan vien co san cot
+     * "Ten dang nhap" nhung khong the co cot mat khau trong file. Tra ve mat khau tam (dang plain
+     * text, CHUA duoc hash) de noi goi hien thi lai cho admin gui cho nhan vien doi lai.
+     */
+    @Transactional
+    public String createForEmployeeWithGeneratedPassword(UUID employeeId, String username) {
+        String tempPassword = generateTempPassword();
+        createForEmployee(employeeId, new CreateUserAccountRequest(username, tempPassword));
+        return tempPassword;
+    }
+
+    private String generateTempPassword() {
+        StringBuilder sb = new StringBuilder(10);
+        for (int i = 0; i < 10; i++) {
+            sb.append(TEMP_PASSWORD_CHARS.charAt(TEMP_PASSWORD_RANDOM.nextInt(TEMP_PASSWORD_CHARS.length())));
+        }
+        return sb.toString();
     }
 
     /** Admin dat lai mat khau cho tai khoan cua 1 nhan vien - dung khi nhan vien quen mat khau va nho admin ho tro. */

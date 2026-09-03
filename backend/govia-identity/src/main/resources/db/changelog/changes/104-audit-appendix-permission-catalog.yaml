@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Danh muc Quan ly phu luc =====================
+  - changeSet:
+      id: 104-1-permission-catalog-audit-appendix
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d3e4f5a6-1040-4a11-8e01-104000000001" }
+              - column: { name: code, value: "AUDIT.APPENDIX.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc phu luc" }
+              - column: { name: resource_label, value: "Quản lý phụ lục" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d3e4f5a6-1040-4a11-8e01-104000000002" }
+              - column: { name: code, value: "AUDIT.APPENDIX.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi danh muc phu luc" }
+              - column: { name: resource_label, value: "Quản lý phụ lục" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d3e4f5a6-1040-4a11-8e01-104000000003" }
+              - column: { name: code, value: "AUDIT.APPENDIX.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua danh muc phu luc" }
+              - column: { name: resource_label, value: "Quản lý phụ lục" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d3e4f5a6-1040-4a11-8e01-104000000004" }
+              - column: { name: code, value: "AUDIT.APPENDIX.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa danh muc phu luc" }
+              - column: { name: resource_label, value: "Quản lý phụ lục" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d3e4f5a6-1040-4a11-8e01-104000000005" }
+              - column: { name: code, value: "AUDIT.APPENDIX.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu danh muc phu luc" }
+              - column: { name: resource_label, value: "Quản lý phụ lục" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d3e4f5a6-1040-4a11-8e01-104000000006" }
+              - column: { name: code, value: "AUDIT.APPENDIX.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu danh muc phu luc" }
+              - column: { name: resource_label, value: "Quản lý phụ lục" }

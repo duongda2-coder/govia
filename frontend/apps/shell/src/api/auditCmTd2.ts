@@ -3,6 +3,14 @@ import { httpClient } from "./client";
 
 export interface AuditCmTd2Item {
   id: string;
+  engagementId: string | null;
+  engagementCode: string | null;
+  assignedEmployeeId: string | null;
+  assignedEmployeeCode: string | null;
+  assignedUsername: string | null;
+  processStepSummaryId: string | null;
+  processStepSummaryCode: string | null;
+  processStepSummaryName: string | null;
   branchCode: string;
   transactionDate: string;
   valueDate: string;
@@ -24,6 +32,9 @@ export interface AuditCmTd2Item {
 }
 
 export interface AuditCmTd2Request {
+  engagementId: string;
+  assignedEmployeeId: string | null;
+  processStepSummaryId: string | null;
   branchCode: string;
   transactionDate: string;
   valueDate: string;
@@ -45,8 +56,8 @@ export interface AuditCmTd2Request {
 
 const BASE = "/api/audit/plan/execution/cm-td2";
 
-export async function listAuditCmTd2(): Promise<AuditCmTd2Item[]> {
-  const res = await httpClient.get<ApiResponse<AuditCmTd2Item[]>>(BASE);
+export async function listAuditCmTd2(engagementId: string): Promise<AuditCmTd2Item[]> {
+  const res = await httpClient.get<ApiResponse<AuditCmTd2Item[]>>(BASE, { params: { engagementId } });
   return res.data.data;
 }
 
@@ -64,17 +75,18 @@ export async function deleteAuditCmTd2(id: string): Promise<void> {
   await httpClient.delete(`${BASE}/${id}`);
 }
 
-export async function importAuditCmTd2(file: File): Promise<ImportResult> {
+export async function importAuditCmTd2(engagementId: string, file: File): Promise<ImportResult> {
   const formData = new FormData();
   formData.append("file", file);
   const res = await httpClient.post<ApiResponse<ImportResult>>(`${BASE}/import`, formData, {
+    params: { engagementId },
     headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data.data;
 }
 
-export async function exportAuditCmTd2(kind: "excel" | "word"): Promise<void> {
-  const res = await httpClient.get(`${BASE}/export/${kind}`, { responseType: "blob" });
+export async function exportAuditCmTd2(kind: "excel" | "word", engagementId: string): Promise<void> {
+  const res = await httpClient.get(`${BASE}/export/${kind}`, { params: { engagementId }, responseType: "blob" });
   const blobUrl = window.URL.createObjectURL(res.data as Blob);
   const link = document.createElement("a");
   link.href = blobUrl;

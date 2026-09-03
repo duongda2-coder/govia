@@ -1,0 +1,52 @@
+databaseChangeLog:
+
+  # ===================== Danh muc "Khai bao kha nang dam nhan linh vuc cua nhan vien" (sheet ZTC_KNDN, bang ZTB_KNDN) =====================
+  - changeSet:
+      id: 101-1-audit-employee-capability-schema
+      author: govia
+      comment: "Tao bang audit_employee_capability"
+      changes:
+        - createTable:
+            tableName: audit_employee_capability
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: employee_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: the_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: qtdh_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: hdv_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: tckt_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: cntt_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: ttkq_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: pcrt_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: ttqt_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: xdcb_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: td_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: truong_doan_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: truong_nhom_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: to_giam_sat_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: dgcl_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: approved, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: approved_by, type: VARCHAR(100) }
+              - column: { name: approved_at, type: TIMESTAMP }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_employee_capability
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_employee_capability_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_employee_capability
+            baseColumnNames: employee_id
+            referencedTableName: employee
+            referencedColumnNames: id
+            constraintName: fk_audit_employee_capability_employee
+        - addUniqueConstraint:
+            tableName: audit_employee_capability
+            columnNames: tenant_id, employee_id
+            constraintName: uk_audit_employee_capability_tenant_employee
