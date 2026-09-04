@@ -155,6 +155,20 @@ class FrameworkShowcaseWorkflowTest extends AbstractApiTest {
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[?(@.id == '" + taskAId + "')]", org.hamcrest.Matchers.hasSize(1)));
+
+        // Don dep: subtask la task doc lap gan truc tiep cho admin (khong thuoc process instance nen
+        // /cancel ben duoi khong xoa duoc) - neu de mo se ton tai that su (class nay @Transactional
+        // NOT_SUPPORTED, khong rollback) va lam "no le" sang /api/workflow/tasks/my cua admin o CAC
+        // TEST CLASS KHAC chay sau trong cung JVM (vd EmployeeApprovalWorkflowTest mong doi task dau
+        // tien tra ve la task no vua tao, khong phai subtask con sot lai nay).
+        mockMvc.perform(post("/api/workflow/tasks/" + subtaskId + "/complete")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/workflow/instances/" + processInstanceId + "/cancel")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
     }
 
     private String startShowcase(boolean simulateRiskyError) throws Exception {
