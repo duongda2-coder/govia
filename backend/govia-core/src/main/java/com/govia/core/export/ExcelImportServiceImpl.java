@@ -1,17 +1,19 @@
 package com.govia.core.export;
 
+import com.govia.core.web.BusinessException;
+import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +25,7 @@ public class ExcelImportServiceImpl implements ExcelImportService {
 
     @Override
     public List<Map<String, String>> parse(InputStream inputStream, List<ExportColumn> columns) {
-        try (Workbook workbook = new XSSFWorkbook(inputStream)) {
+        try (Workbook workbook = WorkbookFactory.create(inputStream)) {
             Sheet sheet = workbook.getSheetAt(0);
             Row headerRow = sheet.getRow(sheet.getFirstRowNum());
             if (headerRow == null) {
@@ -63,8 +65,12 @@ public class ExcelImportServiceImpl implements ExcelImportService {
                 }
             }
             return rows;
+        } catch (EncryptedDocumentException e) {
+            throw new BusinessException("EXCEL_ENCRYPTED",
+                    "File Excel dang duoc bao ve mat khau, vui long go bo mat khau truoc khi import", HttpStatus.BAD_REQUEST);
         } catch (IOException e) {
-            throw new UncheckedIOException("Khong doc duoc file Excel", e);
+            throw new BusinessException("EXCEL_INVALID_FORMAT",
+                    "File khong dung dinh dang Excel (.xls/.xlsx) hoac da bi hong, vui long kiem tra lai file", HttpStatus.BAD_REQUEST);
         }
     }
 

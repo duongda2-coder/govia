@@ -80,6 +80,23 @@ public final class EmployeeSpecifications {
         };
     }
 
+    /** Employee.departmentId tro toi AuditMasterDataItem (category=DEPARTMENT) - cung ly do khong co
+     * quan he JPA @ManyToOne nhu positionNameContains o tren. */
+    public static Specification<Employee> departmentNameContains(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        String like = likePattern(value);
+        return (root, query, cb) -> {
+            Subquery<UUID> sub = query.subquery(UUID.class);
+            Root<AuditMasterDataItem> item = sub.from(AuditMasterDataItem.class);
+            sub.select(item.get("id"))
+                    .where(cb.equal(item.get("category"), AuditMasterDataCategory.DEPARTMENT),
+                            cb.like(cb.lower(item.get("name")), like));
+            return root.get("departmentId").in(sub);
+        };
+    }
+
     public static Specification<Employee> managerNameContains(String value) {
         if (isBlank(value)) {
             return null;

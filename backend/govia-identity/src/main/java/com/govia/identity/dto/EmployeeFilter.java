@@ -19,6 +19,7 @@ public record EmployeeFilter(
         String phone,
         String email,
         String orgUnitName,
-        String managerName
+        String managerName,
+        String departmentName
 ) {
 }

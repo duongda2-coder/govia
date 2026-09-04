@@ -51,6 +51,9 @@ public record EmployeeResponse(
         UUID businessSegmentId,
         String businessSegmentCode,
         String businessSegmentName,
+        UUID departmentId,
+        String departmentCode,
+        String departmentName,
         /** Username tai khoan dang nhap gan voi nhan vien nay - null neu chua co tai khoan. */
         String username,
         Instant createdAt,

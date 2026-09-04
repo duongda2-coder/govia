@@ -27,8 +27,9 @@ const STATUS_COLORS: Record<EmployeeStatus, string> = {
 const STATUSES: EmployeeStatus[] = ["ACTIVE", "ON_LEAVE", "TERMINATED", "PENDING_APPROVAL", "REJECTED"];
 
 /** dataIndex cua cot -> duong dan sort ma backend hieu (cot tham chieu can join sang bang khac).
- * positionName KHONG co trong map nay - Employee.positionId tro toi AuditMasterDataItem (khac module,
- * khong co quan he JPA de backend sort qua join), nen cot Chuc vu chi ho tro loc, khong sort. */
+ * positionName/departmentName KHONG co trong map nay - Employee.positionId/departmentId tro toi
+ * AuditMasterDataItem (khac module, khong co quan he JPA de backend sort qua join), nen 2 cot nay
+ * chi ho tro loc, khong sort. */
 const SORT_FIELD_MAP: Record<string, string> = {
   orgUnitName: "orgUnit.name",
   managerName: "manager.fullName",
@@ -57,6 +58,7 @@ export function EmployeeListPage() {
   const [orgUnits, setOrgUnits] = useState<OrganizationUnit[]>([]);
   const [positions, setPositions] = useState<PositionItem[]>([]);
   const [businessSegments, setBusinessSegments] = useState<MasterDataItem[]>([]);
+  const [departments, setDepartments] = useState<MasterDataItem[]>([]);
   const [branches, setBranches] = useState<AuditObjectUnitItem[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -72,17 +74,19 @@ export function EmployeeListPage() {
    * lam loi ca man hinh - chi dropdown tuong ung se rong.
    */
   const loadLookups = useCallback(async () => {
-    const [unitsResult, positionResult, employeeResult, businessSegmentResult, branchResult] = await Promise.allSettled([
+    const [unitsResult, positionResult, employeeResult, businessSegmentResult, departmentResult, branchResult] = await Promise.allSettled([
       listOrgUnits(),
       listPositionCatalog(),
       listEmployees({ page: 0, size: 500 }),
       listMasterDataItems("BUSINESS_SEGMENT"),
+      listMasterDataItems("DEPARTMENT"),
       auditObjectUnitApi.list(),
     ]);
     if (unitsResult.status === "fulfilled") setOrgUnits(unitsResult.value);
     if (positionResult.status === "fulfilled") setPositions(positionResult.value);
     if (employeeResult.status === "fulfilled") setAllEmployees(employeeResult.value.content);
     if (businessSegmentResult.status === "fulfilled") setBusinessSegments(businessSegmentResult.value);
+    if (departmentResult.status === "fulfilled") setDepartments(departmentResult.value);
     if (branchResult.status === "fulfilled") setBranches(branchResult.value.filter((b) => b.unitType === "CN"));
   }, []);
 
@@ -167,6 +171,13 @@ export function EmployeeListPage() {
       sorter: true,
       ...getSearchColumnProps("orgUnitName", filters.orgUnitName, searchLabels),
       render: (_: string | null, record) => <CodeWithTooltip code={record.orgUnitCode} name={record.orgUnitName} />,
+    },
+    {
+      title: t("employee.columns.department"),
+      dataIndex: "departmentName",
+      width: 120,
+      ...getSearchColumnProps("departmentName", filters.departmentName, searchLabels),
+      render: (_: string | null, record) => <CodeWithTooltip code={record.departmentCode} name={record.departmentName} />,
     },
     {
       title: t("employee.columns.manager"),
@@ -362,6 +373,7 @@ export function EmployeeListPage() {
         positions={positions}
         employees={allEmployees}
         businessSegments={businessSegments}
+        departments={departments}
         branches={branches}
         onClose={() => setDrawerOpen(false)}
         onSaved={() => {

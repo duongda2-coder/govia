@@ -24,6 +24,7 @@ export interface EmployeeFormDrawerProps {
   positions: PositionItem[];
   employees: Employee[];
   businessSegments: MasterDataItem[];
+  departments: MasterDataItem[];
   branches: AuditObjectUnitItem[];
   onClose: () => void;
   onSaved: () => void;
@@ -36,6 +37,7 @@ interface FormValues {
   personalEmail?: string;
   phone?: string;
   orgUnitId?: string;
+  departmentId?: string;
   positionId?: string;
   hireDate?: dayjs.Dayjs;
   dateOfBirth?: dayjs.Dayjs;
@@ -98,6 +100,7 @@ export function EmployeeFormDrawer({
   positions,
   employees,
   businessSegments,
+  departments,
   branches,
   onClose,
   onSaved,
@@ -117,6 +120,7 @@ export function EmployeeFormDrawer({
         personalEmail: employee.personalEmail ?? undefined,
         phone: employee.phone ?? undefined,
         orgUnitId: employee.orgUnitId ?? undefined,
+        departmentId: employee.departmentId ?? undefined,
         positionId: employee.positionId ?? undefined,
         hireDate: employee.hireDate ? dayjs(employee.hireDate) : undefined,
         dateOfBirth: employee.dateOfBirth ? dayjs(employee.dateOfBirth) : undefined,
@@ -155,6 +159,7 @@ export function EmployeeFormDrawer({
       personalEmail: values.personalEmail || null,
       phone: values.phone || null,
       orgUnitId: values.orgUnitId || null,
+      departmentId: values.departmentId || null,
       positionId: values.positionId || null,
       hireDate: values.hireDate ? values.hireDate.format("YYYY-MM-DD") : null,
       dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format("YYYY-MM-DD") : null,
@@ -295,6 +300,16 @@ export function EmployeeFormDrawer({
 
         <Row gutter={12}>
           <Col span={12}>
+            <Form.Item label={t("employee.form.department")} name="departmentId">
+              <Select
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                options={departments.map((d) => ({ value: d.id, label: `${d.code} - ${d.name}` }))}
+              />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
             <Form.Item label={t("employee.form.position")} name="positionId">
               <Select
                 allowClear
@@ -304,12 +319,11 @@ export function EmployeeFormDrawer({
               />
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item label={t("employee.form.manager")} name="managerId">
-              <Select allowClear showSearch optionFilterProp="label" placeholder={t("employee.form.noManager")} options={managerOptions} />
-            </Form.Item>
-          </Col>
         </Row>
+
+        <Form.Item label={t("employee.form.manager")} name="managerId">
+          <Select allowClear showSearch optionFilterProp="label" placeholder={t("employee.form.noManager")} options={managerOptions} />
+        </Form.Item>
 
         <Row gutter={12}>
           <Col span={12}>

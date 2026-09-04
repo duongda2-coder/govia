@@ -94,10 +94,10 @@ class ImportExportRoundTripTest {
     void exportThenImportEmployees_recreatesRowFromTemplate() throws Exception {
         employeeService.create(new EmployeeRequest("RT-EMP-01", "Nguyen Van RoundTrip", null, null,
                 null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null));
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null, null));
 
         byte[] excel = employeeService.exportExcel(
-                new EmployeeFilter(null, null, "RT-EMP-01", null, null, null, null, null, null, null));
+                new EmployeeFilter(null, null, "RT-EMP-01", null, null, null, null, null, null, null, null));
 
         MockMultipartFile file = new MockMultipartFile("file", "employees.xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excel);
@@ -109,7 +109,7 @@ class ImportExportRoundTripTest {
         assertThat(result.errors().get(0).message()).contains("da ton tai");
 
         var page = employeeService.list(
-                new EmployeeFilter(null, null, "RT-EMP-01", null, null, null, null, null, null, null),
+                new EmployeeFilter(null, null, "RT-EMP-01", null, null, null, null, null, null, null, null),
                 PageRequest.of(0, 10));
         assertThat(page.getContent()).hasSize(1);
     }
@@ -118,10 +118,10 @@ class ImportExportRoundTripTest {
     void importEmployees_withUsernameColumn_createsLoginAccountWithTempPassword() throws Exception {
         employeeService.create(new EmployeeRequest("RT-EMP-USR-01", "Nguyen Van Username", null, null,
                 null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null));
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null, null));
 
         byte[] excel = employeeService.exportExcel(
-                new EmployeeFilter(null, null, "RT-EMP-USR-01", null, null, null, null, null, null, null));
+                new EmployeeFilter(null, null, "RT-EMP-USR-01", null, null, null, null, null, null, null, null));
         byte[] edited = editExportedRow(excel, "Ma NV", "RT-EMP-USR-01", "RT-EMP-USR-02", "Ten dang nhap", "rt.emp.usr.02");
 
         MockMultipartFile file = new MockMultipartFile("file", "employees.xlsx",
@@ -134,7 +134,7 @@ class ImportExportRoundTripTest {
         assertThat(result.notices()).anyMatch(n -> n.contains("rt.emp.usr.02") && n.contains("RT-EMP-USR-02"));
 
         var page = employeeService.list(
-                new EmployeeFilter(null, null, "RT-EMP-USR-02", null, null, null, null, null, null, null),
+                new EmployeeFilter(null, null, "RT-EMP-USR-02", null, null, null, null, null, null, null, null),
                 PageRequest.of(0, 10));
         assertThat(page.getContent()).hasSize(1);
         assertThat(page.getContent().get(0).username()).isEqualTo("rt.emp.usr.02");
@@ -211,7 +211,7 @@ class ImportExportRoundTripTest {
     void exportAccountsExcel_containsCreatedAccount() throws Exception {
         EmployeeResponse emp = employeeService.create(new EmployeeRequest("RT-ACC-01", "Nguyen Van Export",
                 null, null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null));
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null, null));
         userAccountService.createForEmployee(emp.id(), new CreateUserAccountRequest("rt.acc.01", "Password123"));
 
         byte[] excel = userAccountService.exportAccountsExcel();

@@ -55,11 +55,11 @@ class EmployeeServiceTest {
     private EmployeeRequest sampleRequest(String code, UUID managerId) {
         return new EmployeeRequest(code, "Nguyen Van " + code, code.toLowerCase() + "@govia.local", null,
                 "0900000000", null, null, null, null, null, null, managerId, null,
-                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null);
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null, null);
     }
 
     private EmployeeFilter keywordFilter(String keyword) {
-        return new EmployeeFilter(null, null, keyword, null, null, null, null, null, null, null);
+        return new EmployeeFilter(null, null, keyword, null, null, null, null, null, null, null, null);
     }
 
     @Test
@@ -128,7 +128,7 @@ class EmployeeServiceTest {
     void listByColumnFilter_matchesOnlyThatColumn() {
         employeeService.create(sampleRequest("EMP-T09", null));
 
-        EmployeeFilter byCode = new EmployeeFilter(null, null, null, "EMP-T09", null, null, null, null, null, null);
+        EmployeeFilter byCode = new EmployeeFilter(null, null, null, "EMP-T09", null, null, null, null, null, null, null);
         Page<EmployeeResponse> page = employeeService.list(byCode, PageRequest.of(0, 10));
 
         assertThat(page.getContent()).extracting(EmployeeResponse::employeeCode).containsExactly("EMP-T09");

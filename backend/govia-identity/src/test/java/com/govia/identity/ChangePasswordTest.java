@@ -70,7 +70,7 @@ class ChangePasswordTest {
     private UserAccount createTestAccount(String employeeCode, String username, String password) {
         EmployeeResponse emp = employeeService.create(new EmployeeRequest(employeeCode, "Nguyen Van " + employeeCode,
                 null, null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null));
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null, null));
         userAccountService.createForEmployee(emp.id(), new CreateUserAccountRequest(username, password));
         return userAccountRepository.findByTenantIdAndUsername(tenantId, username).orElseThrow();
     }

@@ -103,6 +103,7 @@ public class EmployeeService {
         validatePosition(tenantId, request.positionId());
         validateManagerExists(tenantId, request.managerId());
         validateBusinessSegment(tenantId, request.businessSegmentId());
+        validateDepartment(tenantId, request.departmentId());
 
         Employee employee = new Employee();
         employee.setTenantId(tenantId);
@@ -139,6 +140,7 @@ public class EmployeeService {
         validatePosition(tenantId, request.positionId());
         validateManager(tenantId, id, request.managerId());
         validateBusinessSegment(tenantId, request.businessSegmentId());
+        validateDepartment(tenantId, request.departmentId());
 
         applyRequest(employee, request);
         employee = repository.save(employee);
@@ -235,11 +237,12 @@ public class EmployeeService {
                 }
                 UUID orgUnitId = resolveOrgUnitIdByName(tenantId, row.get("orgUnitName"));
                 UUID positionId = resolvePositionIdByName(tenantId, row.get("positionName"));
+                UUID departmentId = resolveDepartmentIdByName(tenantId, row.get("departmentName"));
                 EmployeeStatus status = resolveStatus(row.get("status"));
 
                 EmployeeRequest request = new EmployeeRequest(employeeCode.trim(), fullName.trim(), null, null,
                         emptyToNull(row.get("phone")), orgUnitId, positionId, null, null, null, null, null, null,
-                        null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null);
+                        null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null, departmentId);
                 EmployeeResponse created = create(request);
                 if (status != EmployeeStatus.ACTIVE) {
                     changeStatus(created.id(), status);
@@ -285,6 +288,15 @@ public class EmployeeService {
                 .getId();
     }
 
+    private UUID resolveDepartmentIdByName(UUID tenantId, String name) {
+        if (isBlank(name)) {
+            return null;
+        }
+        return masterDataItemRepository.findByTenantIdAndCategoryAndNameIgnoreCase(tenantId, AuditMasterDataCategory.DEPARTMENT, name.trim())
+                .orElseThrow(() -> new BusinessException("IMPORT_DEPARTMENT_NOT_FOUND", "Khong tim thay phong ten: " + name))
+                .getId();
+    }
+
     private EmployeeStatus resolveStatus(String value) {
         if (isBlank(value)) {
             return EmployeeStatus.ACTIVE;
@@ -315,6 +327,7 @@ public class EmployeeService {
                 .and(EmployeeSpecifications.fieldContains("email", filter.email()))
                 .and(EmployeeSpecifications.orgUnitNameContains(filter.orgUnitName()))
                 .and(EmployeeSpecifications.positionNameContains(filter.positionName()))
+                .and(EmployeeSpecifications.departmentNameContains(filter.departmentName()))
                 .and(EmployeeSpecifications.managerNameContains(filter.managerName()));
     }
 
@@ -331,6 +344,7 @@ public class EmployeeService {
                 new ExportColumn("phone", "Dien thoai"),
                 new ExportColumn("idNumber", "So CCCD/CMND"),
                 new ExportColumn("orgUnitName", "Don vi"),
+                new ExportColumn("departmentName", "Phong"),
                 new ExportColumn("positionName", "Chuc danh"),
                 new ExportColumn("managerName", "Quan ly truc tiep"),
                 new ExportColumn("hireDate", "Ngay vao lam"),
@@ -368,6 +382,7 @@ public class EmployeeService {
             row.put("phone", e.getPhone());
             row.put("idNumber", e.getIdNumber());
             row.put("orgUnitName", e.getOrgUnitId() == null ? "" : nameOf(ctx.orgUnits.get(e.getOrgUnitId())));
+            row.put("departmentName", e.getDepartmentId() == null ? "" : nameOf(ctx.departments.get(e.getDepartmentId())));
             row.put("positionName", e.getPositionId() == null ? "" : nameOf(ctx.positions.get(e.getPositionId())));
             row.put("managerName", e.getManagerId() == null ? "" : nameOfEmployee(ctx.managers.get(e.getManagerId())));
             row.put("hireDate", e.getHireDate());
@@ -422,6 +437,16 @@ public class EmployeeService {
         masterDataItemRepository.findById(businessSegmentId)
                 .filter(item -> item.getTenantId().equals(tenantId) && item.getCategory() == AuditMasterDataCategory.BUSINESS_SEGMENT)
                 .orElseThrow(() -> new BusinessException("BUSINESS_SEGMENT_NOT_FOUND", "Khong tim thay linh vuc/mang nghiep vu"));
+    }
+
+    /** "Phong" phai la 1 dong danh muc DEPARTMENT that su (khong duoc tro sang danh muc khac cung bang audit_master_data_item). */
+    private void validateDepartment(UUID tenantId, UUID departmentId) {
+        if (departmentId == null) {
+            return;
+        }
+        masterDataItemRepository.findById(departmentId)
+                .filter(item -> item.getTenantId().equals(tenantId) && item.getCategory() == AuditMasterDataCategory.DEPARTMENT)
+                .orElseThrow(() -> new BusinessException("DEPARTMENT_NOT_FOUND", "Khong tim thay phong"));
     }
 
     private void validateManagerExists(UUID tenantId, UUID managerId) {
@@ -490,6 +515,7 @@ public class EmployeeService {
         employee.setRelatedPersonBranches(request.relatedPersonBranches());
         employee.setOnLeave(request.onLeave());
         employee.setBusinessSegmentId(request.businessSegmentId());
+        employee.setDepartmentId(request.departmentId());
     }
 
     private Employee getOwnedOrThrow(UUID tenantId, UUID id) {
@@ -505,6 +531,7 @@ public class EmployeeService {
         Set<UUID> managerIds = employees.stream().map(Employee::getManagerId).filter(Objects::nonNull).collect(Collectors.toSet());
         Set<UUID> employeeIds = employees.stream().map(Employee::getId).collect(Collectors.toSet());
         Set<UUID> businessSegmentIds = employees.stream().map(Employee::getBusinessSegmentId).filter(Objects::nonNull).collect(Collectors.toSet());
+        Set<UUID> departmentIds = employees.stream().map(Employee::getDepartmentId).filter(Objects::nonNull).collect(Collectors.toSet());
 
         Map<UUID, OrganizationUnit> orgUnits = orgUnitIds.isEmpty() ? Map.of()
                 : orgUnitRepository.findAllById(orgUnitIds).stream().collect(Collectors.toMap(OrganizationUnit::getId, u -> u));
@@ -518,8 +545,11 @@ public class EmployeeService {
         Map<UUID, AuditMasterDataItem> businessSegments = businessSegmentIds.isEmpty() ? Map.of()
                 : masterDataItemRepository.findAllById(businessSegmentIds).stream()
                         .collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i));
+        Map<UUID, AuditMasterDataItem> departments = departmentIds.isEmpty() ? Map.of()
+                : masterDataItemRepository.findAllById(departmentIds).stream()
+                        .collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i));
 
-        return new ResponseContext(orgUnits, positions, managers, usernames, businessSegments);
+        return new ResponseContext(orgUnits, positions, managers, usernames, businessSegments, departments);
     }
 
     private EmployeeResponse toResponse(Employee e, ResponseContext ctx) {
@@ -527,6 +557,7 @@ public class EmployeeService {
         AuditMasterDataItem position = e.getPositionId() == null ? null : ctx.positions.get(e.getPositionId());
         Employee manager = e.getManagerId() == null ? null : ctx.managers.get(e.getManagerId());
         AuditMasterDataItem businessSegment = e.getBusinessSegmentId() == null ? null : ctx.businessSegments.get(e.getBusinessSegmentId());
+        AuditMasterDataItem department = e.getDepartmentId() == null ? null : ctx.departments.get(e.getDepartmentId());
 
         return new EmployeeResponse(
                 e.getId(), e.getEmployeeCode(), e.getFullName(), e.getEmail(), e.getPersonalEmail(), e.getPhone(),
@@ -540,6 +571,7 @@ public class EmployeeService {
                 e.getAuditorClassification(), e.isTeamLeadCapable(), e.getAuditedBranches(), e.getOtherDuties(),
                 e.getRelatedPersonBranches(), e.isOnLeave(),
                 e.getBusinessSegmentId(), businessSegment == null ? null : businessSegment.getCode(), businessSegment == null ? null : businessSegment.getName(),
+                e.getDepartmentId(), department == null ? null : department.getCode(), department == null ? null : department.getName(),
                 ctx.usernames.get(e.getId()),
                 e.getCreatedAt(), e.getUpdatedAt());
     }
@@ -561,7 +593,8 @@ public class EmployeeService {
             Map<UUID, AuditMasterDataItem> positions,
             Map<UUID, Employee> managers,
             Map<UUID, String> usernames,
-            Map<UUID, AuditMasterDataItem> businessSegments
+            Map<UUID, AuditMasterDataItem> businessSegments,
+            Map<UUID, AuditMasterDataItem> departments
     ) {
     }
 }

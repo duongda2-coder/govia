@@ -40,6 +40,7 @@ public record EmployeeRequest(
         String otherDuties,
         String relatedPersonBranches,
         boolean onLeave,
-        UUID businessSegmentId
+        UUID businessSegmentId,
+        UUID departmentId
 ) {
 }

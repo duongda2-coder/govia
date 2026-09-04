@@ -412,7 +412,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .content(objectMapper.writeValueAsString(
                                 new EmployeeRequest(employeeCode, "Nhan vien " + employeeCode, null, null, null,
                                         null, null, null, null, null, null, null, null,
-                                        null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null))))
+                                        null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null, null))))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString(StandardCharsets.UTF_8);
         UUID employeeId = UUID.fromString(objectMapper.readTree(empBody).get("data").get("id").asText());

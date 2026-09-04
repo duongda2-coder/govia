@@ -58,7 +58,7 @@ class AuditEmployeeCapabilityServiceTest {
     private EmployeeResponse createEmployee(String code) {
         return employeeService.create(new EmployeeRequest(code, "Nguyen Van " + code, null, null,
                 null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null));
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null, null));
     }
 
     private AuditEmployeeCapabilityItemRequest allFalseExcept(UUID employeeId, boolean tdCapable) {

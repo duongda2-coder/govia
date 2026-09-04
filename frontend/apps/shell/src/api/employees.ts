@@ -58,6 +58,9 @@ export interface Employee {
   businessSegmentId: string | null;
   businessSegmentCode: string | null;
   businessSegmentName: string | null;
+  departmentId: string | null;
+  departmentCode: string | null;
+  departmentName: string | null;
   /** Username tai khoan dang nhap gan voi nhan vien nay - null neu chua co tai khoan. */
   username: string | null;
   createdAt: string;
@@ -94,6 +97,7 @@ export interface EmployeeRequest {
   relatedPersonBranches?: string | null;
   onLeave: boolean;
   businessSegmentId?: string | null;
+  departmentId?: string | null;
 }
 
 export interface CreateUserAccountRequest {
@@ -120,6 +124,7 @@ export interface EmployeeListParams {
   email?: string;
   orgUnitName?: string;
   managerName?: string;
+  departmentName?: string;
   page?: number;
   size?: number;
   /** Dinh dang Spring Pageable: "field,asc" hoac "field,desc" (vd "orgUnit.name,asc"). */

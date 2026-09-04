@@ -1,5 +1,7 @@
 package com.govia.audit.planengagement.service;
 
+import com.govia.audit.employeecapability.entity.AuditEmployeeCapability;
+import com.govia.audit.employeecapability.repository.AuditEmployeeCapabilityRepository;
 import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import com.govia.audit.planengagement.dto.AssignWorkItemsRequest;
@@ -54,12 +56,14 @@ public class AuditEngagementTeamService {
     private final AuditMasterDataItemRepository masterDataItemRepository;
     private final EmployeeRepository employeeRepository;
     private final UserAccountRepository userAccountRepository;
+    private final AuditEmployeeCapabilityRepository employeeCapabilityRepository;
     private final AuditLogService auditLogService;
 
     public AuditEngagementTeamService(AuditEngagementRepository engagementRepository, AuditEngagementGroupRepository groupRepository,
                                        AuditEngagementGroupMemberRepository memberRepository, AuditEngagementAssignmentRepository assignmentRepository,
                                        AuditWorkItemRepository workItemRepository, AuditMasterDataItemRepository masterDataItemRepository,
-                                       EmployeeRepository employeeRepository, UserAccountRepository userAccountRepository, AuditLogService auditLogService) {
+                                       EmployeeRepository employeeRepository, UserAccountRepository userAccountRepository,
+                                       AuditEmployeeCapabilityRepository employeeCapabilityRepository, AuditLogService auditLogService) {
         this.engagementRepository = engagementRepository;
         this.groupRepository = groupRepository;
         this.memberRepository = memberRepository;
@@ -68,6 +72,7 @@ public class AuditEngagementTeamService {
         this.masterDataItemRepository = masterDataItemRepository;
         this.employeeRepository = employeeRepository;
         this.userAccountRepository = userAccountRepository;
+        this.employeeCapabilityRepository = employeeCapabilityRepository;
         this.auditLogService = auditLogService;
     }
 
@@ -94,7 +99,9 @@ public class AuditEngagementTeamService {
             throw new BusinessException("AUDIT_ENGAGEMENT_GROUP_DUPLICATE", "Nhom nay da ton tai trong cuoc kiem toan");
         }
         Employee leader = getEmployeeOrThrow(tenantId, request.leaderEmployeeId());
-        if (!leader.isTeamLeadCapable()) {
+        boolean truongNhomCapable = employeeCapabilityRepository.findByTenantIdAndEmployeeId(tenantId, leader.getId())
+                .map(AuditEmployeeCapability::isTruongNhomCapable).orElse(false);
+        if (!truongNhomCapable) {
             throw new BusinessException("EMPLOYEE_NOT_TEAM_LEAD_CAPABLE", "Nhan vien nay khong co kha nang dam nhiem truong nhom");
         }
 

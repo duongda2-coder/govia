@@ -140,4 +140,8 @@ public class Employee extends BaseEntity {
     /** "Linh vuc" - link toi AuditMasterDataItem danh muc BUSINESS_SEGMENT (sheet ZTC_Mang_NV). */
     @Column(name = "business_segment_id", columnDefinition = "uuid")
     private UUID businessSegmentId;
+
+    /** "Phong" - link toi AuditMasterDataItem danh muc DEPARTMENT (Danh muc Bo phan KT). */
+    @Column(name = "department_id", columnDefinition = "uuid")
+    private UUID departmentId;
 }

@@ -67,7 +67,7 @@ class ResetPasswordTest {
     void resetPassword_succeedsAndAllowsLoginWithNewPassword() {
         EmployeeResponse emp = employeeService.create(new EmployeeRequest("RST-T01", "Nguyen Van RST-T01",
                 null, null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null));
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null, null));
         userAccountService.createForEmployee(emp.id(), new CreateUserAccountRequest("rst.t01", "OldPass123"));
 
         userAccountService.resetPassword(emp.id(), new AdminResetPasswordRequest("BrandNewPass789"));
@@ -83,7 +83,7 @@ class ResetPasswordTest {
     void resetPassword_rejectedWhenEmployeeHasNoAccount() {
         EmployeeResponse emp = employeeService.create(new EmployeeRequest("RST-T02", "Nguyen Van RST-T02",
                 null, null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null));
+                null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null, null));
 
         assertThatThrownBy(() -> userAccountService.resetPassword(emp.id(), new AdminResetPasswordRequest("BrandNewPass789")))
                 .isInstanceOf(BusinessException.class)
