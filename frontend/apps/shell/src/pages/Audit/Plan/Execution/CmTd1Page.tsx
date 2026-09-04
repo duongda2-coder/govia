@@ -24,6 +24,7 @@ interface FormValues {
   branchCode: string;
   auditDate: dayjs.Dayjs;
   customerCode?: string;
+  sampleFilterUser?: string;
   customerName: string;
   approvedAmount?: number;
   loanPurpose?: string;
@@ -113,6 +114,7 @@ export function CmTd1Page() {
       branchCode: target.branchCode,
       auditDate: dayjs(target.auditDate),
       customerCode: target.customerCode ?? undefined,
+      sampleFilterUser: target.sampleFilterUser ?? undefined,
       customerName: target.customerName,
       approvedAmount: target.approvedAmount ?? undefined,
       loanPurpose: target.loanPurpose ?? undefined,
@@ -148,6 +150,7 @@ export function CmTd1Page() {
         branchCode: values.branchCode,
         auditDate: values.auditDate.format("YYYY-MM-DD"),
         customerCode: values.customerCode ?? null,
+        sampleFilterUser: values.sampleFilterUser ?? null,
         customerName: values.customerName,
         approvedAmount: values.approvedAmount ?? null,
         loanPurpose: values.loanPurpose ?? null,
@@ -208,6 +211,7 @@ export function CmTd1Page() {
     { title: t("auditCmTd1.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
     { title: t("auditCmTd1.columns.auditDate"), dataIndex: "auditDate", width: 120 },
     { title: t("auditCmTd1.columns.customerCode"), dataIndex: "customerCode", width: 140, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmTd1.columns.sampleFilterUser"), dataIndex: "sampleFilterUser", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmTd1.columns.customerName"), ...getSearchColumnProps("customerName", searchLabels) },
     { title: t("auditCmTd1.columns.approvedAmount"), dataIndex: "approvedAmount", width: 150, align: "right", render: money },
     { title: t("auditCmTd1.columns.loanPurpose"), dataIndex: "loanPurpose", render: (v: string | null) => v ?? "-" },
@@ -326,11 +330,18 @@ export function CmTd1Page() {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
+              <Form.Item name="sampleFilterUser" label={t("auditCmTd1.columns.sampleFilterUser")}>
+                <Input maxLength={20} />
+              </Form.Item>
+            </Col>
+            <Col span={16}>
               <Form.Item name="customerName" label={t("auditCmTd1.columns.customerName")} rules={[{ required: true }]}>
                 <Input maxLength={200} />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="approvedAmount" label={t("auditCmTd1.columns.approvedAmount")}>
                 <InputNumber style={{ width: "100%" }} min={0} formatter={(v) => (v ? numberFormatter.format(Number(v)) : "")} />
@@ -372,24 +383,22 @@ export function CmTd1Page() {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item name="debtGroup" label={t("auditCmTd1.columns.debtGroup")}>
                 <Input maxLength={20} />
               </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item name="auditorCode" label={t("auditCmTd1.columns.auditorCode")}>
-                <Input maxLength={50} />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item name="sampleReason" label={t("auditCmTd1.columns.sampleReason")}>
                 <Input maxLength={50} />
               </Form.Item>
             </Col>
           </Row>
           <Form.Item name="auditScope" label={t("auditCmTd1.columns.auditScope")}>
             <Input maxLength={120} />
+          </Form.Item>
+          <Form.Item name="sampleReason" label={t("auditCmTd1.columns.sampleReason")}>
+            <Input.TextArea rows={2} maxLength={1000} />
           </Form.Item>
           <Form.Item name="note" label={t("auditCmTd1.columns.note")}>
             <Input.TextArea rows={2} maxLength={120} />

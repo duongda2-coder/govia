@@ -54,7 +54,7 @@ public class AuditCmNtd6 extends BaseEntity {
     @Column(name = "security_device", length = 20)
     private String securityDevice;
 
-    @Column(name = "sample_reason", length = 50)
+    @Column(name = "sample_reason", length = 1000)
     private String sampleReason;
 
     @Column(name = "sample_code", length = 20)

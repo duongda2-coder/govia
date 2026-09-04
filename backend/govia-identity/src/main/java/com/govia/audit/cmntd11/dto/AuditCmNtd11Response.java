@@ -15,7 +15,7 @@ public record AuditCmNtd11Response(
         String processStepSummaryCode,
         String processStepSummaryName,
         String branchCode,
-        BigDecimal referenceNumber,
+        String referenceNumber,
         String customerCode,
         String customerName,
         LocalDate transactionDate,

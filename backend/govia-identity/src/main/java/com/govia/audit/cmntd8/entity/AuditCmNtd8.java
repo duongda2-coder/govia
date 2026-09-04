@@ -42,8 +42,8 @@ public class AuditCmNtd8 extends BaseEntity {
     @Column(name = "transaction_date", nullable = false)
     private LocalDate transactionDate;
 
-    @Column(name = "reference_number", precision = 20, scale = 2)
-    private BigDecimal referenceNumber;
+    @Column(name = "reference_number", length = 50)
+    private String referenceNumber;
 
     @Column(name = "posting_user", nullable = false, length = 20)
     private String postingUser;
@@ -66,7 +66,7 @@ public class AuditCmNtd8 extends BaseEntity {
     @Column(name = "beneficiary_account", length = 20)
     private String beneficiaryAccount;
 
-    @Column(name = "sample_reason", length = 50)
+    @Column(name = "sample_reason", length = 1000)
     private String sampleReason;
 
     @Column(name = "audit_result", length = 120)

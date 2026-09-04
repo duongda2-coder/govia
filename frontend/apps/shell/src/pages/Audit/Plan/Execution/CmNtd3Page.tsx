@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Col, DatePicker, Form, Input, InputNumber, Modal, Result, Row, Select, Space, Switch, Typography } from "antd";
+import { App, Col, Form, Input, InputNumber, Modal, Result, Row, Select, Space, Switch, Typography } from "antd";
 import type { TableProps } from "antd";
-import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
 import {
@@ -22,11 +21,10 @@ interface FormValues {
   assignedEmployeeId?: string;
   processStepSummaryId?: string;
   branchCode: string;
-  transactionDate: dayjs.Dayjs;
   customerCode?: string;
   customerName: string;
   customerAddress?: string;
-  accountNumber: string;
+  corebankCustomerCode?: string;
   currency?: string;
   originalCurrencyBalance?: number;
   convertedBalance?: number;
@@ -111,11 +109,10 @@ export function CmNtd3Page() {
       assignedEmployeeId: target.assignedEmployeeId ?? undefined,
       processStepSummaryId: target.processStepSummaryId ?? undefined,
       branchCode: target.branchCode,
-      transactionDate: dayjs(target.transactionDate),
       customerCode: target.customerCode ?? undefined,
       customerName: target.customerName,
       customerAddress: target.customerAddress ?? undefined,
-      accountNumber: target.accountNumber,
+      corebankCustomerCode: target.corebankCustomerCode ?? undefined,
       currency: target.currency ?? undefined,
       originalCurrencyBalance: target.originalCurrencyBalance ?? undefined,
       convertedBalance: target.convertedBalance ?? undefined,
@@ -145,11 +142,10 @@ export function CmNtd3Page() {
         assignedEmployeeId: values.assignedEmployeeId ?? null,
         processStepSummaryId: values.processStepSummaryId ?? null,
         branchCode: values.branchCode,
-        transactionDate: values.transactionDate.format("YYYY-MM-DD"),
         customerCode: values.customerCode ?? null,
         customerName: values.customerName,
         customerAddress: values.customerAddress ?? null,
-        accountNumber: values.accountNumber,
+        corebankCustomerCode: values.corebankCustomerCode ?? null,
         currency: values.currency ?? null,
         originalCurrencyBalance: values.originalCurrencyBalance ?? null,
         convertedBalance: values.convertedBalance ?? null,
@@ -204,11 +200,10 @@ export function CmNtd3Page() {
     { title: t("auditCmNtd3.columns.assignedUsername"), dataIndex: "assignedUsername", width: 150, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd3.columns.processStepSummaryCode"), dataIndex: "processStepSummaryCode", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd3.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
-    { title: t("auditCmNtd3.columns.transactionDate"), dataIndex: "transactionDate", width: 130 },
     { title: t("auditCmNtd3.columns.customerCode"), dataIndex: "customerCode", width: 140, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd3.columns.customerName"), ...getSearchColumnProps("customerName", searchLabels) },
     { title: t("auditCmNtd3.columns.customerAddress"), dataIndex: "customerAddress", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd3.columns.accountNumber"), dataIndex: "accountNumber", width: 130 },
+    { title: t("auditCmNtd3.columns.corebankCustomerCode"), dataIndex: "corebankCustomerCode", width: 150, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd3.columns.currency"), dataIndex: "currency", width: 90, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd3.columns.originalCurrencyBalance"), dataIndex: "originalCurrencyBalance", width: 150, align: "right", render: money },
     { title: t("auditCmNtd3.columns.convertedBalance"), dataIndex: "convertedBalance", width: 150, align: "right", render: money },
@@ -311,12 +306,12 @@ export function CmNtd3Page() {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name="transactionDate" label={t("auditCmNtd3.columns.transactionDate")} rules={[{ required: true }]}>
-                <DatePicker style={{ width: "100%" }} format="DD.MM.YYYY" />
+              <Form.Item name="customerCode" label={t("auditCmNtd3.columns.customerCode")}>
+                <Input maxLength={50} />
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name="customerCode" label={t("auditCmNtd3.columns.customerCode")}>
+              <Form.Item name="corebankCustomerCode" label={t("auditCmNtd3.columns.corebankCustomerCode")}>
                 <Input maxLength={50} />
               </Form.Item>
             </Col>
@@ -334,11 +329,6 @@ export function CmNtd3Page() {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col span={8}>
-              <Form.Item name="accountNumber" label={t("auditCmNtd3.columns.accountNumber")} rules={[{ required: true }]}>
-                <Input maxLength={10} />
-              </Form.Item>
-            </Col>
             <Col span={8}>
               <Form.Item name="currency" label={t("auditCmNtd3.columns.currency")}>
                 <Input maxLength={3} />

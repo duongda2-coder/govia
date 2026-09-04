@@ -355,7 +355,7 @@ export function CmNtd10Page() {
           <Row gutter={16}>
             <Col span={8}>
               <Form.Item name="cardTier" label={t("auditCmNtd10.columns.cardTier")}>
-                <Input maxLength={20} />
+                <Input maxLength={100} />
               </Form.Item>
             </Col>
             <Col span={8}>

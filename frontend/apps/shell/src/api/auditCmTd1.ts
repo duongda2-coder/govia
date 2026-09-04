@@ -14,6 +14,7 @@ export interface AuditCmTd1Item {
   branchCode: string;
   auditDate: string;
   customerCode: string | null;
+  sampleFilterUser: string | null;
   customerName: string;
   approvedAmount: number | null;
   loanPurpose: string | null;
@@ -38,6 +39,7 @@ export interface AuditCmTd1Request {
   branchCode: string;
   auditDate: string;
   customerCode: string | null;
+  sampleFilterUser: string | null;
   customerName: string;
   approvedAmount: number | null;
   loanPurpose: string | null;

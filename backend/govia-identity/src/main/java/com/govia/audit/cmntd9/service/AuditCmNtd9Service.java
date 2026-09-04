@@ -175,7 +175,7 @@ public class AuditCmNtd9Service {
                         isBlank(assignedUsername) ? null : employeeIdsByUsername.get(assignedUsername.trim()),
                         isBlank(stepSummaryCode) ? null : stepSummaryIdsByCode.get(stepSummaryCode.trim()),
                         branchCode.trim(), transactionDate, postingUser.trim(),
-                        emptyToNull(row.get("customerCode")), customerName.trim(), emptyToNull(row.get("idNumber")),
+                        emptyToNull(row.get("customerCode")), customerName.trim(),
                         emptyToNull(row.get("customerType")), emptyToNull(row.get("transactionContent")), emptyToNull(row.get("sampleReason")),
                         emptyToNull(row.get("auditResult")), emptyToNull(row.get("recommendationType")), emptyToNull(row.get("transactionStaff")),
                         emptyToNull(row.get("controlUser")), emptyToNull(row.get("controlStaff")), emptyToNull(row.get("controlStaffTitle")),
@@ -205,7 +205,6 @@ public class AuditCmNtd9Service {
         item.setPostingUser(request.postingUser());
         item.setCustomerCode(request.customerCode());
         item.setCustomerName(request.customerName());
-        item.setIdNumber(request.idNumber());
         item.setCustomerType(request.customerType());
         item.setTransactionContent(request.transactionContent());
         item.setSampleReason(request.sampleReason());
@@ -263,9 +262,8 @@ public class AuditCmNtd9Service {
                 new ExportColumn("branchCode", "Mã chi nhánh"),
                 new ExportColumn("transactionDate", "Ngày giao dịch thực tế"),
                 new ExportColumn("postingUser", "User hạch toán"),
-                new ExportColumn("customerCode", "Mã Khách hàng"),
+                new ExportColumn("customerCode", "Mã KH của Corebank"),
                 new ExportColumn("customerName", "Tên khách hàng"),
-                new ExportColumn("idNumber", "Số CMND/Hộ chiếu"),
                 new ExportColumn("customerType", "Loại KH"),
                 new ExportColumn("transactionContent", "Nội dung giao dịch"),
                 new ExportColumn("sampleReason", "Lý do chọn mẫu"),
@@ -292,7 +290,6 @@ public class AuditCmNtd9Service {
                     row.put("postingUser", item.getPostingUser());
                     row.put("customerCode", item.getCustomerCode());
                     row.put("customerName", item.getCustomerName());
-                    row.put("idNumber", item.getIdNumber());
                     row.put("customerType", item.getCustomerType());
                     row.put("transactionContent", item.getTransactionContent());
                     row.put("sampleReason", item.getSampleReason());
@@ -359,7 +356,7 @@ public class AuditCmNtd9Service {
                 assignee == null ? null : ctx.usernames().get(assignee.getId()),
                 item.getProcessStepSummaryId(), step == null ? null : step.getCode(), step == null ? null : step.getName(),
                 item.getBranchCode(), item.getTransactionDate(), item.getPostingUser(),
-                item.getCustomerCode(), item.getCustomerName(), item.getIdNumber(), item.getCustomerType(), item.getTransactionContent(),
+                item.getCustomerCode(), item.getCustomerName(), item.getCustomerType(), item.getTransactionContent(),
                 item.getSampleReason(), item.getAuditResult(), item.getRecommendationType(), item.getTransactionStaff(),
                 item.getControlUser(), item.getControlStaff(), item.getControlStaffTitle(), item.isActive());
     }

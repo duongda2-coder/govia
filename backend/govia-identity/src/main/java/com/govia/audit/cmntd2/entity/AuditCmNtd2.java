@@ -58,7 +58,7 @@ public class AuditCmNtd2 extends BaseEntity {
     @Column(name = "amount", precision = 20, scale = 2)
     private BigDecimal amount;
 
-    @Column(name = "account_number", length = 10)
+    @Column(name = "account_number", length = 50)
     private String accountNumber;
 
     @Column(name = "book_number", length = 20)
@@ -69,6 +69,9 @@ public class AuditCmNtd2 extends BaseEntity {
 
     @Column(name = "transaction_status", length = 50)
     private String transactionStatus;
+
+    @Column(name = "sample_reason", length = 1000)
+    private String sampleReason;
 
     @Column(name = "audit_result", length = 120)
     private String auditResult;

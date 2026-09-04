@@ -17,6 +17,7 @@ public record AuditCmTd1Response(
         String branchCode,
         LocalDate auditDate,
         String customerCode,
+        String sampleFilterUser,
         String customerName,
         BigDecimal approvedAmount,
         String loanPurpose,

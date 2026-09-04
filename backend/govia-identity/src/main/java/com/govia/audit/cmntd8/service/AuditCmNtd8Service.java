@@ -175,7 +175,7 @@ public class AuditCmNtd8Service {
                 AuditCmNtd8Request request = new AuditCmNtd8Request(engagementId,
                         isBlank(assignedUsername) ? null : employeeIdsByUsername.get(assignedUsername.trim()),
                         isBlank(stepSummaryCode) ? null : stepSummaryIdsByCode.get(stepSummaryCode.trim()),
-                        branchCode.trim(), transactionDate, parseDecimal(row.get("referenceNumber")),
+                        branchCode.trim(), transactionDate, emptyToNull(row.get("referenceNumber")),
                         postingUser.trim(), entryNumber, parseDecimal(row.get("amount")), emptyToNull(row.get("currency")),
                         emptyToNull(row.get("orderingParty")), emptyToNull(row.get("beneficiaryParty")), emptyToNull(row.get("beneficiaryAccount")),
                         emptyToNull(row.get("sampleReason")), emptyToNull(row.get("auditResult")), emptyToNull(row.get("recommendationType")),

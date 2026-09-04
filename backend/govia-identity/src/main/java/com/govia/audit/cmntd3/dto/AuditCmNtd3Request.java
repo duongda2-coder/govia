@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.UUID;
 
 public record AuditCmNtd3Request(
@@ -13,11 +12,10 @@ public record AuditCmNtd3Request(
         UUID assignedEmployeeId,
         UUID processStepSummaryId,
         @NotBlank @Size(max = 10) String branchCode,
-        @NotNull LocalDate transactionDate,
         @Size(max = 50) String customerCode,
         @NotBlank @Size(max = 200) String customerName,
         @Size(max = 200) String customerAddress,
-        @NotBlank @Size(max = 10) String accountNumber,
+        @Size(max = 50) String corebankCustomerCode,
         @Size(max = 3) String currency,
         BigDecimal originalCurrencyBalance,
         BigDecimal convertedBalance,

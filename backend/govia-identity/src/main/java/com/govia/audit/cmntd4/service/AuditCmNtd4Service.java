@@ -88,7 +88,7 @@ public class AuditCmNtd4Service {
     @Transactional
     public AuditCmNtd4Response create(AuditCmNtd4Request request) {
         UUID tenantId = TenantContext.getTenantId();
-        checkNoDuplicate(tenantId, request.branchCode(), request.referenceNumber(), request.openDate(), request.customerName(), null);
+        checkNoDuplicate(tenantId, request.branchCode(), request.referenceNumber(), request.openDate(), request.corebankCustomerCode(), null);
         validateEngagement(tenantId, request.engagementId());
 
         AuditCmNtd4 item = new AuditCmNtd4();
@@ -97,7 +97,7 @@ public class AuditCmNtd4Service {
         item = repository.save(item);
 
         auditLogService.record("AuditCmNtd4", item.getId(), AuditAction.CREATE,
-                "Tao ban ghi chon mau LC va nho thu TTQT: " + item.getBranchCode() + " - " + item.getCustomerName());
+                "Tao ban ghi chon mau LC va nho thu TTQT: " + item.getBranchCode() + " - " + item.getCorebankCustomerCode());
         return toResponse(item, buildResponseContext(tenantId));
     }
 
@@ -105,14 +105,14 @@ public class AuditCmNtd4Service {
     public AuditCmNtd4Response update(UUID id, AuditCmNtd4Request request) {
         UUID tenantId = TenantContext.getTenantId();
         AuditCmNtd4 item = getOwnedOrThrow(tenantId, id);
-        checkNoDuplicate(tenantId, request.branchCode(), request.referenceNumber(), request.openDate(), request.customerName(), id);
+        checkNoDuplicate(tenantId, request.branchCode(), request.referenceNumber(), request.openDate(), request.corebankCustomerCode(), id);
         validateEngagement(tenantId, request.engagementId());
 
         applyRequest(item, request);
         item = repository.save(item);
 
         auditLogService.record("AuditCmNtd4", item.getId(), AuditAction.UPDATE,
-                "Cap nhat ban ghi chon mau LC va nho thu TTQT: " + item.getBranchCode() + " - " + item.getCustomerName());
+                "Cap nhat ban ghi chon mau LC va nho thu TTQT: " + item.getBranchCode() + " - " + item.getCorebankCustomerCode());
         return toResponse(item, buildResponseContext(tenantId));
     }
 
@@ -122,7 +122,7 @@ public class AuditCmNtd4Service {
         AuditCmNtd4 item = getOwnedOrThrow(tenantId, id);
         repository.delete(item);
         auditLogService.record("AuditCmNtd4", id, AuditAction.DELETE,
-                "Xoa ban ghi chon mau LC va nho thu TTQT: " + item.getBranchCode() + " - " + item.getCustomerName());
+                "Xoa ban ghi chon mau LC va nho thu TTQT: " + item.getBranchCode() + " - " + item.getCorebankCustomerCode());
     }
 
     @Transactional(readOnly = true)
@@ -160,23 +160,23 @@ public class AuditCmNtd4Service {
             Map<String, String> row = rows.get(i);
             try {
                 String branchCode = row.get("branchCode");
-                String customerName = row.get("customerName");
+                String corebankCustomerCode = row.get("corebankCustomerCode");
                 BigDecimal referenceNumber = parseDecimal(row.get("referenceNumber"));
                 LocalDate openDate = parseDate(row.get("openDate"));
-                if (isBlank(branchCode) || isBlank(customerName) || referenceNumber == null || openDate == null) {
-                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Ma chi nhanh, So tham chieu, Ngay mo hoac Ten khach hang");
+                if (isBlank(branchCode) || referenceNumber == null || openDate == null) {
+                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Ma chi nhanh, So tham chieu hoac Ngay mo");
                 }
                 String assignedUsername = row.get("assignedUsername");
                 String stepSummaryCode = row.get("processStepSummaryCode");
 
-                Optional<AuditCmNtd4> existing = repository.findByTenantIdAndBranchCodeAndReferenceNumberAndOpenDateAndCustomerName(
-                        tenantId, branchCode.trim(), referenceNumber, openDate, customerName.trim());
+                Optional<AuditCmNtd4> existing = repository.findByTenantIdAndBranchCodeAndReferenceNumberAndOpenDateAndCorebankCustomerCode(
+                        tenantId, branchCode.trim(), referenceNumber, openDate, emptyToNull(corebankCustomerCode));
                 AuditCmNtd4Request request = new AuditCmNtd4Request(engagementId,
                         isBlank(assignedUsername) ? null : employeeIdsByUsername.get(assignedUsername.trim()),
                         isBlank(stepSummaryCode) ? null : stepSummaryIdsByCode.get(stepSummaryCode.trim()),
                         branchCode.trim(), referenceNumber, openDate,
-                        emptyToNull(row.get("customerCode")), customerName.trim(), parseDecimal(row.get("amount")),
-                        emptyToNull(row.get("beneficiary")), emptyToNull(row.get("auditResult")), emptyToNull(row.get("recommendationType")),
+                        emptyToNull(corebankCustomerCode), parseDecimal(row.get("amount")),
+                        emptyToNull(row.get("beneficiary")), emptyToNull(row.get("sampleReason")), emptyToNull(row.get("auditResult")), emptyToNull(row.get("recommendationType")),
                         emptyToNull(row.get("transactionStaff")), emptyToNull(row.get("controlUser")), emptyToNull(row.get("controlStaff")),
                         emptyToNull(row.get("controlStaffTitle")), existing.map(AuditCmNtd4::isActive).orElse(true));
                 if (existing.isPresent()) {
@@ -202,10 +202,10 @@ public class AuditCmNtd4Service {
         item.setBranchCode(request.branchCode());
         item.setReferenceNumber(request.referenceNumber());
         item.setOpenDate(request.openDate());
-        item.setCustomerCode(request.customerCode());
-        item.setCustomerName(request.customerName());
+        item.setCorebankCustomerCode(request.corebankCustomerCode());
         item.setAmount(request.amount());
         item.setBeneficiary(request.beneficiary());
+        item.setSampleReason(request.sampleReason());
         item.setAuditResult(request.auditResult());
         item.setRecommendationType(request.recommendationType());
         item.setTransactionStaff(request.transactionStaff());
@@ -215,11 +215,11 @@ public class AuditCmNtd4Service {
         item.setActive(request.active());
     }
 
-    private void checkNoDuplicate(UUID tenantId, String branchCode, BigDecimal referenceNumber, LocalDate openDate, String customerName, UUID excludingId) {
-        repository.findByTenantIdAndBranchCodeAndReferenceNumberAndOpenDateAndCustomerName(tenantId, branchCode, referenceNumber, openDate, customerName)
+    private void checkNoDuplicate(UUID tenantId, String branchCode, BigDecimal referenceNumber, LocalDate openDate, String corebankCustomerCode, UUID excludingId) {
+        repository.findByTenantIdAndBranchCodeAndReferenceNumberAndOpenDateAndCorebankCustomerCode(tenantId, branchCode, referenceNumber, openDate, corebankCustomerCode)
                 .filter(existing -> excludingId == null || !existing.getId().equals(excludingId))
                 .ifPresent(existing -> {
-                    throw new BusinessException("AUDIT_CM_NTD4_DUPLICATE", "Ban ghi nay da ton tai: " + customerName);
+                    throw new BusinessException("AUDIT_CM_NTD4_DUPLICATE", "Ban ghi nay da ton tai: " + referenceNumber);
                 });
     }
 
@@ -260,10 +260,10 @@ public class AuditCmNtd4Service {
                 new ExportColumn("branchCode", "Mã chi nhánh"),
                 new ExportColumn("referenceNumber", "Số tham chiếu"),
                 new ExportColumn("openDate", "Ngày mở"),
-                new ExportColumn("customerCode", "Mã Khách hàng"),
-                new ExportColumn("customerName", "Tên khách hàng"),
+                new ExportColumn("corebankCustomerCode", "Mã KH của Corebank"),
                 new ExportColumn("amount", "Số tiền"),
                 new ExportColumn("beneficiary", "Người thụ hưởng"),
+                new ExportColumn("sampleReason", "Lý do chọn mẫu"),
                 new ExportColumn("auditResult", "Kết quả kiểm toán"),
                 new ExportColumn("recommendationType", "Dạng kiến nghị"),
                 new ExportColumn("transactionStaff", "Cán bộ giao dịch"),
@@ -285,10 +285,10 @@ public class AuditCmNtd4Service {
                     row.put("branchCode", item.getBranchCode());
                     row.put("referenceNumber", item.getReferenceNumber());
                     row.put("openDate", item.getOpenDate() == null ? null : item.getOpenDate().format(DATE_FORMATS[0]));
-                    row.put("customerCode", item.getCustomerCode());
-                    row.put("customerName", item.getCustomerName());
+                    row.put("corebankCustomerCode", item.getCorebankCustomerCode());
                     row.put("amount", item.getAmount());
                     row.put("beneficiary", item.getBeneficiary());
+                    row.put("sampleReason", item.getSampleReason());
                     row.put("auditResult", item.getAuditResult());
                     row.put("recommendationType", item.getRecommendationType());
                     row.put("transactionStaff", item.getTransactionStaff());
@@ -352,7 +352,7 @@ public class AuditCmNtd4Service {
                 assignee == null ? null : ctx.usernames().get(assignee.getId()),
                 item.getProcessStepSummaryId(), step == null ? null : step.getCode(), step == null ? null : step.getName(),
                 item.getBranchCode(), item.getReferenceNumber(), item.getOpenDate(),
-                item.getCustomerCode(), item.getCustomerName(), item.getAmount(), item.getBeneficiary(), item.getAuditResult(),
+                item.getCorebankCustomerCode(), item.getAmount(), item.getBeneficiary(), item.getSampleReason(), item.getAuditResult(),
                 item.getRecommendationType(), item.getTransactionStaff(), item.getControlUser(), item.getControlStaff(),
                 item.getControlStaffTitle(), item.isActive());
     }

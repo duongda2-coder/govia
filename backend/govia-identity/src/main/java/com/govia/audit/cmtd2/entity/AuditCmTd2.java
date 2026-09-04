@@ -78,7 +78,7 @@ public class AuditCmTd2 extends BaseEntity {
     @Column(name = "credit_amount", precision = 20, scale = 2)
     private BigDecimal creditAmount;
 
-    @Column(name = "account_number", length = 10)
+    @Column(name = "account_number", length = 50)
     private String accountNumber;
 
     /** Chenh lech ngay hach toan (D-C) = valueDate - transactionDate, tinh theo ngay - he thong tu

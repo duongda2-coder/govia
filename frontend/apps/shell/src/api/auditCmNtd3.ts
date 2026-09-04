@@ -12,11 +12,10 @@ export interface AuditCmNtd3Item {
   processStepSummaryCode: string | null;
   processStepSummaryName: string | null;
   branchCode: string;
-  transactionDate: string;
   customerCode: string | null;
   customerName: string;
   customerAddress: string | null;
-  accountNumber: string;
+  corebankCustomerCode: string | null;
   currency: string | null;
   originalCurrencyBalance: number | null;
   convertedBalance: number | null;
@@ -34,11 +33,10 @@ export interface AuditCmNtd3Request {
   assignedEmployeeId: string | null;
   processStepSummaryId: string | null;
   branchCode: string;
-  transactionDate: string;
   customerCode: string | null;
   customerName: string;
   customerAddress: string | null;
-  accountNumber: string;
+  corebankCustomerCode: string | null;
   currency: string | null;
   originalCurrencyBalance: number | null;
   convertedBalance: number | null;

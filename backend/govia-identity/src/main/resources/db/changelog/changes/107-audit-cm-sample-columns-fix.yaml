@@ -1,0 +1,189 @@
+databaseChangeLog:
+
+  # ===================== Mau 02L/BKS-KTNB (TD1): doi "Ma khach hang" -> "Ma KH cua Corebank" (label
+  # o exportColumns, khong doi cot), them "User loc mau" ben canh, widen sample_reason =====================
+  - changeSet:
+      id: 107-1-audit-cm-td1-sample-filter-user
+      author: govia
+      comment: "Them cot sample_filter_user (User loc mau) vao audit_cm_td1, widen sample_reason len 1000"
+      changes:
+        - addColumn:
+            tableName: audit_cm_td1
+            columns:
+              - column: { name: sample_filter_user, type: VARCHAR(20) }
+        - modifyDataType:
+            tableName: audit_cm_td1
+            columnName: sample_reason
+            newDataType: VARCHAR(1000)
+
+  # ===================== Mau 03E/BKS-KTNB (NTD2): thieu cot "Ly do chon mau", widen account_number =====================
+  - changeSet:
+      id: 107-2-audit-cm-ntd2-sample-reason
+      author: govia
+      comment: "Them cot sample_reason (Ly do chon mau) vao audit_cm_ntd2, widen account_number len 50"
+      changes:
+        - addColumn:
+            tableName: audit_cm_ntd2
+            columns:
+              - column: { name: sample_reason, type: VARCHAR(1000) }
+        - modifyDataType:
+            tableName: audit_cm_ntd2
+            columnName: account_number
+            newDataType: VARCHAR(50)
+
+  # ===================== Mau 03E/BKS-KTNB (NTD3): thieu "Ma KH cua Corebank", thua "Ngay giao dich
+  # thuc te" va "Tai khoan hach toan" (doi thanh corebank_customer_code, dat truoc vi tri account_number cu) =====================
+  - changeSet:
+      id: 107-3-audit-cm-ntd3-corebank-customer-code
+      author: govia
+      comment: "Bo transaction_date + account_number, them corebank_customer_code trong audit_cm_ntd3"
+      changes:
+        - dropUniqueConstraint:
+            tableName: audit_cm_ntd3
+            constraintName: uk_audit_cm_ntd3_tenant_branch_date_customer_account
+        - dropColumn:
+            tableName: audit_cm_ntd3
+            columnName: transaction_date
+        - dropColumn:
+            tableName: audit_cm_ntd3
+            columnName: account_number
+        - addColumn:
+            tableName: audit_cm_ntd3
+            columns:
+              - column: { name: corebank_customer_code, type: VARCHAR(50) }
+        - addUniqueConstraint:
+            tableName: audit_cm_ntd3
+            columnNames: tenant_id, branch_code, customer_name, corebank_customer_code
+            constraintName: uk_audit_cm_ntd3_tenant_branch_customer_corebank
+
+  # ===================== Mau 06B/BKS-KTNB (NTD4): thua "Ma khach hang"/"Ten khach hang", thieu
+  # "Ma KH cua Corebank" va "Ly do chon mau" =====================
+  - changeSet:
+      id: 107-4-audit-cm-ntd4-corebank-customer-code
+      author: govia
+      comment: "Bo customer_code + customer_name, them corebank_customer_code + sample_reason trong audit_cm_ntd4"
+      changes:
+        - dropUniqueConstraint:
+            tableName: audit_cm_ntd4
+            constraintName: uk_audit_cm_ntd4_tenant_branch_ref_date_customer
+        - dropColumn:
+            tableName: audit_cm_ntd4
+            columnName: customer_code
+        - dropColumn:
+            tableName: audit_cm_ntd4
+            columnName: customer_name
+        - addColumn:
+            tableName: audit_cm_ntd4
+            columns:
+              - column: { name: corebank_customer_code, type: VARCHAR(50) }
+              - column: { name: sample_reason, type: VARCHAR(1000) }
+        - addUniqueConstraint:
+            tableName: audit_cm_ntd4
+            columnNames: tenant_id, branch_code, reference_number, open_date, corebank_customer_code
+            constraintName: uk_audit_cm_ntd4_tenant_branch_ref_date_corebank
+
+  # ===================== Mau 13B/BKS-KTNB (NTD8): "So tham chieu" dang Number -> chuyen sang char50 =====================
+  - changeSet:
+      id: 107-5-audit-cm-ntd8-reference-number-text
+      author: govia
+      comment: "Doi reference_number tu DECIMAL(20,2) sang VARCHAR(50), widen sample_reason len 1000"
+      changes:
+        - sql:
+            sql: ALTER TABLE audit_cm_ntd8 ALTER COLUMN reference_number TYPE VARCHAR(50) USING reference_number::VARCHAR(50);
+        - modifyDataType:
+            tableName: audit_cm_ntd8
+            columnName: sample_reason
+            newDataType: VARCHAR(1000)
+
+  # ===================== Mau 13A/BKS-KTNB (NTD9): doi "Ma khach hang" -> "Ma KH cua Corebank" (label),
+  # thua cot "So CMND/Ho chieu" =====================
+  - changeSet:
+      id: 107-6-audit-cm-ntd9-drop-id-number
+      author: govia
+      comment: "Bo cot id_number khoi audit_cm_ntd9, widen sample_reason len 1000"
+      changes:
+        - dropColumn:
+            tableName: audit_cm_ntd9
+            columnName: id_number
+        - modifyDataType:
+            tableName: audit_cm_ntd9
+            columnName: sample_reason
+            newDataType: VARCHAR(1000)
+
+  # ===================== Mau 07B/BKS-KTNB (NTD10): doi "Ma khach hang" -> "Ma KH cua Corebank" (label),
+  # "Hang the" tang len char100 (dang bi cat chu) =====================
+  - changeSet:
+      id: 107-7-audit-cm-ntd10-card-tier-widen
+      author: govia
+      comment: "Widen card_tier tu VARCHAR(20) len VARCHAR(100) trong audit_cm_ntd10, widen sample_reason len 1000"
+      changes:
+        - modifyDataType:
+            tableName: audit_cm_ntd10
+            columnName: card_tier
+            newDataType: VARCHAR(100)
+        - modifyDataType:
+            tableName: audit_cm_ntd10
+            columnName: sample_reason
+            newDataType: VARCHAR(1000)
+
+  # ===================== Mau 06C/BKS-KTNB (NTD11): doi "Ma khach hang" -> "Ma KH cua Corebank" (label),
+  # "So tham chieu" doi kieu hien tai (Number) thanh char100 =====================
+  - changeSet:
+      id: 107-8-audit-cm-ntd11-reference-number-text
+      author: govia
+      comment: "Doi reference_number tu DECIMAL(20,2) sang VARCHAR(100), widen sample_reason len 1000"
+      changes:
+        - sql:
+            sql: ALTER TABLE audit_cm_ntd11 ALTER COLUMN reference_number TYPE VARCHAR(100) USING reference_number::VARCHAR(100);
+        - modifyDataType:
+            tableName: audit_cm_ntd11
+            columnName: sample_reason
+            newDataType: VARCHAR(1000)
+
+  # ===================== Toan cuc: tat ca cot "Tai khoan hach toan" dang VARCHAR(10) gay loi upload
+  # khi so tai khoan dai hon 10 ky tu - widen len VARCHAR(50) =====================
+  - changeSet:
+      id: 107-9-audit-cm-account-number-widen-global
+      author: govia
+      comment: "Widen account_number (Tai khoan hach toan) len VARCHAR(50) o audit_cm_td2/ntd1/ntd12"
+      changes:
+        - modifyDataType:
+            tableName: audit_cm_td2
+            columnName: account_number
+            newDataType: VARCHAR(50)
+        - modifyDataType:
+            tableName: audit_cm_ntd1
+            columnName: account_number
+            newDataType: VARCHAR(50)
+        - modifyDataType:
+            tableName: audit_cm_ntd12
+            columnName: account_number
+            newDataType: VARCHAR(50)
+
+  # ===================== Toan cuc: tat ca cot "Ly do chon mau" dang VARCHAR(50) gay loi upload khi
+  # noi dung dai hon 50 ky tu - widen len VARCHAR(1000) =====================
+  - changeSet:
+      id: 107-10-audit-cm-sample-reason-widen-global
+      author: govia
+      comment: "Widen sample_reason (Ly do chon mau) len VARCHAR(1000) o audit_cm_ntd1/ntd6/ntd12/ntd13/ntd14"
+      changes:
+        - modifyDataType:
+            tableName: audit_cm_ntd1
+            columnName: sample_reason
+            newDataType: VARCHAR(1000)
+        - modifyDataType:
+            tableName: audit_cm_ntd6
+            columnName: sample_reason
+            newDataType: VARCHAR(1000)
+        - modifyDataType:
+            tableName: audit_cm_ntd12
+            columnName: sample_reason
+            newDataType: VARCHAR(1000)
+        - modifyDataType:
+            tableName: audit_cm_ntd13
+            columnName: sample_reason
+            newDataType: VARCHAR(1000)
+        - modifyDataType:
+            tableName: audit_cm_ntd14
+            columnName: sample_reason
+            newDataType: VARCHAR(1000)

@@ -15,6 +15,7 @@ public record AuditCmTd1Request(
         @NotBlank @Size(max = 10) String branchCode,
         @NotNull LocalDate auditDate,
         @Size(max = 50) String customerCode,
+        @Size(max = 20) String sampleFilterUser,
         @NotBlank @Size(max = 200) String customerName,
         BigDecimal approvedAmount,
         @Size(max = 60) String loanPurpose,
@@ -26,7 +27,7 @@ public record AuditCmTd1Request(
         @Size(max = 20) String debtGroup,
         @Size(max = 120) String auditScope,
         @Size(max = 50) String auditorCode,
-        @Size(max = 50) String sampleReason,
+        @Size(max = 1000) String sampleReason,
         @Size(max = 120) String note,
         boolean active
 ) {

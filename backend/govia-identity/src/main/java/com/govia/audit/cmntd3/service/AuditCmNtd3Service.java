@@ -29,9 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,11 +40,6 @@ import java.util.stream.Collectors;
 /** CRUD + Import/Export cho "Danh sach chon mau khach hang to chuc tien gui HDV" (sheet ZTC_CM_NTD3). */
 @Service
 public class AuditCmNtd3Service {
-
-    private static final DateTimeFormatter[] DATE_FORMATS = {
-            DateTimeFormatter.ofPattern("dd.MM.yyyy"),
-            DateTimeFormatter.ofPattern("d.M.yyyy"),
-    };
 
     private final AuditCmNtd3Repository repository;
     private final AuditEngagementRepository engagementRepository;
@@ -88,7 +80,7 @@ public class AuditCmNtd3Service {
     @Transactional
     public AuditCmNtd3Response create(AuditCmNtd3Request request) {
         UUID tenantId = TenantContext.getTenantId();
-        checkNoDuplicate(tenantId, request.branchCode(), request.transactionDate(), request.customerName(), request.accountNumber(), null);
+        checkNoDuplicate(tenantId, request.branchCode(), request.customerName(), request.corebankCustomerCode(), null);
         validateEngagement(tenantId, request.engagementId());
 
         AuditCmNtd3 item = new AuditCmNtd3();
@@ -105,7 +97,7 @@ public class AuditCmNtd3Service {
     public AuditCmNtd3Response update(UUID id, AuditCmNtd3Request request) {
         UUID tenantId = TenantContext.getTenantId();
         AuditCmNtd3 item = getOwnedOrThrow(tenantId, id);
-        checkNoDuplicate(tenantId, request.branchCode(), request.transactionDate(), request.customerName(), request.accountNumber(), id);
+        checkNoDuplicate(tenantId, request.branchCode(), request.customerName(), request.corebankCustomerCode(), id);
         validateEngagement(tenantId, request.engagementId());
 
         applyRequest(item, request);
@@ -161,21 +153,20 @@ public class AuditCmNtd3Service {
             try {
                 String branchCode = row.get("branchCode");
                 String customerName = row.get("customerName");
-                String accountNumber = row.get("accountNumber");
-                LocalDate transactionDate = parseDate(row.get("transactionDate"));
-                if (isBlank(branchCode) || isBlank(customerName) || isBlank(accountNumber) || transactionDate == null) {
-                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Ma chi nhanh, Ten khach hang, Tai khoan hach toan hoac Ngay giao dich thuc te");
+                String corebankCustomerCode = row.get("corebankCustomerCode");
+                if (isBlank(branchCode) || isBlank(customerName)) {
+                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Ma chi nhanh hoac Ten khach hang");
                 }
                 String assignedUsername = row.get("assignedUsername");
                 String stepSummaryCode = row.get("processStepSummaryCode");
 
-                Optional<AuditCmNtd3> existing = repository.findByTenantIdAndBranchCodeAndTransactionDateAndCustomerNameAndAccountNumber(
-                        tenantId, branchCode.trim(), transactionDate, customerName.trim(), accountNumber.trim());
+                Optional<AuditCmNtd3> existing = repository.findByTenantIdAndBranchCodeAndCustomerNameAndCorebankCustomerCode(
+                        tenantId, branchCode.trim(), customerName.trim(), emptyToNull(corebankCustomerCode));
                 AuditCmNtd3Request request = new AuditCmNtd3Request(engagementId,
                         isBlank(assignedUsername) ? null : employeeIdsByUsername.get(assignedUsername.trim()),
                         isBlank(stepSummaryCode) ? null : stepSummaryIdsByCode.get(stepSummaryCode.trim()),
-                        branchCode.trim(), transactionDate, emptyToNull(row.get("customerCode")),
-                        customerName.trim(), emptyToNull(row.get("customerAddress")), accountNumber.trim(), emptyToNull(row.get("currency")),
+                        branchCode.trim(), emptyToNull(row.get("customerCode")),
+                        customerName.trim(), emptyToNull(row.get("customerAddress")), emptyToNull(corebankCustomerCode), emptyToNull(row.get("currency")),
                         parseDecimal(row.get("originalCurrencyBalance")), parseDecimal(row.get("convertedBalance")), emptyToNull(row.get("auditResult")),
                         emptyToNull(row.get("recommendationType")), emptyToNull(row.get("transactionStaff")), emptyToNull(row.get("controlUser")),
                         emptyToNull(row.get("controlStaff")), emptyToNull(row.get("controlStaffTitle")),
@@ -201,11 +192,10 @@ public class AuditCmNtd3Service {
         item.setAssignedEmployeeId(request.assignedEmployeeId());
         item.setProcessStepSummaryId(request.processStepSummaryId());
         item.setBranchCode(request.branchCode());
-        item.setTransactionDate(request.transactionDate());
         item.setCustomerCode(request.customerCode());
         item.setCustomerName(request.customerName());
         item.setCustomerAddress(request.customerAddress());
-        item.setAccountNumber(request.accountNumber());
+        item.setCorebankCustomerCode(request.corebankCustomerCode());
         item.setCurrency(request.currency());
         item.setOriginalCurrencyBalance(request.originalCurrencyBalance());
         item.setConvertedBalance(request.convertedBalance());
@@ -218,8 +208,8 @@ public class AuditCmNtd3Service {
         item.setActive(request.active());
     }
 
-    private void checkNoDuplicate(UUID tenantId, String branchCode, LocalDate transactionDate, String customerName, String accountNumber, UUID excludingId) {
-        repository.findByTenantIdAndBranchCodeAndTransactionDateAndCustomerNameAndAccountNumber(tenantId, branchCode, transactionDate, customerName, accountNumber)
+    private void checkNoDuplicate(UUID tenantId, String branchCode, String customerName, String corebankCustomerCode, UUID excludingId) {
+        repository.findByTenantIdAndBranchCodeAndCustomerNameAndCorebankCustomerCode(tenantId, branchCode, customerName, corebankCustomerCode)
                 .filter(existing -> excludingId == null || !existing.getId().equals(excludingId))
                 .ifPresent(existing -> {
                     throw new BusinessException("AUDIT_CM_NTD3_DUPLICATE", "Ban ghi nay da ton tai: " + customerName);
@@ -261,11 +251,10 @@ public class AuditCmNtd3Service {
                 new ExportColumn("assignedUsername", "Username người được phân công"),
                 new ExportColumn("processStepSummaryCode", "Mã BQT_TH"),
                 new ExportColumn("branchCode", "Mã chi nhánh"),
-                new ExportColumn("transactionDate", "Ngày giao dịch thực tế"),
                 new ExportColumn("customerCode", "Mã Khách hàng"),
                 new ExportColumn("customerName", "Tên khách hàng"),
                 new ExportColumn("customerAddress", "Địa chỉ khách hàng"),
-                new ExportColumn("accountNumber", "Tài khoản hạch toán"),
+                new ExportColumn("corebankCustomerCode", "Mã KH của Corebank"),
                 new ExportColumn("currency", "Loại tiền tệ"),
                 new ExportColumn("originalCurrencyBalance", "Số dư nguyên tệ"),
                 new ExportColumn("convertedBalance", "Số dư quy đổi"),
@@ -288,11 +277,10 @@ public class AuditCmNtd3Service {
                     row.put("assignedUsername", assignee == null ? null : ctx.usernames().get(assignee.getId()));
                     row.put("processStepSummaryCode", step == null ? null : step.getCode());
                     row.put("branchCode", item.getBranchCode());
-                    row.put("transactionDate", item.getTransactionDate() == null ? null : item.getTransactionDate().format(DATE_FORMATS[0]));
                     row.put("customerCode", item.getCustomerCode());
                     row.put("customerName", item.getCustomerName());
                     row.put("customerAddress", item.getCustomerAddress());
-                    row.put("accountNumber", item.getAccountNumber());
+                    row.put("corebankCustomerCode", item.getCorebankCustomerCode());
                     row.put("currency", item.getCurrency());
                     row.put("originalCurrencyBalance", item.getOriginalCurrencyBalance());
                     row.put("convertedBalance", item.getConvertedBalance());
@@ -325,31 +313,6 @@ public class AuditCmNtd3Service {
         }
     }
 
-    /** O ngay trong Excel co the la text "10.04.2021" hoac 1 o date-format that (POI tra ve numeric
-     * serial number qua ExcelImportServiceImpl.cellToString, xem class do) - thu ca 2 truong hop. */
-    private LocalDate parseDate(String value) {
-        if (isBlank(value)) {
-            return null;
-        }
-        String trimmed = value.trim();
-        for (DateTimeFormatter format : DATE_FORMATS) {
-            try {
-                return LocalDate.parse(trimmed, format);
-            } catch (DateTimeParseException ignored) {
-                // thu dinh dang tiep theo
-            }
-        }
-        if (trimmed.matches("\\d+(\\.\\d+)?")) {
-            try {
-                long serial = new BigDecimal(trimmed).longValue();
-                return LocalDate.of(1899, 12, 30).plusDays(serial);
-            } catch (NumberFormatException | java.time.DateTimeException ignored) {
-                return null;
-            }
-        }
-        return null;
-    }
-
     private AuditCmNtd3Response toResponse(AuditCmNtd3 item, ResponseContext ctx) {
         Employee assignee = item.getAssignedEmployeeId() == null ? null : ctx.employees().get(item.getAssignedEmployeeId());
         AuditProcessStepSummary step = item.getProcessStepSummaryId() == null ? null : ctx.stepSummaries().get(item.getProcessStepSummaryId());
@@ -358,8 +321,8 @@ public class AuditCmNtd3Service {
                 item.getAssignedEmployeeId(), assignee == null ? null : assignee.getEmployeeCode(),
                 assignee == null ? null : ctx.usernames().get(assignee.getId()),
                 item.getProcessStepSummaryId(), step == null ? null : step.getCode(), step == null ? null : step.getName(),
-                item.getBranchCode(), item.getTransactionDate(), item.getCustomerCode(),
-                item.getCustomerName(), item.getCustomerAddress(), item.getAccountNumber(), item.getCurrency(),
+                item.getBranchCode(), item.getCustomerCode(),
+                item.getCustomerName(), item.getCustomerAddress(), item.getCorebankCustomerCode(), item.getCurrency(),
                 item.getOriginalCurrencyBalance(), item.getConvertedBalance(), item.getAuditResult(), item.getRecommendationType(),
                 item.getTransactionStaff(), item.getControlUser(), item.getControlStaff(), item.getControlStaffTitle(), item.isActive());
     }

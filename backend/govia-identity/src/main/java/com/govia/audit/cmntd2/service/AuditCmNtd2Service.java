@@ -177,7 +177,7 @@ public class AuditCmNtd2Service {
                         branchCode.trim(), transactionDate, parseDate(row.get("valueDate")),
                         postingUser.trim(), entryNumber, emptyToNull(row.get("currency")), parseDecimal(row.get("amount")),
                         emptyToNull(row.get("accountNumber")), emptyToNull(row.get("bookNumber")), emptyToNull(row.get("transactionType")),
-                        emptyToNull(row.get("transactionStatus")), emptyToNull(row.get("auditResult")), emptyToNull(row.get("recommendationType")),
+                        emptyToNull(row.get("transactionStatus")), emptyToNull(row.get("sampleReason")), emptyToNull(row.get("auditResult")), emptyToNull(row.get("recommendationType")),
                         emptyToNull(row.get("transactionStaff")), emptyToNull(row.get("controlUser")), emptyToNull(row.get("controlStaff")),
                         emptyToNull(row.get("controlStaffTitle")), existing.map(AuditCmNtd2::isActive).orElse(true));
                 if (existing.isPresent()) {
@@ -211,6 +211,7 @@ public class AuditCmNtd2Service {
         item.setBookNumber(request.bookNumber());
         item.setTransactionType(request.transactionType());
         item.setTransactionStatus(request.transactionStatus());
+        item.setSampleReason(request.sampleReason());
         item.setAuditResult(request.auditResult());
         item.setRecommendationType(request.recommendationType());
         item.setTransactionStaff(request.transactionStaff());
@@ -273,6 +274,7 @@ public class AuditCmNtd2Service {
                 new ExportColumn("bookNumber", "Số sổ"),
                 new ExportColumn("transactionType", "Loại giao dịch"),
                 new ExportColumn("transactionStatus", "Trạng thái giao dịch"),
+                new ExportColumn("sampleReason", "Lý do chọn mẫu"),
                 new ExportColumn("auditResult", "Kết quả kiểm toán"),
                 new ExportColumn("recommendationType", "Dạng kiến nghị"),
                 new ExportColumn("transactionStaff", "Cán bộ giao dịch"),
@@ -302,6 +304,7 @@ public class AuditCmNtd2Service {
                     row.put("bookNumber", item.getBookNumber());
                     row.put("transactionType", item.getTransactionType());
                     row.put("transactionStatus", item.getTransactionStatus());
+                    row.put("sampleReason", item.getSampleReason());
                     row.put("auditResult", item.getAuditResult());
                     row.put("recommendationType", item.getRecommendationType());
                     row.put("transactionStaff", item.getTransactionStaff());
@@ -366,7 +369,7 @@ public class AuditCmNtd2Service {
                 item.getProcessStepSummaryId(), step == null ? null : step.getCode(), step == null ? null : step.getName(),
                 item.getBranchCode(), item.getTransactionDate(), item.getValueDate(),
                 item.getPostingUser(), item.getEntryNumber(), item.getCurrency(), item.getAmount(), item.getAccountNumber(),
-                item.getBookNumber(), item.getTransactionType(), item.getTransactionStatus(), item.getAuditResult(),
+                item.getBookNumber(), item.getTransactionType(), item.getTransactionStatus(), item.getSampleReason(), item.getAuditResult(),
                 item.getRecommendationType(), item.getTransactionStaff(), item.getControlUser(), item.getControlStaff(),
                 item.getControlStaffTitle(), item.isActive());
     }

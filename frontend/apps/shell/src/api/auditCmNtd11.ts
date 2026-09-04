@@ -12,7 +12,7 @@ export interface AuditCmNtd11Item {
   processStepSummaryCode: string | null;
   processStepSummaryName: string | null;
   branchCode: string;
-  referenceNumber: number;
+  referenceNumber: string;
   customerCode: string;
   customerName: string;
   transactionDate: string;
@@ -33,7 +33,7 @@ export interface AuditCmNtd11Request {
   assignedEmployeeId: string | null;
   processStepSummaryId: string | null;
   branchCode: string;
-  referenceNumber: number;
+  referenceNumber: string;
   customerCode: string;
   customerName: string;
   transactionDate: string;

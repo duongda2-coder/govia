@@ -45,17 +45,18 @@ public class AuditCmNtd4 extends BaseEntity {
     @Column(name = "open_date", nullable = false)
     private LocalDate openDate;
 
-    @Column(name = "customer_code", length = 50)
-    private String customerCode;
-
-    @Column(name = "customer_name", nullable = false, length = 200)
-    private String customerName;
+    /** "Ma KH cua Corebank" - ma khach hang theo he thong Core Banking, thay the customerCode/customerName cu. */
+    @Column(name = "corebank_customer_code", length = 50)
+    private String corebankCustomerCode;
 
     @Column(name = "amount", precision = 20, scale = 2)
     private BigDecimal amount;
 
     @Column(name = "beneficiary", length = 20)
     private String beneficiary;
+
+    @Column(name = "sample_reason", length = 1000)
+    private String sampleReason;
 
     @Column(name = "audit_result", length = 120)
     private String auditResult;

@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.UUID;
 
 /** Man hinh "Danh sach chon mau khach hang to chuc tien gui HDV" (sheet ZTC_CM_NTD3, phu luc
@@ -39,9 +38,6 @@ public class AuditCmNtd3 extends BaseEntity {
     @Column(name = "branch_code", nullable = false, length = 10)
     private String branchCode;
 
-    @Column(name = "transaction_date", nullable = false)
-    private LocalDate transactionDate;
-
     @Column(name = "customer_code", length = 50)
     private String customerCode;
 
@@ -51,8 +47,9 @@ public class AuditCmNtd3 extends BaseEntity {
     @Column(name = "customer_address", length = 200)
     private String customerAddress;
 
-    @Column(name = "account_number", nullable = false, length = 10)
-    private String accountNumber;
+    /** "Ma KH cua Corebank" - ma khach hang theo he thong Core Banking, khac voi customerCode noi bo. */
+    @Column(name = "corebank_customer_code", length = 50)
+    private String corebankCustomerCode;
 
     @Column(name = "currency", length = 3)
     private String currency;

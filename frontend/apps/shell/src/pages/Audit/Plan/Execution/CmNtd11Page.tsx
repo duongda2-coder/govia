@@ -22,7 +22,7 @@ interface FormValues {
   assignedEmployeeId?: string;
   processStepSummaryId?: string;
   branchCode: string;
-  referenceNumber: number;
+  referenceNumber: string;
   customerCode: string;
   customerName: string;
   transactionDate: dayjs.Dayjs;
@@ -201,7 +201,7 @@ export function CmNtd11Page() {
     { title: t("auditCmNtd11.columns.assignedUsername"), dataIndex: "assignedUsername", width: 150, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd11.columns.processStepSummaryCode"), dataIndex: "processStepSummaryCode", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd11.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
-    { title: t("auditCmNtd11.columns.referenceNumber"), dataIndex: "referenceNumber", width: 150, align: "right", render: money },
+    { title: t("auditCmNtd11.columns.referenceNumber"), dataIndex: "referenceNumber", width: 150 },
     { title: t("auditCmNtd11.columns.customerCode"), ...getSearchColumnProps("customerCode", searchLabels) },
     { title: t("auditCmNtd11.columns.customerName"), ...getSearchColumnProps("customerName", searchLabels) },
     { title: t("auditCmNtd11.columns.transactionDate"), dataIndex: "transactionDate", width: 130 },
@@ -308,7 +308,7 @@ export function CmNtd11Page() {
             </Col>
             <Col span={8}>
               <Form.Item name="referenceNumber" label={t("auditCmNtd11.columns.referenceNumber")} rules={[{ required: true }]}>
-                <InputNumber style={{ width: "100%" }} />
+                <Input maxLength={100} />
               </Form.Item>
             </Col>
             <Col span={8}>

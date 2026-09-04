@@ -18,7 +18,6 @@ public record AuditCmNtd9Response(
         String postingUser,
         String customerCode,
         String customerName,
-        String idNumber,
         String customerType,
         String transactionContent,
         String sampleReason,

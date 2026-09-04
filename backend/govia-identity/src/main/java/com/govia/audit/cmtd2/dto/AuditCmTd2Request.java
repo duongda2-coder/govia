@@ -25,7 +25,7 @@ public record AuditCmTd2Request(
         @Size(max = 3) String currency,
         BigDecimal debitAmount,
         BigDecimal creditAmount,
-        @Size(max = 10) String accountNumber,
+        @Size(max = 50) String accountNumber,
         @Size(max = 120) String ipcasReviewResult,
         @Size(max = 120) String documentCheckResult,
         boolean active

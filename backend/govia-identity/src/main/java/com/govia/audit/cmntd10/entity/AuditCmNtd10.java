@@ -53,7 +53,7 @@ public class AuditCmNtd10 extends BaseEntity {
     @Column(name = "account_number", nullable = false, length = 20)
     private String accountNumber;
 
-    @Column(name = "card_tier", length = 20)
+    @Column(name = "card_tier", length = 100)
     private String cardTier;
 
     @Column(name = "issuing_user", length = 20)
@@ -70,7 +70,7 @@ public class AuditCmNtd10 extends BaseEntity {
     @Column(name = "issuance_occurrence", length = 20)
     private String issuanceOccurrence;
 
-    @Column(name = "sample_reason", length = 50)
+    @Column(name = "sample_reason", length = 1000)
     private String sampleReason;
 
     @Column(name = "audit_result", length = 120)

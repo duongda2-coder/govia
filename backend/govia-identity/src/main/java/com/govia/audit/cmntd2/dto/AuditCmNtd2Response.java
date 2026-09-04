@@ -25,6 +25,7 @@ public record AuditCmNtd2Response(
         String bookNumber,
         String transactionType,
         String transactionStatus,
+        String sampleReason,
         String auditResult,
         String recommendationType,
         String transactionStaff,

@@ -14,10 +14,10 @@ export interface AuditCmNtd4Item {
   branchCode: string;
   referenceNumber: number;
   openDate: string;
-  customerCode: string | null;
-  customerName: string;
+  corebankCustomerCode: string | null;
   amount: number | null;
   beneficiary: string | null;
+  sampleReason: string | null;
   auditResult: string | null;
   recommendationType: string | null;
   transactionStaff: string | null;
@@ -34,10 +34,10 @@ export interface AuditCmNtd4Request {
   branchCode: string;
   referenceNumber: number;
   openDate: string;
-  customerCode: string | null;
-  customerName: string;
+  corebankCustomerCode: string | null;
   amount: number | null;
   beneficiary: string | null;
+  sampleReason: string | null;
   auditResult: string | null;
   recommendationType: string | null;
   transactionStaff: string | null;

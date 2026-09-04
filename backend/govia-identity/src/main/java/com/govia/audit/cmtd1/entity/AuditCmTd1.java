@@ -46,6 +46,10 @@ public class AuditCmTd1 extends BaseEntity {
     @Column(name = "customer_code", length = 50)
     private String customerCode;
 
+    /** "User loc mau" - user thuc hien loc/chon mau tren he thong loc mau, KHONG phai can bo kiem toan. */
+    @Column(name = "sample_filter_user", length = 20)
+    private String sampleFilterUser;
+
     @Column(name = "customer_name", nullable = false, length = 200)
     private String customerName;
 
@@ -83,7 +87,7 @@ public class AuditCmTd1 extends BaseEntity {
     @Column(name = "auditor_code", length = 50)
     private String auditorCode;
 
-    @Column(name = "sample_reason", length = 50)
+    @Column(name = "sample_reason", length = 1000)
     private String sampleReason;
 
     @Column(name = "note", length = 120)

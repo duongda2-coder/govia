@@ -23,7 +23,7 @@ interface FormValues {
   processStepSummaryId?: string;
   branchCode: string;
   transactionDate: dayjs.Dayjs;
-  referenceNumber?: number;
+  referenceNumber?: string;
   postingUser: string;
   entryNumber: number;
   amount?: number;
@@ -211,7 +211,7 @@ export function CmNtd8Page() {
     { title: t("auditCmNtd8.columns.processStepSummaryCode"), dataIndex: "processStepSummaryCode", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd8.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
     { title: t("auditCmNtd8.columns.transactionDate"), dataIndex: "transactionDate", width: 130 },
-    { title: t("auditCmNtd8.columns.referenceNumber"), dataIndex: "referenceNumber", width: 140, align: "right", render: money },
+    { title: t("auditCmNtd8.columns.referenceNumber"), dataIndex: "referenceNumber", width: 140, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd8.columns.postingUser"), ...getSearchColumnProps("postingUser", searchLabels), width: 140 },
     { title: t("auditCmNtd8.columns.entryNumber"), dataIndex: "entryNumber", width: 120, align: "right", render: money },
     { title: t("auditCmNtd8.columns.amount"), dataIndex: "amount", width: 150, align: "right", render: money },
@@ -325,7 +325,7 @@ export function CmNtd8Page() {
             </Col>
             <Col span={8}>
               <Form.Item name="referenceNumber" label={t("auditCmNtd8.columns.referenceNumber")}>
-                <InputNumber style={{ width: "100%" }} />
+                <Input maxLength={50} />
               </Form.Item>
             </Col>
           </Row>
@@ -364,22 +364,20 @@ export function CmNtd8Page() {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item name="beneficiaryAccount" label={t("auditCmNtd8.columns.beneficiaryAccount")}>
                 <Input maxLength={20} />
               </Form.Item>
             </Col>
-            <Col span={8}>
-              <Form.Item name="sampleReason" label={t("auditCmNtd8.columns.sampleReason")}>
-                <Input maxLength={50} />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item name="recommendationType" label={t("auditCmNtd8.columns.recommendationType")}>
                 <Input maxLength={120} />
               </Form.Item>
             </Col>
           </Row>
+          <Form.Item name="sampleReason" label={t("auditCmNtd8.columns.sampleReason")}>
+            <Input.TextArea rows={2} maxLength={1000} />
+          </Form.Item>
           <Form.Item name="auditResult" label={t("auditCmNtd8.columns.auditResult")}>
             <Input maxLength={120} />
           </Form.Item>

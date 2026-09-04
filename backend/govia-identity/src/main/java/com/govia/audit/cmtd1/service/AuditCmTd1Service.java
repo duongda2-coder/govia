@@ -173,7 +173,7 @@ public class AuditCmTd1Service {
                 AuditCmTd1Request request = new AuditCmTd1Request(engagementId,
                         isBlank(assignedUsername) ? null : employeeIdsByUsername.get(assignedUsername.trim()),
                         isBlank(stepSummaryCode) ? null : stepSummaryIdsByCode.get(stepSummaryCode.trim()),
-                        branchCode.trim(), auditDate, emptyToNull(row.get("customerCode")),
+                        branchCode.trim(), auditDate, emptyToNull(row.get("customerCode")), emptyToNull(row.get("sampleFilterUser")),
                         customerName.trim(), parseDecimal(row.get("approvedAmount")), emptyToNull(row.get("loanPurpose")),
                         emptyToNull(row.get("description")), parseDecimal(row.get("onBalanceDebt")), parseDecimal(row.get("guaranteeBalance")),
                         parseDecimal(row.get("riskClassifiedDebt")), parseDecimal(row.get("vamcSoldDebt")), emptyToNull(row.get("debtGroup")),
@@ -202,6 +202,7 @@ public class AuditCmTd1Service {
         item.setBranchCode(request.branchCode());
         item.setAuditDate(request.auditDate());
         item.setCustomerCode(request.customerCode());
+        item.setSampleFilterUser(request.sampleFilterUser());
         item.setCustomerName(request.customerName());
         item.setApprovedAmount(request.approvedAmount());
         item.setLoanPurpose(request.loanPurpose());
@@ -273,7 +274,8 @@ public class AuditCmTd1Service {
                 new ExportColumn("processStepSummaryCode", "Mã BQT_TH"),
                 new ExportColumn("branchCode", "Mã chi nhánh"),
                 new ExportColumn("auditDate", "Thời điểm kiểm toán"),
-                new ExportColumn("customerCode", "Mã Khách hàng"),
+                new ExportColumn("customerCode", "Mã KH của Corebank"),
+                new ExportColumn("sampleFilterUser", "User lọc mẫu"),
                 new ExportColumn("customerName", "Tên khách hàng"),
                 new ExportColumn("approvedAmount", "Số tiền phê duyệt cho vay/ cấp bảo lãnh"),
                 new ExportColumn("loanPurpose", "Mục đích vay vốn"),
@@ -303,6 +305,7 @@ public class AuditCmTd1Service {
                     row.put("branchCode", item.getBranchCode());
                     row.put("auditDate", item.getAuditDate() == null ? null : item.getAuditDate().format(DATE_FORMATS[0]));
                     row.put("customerCode", item.getCustomerCode());
+                    row.put("sampleFilterUser", item.getSampleFilterUser());
                     row.put("customerName", item.getCustomerName());
                     row.put("approvedAmount", item.getApprovedAmount());
                     row.put("loanPurpose", item.getLoanPurpose());
@@ -373,7 +376,7 @@ public class AuditCmTd1Service {
                 item.getAssignedEmployeeId(), assignee == null ? null : assignee.getEmployeeCode(),
                 assignee == null ? null : ctx.usernames().get(assignee.getId()),
                 item.getProcessStepSummaryId(), step == null ? null : step.getCode(), step == null ? null : step.getName(),
-                item.getBranchCode(), item.getAuditDate(), item.getCustomerCode(),
+                item.getBranchCode(), item.getAuditDate(), item.getCustomerCode(), item.getSampleFilterUser(),
                 item.getCustomerName(), item.getApprovedAmount(), item.getLoanPurpose(), item.getDescription(),
                 item.getOnBalanceDebt(), item.getGuaranteeBalance(), item.getRiskClassifiedDebt(), item.getVamcSoldDebt(),
                 item.getTotalCreditBalance(), item.getDebtGroup(), item.getAuditScope(), item.getAuditorCode(),

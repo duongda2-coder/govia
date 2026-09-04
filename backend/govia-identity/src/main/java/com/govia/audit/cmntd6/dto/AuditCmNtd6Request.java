@@ -16,7 +16,7 @@ public record AuditCmNtd6Request(
         @NotBlank @Size(max = 20) String ipcasUser,
         @Size(max = 20) String adUser,
         @Size(max = 20) String securityDevice,
-        @Size(max = 50) String sampleReason,
+        @Size(max = 1000) String sampleReason,
         @Size(max = 20) String sampleCode,
         @Size(max = 120) String auditResult,
         boolean active

@@ -17,7 +17,7 @@ public record AuditCmNtd13Request(
         @NotBlank @Size(max = 20) String merchantAccountNumber,
         @NotBlank @Size(max = 120) String businessRegistrationName,
         @Size(max = 20) String status,
-        @Size(max = 50) String sampleReason,
+        @Size(max = 1000) String sampleReason,
         @Size(max = 200) String auditResult,
         @Size(max = 120) String recommendationType,
         @Size(max = 120) String transactionStaff,

@@ -13,7 +13,7 @@ export interface AuditCmNtd8Item {
   processStepSummaryName: string | null;
   branchCode: string;
   transactionDate: string;
-  referenceNumber: number | null;
+  referenceNumber: string | null;
   postingUser: string;
   entryNumber: number;
   amount: number | null;
@@ -37,7 +37,7 @@ export interface AuditCmNtd8Request {
   processStepSummaryId: string | null;
   branchCode: string;
   transactionDate: string;
-  referenceNumber: number | null;
+  referenceNumber: string | null;
   postingUser: string;
   entryNumber: number;
   amount: number | null;

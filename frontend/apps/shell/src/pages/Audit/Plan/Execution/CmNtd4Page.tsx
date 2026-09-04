@@ -24,10 +24,10 @@ interface FormValues {
   branchCode: string;
   referenceNumber: number;
   openDate: dayjs.Dayjs;
-  customerCode?: string;
-  customerName: string;
+  corebankCustomerCode?: string;
   amount?: number;
   beneficiary?: string;
+  sampleReason?: string;
   auditResult?: string;
   recommendationType?: string;
   transactionStaff?: string;
@@ -110,10 +110,10 @@ export function CmNtd4Page() {
       branchCode: target.branchCode,
       referenceNumber: target.referenceNumber,
       openDate: dayjs(target.openDate),
-      customerCode: target.customerCode ?? undefined,
-      customerName: target.customerName,
+      corebankCustomerCode: target.corebankCustomerCode ?? undefined,
       amount: target.amount ?? undefined,
       beneficiary: target.beneficiary ?? undefined,
+      sampleReason: target.sampleReason ?? undefined,
       auditResult: target.auditResult ?? undefined,
       recommendationType: target.recommendationType ?? undefined,
       transactionStaff: target.transactionStaff ?? undefined,
@@ -142,10 +142,10 @@ export function CmNtd4Page() {
         branchCode: values.branchCode,
         referenceNumber: values.referenceNumber,
         openDate: values.openDate.format("YYYY-MM-DD"),
-        customerCode: values.customerCode ?? null,
-        customerName: values.customerName,
+        corebankCustomerCode: values.corebankCustomerCode ?? null,
         amount: values.amount ?? null,
         beneficiary: values.beneficiary ?? null,
+        sampleReason: values.sampleReason ?? null,
         auditResult: values.auditResult ?? null,
         recommendationType: values.recommendationType ?? null,
         transactionStaff: values.transactionStaff ?? null,
@@ -199,10 +199,10 @@ export function CmNtd4Page() {
     { title: t("auditCmNtd4.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
     { title: t("auditCmNtd4.columns.referenceNumber"), dataIndex: "referenceNumber", width: 140, align: "right", render: money },
     { title: t("auditCmNtd4.columns.openDate"), dataIndex: "openDate", width: 120 },
-    { title: t("auditCmNtd4.columns.customerCode"), dataIndex: "customerCode", width: 160, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd4.columns.customerName"), ...getSearchColumnProps("customerName", searchLabels) },
+    { title: t("auditCmNtd4.columns.corebankCustomerCode"), dataIndex: "corebankCustomerCode", width: 160, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd4.columns.amount"), dataIndex: "amount", width: 150, align: "right", render: money },
     { title: t("auditCmNtd4.columns.beneficiary"), dataIndex: "beneficiary", width: 140, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd4.columns.sampleReason"), dataIndex: "sampleReason", width: 160, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd4.columns.auditResult"), dataIndex: "auditResult", render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd4.columns.recommendationType"), dataIndex: "recommendationType", render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd4.columns.transactionStaff"), dataIndex: "transactionStaff", render: (v: string | null) => v ?? "-" },
@@ -314,13 +314,8 @@ export function CmNtd4Page() {
           </Row>
           <Row gutter={16}>
             <Col span={8}>
-              <Form.Item name="customerCode" label={t("auditCmNtd4.columns.customerCode")}>
+              <Form.Item name="corebankCustomerCode" label={t("auditCmNtd4.columns.corebankCustomerCode")}>
                 <Input maxLength={50} />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
-              <Form.Item name="customerName" label={t("auditCmNtd4.columns.customerName")} rules={[{ required: true }]}>
-                <Input maxLength={200} />
               </Form.Item>
             </Col>
             <Col span={8}>
@@ -328,22 +323,27 @@ export function CmNtd4Page() {
                 <InputNumber style={{ width: "100%" }} min={0} formatter={(v) => (v ? numberFormatter.format(Number(v)) : "")} />
               </Form.Item>
             </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col span={12}>
+            <Col span={8}>
               <Form.Item name="beneficiary" label={t("auditCmNtd4.columns.beneficiary")}>
                 <Input maxLength={20} />
               </Form.Item>
             </Col>
+          </Row>
+          <Form.Item name="sampleReason" label={t("auditCmNtd4.columns.sampleReason")}>
+            <Input.TextArea rows={2} maxLength={1000} />
+          </Form.Item>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="recommendationType" label={t("auditCmNtd4.columns.recommendationType")}>
                 <Input maxLength={120} />
               </Form.Item>
             </Col>
+            <Col span={12}>
+              <Form.Item name="auditResult" label={t("auditCmNtd4.columns.auditResult")}>
+                <Input maxLength={120} />
+              </Form.Item>
+            </Col>
           </Row>
-          <Form.Item name="auditResult" label={t("auditCmNtd4.columns.auditResult")}>
-            <Input maxLength={120} />
-          </Form.Item>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="transactionStaff" label={t("auditCmNtd4.columns.transactionStaff")}>

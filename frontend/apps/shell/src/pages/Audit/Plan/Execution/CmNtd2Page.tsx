@@ -32,6 +32,7 @@ interface FormValues {
   bookNumber?: string;
   transactionType?: string;
   transactionStatus?: string;
+  sampleReason?: string;
   auditResult?: string;
   recommendationType?: string;
   transactionStaff?: string;
@@ -122,6 +123,7 @@ export function CmNtd2Page() {
       bookNumber: target.bookNumber ?? undefined,
       transactionType: target.transactionType ?? undefined,
       transactionStatus: target.transactionStatus ?? undefined,
+      sampleReason: target.sampleReason ?? undefined,
       auditResult: target.auditResult ?? undefined,
       recommendationType: target.recommendationType ?? undefined,
       transactionStaff: target.transactionStaff ?? undefined,
@@ -158,6 +160,7 @@ export function CmNtd2Page() {
         bookNumber: values.bookNumber ?? null,
         transactionType: values.transactionType ?? null,
         transactionStatus: values.transactionStatus ?? null,
+        sampleReason: values.sampleReason ?? null,
         auditResult: values.auditResult ?? null,
         recommendationType: values.recommendationType ?? null,
         transactionStaff: values.transactionStaff ?? null,
@@ -219,6 +222,7 @@ export function CmNtd2Page() {
     { title: t("auditCmNtd2.columns.bookNumber"), dataIndex: "bookNumber", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd2.columns.transactionType"), dataIndex: "transactionType", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd2.columns.transactionStatus"), dataIndex: "transactionStatus", width: 140, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd2.columns.sampleReason"), dataIndex: "sampleReason", width: 160, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd2.columns.auditResult"), dataIndex: "auditResult", render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd2.columns.recommendationType"), dataIndex: "recommendationType", width: 150, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd2.columns.transactionStaff"), dataIndex: "transactionStaff", width: 150, render: (v: string | null) => v ?? "-" },
@@ -353,7 +357,7 @@ export function CmNtd2Page() {
             </Col>
             <Col span={8}>
               <Form.Item name="accountNumber" label={t("auditCmNtd2.columns.accountNumber")}>
-                <Input maxLength={10} />
+                <Input maxLength={50} />
               </Form.Item>
             </Col>
             <Col span={8}>
@@ -374,6 +378,9 @@ export function CmNtd2Page() {
               </Form.Item>
             </Col>
           </Row>
+          <Form.Item name="sampleReason" label={t("auditCmNtd2.columns.sampleReason")}>
+            <Input.TextArea rows={2} maxLength={1000} />
+          </Form.Item>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="auditResult" label={t("auditCmNtd2.columns.auditResult")}>

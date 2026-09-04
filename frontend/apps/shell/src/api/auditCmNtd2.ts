@@ -22,6 +22,7 @@ export interface AuditCmNtd2Item {
   bookNumber: string | null;
   transactionType: string | null;
   transactionStatus: string | null;
+  sampleReason: string | null;
   auditResult: string | null;
   recommendationType: string | null;
   transactionStaff: string | null;
@@ -46,6 +47,7 @@ export interface AuditCmNtd2Request {
   bookNumber: string | null;
   transactionType: string | null;
   transactionStatus: string | null;
+  sampleReason: string | null;
   auditResult: string | null;
   recommendationType: string | null;
   transactionStaff: string | null;

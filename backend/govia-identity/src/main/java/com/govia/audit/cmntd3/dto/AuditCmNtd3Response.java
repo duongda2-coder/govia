@@ -1,7 +1,6 @@
 package com.govia.audit.cmntd3.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.UUID;
 
 public record AuditCmNtd3Response(
@@ -15,11 +14,10 @@ public record AuditCmNtd3Response(
         String processStepSummaryCode,
         String processStepSummaryName,
         String branchCode,
-        LocalDate transactionDate,
         String customerCode,
         String customerName,
         String customerAddress,
-        String accountNumber,
+        String corebankCustomerCode,
         String currency,
         BigDecimal originalCurrencyBalance,
         BigDecimal convertedBalance,

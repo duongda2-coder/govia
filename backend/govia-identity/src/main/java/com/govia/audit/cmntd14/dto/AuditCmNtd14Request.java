@@ -24,7 +24,7 @@ public record AuditCmNtd14Request(
         @Size(max = 15) String userCode,
         @Size(max = 1000) String note,
         @Size(max = 20) String sampleCode,
-        @Size(max = 50) String sampleReason,
+        @Size(max = 1000) String sampleReason,
         @Size(max = 200) String auditResult,
         boolean active
 ) {

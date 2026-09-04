@@ -162,20 +162,20 @@ public class AuditCmNtd11Service {
                 String branchCode = row.get("branchCode");
                 String customerCode = row.get("customerCode");
                 String customerName = row.get("customerName");
-                BigDecimal referenceNumber = parseDecimal(row.get("referenceNumber"));
+                String referenceNumber = row.get("referenceNumber");
                 LocalDate transactionDate = parseDate(row.get("transactionDate"));
-                if (isBlank(branchCode) || isBlank(customerCode) || isBlank(customerName) || referenceNumber == null || transactionDate == null) {
+                if (isBlank(branchCode) || isBlank(customerCode) || isBlank(customerName) || isBlank(referenceNumber) || transactionDate == null) {
                     throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Ma chi nhanh, So tham chieu, Ma khach hang, Ten khach hang hoac Ngay giao dich");
                 }
                 String assignedUsername = row.get("assignedUsername");
                 String stepSummaryCode = row.get("processStepSummaryCode");
 
                 Optional<AuditCmNtd11> existing = repository.findByTenantIdAndBranchCodeAndReferenceNumberAndCustomerCodeAndTransactionDate(
-                        tenantId, branchCode.trim(), referenceNumber, customerCode.trim(), transactionDate);
+                        tenantId, branchCode.trim(), referenceNumber.trim(), customerCode.trim(), transactionDate);
                 AuditCmNtd11Request request = new AuditCmNtd11Request(engagementId,
                         isBlank(assignedUsername) ? null : employeeIdsByUsername.get(assignedUsername.trim()),
                         isBlank(stepSummaryCode) ? null : stepSummaryIdsByCode.get(stepSummaryCode.trim()),
-                        branchCode.trim(), referenceNumber, customerCode.trim(),
+                        branchCode.trim(), referenceNumber.trim(), customerCode.trim(),
                         customerName.trim(), transactionDate, emptyToNull(row.get("currency")), parseDecimal(row.get("amount")),
                         emptyToNull(row.get("sampleReason")), emptyToNull(row.get("auditResult")), emptyToNull(row.get("recommendationType")),
                         emptyToNull(row.get("transactionStaff")), emptyToNull(row.get("controlUser")), emptyToNull(row.get("controlStaff")),
@@ -217,7 +217,7 @@ public class AuditCmNtd11Service {
         item.setActive(request.active());
     }
 
-    private void checkNoDuplicate(UUID tenantId, String branchCode, BigDecimal referenceNumber, String customerCode, LocalDate transactionDate, UUID excludingId) {
+    private void checkNoDuplicate(UUID tenantId, String branchCode, String referenceNumber, String customerCode, LocalDate transactionDate, UUID excludingId) {
         repository.findByTenantIdAndBranchCodeAndReferenceNumberAndCustomerCodeAndTransactionDate(tenantId, branchCode, referenceNumber, customerCode, transactionDate)
                 .filter(existing -> excludingId == null || !existing.getId().equals(excludingId))
                 .ifPresent(existing -> {
@@ -261,7 +261,7 @@ public class AuditCmNtd11Service {
                 new ExportColumn("processStepSummaryCode", "Mã BQT_TH"),
                 new ExportColumn("branchCode", "Mã chi nhánh"),
                 new ExportColumn("referenceNumber", "Số tham chiếu"),
-                new ExportColumn("customerCode", "Mã Khách hàng"),
+                new ExportColumn("customerCode", "Mã KH của Corebank"),
                 new ExportColumn("customerName", "Tên khách hàng"),
                 new ExportColumn("transactionDate", "Ngày giao dịch"),
                 new ExportColumn("currency", "Loại tiền"),

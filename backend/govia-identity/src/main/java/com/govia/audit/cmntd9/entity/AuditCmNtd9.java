@@ -50,16 +50,13 @@ public class AuditCmNtd9 extends BaseEntity {
     @Column(name = "customer_name", nullable = false, length = 200)
     private String customerName;
 
-    @Column(name = "id_number", length = 20)
-    private String idNumber;
-
     @Column(name = "customer_type", length = 20)
     private String customerType;
 
     @Column(name = "transaction_content", length = 120)
     private String transactionContent;
 
-    @Column(name = "sample_reason", length = 50)
+    @Column(name = "sample_reason", length = 1000)
     private String sampleReason;
 
     @Column(name = "audit_result", length = 120)

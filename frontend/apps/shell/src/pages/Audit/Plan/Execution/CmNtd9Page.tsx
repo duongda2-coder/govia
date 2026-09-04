@@ -26,7 +26,6 @@ interface FormValues {
   postingUser: string;
   customerCode?: string;
   customerName: string;
-  idNumber?: string;
   customerType?: string;
   transactionContent?: string;
   sampleReason?: string;
@@ -113,7 +112,6 @@ export function CmNtd9Page() {
       postingUser: target.postingUser,
       customerCode: target.customerCode ?? undefined,
       customerName: target.customerName,
-      idNumber: target.idNumber ?? undefined,
       customerType: target.customerType ?? undefined,
       transactionContent: target.transactionContent ?? undefined,
       sampleReason: target.sampleReason ?? undefined,
@@ -147,7 +145,6 @@ export function CmNtd9Page() {
         postingUser: values.postingUser,
         customerCode: values.customerCode ?? null,
         customerName: values.customerName,
-        idNumber: values.idNumber ?? null,
         customerType: values.customerType ?? null,
         transactionContent: values.transactionContent ?? null,
         sampleReason: values.sampleReason ?? null,
@@ -204,7 +201,6 @@ export function CmNtd9Page() {
     { title: t("auditCmNtd9.columns.postingUser"), dataIndex: "postingUser", width: 130 },
     { title: t("auditCmNtd9.columns.customerCode"), dataIndex: "customerCode", width: 140, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd9.columns.customerName"), ...getSearchColumnProps("customerName", searchLabels) },
-    { title: t("auditCmNtd9.columns.idNumber"), dataIndex: "idNumber", width: 140, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd9.columns.customerType"), dataIndex: "customerType", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd9.columns.transactionContent"), dataIndex: "transactionContent", render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd9.columns.sampleReason"), dataIndex: "sampleReason", width: 130, render: (v: string | null) => v ?? "-" },
@@ -331,28 +327,17 @@ export function CmNtd9Page() {
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="idNumber" label={t("auditCmNtd9.columns.idNumber")}>
-                <Input maxLength={20} />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
               <Form.Item name="customerType" label={t("auditCmNtd9.columns.customerType")}>
                 <Input maxLength={20} />
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="transactionContent" label={t("auditCmNtd9.columns.transactionContent")}>
-                <Input maxLength={120} />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="sampleReason" label={t("auditCmNtd9.columns.sampleReason")}>
-                <Input maxLength={50} />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Form.Item name="transactionContent" label={t("auditCmNtd9.columns.transactionContent")}>
+            <Input maxLength={120} />
+          </Form.Item>
+          <Form.Item name="sampleReason" label={t("auditCmNtd9.columns.sampleReason")}>
+            <Input.TextArea rows={2} maxLength={1000} />
+          </Form.Item>
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="auditResult" label={t("auditCmNtd9.columns.auditResult")}>

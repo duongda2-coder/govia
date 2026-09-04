@@ -53,7 +53,7 @@ public class AuditCmNtd13 extends BaseEntity {
     @Column(name = "status", length = 20)
     private String status;
 
-    @Column(name = "sample_reason", length = 50)
+    @Column(name = "sample_reason", length = 1000)
     private String sampleReason;
 
     @Column(name = "audit_result", length = 200)

@@ -16,7 +16,7 @@ public record AuditCmNtd8Response(
         String processStepSummaryName,
         String branchCode,
         LocalDate transactionDate,
-        BigDecimal referenceNumber,
+        String referenceNumber,
         String postingUser,
         BigDecimal entryNumber,
         BigDecimal amount,

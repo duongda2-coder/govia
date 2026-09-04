@@ -264,7 +264,7 @@ public class AuditCmNtd10Service {
                 new ExportColumn("processStepSummaryCode", "Mã BQT_TH"),
                 new ExportColumn("branchCode", "Mã chi nhánh"),
                 new ExportColumn("issueDate", "Ngày phát hành"),
-                new ExportColumn("customerCode", "Mã Khách hàng"),
+                new ExportColumn("customerCode", "Mã KH của Corebank"),
                 new ExportColumn("customerName", "Tên khách hàng"),
                 new ExportColumn("accountNumber", "Số tài khoản"),
                 new ExportColumn("cardTier", "Hạng thẻ"),

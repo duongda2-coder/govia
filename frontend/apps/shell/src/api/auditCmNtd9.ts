@@ -16,7 +16,6 @@ export interface AuditCmNtd9Item {
   postingUser: string;
   customerCode: string | null;
   customerName: string;
-  idNumber: string | null;
   customerType: string | null;
   transactionContent: string | null;
   sampleReason: string | null;
@@ -38,7 +37,6 @@ export interface AuditCmNtd9Request {
   postingUser: string;
   customerCode: string | null;
   customerName: string;
-  idNumber: string | null;
   customerType: string | null;
   transactionContent: string | null;
   sampleReason: string | null;

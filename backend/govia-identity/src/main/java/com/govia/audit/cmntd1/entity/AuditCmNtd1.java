@@ -62,14 +62,14 @@ public class AuditCmNtd1 extends BaseEntity {
     @Column(name = "currency", length = 3)
     private String currency;
 
-    @Column(name = "account_number", length = 10)
+    @Column(name = "account_number", length = 50)
     private String accountNumber;
 
     /** Spec ghi Type = "number" nhung vi du la text "ABC" - noi dung mo ta, luu String theo vi du. */
     @Column(name = "content", length = 200)
     private String content;
 
-    @Column(name = "sample_reason", length = 50)
+    @Column(name = "sample_reason", length = 1000)
     private String sampleReason;
 
     @Column(name = "audit_result", length = 200)
