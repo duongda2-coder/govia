@@ -1,5 +1,6 @@
 package com.govia.identity.controller;
 
+import com.govia.core.security.CurrentUserPrincipal;
 import com.govia.core.web.ApiResponse;
 import com.govia.identity.dto.AccountSummaryResponse;
 import com.govia.identity.dto.AssignRolesRequest;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,6 +59,13 @@ public class AccountController {
     @PostMapping("/{id}/copy-roles")
     public ApiResponse<Void> copyRoles(@PathVariable UUID id, @RequestBody CopyRolesRequest request) {
         userAccountService.copyRoles(id, request.sourceAccountId());
+        return ApiResponse.ok(null);
+    }
+
+    /** Xoa han 1 tai khoan dang nhap - dung khi can go tai khoan de xoa duoc Employee gan voi no. */
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> delete(@PathVariable UUID id, @AuthenticationPrincipal CurrentUserPrincipal principal) {
+        userAccountService.delete(id, principal);
         return ApiResponse.ok(null);
     }
 }

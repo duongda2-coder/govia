@@ -27,6 +27,11 @@ export async function copyAccountRoles(id: string, sourceAccountId: string): Pro
   await httpClient.post(`/api/accounts/${id}/copy-roles`, { sourceAccountId });
 }
 
+/** Xoa han tai khoan dang nhap - chi SUPER_ADMIN goi duoc (xem AccountController). */
+export async function deleteAccount(id: string): Promise<void> {
+  await httpClient.delete(`/api/accounts/${id}`);
+}
+
 /** Tai file Excel ve may - dung axios (khong phai <a href>) de header Authorization duoc dinh kem tu dong. */
 export async function exportAccounts(): Promise<void> {
   const res = await httpClient.get("/api/accounts/export/excel", { responseType: "blob" });

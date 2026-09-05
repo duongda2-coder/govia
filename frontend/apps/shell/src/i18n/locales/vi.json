@@ -235,8 +235,12 @@
       "success": "Đã sao chép quyền",
       "error": "Sao chép quyền thất bại"
     },
+    "deleteConfirmTitle": "Xóa tài khoản \"{{username}}\"?",
+    "deleteConfirmContent": "Nhân viên gắn với tài khoản này sẽ không còn tài khoản đăng nhập. Hành động này không thể hoàn tác.",
     "messages": {
-      "loadError": "Không tải được dữ liệu"
+      "loadError": "Không tải được dữ liệu",
+      "deleteSuccess": "Đã xóa tài khoản",
+      "deleteError": "Xóa tài khoản thất bại"
     }
   },
   "employee": {

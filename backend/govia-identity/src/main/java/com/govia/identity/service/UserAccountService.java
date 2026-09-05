@@ -5,6 +5,7 @@ import com.govia.core.audit.AuditLogService;
 import com.govia.core.export.ExcelExportService;
 import com.govia.core.export.ExportColumn;
 import com.govia.core.tenant.TenantContext;
+import com.govia.core.security.CurrentUserPrincipal;
 import com.govia.core.web.BusinessException;
 import com.govia.identity.dto.AccountSummaryResponse;
 import com.govia.identity.dto.AdminResetPasswordRequest;
@@ -36,6 +37,7 @@ public class UserAccountService {
 
     private static final SecureRandom TEMP_PASSWORD_RANDOM = new SecureRandom();
     private static final String TEMP_PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    private static final String SUPER_ADMIN_ROLE_CODE = "SUPER_ADMIN";
 
     private final UserAccountRepository userAccountRepository;
     private final EmployeeRepository employeeRepository;
@@ -212,5 +214,36 @@ public class UserAccountService {
 
         auditLogService.record("UserAccount", targetAccountId, AuditAction.UPDATE,
                 "Sao chep vai tro tu tai khoan " + source.getUsername() + " sang tai khoan nay");
+    }
+
+    /**
+     * Xoa cung tai khoan dang nhap - chi SUPER_ADMIN duoc goi (xem AccountController). Dung khi can
+     * xoa han 1 Employee dang bi EmployeeService.delete() chan lai (EMPLOYEE_HAS_USER_ACCOUNT): admin
+     * xoa tai khoan nay truoc, roi quay lai xoa nhan vien. 2 guard an toan: khong cho xoa tai khoan
+     * dang dang nhap cua chinh minh, va khong cho xoa tai khoan SUPER_ADMIN cuoi cung con lai (tranh
+     * khoa het he thong khong con ai quan tri duoc).
+     */
+    @Transactional
+    public void delete(UUID accountId, CurrentUserPrincipal principal) {
+        UUID tenantId = TenantContext.getTenantId();
+        UserAccount account = userAccountRepository.findById(accountId)
+                .filter(a -> a.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("ACCOUNT_NOT_FOUND", "Khong tim thay tai khoan", HttpStatus.NOT_FOUND));
+
+        if (principal.userId().equals(accountId)) {
+            throw new BusinessException("CANNOT_DELETE_OWN_ACCOUNT", "Khong the xoa tai khoan dang dang nhap cua chinh minh");
+        }
+
+        List<UUID> roleIds = userRoleRepository.findByUserId(accountId).stream().map(UserRole::getRoleId).toList();
+        roleRepository.findByTenantIdAndCode(tenantId, SUPER_ADMIN_ROLE_CODE).ifPresent(superAdminRole -> {
+            if (roleIds.contains(superAdminRole.getId()) && userRoleRepository.countByRoleId(superAdminRole.getId()) <= 1) {
+                throw new BusinessException("CANNOT_DELETE_LAST_SUPER_ADMIN", "Khong the xoa: day la tai khoan SUPER_ADMIN cuoi cung con lai");
+            }
+        });
+
+        userRoleRepository.deleteByUserId(accountId);
+        userAccountRepository.delete(account);
+
+        auditLogService.record("UserAccount", accountId, AuditAction.DELETE, "Xoa tai khoan dang nhap " + account.getUsername());
     }
 }

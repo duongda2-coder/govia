@@ -2,10 +2,11 @@ import { useCallback, useEffect, useState } from "react";
 import { App, Button, Space, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
-import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
+import { CrudTable, getApiErrorMessage, useClientSearchColumn } from "@govia/ui-kit";
 import type { AccountStatus, AccountSummary } from "../../api/accounts";
-import { exportAccounts, listAccounts } from "../../api/accounts";
+import { deleteAccount, exportAccounts, listAccounts } from "../../api/accounts";
 import { listRoles, type Role } from "../../api/roles";
+import { useAuth } from "../../auth/AuthContext";
 import { AssignRolesModal } from "./AssignRolesModal";
 import { CopyRolesModal } from "./CopyRolesModal";
 
@@ -19,7 +20,8 @@ const STATUSES: AccountStatus[] = ["ACTIVE", "LOCKED", "DISABLED"];
 
 export function AccountListPage() {
   const { t } = useTranslation();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
+  const { user } = useAuth();
   const { getSearchColumnProps } = useClientSearchColumn<AccountSummary>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
@@ -45,6 +47,25 @@ export function AccountListPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const handleDelete = (account: AccountSummary) => {
+    modal.confirm({
+      title: t("account.deleteConfirmTitle", { username: account.username }),
+      content: t("account.deleteConfirmContent"),
+      okText: t("common.yes"),
+      cancelText: t("common.no"),
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await deleteAccount(account.id);
+          message.success(t("account.messages.deleteSuccess"));
+          await load();
+        } catch (err) {
+          message.error(getApiErrorMessage(err, t("account.messages.deleteError")));
+        }
+      },
+    });
+  };
 
   const columns: TableProps<AccountSummary>["columns"] = [
     { title: t("account.columns.username"), width: 180, ...getSearchColumnProps("username", searchLabels) },
@@ -82,7 +103,7 @@ export function AccountListPage() {
     {
       title: t("account.columns.assignRoles"),
       key: "assign",
-      width: 260,
+      width: 340,
       render: (_: unknown, record) => (
         <Space>
           <Button size="small" onClick={() => setAssigning(record)}>
@@ -90,6 +111,9 @@ export function AccountListPage() {
           </Button>
           <Button size="small" onClick={() => setCopyingInto(record)}>
             {t("account.copyRoles.action")}
+          </Button>
+          <Button size="small" danger disabled={record.id === user?.userId} onClick={() => handleDelete(record)}>
+            {t("common.delete")}
           </Button>
         </Space>
       ),

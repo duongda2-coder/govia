@@ -235,8 +235,12 @@
       "success": "Roles copied",
       "error": "Failed to copy roles"
     },
+    "deleteConfirmTitle": "Delete account \"{{username}}\"?",
+    "deleteConfirmContent": "The employee linked to this account will no longer have a login. This action cannot be undone.",
     "messages": {
-      "loadError": "Failed to load data"
+      "loadError": "Failed to load data",
+      "deleteSuccess": "Account deleted",
+      "deleteError": "Failed to delete account"
     }
   },
   "employee": {
