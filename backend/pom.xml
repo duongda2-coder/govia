@@ -24,7 +24,7 @@
         <spring-boot.version>3.3.4</spring-boot.version>
         <jjwt.version>0.12.6</jjwt.version>
         <springdoc.version>2.6.0</springdoc.version>
-        <poi.version>5.3.0</poi.version>
+        <poi.version>5.4.0</poi.version>
         <liquibase.version>4.29.2</liquibase.version>
         <flowable.version>7.2.0</flowable.version>
     </properties>
