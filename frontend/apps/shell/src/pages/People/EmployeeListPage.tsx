@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { App, Result, Select, Tag, Typography } from "antd";
 import { useTranslation } from "react-i18next";
-import { CodeWithTooltip, CrudTable, useSearchColumn, useSelectFilterColumn, useServerTable } from "@govia/ui-kit";
+import { CodeWithTooltip, CrudTable, getApiErrorMessage, useSearchColumn, useSelectFilterColumn, useServerTable } from "@govia/ui-kit";
 import type { CrudColumn } from "@govia/ui-kit";
 import type {
   Employee,
@@ -136,8 +136,8 @@ export function EmployeeListPage() {
           message.success(t("employee.messages.deleteSuccess"));
           setSelected([]);
           await loadEmployees();
-        } catch {
-          message.error(t("employee.messages.deleteError"));
+        } catch (err) {
+          message.error(getApiErrorMessage(err, t("employee.messages.deleteError")));
         }
       },
     });

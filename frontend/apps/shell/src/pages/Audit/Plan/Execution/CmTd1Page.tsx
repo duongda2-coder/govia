@@ -385,7 +385,7 @@ export function CmTd1Page() {
           <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="debtGroup" label={t("auditCmTd1.columns.debtGroup")}>
-                <Input maxLength={20} />
+                <Input maxLength={100} />
               </Form.Item>
             </Col>
             <Col span={12}>

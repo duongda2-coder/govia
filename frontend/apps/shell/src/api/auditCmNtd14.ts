@@ -22,7 +22,6 @@ export interface AuditCmNtd14Item {
   adjustedTransactionCount: number | null;
   userCode: string | null;
   note: string | null;
-  sampleCode: string | null;
   sampleReason: string | null;
   auditResult: string | null;
   active: boolean;
@@ -43,7 +42,6 @@ export interface AuditCmNtd14Request {
   adjustedTransactionCount: number | null;
   userCode: string | null;
   note: string | null;
-  sampleCode: string | null;
   sampleReason: string | null;
   auditResult: string | null;
   active: boolean;

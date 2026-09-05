@@ -84,11 +84,12 @@ public class AuditEngagementTeamService {
         AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
         List<AuditEngagementGroup> groups = groupRepository.findByTenantIdAndAuditEngagementIdOrderByGroupCodeAsc(tenantId, engagementId);
         Map<UUID, Employee> leaders = employeesById(groups.stream().map(AuditEngagementGroup::getLeaderEmployeeId).toList());
+        Map<UUID, String> leaderUsernames = usernamesByEmployeeIds(leaders.keySet());
         List<AuditEngagementGroupMember> members = memberRepository.findByTenantIdAndGroupIdIn(tenantId, groups.stream().map(AuditEngagementGroup::getId).toList());
         Map<UUID, Long> memberCountByGroup = members.stream().collect(Collectors.groupingBy(AuditEngagementGroupMember::getGroupId, Collectors.counting()));
         Map<UUID, Long> assignmentCountByGroup = assignmentRepository.findByTenantIdAndGroupMemberIdIn(tenantId, members.stream().map(AuditEngagementGroupMember::getId).toList())
                 .stream().collect(Collectors.groupingBy(a -> memberGroupId(members, a.getGroupMemberId()), Collectors.counting()));
-        return groups.stream().map(g -> toGroupResponse(g, engagement, leaders, memberCountByGroup, assignmentCountByGroup)).toList();
+        return groups.stream().map(g -> toGroupResponse(g, engagement, leaders, leaderUsernames, memberCountByGroup, assignmentCountByGroup)).toList();
     }
 
     @Transactional
@@ -113,7 +114,7 @@ public class AuditEngagementTeamService {
         group = groupRepository.save(group);
 
         auditLogService.record("AuditEngagementGroup", group.getId(), AuditAction.CREATE, "Them nhom " + request.groupCode() + " cho CKT: " + engagement.getCode());
-        return toGroupResponse(group, engagement, employeesById(List.of(leader.getId())), Map.of(), Map.of());
+        return toGroupResponse(group, engagement, employeesById(List.of(leader.getId())), usernamesByEmployeeIds(Set.of(leader.getId())), Map.of(), Map.of());
     }
 
     @Transactional
@@ -362,12 +363,13 @@ public class AuditEngagementTeamService {
     }
 
     private AuditEngagementGroupResponse toGroupResponse(AuditEngagementGroup group, AuditEngagement engagement, Map<UUID, Employee> leaders,
-                                                           Map<UUID, Long> memberCountByGroup, Map<UUID, Long> assignmentCountByGroup) {
+                                                           Map<UUID, String> leaderUsernames, Map<UUID, Long> memberCountByGroup,
+                                                           Map<UUID, Long> assignmentCountByGroup) {
         Employee leader = leaders.get(group.getLeaderEmployeeId());
         return new AuditEngagementGroupResponse(group.getId(), group.getAuditEngagementId(), engagement.getCode(), group.getGroupCode(),
                 group.getGroupCode().name(), group.getLeaderEmployeeId(), leader == null ? null : leader.getEmployeeCode(),
-                leader == null ? null : leader.getFullName(), memberCountByGroup.getOrDefault(group.getId(), 0L),
-                assignmentCountByGroup.getOrDefault(group.getId(), 0L));
+                leader == null ? null : leader.getFullName(), leaderUsernames.get(group.getLeaderEmployeeId()),
+                memberCountByGroup.getOrDefault(group.getId(), 0L), assignmentCountByGroup.getOrDefault(group.getId(), 0L));
     }
 
     private List<AuditEngagementGroupMemberResponse> toMemberResponses(List<AuditEngagementGroupMember> members, AuditEngagement engagement, AuditEngagementGroup group) {
@@ -375,18 +377,25 @@ public class AuditEngagementTeamService {
         Map<UUID, Employee> employees = employeesById(members.stream().map(AuditEngagementGroupMember::getEmployeeId).toList());
         Employee leader = employeeRepository.findById(group.getLeaderEmployeeId()).orElse(null);
         Map<UUID, AuditMasterDataItem> segments = businessSegmentsById(tenantId);
-        Map<UUID, String> usernames = userAccountRepository.findByEmployeeIdIn(employees.keySet()).stream()
-                .collect(Collectors.toMap(UserAccount::getEmployeeId, UserAccount::getUsername, (a, b) -> a));
+        Set<UUID> usernameLookupIds = new HashSet<>(employees.keySet());
+        usernameLookupIds.add(group.getLeaderEmployeeId());
+        Map<UUID, String> usernames = usernamesByEmployeeIds(usernameLookupIds);
         return members.stream().map(member -> {
             Employee employee = employees.get(member.getEmployeeId());
             return new AuditEngagementGroupMemberResponse(member.getId(), member.getGroupId(), group.getGroupCode(), group.getGroupCode().name(),
                     engagement.getId(), engagement.getCode(), member.getEmployeeId(), employee == null ? null : employee.getEmployeeCode(),
                     employee == null ? null : employee.getFullName(), employee == null || employee.getOrgUnit() == null ? null : employee.getOrgUnit().getName(),
                     usernames.get(member.getEmployeeId()), group.getLeaderEmployeeId(), leader == null ? null : leader.getFullName(),
+                    usernames.get(group.getLeaderEmployeeId()),
                     member.getBusinessSegment1Id(), codeOf(segments.get(member.getBusinessSegment1Id())),
                     member.getBusinessSegment2Id(), codeOf(segments.get(member.getBusinessSegment2Id())),
                     member.getBusinessSegment3Id(), codeOf(segments.get(member.getBusinessSegment3Id())));
         }).toList();
+    }
+
+    private Map<UUID, String> usernamesByEmployeeIds(Set<UUID> employeeIds) {
+        return userAccountRepository.findByEmployeeIdIn(employeeIds).stream()
+                .collect(Collectors.toMap(UserAccount::getEmployeeId, UserAccount::getUsername, (a, b) -> a));
     }
 
     private List<AuditEngagementAssignmentResponse> toAssignmentResponses(List<AuditEngagementAssignment> assignments, AuditEngagementGroupMember member,

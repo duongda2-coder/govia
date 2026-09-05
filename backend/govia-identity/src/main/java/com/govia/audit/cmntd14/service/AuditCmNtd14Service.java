@@ -177,7 +177,7 @@ public class AuditCmNtd14Service {
                         emptyToNull(row.get("staffName")), emptyToNull(row.get("attendanceCode")), emptyToNull(row.get("description")),
                         parseDecimal(row.get("matchedTransactionCount")), parseDecimal(row.get("unmatchedTransactionCount")),
                         parseDecimal(row.get("adjustedTransactionCount")), emptyToNull(row.get("userCode")), emptyToNull(row.get("note")),
-                        emptyToNull(row.get("sampleCode")), emptyToNull(row.get("sampleReason")), emptyToNull(row.get("auditResult")),
+                        emptyToNull(row.get("sampleReason")), emptyToNull(row.get("auditResult")),
                         existing.map(AuditCmNtd14::isActive).orElse(true));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
@@ -210,7 +210,6 @@ public class AuditCmNtd14Service {
         item.setAdjustedTransactionCount(request.adjustedTransactionCount());
         item.setUserCode(request.userCode());
         item.setNote(request.note());
-        item.setSampleCode(request.sampleCode());
         item.setSampleReason(request.sampleReason());
         item.setAuditResult(request.auditResult());
         item.setActive(request.active());
@@ -269,7 +268,6 @@ public class AuditCmNtd14Service {
                 new ExportColumn("adjustedTransactionCount", "Số GD ĐK, CS TT"),
                 new ExportColumn("userCode", "User"),
                 new ExportColumn("note", "Ghi chú"),
-                new ExportColumn("sampleCode", "Mã mẫu chọn"),
                 new ExportColumn("sampleReason", "Lý do chọn mẫu"),
                 new ExportColumn("auditResult", "Kết quả kiểm toán"));
     }
@@ -295,7 +293,6 @@ public class AuditCmNtd14Service {
                     row.put("adjustedTransactionCount", item.getAdjustedTransactionCount());
                     row.put("userCode", item.getUserCode());
                     row.put("note", item.getNote());
-                    row.put("sampleCode", item.getSampleCode());
                     row.put("sampleReason", item.getSampleReason());
                     row.put("auditResult", item.getAuditResult());
                     return row;
@@ -357,6 +354,6 @@ public class AuditCmNtd14Service {
                 item.getBranchCode(), item.getAttendanceDate(), item.getStaffCode(),
                 item.getStaffName(), item.getAttendanceCode(), item.getDescription(), item.getMatchedTransactionCount(),
                 item.getUnmatchedTransactionCount(), item.getAdjustedTransactionCount(), item.getUserCode(), item.getNote(),
-                item.getSampleCode(), item.getSampleReason(), item.getAuditResult(), item.isActive());
+                item.getSampleReason(), item.getAuditResult(), item.isActive());
     }
 }

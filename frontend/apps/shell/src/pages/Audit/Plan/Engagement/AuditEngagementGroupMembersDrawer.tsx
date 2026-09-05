@@ -144,8 +144,13 @@ export function AuditEngagementGroupMembersDrawer(props: AuditEngagementGroupMem
     });
   };
 
-  const segmentOptions = (excludeIds: (string | undefined)[]) =>
-    businessSegments.filter((s) => !excludeIds.includes(s.id)).map((s) => ({ value: s.id, label: `${s.code} - ${s.name}` }));
+  const segmentOptions = (employeeId: string | undefined, excludeIds: (string | undefined)[]) => {
+    const employee = employees.find((e) => e.id === employeeId);
+    const capableCodes = new Set(employee?.capableSegmentCodes ?? []);
+    return businessSegments
+      .filter((s) => capableCodes.has(s.code) && !excludeIds.includes(s.id))
+      .map((s) => ({ value: s.id, label: `${s.code} - ${s.name}` }));
+  };
 
   const columns: TableProps<AuditEngagementGroupMemberItem>["columns"] = [
     { title: t("auditEngagement.form.memberEmployeeCode"), dataIndex: "employeeCode", width: 110 },
@@ -169,6 +174,8 @@ export function AuditEngagementGroupMembersDrawer(props: AuditEngagementGroupMem
         <>
           <Typography.Paragraph type="secondary">
             {t("auditEngagement.form.groupLeaderLabel")}: {group.leaderEmployeeName} ({group.leaderEmployeeCode})
+            {" - "}
+            {t("auditEngagement.form.groupLeaderUsername")}: {group.leaderUsername ?? "-"}
           </Typography.Paragraph>
           <CrudTable<AuditEngagementGroupMemberItem>
             tableId="audit.planEngagement.groupMembers"
@@ -197,32 +204,68 @@ export function AuditEngagementGroupMembersDrawer(props: AuditEngagementGroupMem
       >
         <Form<FormValues> form={form} layout="vertical">
           <Form.Item name="employeeId" label={t("auditEngagement.form.memberUserId")} rules={[{ required: true }]}>
-            <Select showSearch optionFilterProp="label" options={employees.map((e) => ({ value: e.id, label: `${e.fullName} (${e.employeeCode})` }))} />
+            <Select
+              showSearch
+              optionFilterProp="label"
+              options={employees.map((e) => ({ value: e.id, label: `${e.fullName} (${e.employeeCode})` }))}
+              onChange={() => form.setFieldsValue({ businessSegment1Id: undefined, businessSegment2Id: undefined, businessSegment3Id: undefined })}
+            />
+          </Form.Item>
+          <Form.Item noStyle shouldUpdate={(prev, cur) => prev.employeeId !== cur.employeeId}>
+            {() =>
+              form.getFieldValue("employeeId") && segmentOptions(form.getFieldValue("employeeId"), []).length === 0 ? (
+                <Typography.Paragraph type="warning">{t("auditEngagement.form.noCapableSegments")}</Typography.Paragraph>
+              ) : null
+            }
           </Form.Item>
           <Row gutter={16}>
             <Col span={8}>
-              <Form.Item noStyle shouldUpdate={(prev, cur) => prev.businessSegment2Id !== cur.businessSegment2Id || prev.businessSegment3Id !== cur.businessSegment3Id}>
+              <Form.Item
+                noStyle
+                shouldUpdate={(prev, cur) =>
+                  prev.employeeId !== cur.employeeId || prev.businessSegment2Id !== cur.businessSegment2Id || prev.businessSegment3Id !== cur.businessSegment3Id
+                }
+              >
                 {() => (
                   <Form.Item name="businessSegment1Id" label={t("auditEngagement.form.segment1")}>
-                    <Select allowClear options={segmentOptions([form.getFieldValue("businessSegment2Id"), form.getFieldValue("businessSegment3Id")])} />
+                    <Select
+                      allowClear
+                      options={segmentOptions(form.getFieldValue("employeeId"), [form.getFieldValue("businessSegment2Id"), form.getFieldValue("businessSegment3Id")])}
+                    />
                   </Form.Item>
                 )}
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item noStyle shouldUpdate={(prev, cur) => prev.businessSegment1Id !== cur.businessSegment1Id || prev.businessSegment3Id !== cur.businessSegment3Id}>
+              <Form.Item
+                noStyle
+                shouldUpdate={(prev, cur) =>
+                  prev.employeeId !== cur.employeeId || prev.businessSegment1Id !== cur.businessSegment1Id || prev.businessSegment3Id !== cur.businessSegment3Id
+                }
+              >
                 {() => (
                   <Form.Item name="businessSegment2Id" label={t("auditEngagement.form.segment2")}>
-                    <Select allowClear options={segmentOptions([form.getFieldValue("businessSegment1Id"), form.getFieldValue("businessSegment3Id")])} />
+                    <Select
+                      allowClear
+                      options={segmentOptions(form.getFieldValue("employeeId"), [form.getFieldValue("businessSegment1Id"), form.getFieldValue("businessSegment3Id")])}
+                    />
                   </Form.Item>
                 )}
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item noStyle shouldUpdate={(prev, cur) => prev.businessSegment1Id !== cur.businessSegment1Id || prev.businessSegment2Id !== cur.businessSegment2Id}>
+              <Form.Item
+                noStyle
+                shouldUpdate={(prev, cur) =>
+                  prev.employeeId !== cur.employeeId || prev.businessSegment1Id !== cur.businessSegment1Id || prev.businessSegment2Id !== cur.businessSegment2Id
+                }
+              >
                 {() => (
                   <Form.Item name="businessSegment3Id" label={t("auditEngagement.form.segment3")}>
-                    <Select allowClear options={segmentOptions([form.getFieldValue("businessSegment1Id"), form.getFieldValue("businessSegment2Id")])} />
+                    <Select
+                      allowClear
+                      options={segmentOptions(form.getFieldValue("employeeId"), [form.getFieldValue("businessSegment1Id"), form.getFieldValue("businessSegment2Id")])}
+                    />
                   </Form.Item>
                 )}
               </Form.Item>

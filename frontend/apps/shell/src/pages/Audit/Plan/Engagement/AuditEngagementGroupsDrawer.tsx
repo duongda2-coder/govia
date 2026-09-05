@@ -127,6 +127,7 @@ export function AuditEngagementGroupsDrawer(props: AuditEngagementGroupsDrawerPr
     { title: t("auditEngagement.form.groupName"), dataIndex: "groupName", width: 160 },
     { title: t("auditEngagement.form.groupLeaderCode"), dataIndex: "leaderEmployeeCode", width: 110 },
     { title: t("auditEngagement.form.groupLeaderName"), dataIndex: "leaderEmployeeName" },
+    { title: t("auditEngagement.form.groupLeaderUsername"), dataIndex: "leaderUsername", width: 120, render: (v: string | null) => v ?? "-" },
     { title: t("auditEngagement.form.memberCount"), dataIndex: "memberCount", width: 110 },
     { title: t("auditEngagement.form.workItemCount"), dataIndex: "workItemCount", width: 140 },
     {

@@ -1,0 +1,12 @@
+databaseChangeLog:
+
+  # ===================== Mau 02L/BKS-KTNB (TD1): "Nhom no" mo rong tu VARCHAR(20) len VARCHAR(100) =====================
+  - changeSet:
+      id: 109-1-audit-cm-td1-debt-group-widen
+      author: govia
+      comment: "Widen debt_group (Nhom no) tu VARCHAR(20) len VARCHAR(100) trong audit_cm_td1"
+      changes:
+        - modifyDataType:
+            tableName: audit_cm_td1
+            columnName: debt_group
+            newDataType: VARCHAR(100)

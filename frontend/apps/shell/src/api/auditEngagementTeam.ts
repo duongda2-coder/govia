@@ -13,6 +13,7 @@ export interface AuditEngagementGroupItem {
   leaderEmployeeId: string;
   leaderEmployeeCode: string | null;
   leaderEmployeeName: string | null;
+  leaderUsername: string | null;
   memberCount: number;
   workItemCount: number;
 }
@@ -31,6 +32,7 @@ export interface AuditEngagementGroupMemberItem {
   username: string | null;
   leaderEmployeeId: string;
   leaderEmployeeName: string | null;
+  leaderUsername: string | null;
   businessSegment1Id: string | null;
   businessSegment1Code: string | null;
   businessSegment2Id: string | null;

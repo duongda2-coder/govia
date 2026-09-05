@@ -32,7 +32,6 @@ interface FormValues {
   adjustedTransactionCount?: number;
   userCode?: string;
   note?: string;
-  sampleCode?: string;
   sampleReason?: string;
   auditResult?: string;
   active: boolean;
@@ -120,7 +119,6 @@ export function CmNtd14Page() {
       adjustedTransactionCount: target.adjustedTransactionCount ?? undefined,
       userCode: target.userCode ?? undefined,
       note: target.note ?? undefined,
-      sampleCode: target.sampleCode ?? undefined,
       sampleReason: target.sampleReason ?? undefined,
       auditResult: target.auditResult ?? undefined,
       active: target.active,
@@ -153,7 +151,6 @@ export function CmNtd14Page() {
         adjustedTransactionCount: values.adjustedTransactionCount ?? null,
         userCode: values.userCode ?? null,
         note: values.note ?? null,
-        sampleCode: values.sampleCode ?? null,
         sampleReason: values.sampleReason ?? null,
         auditResult: values.auditResult ?? null,
         active: values.active,
@@ -211,7 +208,6 @@ export function CmNtd14Page() {
     { title: t("auditCmNtd14.columns.adjustedTransactionCount"), dataIndex: "adjustedTransactionCount", width: 130, align: "right", render: count },
     { title: t("auditCmNtd14.columns.userCode"), dataIndex: "userCode", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd14.columns.note"), dataIndex: "note", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd14.columns.sampleCode"), dataIndex: "sampleCode", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd14.columns.sampleReason"), dataIndex: "sampleReason", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd14.columns.auditResult"), dataIndex: "auditResult", render: (v: string | null) => v ?? "-" },
     {
@@ -355,17 +351,12 @@ export function CmNtd14Page() {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col span={8}>
-              <Form.Item name="sampleCode" label={t("auditCmNtd14.columns.sampleCode")}>
-                <Input maxLength={20} />
-              </Form.Item>
-            </Col>
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item name="sampleReason" label={t("auditCmNtd14.columns.sampleReason")}>
-                <Input maxLength={50} />
+                <Input maxLength={1000} />
               </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item name="auditResult" label={t("auditCmNtd14.columns.auditResult")}>
                 <Input maxLength={200} />
               </Form.Item>

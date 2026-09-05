@@ -1,4 +1,4 @@
-export { createGoviaHttpClient, getStoredTokens, storeTokens, clearTokens } from "./api/httpClient";
+export { createGoviaHttpClient, getStoredTokens, storeTokens, clearTokens, getApiErrorMessage } from "./api/httpClient";
 export type { ApiResponse, AuthTokens } from "./api/httpClient";
 
 export { StandardToolbar } from "./components/StandardToolbar";

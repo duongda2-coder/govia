@@ -24,7 +24,7 @@ public record AuditCmTd1Request(
         BigDecimal guaranteeBalance,
         BigDecimal riskClassifiedDebt,
         BigDecimal vamcSoldDebt,
-        @Size(max = 20) String debtGroup,
+        @Size(max = 100) String debtGroup,
         @Size(max = 120) String auditScope,
         @Size(max = 50) String auditorCode,
         @Size(max = 1000) String sampleReason,

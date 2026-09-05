@@ -78,7 +78,7 @@ public class AuditCmTd1 extends BaseEntity {
     @Column(name = "total_credit_balance", precision = 20, scale = 2)
     private BigDecimal totalCreditBalance;
 
-    @Column(name = "debt_group", length = 20)
+    @Column(name = "debt_group", length = 100)
     private String debtGroup;
 
     @Column(name = "audit_scope", length = 120)

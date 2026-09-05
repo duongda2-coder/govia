@@ -855,6 +855,7 @@
       "groupName": "Tên nhóm",
       "groupLeaderCode": "Mã trưởng nhóm",
       "groupLeaderName": "Trưởng nhóm",
+      "groupLeaderUsername": "Username trưởng nhóm",
       "groupLeaderLabel": "Trưởng nhóm",
       "memberCount": "Số lượng thành viên",
       "workItemCount": "Số lượng công việc",
@@ -870,6 +871,7 @@
       "segment1": "Nghiệp vụ 1",
       "segment2": "Nghiệp vụ 2",
       "segment3": "Nghiệp vụ 3",
+      "noCapableSegments": "Cán bộ này chưa được khai báo khả năng đảm nhiệm nghiệp vụ nào (xem màn hình Khả năng đảm nhiệm)",
       "assignmentTitle": "Phân công nghiệp vụ cho thành viên - {{code}}",
       "notTeamLeadWarning": "Chỉ trưởng đoàn ({{name}}) mới được phép phân công công việc cho cuộc kiểm toán này.",
       "membersSectionTitle": "Danh sách thành viên",
@@ -1410,7 +1412,6 @@
       "adjustedTransactionCount": "Số GD ĐK, CS TT",
       "userCode": "User",
       "note": "Ghi chú",
-      "sampleCode": "Mã mẫu chọn",
       "sampleReason": "Lý do chọn mẫu",
       "auditResult": "Kết quả kiểm toán"
     },

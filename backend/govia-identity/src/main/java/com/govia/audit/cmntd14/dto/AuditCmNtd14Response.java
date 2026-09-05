@@ -25,7 +25,6 @@ public record AuditCmNtd14Response(
         BigDecimal adjustedTransactionCount,
         String userCode,
         String note,
-        String sampleCode,
         String sampleReason,
         String auditResult,
         boolean active

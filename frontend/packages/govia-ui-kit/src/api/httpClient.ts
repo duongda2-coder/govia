@@ -12,6 +12,22 @@ export interface ApiResponse<T> {
   timestamp: string;
 }
 
+/**
+ * Lay thong diep loi cu the tu backend (vd "Khong the xoa: nhan vien nay dang la quan ly truc tiep
+ * cua nguoi khac" tu BusinessException) thay vi chi hien 1 thong bao chung chung nhu "Xoa that bai" -
+ * dung trong moi catch block cua thao tac goi API (xoa/luu...). Tra ve fallback neu response khong
+ * co message cu the (loi mang, 500 khong ro nguyen nhan...).
+ */
+export function getApiErrorMessage(err: unknown, fallback: string): string {
+  if (axios.isAxiosError(err)) {
+    const data = err.response?.data as ApiResponse<unknown> | undefined;
+    if (data?.message) {
+      return data.message;
+    }
+  }
+  return fallback;
+}
+
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;

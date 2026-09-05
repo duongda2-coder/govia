@@ -18,6 +18,7 @@ public record AuditEngagementGroupMemberResponse(
         String username,
         UUID leaderEmployeeId,
         String leaderEmployeeName,
+        String leaderUsername,
         UUID businessSegment1Id,
         String businessSegment1Code,
         UUID businessSegment2Id,

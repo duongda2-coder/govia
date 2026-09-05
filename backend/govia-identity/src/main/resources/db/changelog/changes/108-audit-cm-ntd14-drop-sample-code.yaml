@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  # ===================== Mau 08C/BKS-KTNB (NTD14): thua cot "Ma mau chon" (khong co tren form giay) =====================
+  - changeSet:
+      id: 108-1-audit-cm-ntd14-drop-sample-code
+      author: govia
+      comment: "Bo cot sample_code (Ma mau chon) khoi audit_cm_ntd14 - khong co tren form giay 08C"
+      changes:
+        - dropColumn:
+            tableName: audit_cm_ntd14
+            columnName: sample_code

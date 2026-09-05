@@ -855,6 +855,7 @@
       "groupName": "Group Name",
       "groupLeaderCode": "Group Leader Code",
       "groupLeaderName": "Group Leader",
+      "groupLeaderUsername": "Group Leader Username",
       "groupLeaderLabel": "Group Leader",
       "memberCount": "Member Count",
       "workItemCount": "Work Item Count",
@@ -870,6 +871,7 @@
       "segment1": "Business Segment 1",
       "segment2": "Business Segment 2",
       "segment3": "Business Segment 3",
+      "noCapableSegments": "This employee has no declared business-segment capability (see Employee Capability screen)",
       "assignmentTitle": "Work Item Assignment - {{code}}",
       "notTeamLeadWarning": "Only the team lead ({{name}}) is allowed to assign work items for this engagement.",
       "membersSectionTitle": "Members",
@@ -1319,7 +1321,6 @@
       "adjustedTransactionCount": "Adjusted transaction count",
       "userCode": "User",
       "note": "Note",
-      "sampleCode": "Sample code",
       "sampleReason": "Sample reason",
       "auditResult": "Audit result"
     },

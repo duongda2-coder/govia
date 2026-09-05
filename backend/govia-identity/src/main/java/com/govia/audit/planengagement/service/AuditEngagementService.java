@@ -104,9 +104,29 @@ public class AuditEngagementService {
                     AuditEmployeeCapability capability = capabilities.get(e.getId());
                     boolean truongDoan = capability != null && capability.isTruongDoanCapable();
                     boolean truongNhom = capability != null && capability.isTruongNhomCapable();
-                    return new EmployeeOption(e.getId(), e.getEmployeeCode(), e.getFullName(), usernames.get(e.getId()), truongDoan, truongNhom);
+                    return new EmployeeOption(e.getId(), e.getEmployeeCode(), e.getFullName(), usernames.get(e.getId()), truongDoan, truongNhom,
+                            capableSegmentCodes(capability));
                 })
                 .toList();
+    }
+
+    /** Cac ma linh vuc (trung ma danh muc "Nghiep vu" - BUSINESS_SEGMENT) ma nhan vien co "kha nang dam nhan" = true. */
+    private List<String> capableSegmentCodes(AuditEmployeeCapability capability) {
+        if (capability == null) {
+            return List.of();
+        }
+        List<String> codes = new ArrayList<>();
+        if (capability.isTheCapable()) codes.add("THE");
+        if (capability.isQtdhCapable()) codes.add("QTDH");
+        if (capability.isHdvCapable()) codes.add("HDV");
+        if (capability.isTcktCapable()) codes.add("TCKT");
+        if (capability.isCnttCapable()) codes.add("CNTT");
+        if (capability.isTtkqCapable()) codes.add("TTKQ");
+        if (capability.isPcrtCapable()) codes.add("PCRT");
+        if (capability.isTtqtCapable()) codes.add("TTQT");
+        if (capability.isXdcbCapable()) codes.add("XDCB");
+        if (capability.isTdCapable()) codes.add("TD");
+        return codes;
     }
 
     @Transactional(readOnly = true)

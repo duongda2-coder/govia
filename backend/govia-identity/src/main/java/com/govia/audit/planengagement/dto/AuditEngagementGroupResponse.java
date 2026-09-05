@@ -13,6 +13,7 @@ public record AuditEngagementGroupResponse(
         UUID leaderEmployeeId,
         String leaderEmployeeCode,
         String leaderEmployeeName,
+        String leaderUsername,
         long memberCount,
         long workItemCount
 ) {
