@@ -110,22 +110,28 @@ public class AuditEngagementService {
                 .toList();
     }
 
-    /** Cac ma linh vuc (trung ma danh muc "Nghiep vu" - BUSINESS_SEGMENT) ma nhan vien co "kha nang dam nhan" = true. */
+    /**
+     * Cac ma danh muc "Nghiep vu" (BUSINESS_SEGMENT) tuong ung voi tung co "kha nang dam nhan" - CHU
+     * Y: ma trong danh muc Nghiep vu KHONG trung voi ten co (vd co "TCKT" ung voi ma nghiep vu "GA",
+     * co "TD" ung voi ma nghiep vu "LN") - bang dich co dinh nay theo dung danh muc "Mang nghiep vu"
+     * chuan cua ngan hang (Comment: The->CD, QTDH->CE, HDV->DP, TCKT->GA, CNTT->IT, TTKQ->MF,
+     * PCRT->AM, TTQT->TF, XDCB->FA, TD->LN).
+     */
     private List<String> capableSegmentCodes(AuditEmployeeCapability capability) {
         if (capability == null) {
             return List.of();
         }
         List<String> codes = new ArrayList<>();
-        if (capability.isTheCapable()) codes.add("THE");
-        if (capability.isQtdhCapable()) codes.add("QTDH");
-        if (capability.isHdvCapable()) codes.add("HDV");
-        if (capability.isTcktCapable()) codes.add("TCKT");
-        if (capability.isCnttCapable()) codes.add("CNTT");
-        if (capability.isTtkqCapable()) codes.add("TTKQ");
-        if (capability.isPcrtCapable()) codes.add("PCRT");
-        if (capability.isTtqtCapable()) codes.add("TTQT");
-        if (capability.isXdcbCapable()) codes.add("XDCB");
-        if (capability.isTdCapable()) codes.add("TD");
+        if (capability.isTheCapable()) codes.add("CD");
+        if (capability.isQtdhCapable()) codes.add("CE");
+        if (capability.isHdvCapable()) codes.add("DP");
+        if (capability.isTcktCapable()) codes.add("GA");
+        if (capability.isCnttCapable()) codes.add("IT");
+        if (capability.isTtkqCapable()) codes.add("MF");
+        if (capability.isPcrtCapable()) codes.add("AM");
+        if (capability.isTtqtCapable()) codes.add("TF");
+        if (capability.isXdcbCapable()) codes.add("FA");
+        if (capability.isTdCapable()) codes.add("LN");
         return codes;
     }
 
