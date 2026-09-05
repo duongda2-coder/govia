@@ -1,0 +1,64 @@
+databaseChangeLog:
+
+  # ===================== "Báo cáo tiến độ" (Khối B - chức năng trong Quản lý công việc THKT) =====================
+  - changeSet:
+      id: 116-1-audit-progress-report-schema
+      author: govia
+      comment: "Tao bang audit_progress_report"
+      changes:
+        - createTable:
+            tableName: audit_progress_report
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: engagement_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: reported_employee_id, type: UUID }
+              - column: { name: total_findings, type: INT, defaultValueNumeric: 0, constraints: { nullable: false } }
+              - column: { name: total_ttss, type: INT, defaultValueNumeric: 0, constraints: { nullable: false } }
+              - column: { name: total_material_findings, type: INT, defaultValueNumeric: 0, constraints: { nullable: false } }
+              - column: { name: total_material_ttss, type: INT, defaultValueNumeric: 0, constraints: { nullable: false } }
+              - column: { name: total_samples, type: INT, defaultValueNumeric: 0, constraints: { nullable: false } }
+              - column: { name: completed_samples, type: INT, defaultValueNumeric: 0, constraints: { nullable: false } }
+              - column: { name: report_date, type: DATE, constraints: { nullable: false } }
+              - column: { name: report_round, type: INT, defaultValueNumeric: 1, constraints: { nullable: false } }
+              - column: { name: reported_by_username, type: VARCHAR(100) }
+              - column: { name: note, type: VARCHAR(2000) }
+              - column: { name: approval_status, type: VARCHAR(20) }
+              - column: { name: approved_by, type: VARCHAR(100) }
+              - column: { name: approved_at, type: TIMESTAMP }
+              - column: { name: process_instance_id, type: VARCHAR(64) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_progress_report
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_progress_report_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_progress_report
+            baseColumnNames: engagement_id
+            referencedTableName: audit_engagement
+            referencedColumnNames: id
+            constraintName: fk_audit_progress_report_engagement
+        - addForeignKeyConstraint:
+            baseTableName: audit_progress_report
+            baseColumnNames: business_segment_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_progress_report_segment
+        - addForeignKeyConstraint:
+            baseTableName: audit_progress_report
+            baseColumnNames: reported_employee_id
+            referencedTableName: employee
+            referencedColumnNames: id
+            constraintName: fk_audit_progress_report_employee
+        - createIndex:
+            tableName: audit_progress_report
+            indexName: ix_audit_progress_report_engagement
+            columns:
+              - column: { name: engagement_id }

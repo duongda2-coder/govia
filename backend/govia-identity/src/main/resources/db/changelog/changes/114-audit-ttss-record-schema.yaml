@@ -1,0 +1,84 @@
+databaseChangeLog:
+
+  # ===================== "Quản lý tồn tại sai sót" (TTSS, Khối C) =====================
+  # File "Tạo CKT (1).xlsx", sheet "Quản lý công việc", mục C. Hoan toan tach biet voi bang
+  # audit_finding (nguon du lieu cho AI Agent tool get_audit_findings - khong dung chung).
+  - changeSet:
+      id: 114-1-audit-ttss-record-schema
+      author: govia
+      comment: "Tao bang audit_ttss_record (Quan ly ton tai sai sot)"
+      changes:
+        - createTable:
+            tableName: audit_ttss_record
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: engagement_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: record_username, type: VARCHAR(100) }
+              - column: { name: work_item_code, type: VARCHAR(10) }
+              - column: { name: process_step_summary_id, type: UUID }
+              - column: { name: process_step_detail_id, type: UUID }
+              - column: { name: ttss_content, type: VARCHAR(4000) }
+              - column: { name: finding_code, type: VARCHAR(50) }
+              - column: { name: finding_name, type: VARCHAR(1000) }
+              - column: { name: material, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: reference_number, type: VARCHAR(100) }
+              - column: { name: reference_number_2, type: VARCHAR(100) }
+              - column: { name: customer_code, type: VARCHAR(50) }
+              - column: { name: customer_name, type: VARCHAR(255) }
+              - column: { name: amount, type: "DECIMAL(20,2)" }
+              - column: { name: performing_user, type: VARCHAR(100) }
+              - column: { name: transaction_content, type: VARCHAR(2000) }
+              - column: { name: exception_date, type: DATE }
+              - column: { name: approver_name, type: VARCHAR(255) }
+              - column: { name: controller_name, type: VARCHAR(255) }
+              - column: { name: ttss_performer_name, type: VARCHAR(255) }
+              - column: { name: related_staff, type: VARCHAR(500) }
+              - column: { name: uploader_recommendation_code, type: VARCHAR(30) }
+              - column: { name: uploader_recommendation_name, type: VARCHAR(255) }
+              - column: { name: team_recommendation_id, type: UUID }
+              - column: { name: recommendation_approval_status, type: VARCHAR(20) }
+              - column: { name: recommendation_approved_by, type: VARCHAR(100) }
+              - column: { name: recommendation_approved_at, type: TIMESTAMP }
+              - column: { name: recommendation_process_instance_id, type: VARCHAR(64) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_ttss_record
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_ttss_record_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_ttss_record
+            baseColumnNames: engagement_id
+            referencedTableName: audit_engagement
+            referencedColumnNames: id
+            constraintName: fk_audit_ttss_record_engagement
+        - addForeignKeyConstraint:
+            baseTableName: audit_ttss_record
+            baseColumnNames: business_segment_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_ttss_record_segment
+        - addForeignKeyConstraint:
+            baseTableName: audit_ttss_record
+            baseColumnNames: process_step_summary_id
+            referencedTableName: audit_process_step_summary
+            referencedColumnNames: id
+            constraintName: fk_audit_ttss_record_step_summary
+        - addForeignKeyConstraint:
+            baseTableName: audit_ttss_record
+            baseColumnNames: process_step_detail_id
+            referencedTableName: audit_process_step_detail
+            referencedColumnNames: id
+            constraintName: fk_audit_ttss_record_step_detail
+        - createIndex:
+            tableName: audit_ttss_record
+            indexName: ix_audit_ttss_record_engagement
+            columns:
+              - column: { name: engagement_id }

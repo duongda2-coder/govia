@@ -1,0 +1,31 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thực hiện kiểm toán - Quản lý công việc (CBKT/THKT) =====================
+  - changeSet:
+      id: 113-1-permission-catalog-audit-work-management
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b03-110000000001" }
+              - column: { name: code, value: "AUDIT.WORK_MANAGEMENT.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem man hinh Quan ly cong viec CBKT/THKT va file bao cao khac" }
+              - column: { name: resource_label, value: "Thực hiện kiểm toán - Quản lý công việc" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b03-110000000002" }
+              - column: { name: code, value: "AUDIT.WORK_MANAGEMENT.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Cap nhat trang thai/ghi chu cong viec, upload file bao cao khac" }
+              - column: { name: resource_label, value: "Thực hiện kiểm toán - Quản lý công việc" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b03-110000000003" }
+              - column: { name: code, value: "AUDIT.WORK_MANAGEMENT.APPROVE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Phe duyet hang loat cong viec da hoan thanh (chi truong doan)" }
+              - column: { name: resource_label, value: "Thực hiện kiểm toán - Quản lý công việc" }

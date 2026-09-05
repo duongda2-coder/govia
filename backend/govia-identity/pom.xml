@@ -37,6 +37,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+        <dependency>
+            <!-- Chi dung khi govia.notification.email.enabled=true (xem MailWorkflowNotificationService) -
+                 mac dinh tat, khong gui mail that cho toi khi co cau hinh SMTP that. -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springdoc</groupId>

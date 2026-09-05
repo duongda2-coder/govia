@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="com.govia.workflow">
+
+    <!--
+      Phe duyet "Quan ly cong viec" (CBKT/THKT) - sheet "Quản lý công việc" trong Tạo CKT (1).xlsx.
+      Dây phê duyệt ĐỘNG do AuditWorkApprovalChainResolver tinh SAN va truyen vao qua bien
+      approverChain (mac dinh 1 buoc = trưởng đoàn cuộc kiểm toán, co the dai hon neu sau nay cau
+      hinh them ApprovalMatrixRule domain "AUDIT_WORKITEM") - quy trinh chi lap qua tung nguoi bang
+      Multi-Instance Sequential User Task, giong het co che cua employee-approval.bpmn20.xml.
+      Moi buoc duyet co taskListener "create" goi workflowTaskCreatedNotifier (xem
+      com.govia.identity.workflow.delegate.WorkflowTaskCreatedNotifier) de bao (log/mail) cho
+      nguoi duoc giao - day la CHO GAN duy nhat can sua khi bat gui mail that sau nay.
+
+      Bien vao (do AuditWorkAssignmentService thiet lap luc start):
+        - assignmentId (bat buoc)  : id cua AuditEngagementAssignment dang cho duyet
+        - approverChain (bat buoc) : List<String> UserAccount.id theo dung thu tu duyet (co the rong)
+        - approved (mac dinh true luc start): de xu ly dung khi approverChain rong (0 vong lap)
+      Bien nguoi duyet tra ve luc complete tung task: approved (boolean)
+    -->
+    <process id="audit_workitem_approval" name="Audit Work Item Approval" isExecutable="true">
+
+        <startEvent id="start" />
+
+        <userTask id="chainApprovalTask" name="Duyệt công việc" flowable:assignee="${currentApproverId}">
+            <extensionElements>
+                <flowable:taskListener event="create" delegateExpression="${workflowTaskCreatedNotifier}" />
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="true"
+                                               flowable:collection="${approverChain}"
+                                               flowable:elementVariable="currentApproverId">
+                <completionCondition>${approved == false}</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+
+        <exclusiveGateway id="chainOutcomeGateway" name="Dây duyệt: đạt?" />
+
+        <endEvent id="endApproved" name="Approved">
+            <extensionElements>
+                <flowable:executionListener event="end" delegateExpression="${auditWorkItemApprovalApprovedListener}" />
+            </extensionElements>
+        </endEvent>
+        <endEvent id="endRejected" name="Rejected">
+            <extensionElements>
+                <flowable:executionListener event="end" delegateExpression="${auditWorkItemApprovalRejectedListener}" />
+            </extensionElements>
+        </endEvent>
+
+        <sequenceFlow sourceRef="start" targetRef="chainApprovalTask" />
+        <sequenceFlow sourceRef="chainApprovalTask" targetRef="chainOutcomeGateway" />
+
+        <sequenceFlow sourceRef="chainOutcomeGateway" targetRef="endApproved">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="chainOutcomeGateway" targetRef="endRejected">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == false}]]></conditionExpression>
+        </sequenceFlow>
+
+    </process>
+</definitions>

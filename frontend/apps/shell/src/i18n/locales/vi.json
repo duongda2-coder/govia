@@ -70,6 +70,9 @@
     "auditPlanExecCmNtd12": "07F/BKS-KTNB (NTD12)",
     "auditPlanExecCmNtd13": "07D/BKS-KTNB (NTD13)",
     "auditPlanExecCmNtd14": "08C/BKS-KTNB (NTD14)",
+    "auditPlanExecWorkManagementCbkt": "Quản lý công việc CBKT",
+    "auditPlanExecWorkManagementThkt": "Quản lý công việc THKT",
+    "auditPlanExecWorkManagementTtss": "Quản lý TTSS & Kiến nghị",
     "riskScoring": "Chấm điểm rủi ro",
     "riskScoringMasterData": "Master Data CDRR",
     "riskScoringGroups": "Nhóm chỉ tiêu",
@@ -142,6 +145,9 @@
     "exportWord": "Xuất Word",
     "exporting": "Đang xuất file...",
     "attachment": "Đính kèm",
+    "otherReports": "File báo cáo khác",
+    "approve": "Phê duyệt",
+    "downloadTemplate": "Tải mẫu",
     "search": "Tìm kiếm",
     "reset": "Đặt lại",
     "confirm": "Đồng ý",
@@ -923,6 +929,113 @@
   "auditPlanExecution": {
     "engagementFilter": "Mã cuộc kiểm toán",
     "selectEngagement": "Chọn cuộc kiểm toán để xem/nhập dữ liệu"
+  },
+  "auditWorkManagement": {
+    "cbktTitle": "Quản lý công việc Chuẩn bị kiểm toán (CBKT)",
+    "thktTitle": "Quản lý công việc Thực hiện kiểm toán (THKT)",
+    "approveConfirmTitle": "Phê duyệt {{count}} công việc đã chọn?",
+    "columns": {
+      "engagementCode": "Mã CKT",
+      "engagementName": "Tên đợt KT",
+      "businessSegmentCode": "Mảng nghiệp vụ",
+      "workItemCode": "Mã công việc",
+      "workItemName": "Tên công việc",
+      "employee": "Cán bộ thực hiện",
+      "status": "Trạng thái công việc",
+      "approvalStatus": "Trưởng đoàn phê duyệt",
+      "note": "Ghi chú"
+    },
+    "status": {
+      "NOT_STARTED": "Chưa thực hiện",
+      "IN_PROGRESS": "Đang thực hiện",
+      "DONE": "Hoàn thành"
+    },
+    "approvalStatus": {
+      "PENDING": "Đang chờ duyệt",
+      "APPROVED": "Đã duyệt",
+      "REJECTED": "Từ chối"
+    },
+    "form": { "editTitle": "Cập nhật trạng thái công việc" },
+    "messages": {
+      "loadError": "Không tải được danh sách công việc",
+      "updateSuccess": "Đã cập nhật trạng thái công việc",
+      "updateError": "Cập nhật trạng thái công việc thất bại",
+      "approveSuccess": "Đã phê duyệt công việc đã chọn",
+      "approveError": "Phê duyệt thất bại"
+    },
+    "reportFiles": {
+      "title": "File báo cáo khác",
+      "loadError": "Không tải được danh sách file",
+      "uploadSuccess": "Đã tải file lên",
+      "uploadError": "Tải file lên thất bại",
+      "deleteSuccess": "Đã xoá file",
+      "deleteError": "Xoá file thất bại",
+      "columns": {
+        "businessSegment": "Nghiệp vụ",
+        "uploadedAt": "Ngày upload",
+        "uploadedByName": "Tên cán bộ",
+        "reportType": "Loại báo cáo",
+        "fileName": "File báo cáo"
+      }
+    }
+  },
+  "auditProgressReport": {
+    "title": "Báo cáo tiến độ",
+    "loadError": "Không tải được báo cáo tiến độ",
+    "approveConfirmTitle": "Phê duyệt {{count}} báo cáo tiến độ đã chọn?",
+    "approveSuccess": "Đã phê duyệt báo cáo tiến độ",
+    "approveError": "Phê duyệt thất bại",
+    "columns": {
+      "businessSegment": "Mảng NV",
+      "totalFindings": "Tổng số phát hiện",
+      "totalTtss": "Số lượng loại TTSS",
+      "totalMaterialFindings": "Phát hiện trọng yếu",
+      "totalMaterialTtss": "Số TTSS trọng yếu",
+      "totalSamples": "Tổng số lượng mẫu",
+      "completedSamples": "Số lượng mẫu hoàn thành",
+      "reportDate": "Ngày báo cáo",
+      "reportRound": "Lần báo cáo",
+      "reportedByUsername": "User báo cáo",
+      "note": "Ghi chú",
+      "approvalStatus": "Phê duyệt file báo cáo"
+    }
+  },
+  "auditRecommendation": {
+    "title": "Kiến nghị",
+    "loadError": "Không tải được danh sách kiến nghị",
+    "createSuccess": "Đã thêm kiến nghị",
+    "createError": "Thêm kiến nghị thất bại",
+    "columns": {
+      "code": "Mã kiến nghị",
+      "businessSegment": "Loại nghiệp vụ",
+      "content": "Nội dung"
+    }
+  },
+  "auditTtss": {
+    "title": "Quản lý TTSS & Kiến nghị",
+    "linkRecommendationButton": "Gắn kiến nghị",
+    "linkRecommendationTitle": "Gắn kiến nghị cho {{count}} dòng đã chọn",
+    "linkRecommendationSuccess": "Đã gắn kiến nghị",
+    "linkRecommendationError": "Gắn kiến nghị thất bại",
+    "approveConfirmTitle": "Phê duyệt kiến nghị cho {{count}} dòng đã chọn?",
+    "columns": {
+      "businessSegment": "Nghiệp vụ",
+      "workItemCode": "Mã công việc",
+      "processStepSummary": "Bước QT tổng hợp",
+      "ttssContent": "Nội dung TTSS",
+      "findingCode": "Mã phát hiện",
+      "findingName": "Tên phát hiện",
+      "material": "Trọng yếu",
+      "customerName": "Tên KH",
+      "amount": "Số tiền",
+      "teamRecommendation": "Kiến nghị trưởng đoàn",
+      "recommendationApprovalStatus": "Phê duyệt KN"
+    },
+    "messages": {
+      "loadError": "Không tải được danh sách TTSS",
+      "approveSuccess": "Đã phê duyệt kiến nghị",
+      "approveError": "Phê duyệt kiến nghị thất bại"
+    }
   },
   "auditCmTd1": {
     "title": "02L/BKS-KTNB (TD1)",

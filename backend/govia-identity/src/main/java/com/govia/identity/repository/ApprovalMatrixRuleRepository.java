@@ -8,9 +8,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ApprovalMatrixRuleRepository extends JpaRepository<ApprovalMatrixRule, UUID> {
-    List<ApprovalMatrixRule> findByTenantId(UUID tenantId);
+    List<ApprovalMatrixRule> findByTenantIdAndDomain(UUID tenantId, String domain);
 
-    Optional<ApprovalMatrixRule> findByTenantIdAndOrgUnitId(UUID tenantId, UUID orgUnitId);
+    Optional<ApprovalMatrixRule> findByTenantIdAndDomainAndOrgUnitId(UUID tenantId, String domain, UUID orgUnitId);
 
-    Optional<ApprovalMatrixRule> findByTenantIdAndOrgUnitIdIsNull(UUID tenantId);
+    Optional<ApprovalMatrixRule> findByTenantIdAndDomainAndOrgUnitIdIsNull(UUID tenantId, String domain);
 }

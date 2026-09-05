@@ -1,0 +1,31 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thực hiện kiểm toán - Quản lý TTSS & Kiến nghị =====================
+  - changeSet:
+      id: 117-1-permission-catalog-audit-ttss
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b04-110000000001" }
+              - column: { name: code, value: "AUDIT.TTSS.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem man hinh Quan ly ton tai sai sot va kien nghi" }
+              - column: { name: resource_label, value: "Thực hiện kiểm toán - Quản lý TTSS & Kiến nghị" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b04-110000000002" }
+              - column: { name: code, value: "AUDIT.TTSS.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Tai mau, upload TTSS, them/gan kien nghi" }
+              - column: { name: resource_label, value: "Thực hiện kiểm toán - Quản lý TTSS & Kiến nghị" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b04-110000000003" }
+              - column: { name: code, value: "AUDIT.TTSS.APPROVE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Phe duyet kien nghi (chi truong doan)" }
+              - column: { name: resource_label, value: "Thực hiện kiểm toán - Quản lý TTSS & Kiến nghị" }

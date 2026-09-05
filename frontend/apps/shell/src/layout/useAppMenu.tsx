@@ -54,6 +54,9 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-plan-exec-cm-ntd12": "/audit/plan/execution/cm-ntd12",
   "audit-plan-exec-cm-ntd13": "/audit/plan/execution/cm-ntd13",
   "audit-plan-exec-cm-ntd14": "/audit/plan/execution/cm-ntd14",
+  "audit-plan-exec-work-management-cbkt": "/audit/plan/execution/work-management/cbkt",
+  "audit-plan-exec-work-management-thkt": "/audit/plan/execution/work-management/thkt",
+  "audit-plan-exec-work-management-ttss": "/audit/plan/execution/work-management/ttss",
   "audit-rs-groups": "/audit/risk-scoring/master-data/groups",
   "audit-rs-criteria": "/audit/risk-scoring/master-data/criteria",
   "audit-rs-weight": "/audit/risk-scoring/master-data/weight",
@@ -242,6 +245,12 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
             hasPermission("AUDIT.CM_NTD12.VIEW") && leaf("audit-plan-exec-cm-ntd12", t("menu.auditPlanExecCmNtd12"), auditPlanExecGroupLabel),
             hasPermission("AUDIT.CM_NTD13.VIEW") && leaf("audit-plan-exec-cm-ntd13", t("menu.auditPlanExecCmNtd13"), auditPlanExecGroupLabel),
             hasPermission("AUDIT.CM_NTD14.VIEW") && leaf("audit-plan-exec-cm-ntd14", t("menu.auditPlanExecCmNtd14"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.WORK_MANAGEMENT.VIEW") &&
+              leaf("audit-plan-exec-work-management-cbkt", t("menu.auditPlanExecWorkManagementCbkt"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.WORK_MANAGEMENT.VIEW") &&
+              leaf("audit-plan-exec-work-management-thkt", t("menu.auditPlanExecWorkManagementThkt"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.TTSS.VIEW") &&
+              leaf("audit-plan-exec-work-management-ttss", t("menu.auditPlanExecWorkManagementTtss"), auditPlanExecGroupLabel),
           ]),
         },
       ]),

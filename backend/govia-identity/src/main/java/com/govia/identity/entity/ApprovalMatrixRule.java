@@ -22,6 +22,13 @@ import java.util.UUID;
 @Table(name = "approval_matrix_rule")
 public class ApprovalMatrixRule extends BaseEntity {
 
+    /** Domain nghiep vu ap dung quy tac nay (vd "EMPLOYEE", "AUDIT_WORKITEM") - cho phep 1 bang
+     * dung chung cho nhieu loai phe duyet dong khac nhau, moi domain co khong gian scope
+     * (org_unit_id) rieng. Mac dinh "EMPLOYEE" de tuong thich nguoc voi du lieu da co truoc khi
+     * them cot nay. */
+    @Column(name = "domain", nullable = false, length = 40)
+    private String domain = "EMPLOYEE";
+
     /** Null = quy tac mac dinh (fallback) cho toan tenant, khong rieng don vi nao. */
     @Column(name = "org_unit_id", columnDefinition = "uuid")
     private UUID orgUnitId;

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="com.govia.workflow">
+
+    <!--
+      Phe duyet "Báo cáo tiến độ" (Khối B, sheet "Quản lý công việc" trong Tạo CKT (1).xlsx) - rap
+      khuon y het audit-workitem-approval.bpmn20.xml (xem file do de biet chi tiet co che dây phê
+      duyệt động + taskListener bao mail). Chi khac ten process/bien businessKey va listener dich.
+
+      Bien vao (do AuditProgressReportService thiet lap luc start):
+        - progressReportId (bat buoc) : id cua AuditProgressReport dang cho duyet
+        - approverChain (bat buoc)    : List<String> UserAccount.id theo dung thu tu duyet
+        - approved (mac dinh true luc start)
+    -->
+    <process id="audit_progress_report_approval" name="Audit Progress Report Approval" isExecutable="true">
+
+        <startEvent id="start" />
+
+        <userTask id="chainApprovalTask" name="Duyệt báo cáo tiến độ" flowable:assignee="${currentApproverId}">
+            <extensionElements>
+                <flowable:taskListener event="create" delegateExpression="${workflowTaskCreatedNotifier}" />
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="true"
+                                               flowable:collection="${approverChain}"
+                                               flowable:elementVariable="currentApproverId">
+                <completionCondition>${approved == false}</completionCondition>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+
+        <exclusiveGateway id="chainOutcomeGateway" name="Dây duyệt: đạt?" />
+
+        <endEvent id="endApproved" name="Approved">
+            <extensionElements>
+                <flowable:executionListener event="end" delegateExpression="${auditProgressReportApprovalApprovedListener}" />
+            </extensionElements>
+        </endEvent>
+        <endEvent id="endRejected" name="Rejected">
+            <extensionElements>
+                <flowable:executionListener event="end" delegateExpression="${auditProgressReportApprovalRejectedListener}" />
+            </extensionElements>
+        </endEvent>
+
+        <sequenceFlow sourceRef="start" targetRef="chainApprovalTask" />
+        <sequenceFlow sourceRef="chainApprovalTask" targetRef="chainOutcomeGateway" />
+
+        <sequenceFlow sourceRef="chainOutcomeGateway" targetRef="endApproved">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow sourceRef="chainOutcomeGateway" targetRef="endRejected">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == false}]]></conditionExpression>
+        </sequenceFlow>
+
+    </process>
+</definitions>

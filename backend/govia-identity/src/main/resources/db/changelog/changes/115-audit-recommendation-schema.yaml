@@ -1,0 +1,56 @@
+databaseChangeLog:
+
+  # ===================== "Lưu mã kiến nghị" (catalog kiến nghị theo từng CKT, Khối C) =====================
+  - changeSet:
+      id: 115-1-audit-recommendation-schema
+      author: govia
+      comment: "Tao bang audit_recommendation (catalog kien nghi theo tung cuoc kiem toan)"
+      changes:
+        - createTable:
+            tableName: audit_recommendation
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: engagement_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(30), constraints: { nullable: false } }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: content, type: VARCHAR(2000), constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_recommendation
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_recommendation_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_recommendation
+            baseColumnNames: engagement_id
+            referencedTableName: audit_engagement
+            referencedColumnNames: id
+            constraintName: fk_audit_recommendation_engagement
+        - addForeignKeyConstraint:
+            baseTableName: audit_recommendation
+            baseColumnNames: business_segment_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_recommendation_segment
+        - addUniqueConstraint:
+            tableName: audit_recommendation
+            columnNames: engagement_id, code
+            constraintName: uk_audit_recommendation_engagement_code
+
+  - changeSet:
+      id: 115-2-audit-ttss-record-team-recommendation-fk
+      author: govia
+      comment: "Them FK team_recommendation_id cua audit_ttss_record toi audit_recommendation (tao sau vi phu thuoc bang nay)"
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: audit_ttss_record
+            baseColumnNames: team_recommendation_id
+            referencedTableName: audit_recommendation
+            referencedColumnNames: id
+            constraintName: fk_audit_ttss_record_team_recommendation

@@ -1,0 +1,19 @@
+databaseChangeLog:
+
+  # ===================== AUDIT_ENGAGEMENT_ASSIGNMENT: bo sung cho "Quản lý công việc" =====================
+  # File "Tạo CKT (1).xlsx", sheet "Quản lý công việc" (CBKT/THKT): user tu cap nhat trang thai
+  # cong viec + ghi chu; truong doan phe duyet hang loat qua quy trinh Flowable moi
+  # "audit_workitem_approval" (xem AuditWorkAssignmentService).
+  - changeSet:
+      id: 112-1-audit-engagement-assignment-work-management-columns
+      author: govia
+      changes:
+        - addColumn:
+            tableName: audit_engagement_assignment
+            columns:
+              - column: { name: status, type: VARCHAR(20), defaultValue: NOT_STARTED, constraints: { nullable: false } }
+              - column: { name: note, type: VARCHAR(2000) }
+              - column: { name: approval_status, type: VARCHAR(20) }
+              - column: { name: approved_by, type: VARCHAR(100) }
+              - column: { name: approved_at, type: TIMESTAMP }
+              - column: { name: process_instance_id, type: VARCHAR(64) }

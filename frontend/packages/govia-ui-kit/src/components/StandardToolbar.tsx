@@ -10,6 +10,9 @@ import {
   FileWordOutlined,
   PaperClipOutlined,
   UploadOutlined,
+  FolderOpenOutlined,
+  CheckCircleOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 
@@ -37,11 +40,20 @@ export interface StandardToolbarProps {
   onExportWord?: () => void;
   onAttachment?: () => void;
   onImport?: (file: File) => Promise<ImportResult>;
+  /** "File báo cáo khác" - vd man hinh Quan ly cong viec (CBKT/THKT): mo drawer file dinh kem
+   * dung chung cua ca cuoc kiem toan (khac voi onAttachment, thuong gan voi 1 dong dang chon). */
+  onOtherReports?: () => void;
+  /** "Phê duyệt" hang loat - vd truong doan chon nhieu dong da hoan thanh roi bam duyet. */
+  onApprove?: () => void;
+  /** "Tải mẫu" - xuat file Excel rong (chi co header) de nguoi dung dien tay roi Import lai - vd
+   * "Download Template TTSS". Khac onExportExcel (xuat DU LIEU hien co) o cho day la mau RONG. */
+  onDownloadTemplate?: () => void;
   addDisabled?: boolean;
   editDisabled?: boolean;
   copyDisabled?: boolean;
   deleteDisabled?: boolean;
   attachmentDisabled?: boolean;
+  approveDisabled?: boolean;
   loading?: boolean;
 }
 
@@ -55,11 +67,15 @@ export function StandardToolbar(props: StandardToolbarProps) {
     onExportWord,
     onAttachment,
     onImport,
+    onOtherReports,
+    onApprove,
+    onDownloadTemplate,
     addDisabled,
     editDisabled,
     copyDisabled,
     deleteDisabled,
     attachmentDisabled,
+    approveDisabled,
     loading,
   } = props;
   const { t } = useTranslation();
@@ -88,6 +104,11 @@ export function StandardToolbar(props: StandardToolbarProps) {
   return (
     <>
       <Space wrap>
+        {onDownloadTemplate && (
+          <Button icon={<DownloadOutlined />} onClick={onDownloadTemplate}>
+            {t("common.downloadTemplate")}
+          </Button>
+        )}
         {onAdd && (
           <Button type="primary" icon={<PlusOutlined />} onClick={onAdd} loading={loading} disabled={addDisabled}>
             {t("common.add")}
@@ -128,6 +149,16 @@ export function StandardToolbar(props: StandardToolbarProps) {
         {onAttachment && (
           <Button icon={<PaperClipOutlined />} onClick={onAttachment} disabled={attachmentDisabled}>
             {t("common.attachment")}
+          </Button>
+        )}
+        {onOtherReports && (
+          <Button icon={<FolderOpenOutlined />} onClick={onOtherReports}>
+            {t("common.otherReports")}
+          </Button>
+        )}
+        {onApprove && (
+          <Button icon={<CheckCircleOutlined />} onClick={onApprove} disabled={approveDisabled}>
+            {t("common.approve")}
           </Button>
         )}
       </Space>

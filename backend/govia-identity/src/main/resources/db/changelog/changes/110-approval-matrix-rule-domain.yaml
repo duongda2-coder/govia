@@ -1,0 +1,23 @@
+databaseChangeLog:
+
+  # ===================== APPROVAL_MATRIX_RULE: tong quat hoa cho nhieu domain =====================
+  # Them cot "domain" de 1 bang approval_matrix_rule dung chung duoc cho nhieu loai phe duyet dong
+  # (vd "EMPLOYEE" - duyet nhan vien moi hien co, "AUDIT_WORKITEM" - duyet cong viec kiem toan CBKT/
+  # THKT sau nay) thay vi phai tao bang moi cho tung domain. Du lieu cu duoc gan mac dinh "EMPLOYEE"
+  # de tuong thich nguoc. Unique constraint cu (tenant_id, org_unit_id) duoc thay bang (tenant_id,
+  # domain, org_unit_id) de cung 1 don vi to chuc co the co quy tac rieng cho tung domain.
+  - changeSet:
+      id: 110-1-approval-matrix-rule-domain-column
+      author: govia
+      changes:
+        - addColumn:
+            tableName: approval_matrix_rule
+            columns:
+              - column: { name: domain, type: VARCHAR(40), defaultValue: EMPLOYEE, constraints: { nullable: false } }
+        - dropUniqueConstraint:
+            tableName: approval_matrix_rule
+            constraintName: uk_approval_matrix_rule_tenant_org_unit
+        - addUniqueConstraint:
+            tableName: approval_matrix_rule
+            columnNames: tenant_id, domain, org_unit_id
+            constraintName: uk_approval_matrix_rule_tenant_domain_org_unit

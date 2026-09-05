@@ -70,6 +70,9 @@
     "auditPlanExecCmNtd12": "07F/BKS-KTNB (NTD12)",
     "auditPlanExecCmNtd13": "07D/BKS-KTNB (NTD13)",
     "auditPlanExecCmNtd14": "08C/BKS-KTNB (NTD14)",
+    "auditPlanExecWorkManagementCbkt": "Work management (CBKT)",
+    "auditPlanExecWorkManagementThkt": "Work management (THKT)",
+    "auditPlanExecWorkManagementTtss": "Exceptions & recommendations",
     "riskScoring": "Risk Scoring",
     "riskScoringMasterData": "Master Data CDRR",
     "riskScoringGroups": "Criteria Groups",
@@ -142,6 +145,9 @@
     "exportWord": "Export Word",
     "exporting": "Exporting file...",
     "attachment": "Attachment",
+    "otherReports": "Other report files",
+    "approve": "Approve",
+    "downloadTemplate": "Download template",
     "search": "Search",
     "reset": "Reset",
     "confirm": "OK",
@@ -923,6 +929,113 @@
   "auditPlanExecution": {
     "engagementFilter": "Engagement Code",
     "selectEngagement": "Select an audit engagement to view/enter data"
+  },
+  "auditWorkManagement": {
+    "cbktTitle": "Work Management - Preparation (CBKT)",
+    "thktTitle": "Work Management - Fieldwork (THKT)",
+    "approveConfirmTitle": "Approve {{count}} selected work item(s)?",
+    "columns": {
+      "engagementCode": "Engagement Code",
+      "engagementName": "Engagement Name",
+      "businessSegmentCode": "Business Segment",
+      "workItemCode": "Work Item Code",
+      "workItemName": "Work Item Name",
+      "employee": "Assignee",
+      "status": "Status",
+      "approvalStatus": "Team Lead Approval",
+      "note": "Note"
+    },
+    "status": {
+      "NOT_STARTED": "Not started",
+      "IN_PROGRESS": "In progress",
+      "DONE": "Done"
+    },
+    "approvalStatus": {
+      "PENDING": "Pending",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
+    },
+    "form": { "editTitle": "Update work item status" },
+    "messages": {
+      "loadError": "Failed to load work items",
+      "updateSuccess": "Status updated",
+      "updateError": "Failed to update status",
+      "approveSuccess": "Selected work items approved",
+      "approveError": "Approval failed"
+    },
+    "reportFiles": {
+      "title": "Other report files",
+      "loadError": "Failed to load files",
+      "uploadSuccess": "File uploaded",
+      "uploadError": "Failed to upload file",
+      "deleteSuccess": "File deleted",
+      "deleteError": "Failed to delete file",
+      "columns": {
+        "businessSegment": "Segment",
+        "uploadedAt": "Uploaded at",
+        "uploadedByName": "Uploaded by",
+        "reportType": "Report type",
+        "fileName": "File name"
+      }
+    }
+  },
+  "auditProgressReport": {
+    "title": "Progress report",
+    "loadError": "Failed to load progress reports",
+    "approveConfirmTitle": "Approve {{count}} selected progress report(s)?",
+    "approveSuccess": "Progress report approved",
+    "approveError": "Approval failed",
+    "columns": {
+      "businessSegment": "Segment",
+      "totalFindings": "Total findings",
+      "totalTtss": "Distinct exceptions",
+      "totalMaterialFindings": "Material findings",
+      "totalMaterialTtss": "Material exceptions",
+      "totalSamples": "Total samples",
+      "completedSamples": "Completed samples",
+      "reportDate": "Report date",
+      "reportRound": "Round",
+      "reportedByUsername": "Reported by",
+      "note": "Note",
+      "approvalStatus": "File approval"
+    }
+  },
+  "auditRecommendation": {
+    "title": "Recommendations",
+    "loadError": "Failed to load recommendations",
+    "createSuccess": "Recommendation added",
+    "createError": "Failed to add recommendation",
+    "columns": {
+      "code": "Code",
+      "businessSegment": "Business type",
+      "content": "Content"
+    }
+  },
+  "auditTtss": {
+    "title": "Exceptions & Recommendations",
+    "linkRecommendationButton": "Link recommendation",
+    "linkRecommendationTitle": "Link a recommendation to {{count}} selected row(s)",
+    "linkRecommendationSuccess": "Recommendation linked",
+    "linkRecommendationError": "Failed to link recommendation",
+    "approveConfirmTitle": "Approve recommendation for {{count}} selected row(s)?",
+    "columns": {
+      "businessSegment": "Segment",
+      "workItemCode": "Work item code",
+      "processStepSummary": "Process step",
+      "ttssContent": "Exception detail",
+      "findingCode": "Finding code",
+      "findingName": "Finding name",
+      "material": "Material",
+      "customerName": "Customer name",
+      "amount": "Amount",
+      "teamRecommendation": "Team lead recommendation",
+      "recommendationApprovalStatus": "Recommendation approval"
+    },
+    "messages": {
+      "loadError": "Failed to load exceptions",
+      "approveSuccess": "Recommendation approved",
+      "approveError": "Approval failed"
+    }
   },
   "auditCmTd1": {
     "title": "02L/BKS-KTNB (TD1)",

@@ -23,6 +23,20 @@ spring:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
+  # Chi thuc su duoc dung khi govia.notification.email.enabled=true (xem duoi). De trong (host
+  # rong) thi Spring Boot van tao JavaMailSender ben trong nhung MailWorkflowNotificationService
+  # dang tat nen khong ai goi send() - an toan khi chua co SMTP that.
+  mail:
+    host: ${GOVIA_SMTP_HOST:}
+    port: ${GOVIA_SMTP_PORT:587}
+    username: ${GOVIA_SMTP_USERNAME:}
+    password: ${GOVIA_SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 flowable:
   database-schema-update: true   # Flowable tu tao/migrate bang ACT_* rieng, khong quan ly qua Liquibase
@@ -47,6 +61,12 @@ govia:
       timeout-seconds: ${OLLAMA_TIMEOUT_SECONDS:120}
       access-client-id: ${OLLAMA_ACCESS_CLIENT_ID:}
       access-client-secret: ${OLLAMA_ACCESS_CLIENT_SECRET:}
+  notification:
+    email:
+      # Mac dinh TAT: chua co SMTP that nao duoc cau hinh. Khi bat len (true) can dien them
+      # spring.mail.host/port/username/password ben duoi - xem MailWorkflowNotificationService.
+      enabled: ${GOVIA_NOTIFICATION_EMAIL_ENABLED:false}
+      from: ${GOVIA_NOTIFICATION_EMAIL_FROM:no-reply@govia.local}
 
 springdoc:
   swagger-ui:

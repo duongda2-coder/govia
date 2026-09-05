@@ -30,6 +30,11 @@ import java.util.stream.Collectors;
 @Service
 public class ApprovalMatrixRuleService {
 
+    /** Man hinh CRUD "Ma tran phe duyet" hien tai chi quan ly domain nay - cac domain khac (vd
+     * AUDIT_WORKITEM) doc rule qua resolveActiveRuleForOrgUnit(tenantId, domain, orgUnitId) nhung
+     * chua co man hinh quan tri rieng trong dot nay (fallback ve dây 1 buoc neu chua cau hinh). */
+    private static final String EMPLOYEE_DOMAIN = "EMPLOYEE";
+
     private final ApprovalMatrixRuleRepository repository;
     private final OrganizationUnitRepository orgUnitRepository;
     private final AuditLogService auditLogService;
@@ -44,7 +49,7 @@ public class ApprovalMatrixRuleService {
     @Transactional(readOnly = true)
     public List<ApprovalMatrixRuleResponse> list() {
         UUID tenantId = TenantContext.getTenantId();
-        List<ApprovalMatrixRule> rules = repository.findByTenantId(tenantId);
+        List<ApprovalMatrixRule> rules = repository.findByTenantIdAndDomain(tenantId, EMPLOYEE_DOMAIN);
         Map<UUID, OrganizationUnit> orgUnits = orgUnitRepository.findAllById(
                         rules.stream().map(ApprovalMatrixRule::getOrgUnitId).filter(Objects::nonNull).collect(Collectors.toSet()))
                 .stream().collect(Collectors.toMap(OrganizationUnit::getId, u -> u));
@@ -59,6 +64,7 @@ public class ApprovalMatrixRuleService {
 
         ApprovalMatrixRule rule = new ApprovalMatrixRule();
         rule.setTenantId(tenantId);
+        rule.setDomain(EMPLOYEE_DOMAIN);
         applyRequest(rule, request);
         rule = repository.save(rule);
 
@@ -92,17 +98,27 @@ public class ApprovalMatrixRuleService {
     }
 
     /** Uu tien quy tac rieng cho orgUnitId (neu co va active), sau do rot ve quy tac mac dinh
-     * (orgUnitId null, active) - tra ve null neu chua cau hinh gi ca. */
+     * (orgUnitId null, active) - tra ve null neu chua cau hinh gi ca. Domain "EMPLOYEE" (man hinh
+     * duyet nhan vien moi hien tai). */
     @Transactional(readOnly = true)
     public ApprovalMatrixRule resolveActiveRuleForOrgUnit(UUID tenantId, UUID orgUnitId) {
+        return resolveActiveRuleForOrgUnit(tenantId, EMPLOYEE_DOMAIN, orgUnitId);
+    }
+
+    /** Ban tong quat: cho phep domain khac "EMPLOYEE" (vd "AUDIT_WORKITEM") dung CHUNG bang
+     * approval_matrix_rule ma khong dung cham quy tac cua domain khac. Chua co man hinh quan tri
+     * cho cac domain nay trong dot nay - tra ve null (chua cau hinh) neu khong tim thay, buoc goi
+     * (vd AuditWorkApprovalChainResolver) tu quyet dinh fallback phu hop. */
+    @Transactional(readOnly = true)
+    public ApprovalMatrixRule resolveActiveRuleForOrgUnit(UUID tenantId, String domain, UUID orgUnitId) {
         if (orgUnitId != null) {
-            Optional<ApprovalMatrixRule> specific = repository.findByTenantIdAndOrgUnitId(tenantId, orgUnitId)
+            Optional<ApprovalMatrixRule> specific = repository.findByTenantIdAndDomainAndOrgUnitId(tenantId, domain, orgUnitId)
                     .filter(ApprovalMatrixRule::isActive);
             if (specific.isPresent()) {
                 return specific.get();
             }
         }
-        return repository.findByTenantIdAndOrgUnitIdIsNull(tenantId).filter(ApprovalMatrixRule::isActive).orElse(null);
+        return repository.findByTenantIdAndDomainAndOrgUnitIdIsNull(tenantId, domain).filter(ApprovalMatrixRule::isActive).orElse(null);
     }
 
     private void applyRequest(ApprovalMatrixRule rule, ApprovalMatrixRuleRequest request) {
@@ -123,8 +139,8 @@ public class ApprovalMatrixRuleService {
 
     private void checkNoDuplicateScope(UUID tenantId, UUID orgUnitId, UUID excludingId) {
         Optional<ApprovalMatrixRule> existing = orgUnitId == null
-                ? repository.findByTenantIdAndOrgUnitIdIsNull(tenantId)
-                : repository.findByTenantIdAndOrgUnitId(tenantId, orgUnitId);
+                ? repository.findByTenantIdAndDomainAndOrgUnitIdIsNull(tenantId, EMPLOYEE_DOMAIN)
+                : repository.findByTenantIdAndDomainAndOrgUnitId(tenantId, EMPLOYEE_DOMAIN, orgUnitId);
         existing.filter(r -> excludingId == null || !r.getId().equals(excludingId))
                 .ifPresent(r -> {
                     throw new BusinessException("APPROVAL_MATRIX_RULE_DUPLICATE_SCOPE",
