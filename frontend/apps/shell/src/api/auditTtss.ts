@@ -32,6 +32,7 @@ export interface AuditTtssRecordItem {
   relatedStaff: string | null;
   uploaderRecommendationCode: string | null;
   uploaderRecommendationName: string | null;
+  appendix: string | null;
   teamRecommendationId: string | null;
   teamRecommendationCode: string | null;
   teamRecommendationContent: string | null;

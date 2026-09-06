@@ -37,6 +37,7 @@ public record AuditTtssRecordResponse(
         String relatedStaff,
         String uploaderRecommendationCode,
         String uploaderRecommendationName,
+        String appendix,
         UUID teamRecommendationId,
         String teamRecommendationCode,
         String teamRecommendationContent,

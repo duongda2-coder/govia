@@ -8,6 +8,7 @@ import com.govia.audit.planengagement.recommendation.dto.AuditRecommendationResp
 import com.govia.audit.planengagement.recommendation.entity.AuditRecommendation;
 import com.govia.audit.planengagement.recommendation.repository.AuditRecommendationRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRepository;
+import com.govia.audit.planengagement.ttss.repository.AuditTtssRecordRepository;
 import com.govia.core.audit.AuditAction;
 import com.govia.core.audit.AuditLogService;
 import com.govia.core.tenant.TenantContext;
@@ -38,13 +39,16 @@ public class AuditRecommendationService {
     private final AuditRecommendationRepository repository;
     private final AuditEngagementRepository engagementRepository;
     private final AuditMasterDataItemRepository masterDataItemRepository;
+    private final AuditTtssRecordRepository ttssRecordRepository;
     private final AuditLogService auditLogService;
 
     public AuditRecommendationService(AuditRecommendationRepository repository, AuditEngagementRepository engagementRepository,
-                                       AuditMasterDataItemRepository masterDataItemRepository, AuditLogService auditLogService) {
+                                       AuditMasterDataItemRepository masterDataItemRepository, AuditTtssRecordRepository ttssRecordRepository,
+                                       AuditLogService auditLogService) {
         this.repository = repository;
         this.engagementRepository = engagementRepository;
         this.masterDataItemRepository = masterDataItemRepository;
+        this.ttssRecordRepository = ttssRecordRepository;
         this.auditLogService = auditLogService;
     }
 
@@ -74,6 +78,30 @@ public class AuditRecommendationService {
         auditLogService.record("AuditRecommendation", recommendation.getId(), AuditAction.CREATE,
                 "Them kien nghi " + nextCode + " cho CKT");
         return toResponse(recommendation, segmentsById(tenantId));
+    }
+
+    /** Khong cho xoa dong mac dinh (KNKT000, luon phai co san - xem ensureDefaultSeeded) hoac dong
+     * dang duoc gan lam kien nghi chinh thuc cho it nhat 1 dong TTSS (AuditTtssRecord.teamRecommendationId). */
+    @Transactional
+    public void delete(UUID engagementId, UUID recommendationId) {
+        UUID tenantId = TenantContext.getTenantId();
+        getEngagementOrThrow(tenantId, engagementId);
+        AuditRecommendation recommendation = repository.findById(recommendationId)
+                .filter(r -> r.getTenantId().equals(tenantId) && r.getEngagementId().equals(engagementId))
+                .orElseThrow(() -> new BusinessException("AUDIT_RECOMMENDATION_NOT_FOUND", "Khong tim thay kien nghi", HttpStatus.NOT_FOUND));
+
+        if (DEFAULT_CODE.equals(recommendation.getCode())) {
+            throw new BusinessException("AUDIT_RECOMMENDATION_DEFAULT_NOT_DELETABLE",
+                    "Khong the xoa kien nghi mac dinh " + DEFAULT_CODE, HttpStatus.BAD_REQUEST);
+        }
+        if (ttssRecordRepository.existsByTenantIdAndTeamRecommendationId(tenantId, recommendationId)) {
+            throw new BusinessException("AUDIT_RECOMMENDATION_IN_USE",
+                    "Kien nghi dang duoc gan cho it nhat 1 dong TTSS, khong the xoa", HttpStatus.BAD_REQUEST);
+        }
+
+        repository.delete(recommendation);
+        auditLogService.record("AuditRecommendation", recommendationId, AuditAction.DELETE,
+                "Xoa kien nghi " + recommendation.getCode() + " cua CKT");
     }
 
     private String nextCode(UUID tenantId, UUID engagementId) {

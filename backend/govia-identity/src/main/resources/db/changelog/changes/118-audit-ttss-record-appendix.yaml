@@ -1,0 +1,13 @@
+databaseChangeLog:
+
+  # "Phụ lục" - cot bo sung de khop dung mau Excel that (template_upload_ttss.xlsx) ma nghiep vu
+  # dang dung, phat hien sau khi mau "Tải mẫu" cua he thong dung ten cot khac voi mau that.
+  - changeSet:
+      id: 118-1-audit-ttss-record-appendix
+      author: govia
+      comment: "Them cot appendix (Phu luc) vao audit_ttss_record"
+      changes:
+        - addColumn:
+            tableName: audit_ttss_record
+            columns:
+              - column: { name: appendix, type: VARCHAR(1000) }

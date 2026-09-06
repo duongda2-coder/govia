@@ -175,16 +175,17 @@ class AuditTtssTemplateRoundTripTest {
 
             Row dataRow = sheet.getRow(sheet.getFirstRowNum() + 1);
             assertThat(dataRow).isNotNull();
-            assertThat(dataRow.getCell(headerToColumn.get("Nghiệp vụ")).getStringCellValue()).isEqualTo("LN");
-            assertThat(dataRow.getCell(headerToColumn.get("Mã công việc")).getStringCellValue()).isEqualTo("LNB0101");
+            assertThat(dataRow.getCell(headerToColumn.get("NV")).getStringCellValue()).isEqualTo("LN");
+            assertThat(dataRow.getCell(headerToColumn.get("mã công việc")).getStringCellValue()).isEqualTo("LNB0101");
 
             // Nguoi dung dien tay cac cot TTSS con lai truoc khi upload lai.
-            dataRow.createCell(headerToColumn.get("Nội dung TTSS")).setCellValue("Ho so vay thieu chu ky lanh dao chi nhanh");
-            dataRow.createCell(headerToColumn.get("Mã phát hiện")).setCellValue("LN0101_01");
-            dataRow.createCell(headerToColumn.get("Tên phát hiện")).setCellValue("Thieu chu ky phe duyet");
-            dataRow.createCell(headerToColumn.get("Trọng yếu")).setCellValue("x");
+            dataRow.createCell(headerToColumn.get("Diễn giải")).setCellValue("Ho so vay thieu chu ky lanh dao chi nhanh");
+            dataRow.createCell(headerToColumn.get("Mã TTSS")).setCellValue("LN0101_01");
+            dataRow.createCell(headerToColumn.get("Tên TTSS")).setCellValue("Thieu chu ky phe duyet");
+            dataRow.createCell(headerToColumn.get("Trong yếu")).setCellValue("x");
             dataRow.createCell(headerToColumn.get("Tên KH")).setCellValue("Nguyen Van A");
-            dataRow.createCell(headerToColumn.get("Số tiền")).setCellValue(1500000);
+            dataRow.createCell(headerToColumn.get("số tiền giản ngân/Số tiền hạch toán")).setCellValue(1500000);
+            dataRow.createCell(headerToColumn.get("Phụ lục")).setCellValue("Xem BB kiem tra so 12");
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
@@ -206,6 +207,7 @@ class AuditTtssTemplateRoundTripTest {
         assertThat(record.findingName()).isEqualTo("Thieu chu ky phe duyet");
         assertThat(record.material()).isTrue();
         assertThat(record.customerName()).isEqualTo("Nguyen Van A");
+        assertThat(record.appendix()).isEqualTo("Xem BB kiem tra so 12");
         assertThat(record.amount()).isEqualByComparingTo(BigDecimal.valueOf(1500000));
         assertThat(record.ttssPerformerName()).isEqualTo(worker.fullName());
 

@@ -111,6 +111,7 @@ export function TtssManagementPage() {
     },
     { title: t("auditTtss.columns.customerName"), dataIndex: "customerName", width: 160, render: (v) => v ?? "-" },
     { title: t("auditTtss.columns.amount"), dataIndex: "amount", width: 130, align: "right", render: (v) => v ?? "-" },
+    { title: t("auditTtss.columns.appendix"), dataIndex: "appendix", width: 160, render: (v) => v ?? "-" },
     {
       title: t("auditTtss.columns.teamRecommendation"),
       width: 200,

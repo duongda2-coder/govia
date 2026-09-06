@@ -6,6 +6,7 @@ import com.govia.audit.planengagement.recommendation.service.AuditRecommendation
 import com.govia.core.web.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,5 +38,12 @@ public class AuditRecommendationController {
     @PreAuthorize("hasAuthority('PERM_AUDIT.TTSS.EDIT')")
     public ApiResponse<AuditRecommendationResponse> create(@PathVariable UUID engagementId, @Valid @RequestBody AuditRecommendationRequest request) {
         return ApiResponse.ok(service.create(engagementId, request));
+    }
+
+    @DeleteMapping("/{recommendationId}")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.TTSS.EDIT')")
+    public ApiResponse<Void> delete(@PathVariable UUID engagementId, @PathVariable UUID recommendationId) {
+        service.delete(engagementId, recommendationId);
+        return ApiResponse.ok(null);
     }
 }

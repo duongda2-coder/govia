@@ -170,6 +170,28 @@ class AuditTtssAndProgressReportWorkflowTest {
     }
 
     @Test
+    void deleteRecommendation_blockedForDefaultAndInUseOtherwiseRemoved() {
+        EmployeeResponse teamLead = createEmployee("NV-C-TL-03");
+        AuditEngagement engagement = createEngagement("CKT-C-03", teamLead.id());
+
+        AuditRecommendationResponse defaultRecommendation = recommendationService.list(engagement.getId()).get(0);
+        assertThatThrownBy(() -> recommendationService.delete(engagement.getId(), defaultRecommendation.id()))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("mac dinh");
+
+        AuditRecommendationResponse inUse = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Dang duoc gan"));
+        AuditTtssRecord record = ttssRecordRepository.save(newTtssRecord(engagement.getId(), "TT300", false));
+        ttssService.linkRecommendation(engagement.getId(), new AuditTtssLinkRecommendationRequest(List.of(record.getId()), inUse.id()));
+        assertThatThrownBy(() -> recommendationService.delete(engagement.getId(), inUse.id()))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("dang duoc gan");
+
+        AuditRecommendationResponse unused = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Chua dung"));
+        recommendationService.delete(engagement.getId(), unused.id());
+        assertThat(recommendationService.list(engagement.getId())).extracting(AuditRecommendationResponse::id).doesNotContain(unused.id());
+    }
+
+    @Test
     void approveRecommendation_rejectedWhenNotLinked() {
         EmployeeResponse teamLead = createEmployee("NV-C-TL-02");
         UUID teamLeadAccountId = createUserAccount(teamLead.id(), "ctl02");

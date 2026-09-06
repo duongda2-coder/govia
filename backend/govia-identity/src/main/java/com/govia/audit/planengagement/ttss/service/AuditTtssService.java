@@ -170,6 +170,7 @@ public class AuditTtssService {
             }
             AuditMasterDataItem segment = segments.get(workItem.getBusinessSegmentId());
             Map<String, Object> row = new HashMap<>();
+            row.put("stt", rows.size() + 1);
             row.put("engagementCode", engagement.getCode());
             row.put("auditObjectUnitCode", unit == null ? null : unit.getCode());
             row.put("businessSegmentCode", segment == null ? null : segment.getCode());
@@ -232,6 +233,7 @@ public class AuditTtssService {
             record.setRelatedStaff(emptyToNull(row.get("relatedStaff")));
             record.setUploaderRecommendationCode(emptyToNull(row.get("uploaderRecommendationCode")));
             record.setUploaderRecommendationName(emptyToNull(row.get("uploaderRecommendationName")));
+            record.setAppendix(emptyToNull(row.get("appendix")));
             saved.add(ttssRepository.save(record));
         }
 
@@ -357,31 +359,44 @@ public class AuditTtssService {
                 .stream().collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i));
     }
 
+    /** Ten cot PHAI khop CHINH XAC (sau khi trim) voi mau Excel that ma nghiep vu dang dung
+     * (template_upload_ttss.xlsx, khac voi ban dich ban dau) - kem ca loi chinh ta/thieu dau trong
+     * ban goc (vd "Trong yếu" thieu dau, khong duoc "sua dep" lai vi se lam gay khop cot khi import
+     * dung file that. "recordUsername"/"ttssPerformerName" chi de LAM TIEU DE cho nguoi dung biet -
+     * gia tri LUON tu dong lay tu nguoi upload, KHONG doc lai tu file (xem upload()). Cac cot
+     * "*Name" cua BQT chi la ten goi y cho nguoi dien tay, khong doc lai khi import (ten duoc tra ve
+     * qua tra cuu FK trong toResponse()). */
     private List<ExportColumn> templateColumns() {
         return List.of(
-                new ExportColumn("engagementCode", "Mã CKT"),
-                new ExportColumn("auditObjectUnitCode", "Mã CN"),
-                new ExportColumn("businessSegmentCode", "Nghiệp vụ"),
-                new ExportColumn("workItemCode", "Mã công việc"),
-                new ExportColumn("processStepSummaryCode", "Bước QT tổng hợp"),
-                new ExportColumn("ttssContent", "Nội dung TTSS"),
+                new ExportColumn("stt", "STT"),
+                new ExportColumn("engagementCode", "mã CKT"),
+                new ExportColumn("auditObjectUnitCode", "Mã CN (lấy từ mã KH)"),
+                new ExportColumn("recordUsername", "Cán bộ thực hiện (Lấy user Upload lên)"),
+                new ExportColumn("businessSegmentCode", "NV"),
+                new ExportColumn("workItemCode", "mã công việc"),
+                new ExportColumn("processStepSummaryCode", "mã BQT tổng hợp"),
+                new ExportColumn("processStepSummaryName", "tên BQT tổng hợp"),
                 new ExportColumn("processStepDetailCode", "Mã BQT chi tiết"),
-                new ExportColumn("findingCode", "Mã phát hiện"),
-                new ExportColumn("findingName", "Tên phát hiện"),
-                new ExportColumn("material", "Trọng yếu"),
-                new ExportColumn("referenceNumber", "Số tham chiếu"),
-                new ExportColumn("referenceNumber2", "Số tham chiếu 2"),
-                new ExportColumn("customerCode", "Mã KH"),
+                new ExportColumn("processStepDetailName", "Tên BQT chi tiết"),
+                new ExportColumn("findingCode", "Mã TTSS"),
+                new ExportColumn("findingName", "Tên TTSS"),
+                new ExportColumn("material", "Trong yếu"),
+                new ExportColumn("ttssContent", "Diễn giải"),
+                new ExportColumn("referenceNumber", "Số tham chiếu (Số TK, Số thẻ, Số hợp đồng TG,…, số bt)"),
+                new ExportColumn("referenceNumber2", "Số tham chiếu 2 (Ngày phát sinh giao dịch) nếu có"),
+                new ExportColumn("customerCode", "Mã KH/TKHT/Mã CB"),
                 new ExportColumn("customerName", "Tên KH"),
-                new ExportColumn("amount", "Số tiền"),
-                new ExportColumn("performingUser", "User thực hiện"),
-                new ExportColumn("transactionContent", "Nội dung giao dịch"),
+                new ExportColumn("amount", "số tiền giản ngân/Số tiền hạch toán"),
+                new ExportColumn("performingUser", "User thực hiện (nếu có) ,user hạch toán"),
+                new ExportColumn("transactionContent", "Nội dung (giao dịch nếu có)"),
+                new ExportColumn("uploaderRecommendationCode", "mã KN ( nếu có )"),
+                new ExportColumn("uploaderRecommendationName", "Loại Kiến nghị"),
                 new ExportColumn("exceptionDate", "Ngày HTKN"),
-                new ExportColumn("approverName", "Tên cán bộ phê duyệt"),
-                new ExportColumn("controllerName", "Tên người kiểm soát"),
-                new ExportColumn("relatedStaff", "Cán bộ liên quan khác"),
-                new ExportColumn("uploaderRecommendationCode", "Mã KN"),
-                new ExportColumn("uploaderRecommendationName", "Tên KN"));
+                new ExportColumn("ttssPerformerName", "Tên cán bộ người thực hiện TTSS"),
+                new ExportColumn("relatedStaff", "Cán bộ LQ khác"),
+                new ExportColumn("approverName", "tên cán bộ phê duyệt"),
+                new ExportColumn("controllerName", "tên cán bộ-người kiểm soát"),
+                new ExportColumn("appendix", "Phụ lục"));
     }
 
     private boolean isBlank(String value) {
@@ -455,7 +470,7 @@ public class AuditTtssService {
                 record.getFindingCode(), record.getFindingName(), record.isMaterial(), record.getReferenceNumber(), record.getReferenceNumber2(),
                 record.getCustomerCode(), record.getCustomerName(), record.getAmount(), record.getPerformingUser(), record.getTransactionContent(),
                 record.getExceptionDate(), record.getApproverName(), record.getControllerName(), record.getTtssPerformerName(), record.getRelatedStaff(),
-                record.getUploaderRecommendationCode(), record.getUploaderRecommendationName(), record.getTeamRecommendationId(),
+                record.getUploaderRecommendationCode(), record.getUploaderRecommendationName(), record.getAppendix(), record.getTeamRecommendationId(),
                 teamRecommendation == null ? null : teamRecommendation.getCode(), teamRecommendation == null ? null : teamRecommendation.getContent(),
                 record.getRecommendationApprovalStatus(), record.getRecommendationApprovedBy(), record.getRecommendationApprovedAt());
     }

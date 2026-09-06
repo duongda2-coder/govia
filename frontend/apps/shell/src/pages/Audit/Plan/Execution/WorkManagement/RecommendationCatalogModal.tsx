@@ -1,13 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { App, Button, Form, Input, Modal, Select, Table } from "antd";
 import type { TableProps } from "antd";
+import { DeleteOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
+import { getApiErrorMessage } from "@govia/ui-kit";
 import {
   createAuditRecommendation,
+  deleteAuditRecommendation,
   listAuditRecommendations,
   type AuditRecommendationItem,
 } from "../../../../../api/auditRecommendation";
 import { listMasterDataItems, type MasterDataItem } from "../../../../../api/auditMasterData";
+
+/** Ma mac dinh luon co san cho moi engagement, khong duoc phep xoa - khop DEFAULT_CODE ben
+ * AuditRecommendationService (backend cung chan neu co goi xoa). */
+const DEFAULT_RECOMMENDATION_CODE = "KNKT000";
 
 export interface RecommendationCatalogModalProps {
   open: boolean;
@@ -26,7 +33,7 @@ interface FormValues {
  * mac dinh KNKT000 - xem AuditRecommendationService). */
 export function RecommendationCatalogModal({ open, engagementId, onClose, onChanged }: RecommendationCatalogModalProps) {
   const { t } = useTranslation();
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
   const [items, setItems] = useState<AuditRecommendationItem[]>([]);
   const [segments, setSegments] = useState<MasterDataItem[]>([]);
@@ -75,10 +82,38 @@ export function RecommendationCatalogModal({ open, engagementId, onClose, onChan
     }
   };
 
+  const handleDelete = (item: AuditRecommendationItem) => {
+    if (!engagementId) return;
+    modal.confirm({
+      title: t("auditRecommendation.deleteConfirmTitle"),
+      okText: t("common.yes"),
+      cancelText: t("common.no"),
+      onOk: async () => {
+        try {
+          await deleteAuditRecommendation(engagementId, item.id);
+          message.success(t("auditRecommendation.deleteSuccess"));
+          await load();
+          onChanged?.();
+        } catch (err) {
+          message.error(getApiErrorMessage(err, t("auditRecommendation.deleteError")));
+        }
+      },
+    });
+  };
+
   const columns: TableProps<AuditRecommendationItem>["columns"] = [
     { title: t("auditRecommendation.columns.code"), dataIndex: "code", width: 110 },
     { title: t("auditRecommendation.columns.businessSegment"), dataIndex: "businessSegmentCode", width: 120, render: (v) => v ?? "-" },
     { title: t("auditRecommendation.columns.content"), dataIndex: "content" },
+    {
+      title: "",
+      key: "actions",
+      width: 60,
+      render: (_: unknown, item: AuditRecommendationItem) =>
+        item.code === DEFAULT_RECOMMENDATION_CODE ? null : (
+          <Button type="link" danger icon={<DeleteOutlined />} onClick={() => handleDelete(item)} />
+        ),
+    },
   ];
 
   return (

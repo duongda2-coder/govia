@@ -335,3 +335,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/117-audit-ttss-permission-catalog.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/118-audit-ttss-record-appendix.yaml
+      relativeToChangelogFile: false

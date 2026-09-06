@@ -28,3 +28,7 @@ export async function createAuditRecommendation(engagementId: string, request: A
   const res = await httpClient.post<ApiResponse<AuditRecommendationItem>>(base(engagementId), request);
   return res.data.data;
 }
+
+export async function deleteAuditRecommendation(engagementId: string, recommendationId: string): Promise<void> {
+  await httpClient.delete(`${base(engagementId)}/${recommendationId}`);
+}

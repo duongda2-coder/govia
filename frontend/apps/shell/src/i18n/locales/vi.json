@@ -1007,6 +1007,9 @@
     "loadError": "Không tải được danh sách kiến nghị",
     "createSuccess": "Đã thêm kiến nghị",
     "createError": "Thêm kiến nghị thất bại",
+    "deleteConfirmTitle": "Xóa kiến nghị này?",
+    "deleteSuccess": "Đã xóa kiến nghị",
+    "deleteError": "Xóa kiến nghị thất bại",
     "columns": {
       "code": "Mã kiến nghị",
       "businessSegment": "Loại nghiệp vụ",
@@ -1031,7 +1034,8 @@
       "customerName": "Tên KH",
       "amount": "Số tiền",
       "teamRecommendation": "Kiến nghị trưởng đoàn",
-      "recommendationApprovalStatus": "Phê duyệt KN"
+      "recommendationApprovalStatus": "Phê duyệt KN",
+      "appendix": "Phụ lục"
     },
     "messages": {
       "loadError": "Không tải được danh sách TTSS",

@@ -1007,6 +1007,9 @@
     "loadError": "Failed to load recommendations",
     "createSuccess": "Recommendation added",
     "createError": "Failed to add recommendation",
+    "deleteConfirmTitle": "Delete this recommendation?",
+    "deleteSuccess": "Recommendation deleted",
+    "deleteError": "Failed to delete recommendation",
     "columns": {
       "code": "Code",
       "businessSegment": "Business type",
@@ -1031,7 +1034,8 @@
       "customerName": "Customer name",
       "amount": "Amount",
       "teamRecommendation": "Team lead recommendation",
-      "recommendationApprovalStatus": "Recommendation approval"
+      "recommendationApprovalStatus": "Recommendation approval",
+      "appendix": "Appendix"
     },
     "messages": {
       "loadError": "Failed to load exceptions",

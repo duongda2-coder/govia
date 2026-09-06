@@ -113,6 +113,10 @@ public class AuditTtssRecord extends BaseEntity {
     @Column(name = "uploader_recommendation_name", length = 255)
     private String uploaderRecommendationName;
 
+    /** "Phụ lục" - dinh kem tham chieu tu do, chi la text ghi chu. */
+    @Column(name = "appendix", length = 1000)
+    private String appendix;
+
     /** "Mã KN trưởng đoàn" - kien nghi CHINH THUC, set qua chuc nang "Gắn kiến nghị". Noi dung
      * ("Nội dung KN trưởng đoàn") KHONG luu rieng - resolve dong tu day luc tra response de tranh
      * trung lap/lech du lieu voi bang danh muc AuditRecommendation. */
