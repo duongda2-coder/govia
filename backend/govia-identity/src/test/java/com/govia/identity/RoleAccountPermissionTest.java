@@ -131,6 +131,38 @@ class RoleAccountPermissionTest {
     }
 
     @Test
+    void effectivePermissions_unionAcrossAllAssignedRoles() {
+        EmployeeResponse emp = createEmployee("RBAC-T05");
+        userAccountService.createForEmployee(emp.id(), new CreateUserAccountRequest("rbac.t05", "Password123"));
+        UUID accountId = userAccountRepository.findByEmployeeId(emp.id()).orElseThrow().getId();
+
+        RoleResponse roleA = roleService.create(new RoleRequest("RBAC_T05_ROLE_A", "Role A", null));
+        roleService.setPermissionCodes(roleA.id(), new RolePermissionsRequest(List.of("PEOPLE.EMPLOYEE.VIEW")));
+        RoleResponse roleB = roleService.create(new RoleRequest("RBAC_T05_ROLE_B", "Role B", null));
+        roleService.setPermissionCodes(roleB.id(), new RolePermissionsRequest(List.of("PEOPLE.POSITION.VIEW")));
+
+        userAccountService.assignRoles(accountId, new AssignRolesRequest(List.of(roleA.id(), roleB.id())));
+
+        assertThat(userAccountService.getEffectivePermissionCodes(accountId))
+                .containsExactlyInAnyOrder("PEOPLE.EMPLOYEE.VIEW", "PEOPLE.POSITION.VIEW");
+    }
+
+    @Test
+    void effectivePermissions_wildcardRoleGrantsFullCatalog() {
+        EmployeeResponse emp = createEmployee("RBAC-T06");
+        userAccountService.createForEmployee(emp.id(), new CreateUserAccountRequest("rbac.t06", "Password123"));
+        UUID accountId = userAccountRepository.findByEmployeeId(emp.id()).orElseThrow().getId();
+
+        RoleResponse superAdmin = roleService.list().stream()
+                .filter(r -> "SUPER_ADMIN".equals(r.code()))
+                .findFirst().orElseThrow();
+        userAccountService.assignRoles(accountId, new AssignRolesRequest(List.of(superAdmin.id())));
+
+        assertThat(userAccountService.getEffectivePermissionCodes(accountId))
+                .containsExactlyInAnyOrderElementsOf(roleService.listPermissions().stream().map(p -> p.code()).toList());
+    }
+
+    @Test
     void role_cannotBeDeletedWhileAssignedToAnAccount() {
         EmployeeResponse emp = createEmployee("RBAC-T03");
         userAccountService.createForEmployee(emp.id(), new CreateUserAccountRequest("rbac.t03", "Password123"));

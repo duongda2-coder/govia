@@ -55,6 +55,12 @@ public class AccountController {
         return ApiResponse.ok(null);
     }
 
+    /** Quyen hieu luc (hop nhat tu moi vai tro dang gan) cua 1 tai khoan - dung cho man hinh "Xem quyen". */
+    @GetMapping("/{id}/permissions")
+    public ApiResponse<List<String>> permissions(@PathVariable UUID id) {
+        return ApiResponse.ok(userAccountService.getEffectivePermissionCodes(id));
+    }
+
     /** Sao chep toan bo vai tro (nen quyen) tu 1 tai khoan khac sang tai khoan {id} - ghi de vai tro hien co. */
     @PostMapping("/{id}/copy-roles")
     public ApiResponse<Void> copyRoles(@PathVariable UUID id, @RequestBody CopyRolesRequest request) {

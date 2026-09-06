@@ -224,6 +224,12 @@
       "assignRoles": "Gán vai trò",
       "copyRoles": "Sao chép quyền"
     },
+    "viewPermissions": {
+      "action": "Xem quyền",
+      "title": "Quyền hiệu lực của \"{{username}}\"",
+      "rolesPrefix": "Vai trò đang gán:",
+      "loadError": "Không tải được quyền của tài khoản này"
+    },
     "assignRoles": {
       "action": "Gán vai trò",
       "title": "Gán vai trò cho {{username}}",

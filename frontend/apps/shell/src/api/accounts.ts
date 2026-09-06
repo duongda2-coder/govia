@@ -27,6 +27,12 @@ export async function copyAccountRoles(id: string, sourceAccountId: string): Pro
   await httpClient.post(`/api/accounts/${id}/copy-roles`, { sourceAccountId });
 }
 
+/** Quyen HIEU LUC (hop nhat tu moi vai tro dang gan) cua 1 tai khoan - dung cho man hinh "Xem quyen". */
+export async function getAccountPermissions(id: string): Promise<string[]> {
+  const res = await httpClient.get<ApiResponse<string[]>>(`/api/accounts/${id}/permissions`);
+  return res.data.data;
+}
+
 /** Xoa han tai khoan dang nhap - chi SUPER_ADMIN goi duoc (xem AccountController). */
 export async function deleteAccount(id: string): Promise<void> {
   await httpClient.delete(`/api/accounts/${id}`);

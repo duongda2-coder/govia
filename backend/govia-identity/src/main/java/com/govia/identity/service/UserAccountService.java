@@ -12,11 +12,15 @@ import com.govia.identity.dto.AdminResetPasswordRequest;
 import com.govia.identity.dto.AssignRolesRequest;
 import com.govia.identity.dto.CreateUserAccountRequest;
 import com.govia.identity.entity.Employee;
+import com.govia.identity.entity.Permission;
 import com.govia.identity.entity.Role;
+import com.govia.identity.entity.RolePermission;
 import com.govia.identity.entity.UserAccount;
 import com.govia.identity.entity.UserRole;
 import com.govia.identity.entity.UserStatus;
 import com.govia.identity.repository.EmployeeRepository;
+import com.govia.identity.repository.PermissionRepository;
+import com.govia.identity.repository.RolePermissionRepository;
 import com.govia.identity.repository.RoleRepository;
 import com.govia.identity.repository.UserAccountRepository;
 import com.govia.identity.repository.UserRoleRepository;
@@ -43,6 +47,8 @@ public class UserAccountService {
     private final EmployeeRepository employeeRepository;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
+    private final RolePermissionRepository rolePermissionRepository;
+    private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
@@ -51,6 +57,8 @@ public class UserAccountService {
                                EmployeeRepository employeeRepository,
                                RoleRepository roleRepository,
                                UserRoleRepository userRoleRepository,
+                               RolePermissionRepository rolePermissionRepository,
+                               PermissionRepository permissionRepository,
                                PasswordEncoder passwordEncoder,
                                AuditLogService auditLogService,
                                ExcelExportService excelExportService) {
@@ -58,6 +66,8 @@ public class UserAccountService {
         this.employeeRepository = employeeRepository;
         this.roleRepository = roleRepository;
         this.userRoleRepository = userRoleRepository;
+        this.rolePermissionRepository = rolePermissionRepository;
+        this.permissionRepository = permissionRepository;
         this.passwordEncoder = passwordEncoder;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
@@ -144,6 +154,37 @@ public class UserAccountService {
                             roleCodes);
                 })
                 .toList();
+    }
+
+    /**
+     * Quyen HIEU LUC (hop nhat) cua 1 tai khoan = hop tat ca quyen tu moi vai tro dang gan cho no -
+     * dung cho man hinh "Xem quyen" cua Super Admin de biet tai khoan nay THUC SU lam duoc gi, khong
+     * phai lat tung vai tro rieng le. Cung logic wildcard "*" (chi SUPER_ADMIN duoc seed san) nhu luc
+     * dang nhap - xem AuthService.computePermissionCodes().
+     */
+    @Transactional(readOnly = true)
+    public List<String> getEffectivePermissionCodes(UUID accountId) {
+        UUID tenantId = TenantContext.getTenantId();
+        userAccountRepository.findById(accountId)
+                .filter(a -> a.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("ACCOUNT_NOT_FOUND", "Khong tim thay tai khoan", HttpStatus.NOT_FOUND));
+
+        List<UUID> roleIds = userRoleRepository.findByUserId(accountId).stream().map(UserRole::getRoleId).toList();
+        List<UUID> permissionIds = roleIds.stream()
+                .flatMap(roleId -> rolePermissionRepository.findByRoleId(roleId).stream())
+                .map(RolePermission::getPermissionId)
+                .distinct()
+                .toList();
+
+        List<Permission> grantedPermissions = permissionRepository.findAllById(permissionIds);
+        boolean hasWildcard = grantedPermissions.stream().anyMatch(p -> "*".equals(p.getCode()));
+        if (hasWildcard) {
+            return permissionRepository.findAll().stream()
+                    .map(Permission::getCode)
+                    .filter(code -> !"*".equals(code))
+                    .toList();
+        }
+        return grantedPermissions.stream().map(Permission::getCode).toList();
     }
 
     @Transactional(readOnly = true)

@@ -224,6 +224,12 @@
       "assignRoles": "Assign Roles",
       "copyRoles": "Copy Roles"
     },
+    "viewPermissions": {
+      "action": "View Permissions",
+      "title": "Effective permissions of \"{{username}}\"",
+      "rolesPrefix": "Assigned roles:",
+      "loadError": "Could not load this account's permissions"
+    },
     "assignRoles": {
       "action": "Assign Roles",
       "title": "Assign Roles for {{username}}",

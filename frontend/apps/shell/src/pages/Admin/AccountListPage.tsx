@@ -7,6 +7,7 @@ import type { AccountStatus, AccountSummary } from "../../api/accounts";
 import { deleteAccount, exportAccounts, listAccounts } from "../../api/accounts";
 import { listRoles, type Role } from "../../api/roles";
 import { useAuth } from "../../auth/AuthContext";
+import { AccountPermissionsDrawer } from "./AccountPermissionsDrawer";
 import { AssignRolesModal } from "./AssignRolesModal";
 import { CopyRolesModal } from "./CopyRolesModal";
 
@@ -30,6 +31,7 @@ export function AccountListPage() {
   const [loading, setLoading] = useState(false);
   const [assigning, setAssigning] = useState<AccountSummary | null>(null);
   const [copyingInto, setCopyingInto] = useState<AccountSummary | null>(null);
+  const [viewingPermissions, setViewingPermissions] = useState<AccountSummary | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -103,7 +105,7 @@ export function AccountListPage() {
     {
       title: t("account.columns.assignRoles"),
       key: "assign",
-      width: 340,
+      width: 440,
       render: (_: unknown, record) => (
         <Space>
           <Button size="small" onClick={() => setAssigning(record)}>
@@ -111,6 +113,9 @@ export function AccountListPage() {
           </Button>
           <Button size="small" onClick={() => setCopyingInto(record)}>
             {t("account.copyRoles.action")}
+          </Button>
+          <Button size="small" onClick={() => setViewingPermissions(record)}>
+            {t("account.viewPermissions.action")}
           </Button>
           <Button size="small" danger disabled={record.id === user?.userId} onClick={() => handleDelete(record)}>
             {t("common.delete")}
@@ -151,6 +156,7 @@ export function AccountListPage() {
           load();
         }}
       />
+      <AccountPermissionsDrawer open={!!viewingPermissions} account={viewingPermissions} onClose={() => setViewingPermissions(null)} />
     </div>
   );
 }
