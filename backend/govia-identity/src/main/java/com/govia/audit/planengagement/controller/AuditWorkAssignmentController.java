@@ -37,8 +37,9 @@ public class AuditWorkAssignmentController {
     @PreAuthorize("hasAuthority('PERM_AUDIT.WORK_MANAGEMENT.VIEW')")
     public ApiResponse<List<AuditWorkManagementItemResponse>> list(@PathVariable UUID engagementId,
                                                                     @RequestParam AuditWorkPhase phase,
-                                                                    @RequestParam(required = false) UUID employeeId) {
-        return ApiResponse.ok(service.list(engagementId, phase, employeeId));
+                                                                    @RequestParam(required = false) UUID employeeId,
+                                                                    @AuthenticationPrincipal CurrentUserPrincipal principal) {
+        return ApiResponse.ok(service.list(engagementId, phase, employeeId, principal));
     }
 
     @PutMapping("/{assignmentId}/status")

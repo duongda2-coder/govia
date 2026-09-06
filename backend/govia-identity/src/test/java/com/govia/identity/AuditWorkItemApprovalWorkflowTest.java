@@ -2,6 +2,7 @@ package com.govia.identity;
 
 import com.govia.audit.planengagement.dto.AuditWorkAssignmentApproveRequest;
 import com.govia.audit.planengagement.dto.AuditWorkAssignmentStatusUpdateRequest;
+import com.govia.audit.planengagement.dto.AuditWorkManagementItemResponse;
 import com.govia.audit.planengagement.entity.AssignmentApprovalStatus;
 import com.govia.audit.planengagement.entity.AssignmentStatus;
 import com.govia.audit.planengagement.entity.AuditEngagement;
@@ -167,6 +168,65 @@ class AuditWorkItemApprovalWorkflowTest {
         assertThatThrownBy(() -> workAssignmentService.approve(engagement.getId(), request, workerPrincipal))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("truong doan");
+    }
+
+    /** Phan quyen theo dong (xem AuditWorkAssignmentService.resolveVisibleEmployeeIds()): thanh vien
+     * chi thay cong viec cua chinh minh, truong nhom thay ca nhom minh phu trach (KHONG lan sang
+     * nhom khac), truong doan thay tat ca - cung quy tac voi AuditTtssService. */
+    @Test
+    void list_scopesByGroupLeadershipInEngagement() {
+        EmployeeResponse teamLead = createEmployee("NV-WM-TL");
+        EmployeeResponse groupLeadA = createEmployee("NV-WM-GLA");
+        EmployeeResponse memberA = createEmployee("NV-WM-MA");
+        EmployeeResponse groupLeadB = createEmployee("NV-WM-GLB");
+        EmployeeResponse memberB = createEmployee("NV-WM-MB");
+
+        AuditEngagement engagement = createEngagement("CKT-WM-VIS-01", teamLead.id());
+
+        AuditEngagementGroup groupA = new AuditEngagementGroup();
+        groupA.setTenantId(tenantId);
+        groupA.setAuditEngagementId(engagement.getId());
+        groupA.setGroupCode(AuditEngagementGroupCode.TINDUNG);
+        groupA.setLeaderEmployeeId(groupLeadA.id());
+        groupA = groupRepository.save(groupA);
+        AuditEngagementGroupMember memberAInGroup = new AuditEngagementGroupMember();
+        memberAInGroup.setTenantId(tenantId);
+        memberAInGroup.setGroupId(groupA.getId());
+        memberAInGroup.setEmployeeId(memberA.id());
+        memberAInGroup = memberRepository.save(memberAInGroup);
+
+        AuditEngagementGroup groupB = new AuditEngagementGroup();
+        groupB.setTenantId(tenantId);
+        groupB.setAuditEngagementId(engagement.getId());
+        groupB.setGroupCode(AuditEngagementGroupCode.NTINDUNG);
+        groupB.setLeaderEmployeeId(groupLeadB.id());
+        groupB = groupRepository.save(groupB);
+        AuditEngagementGroupMember memberBInGroup = new AuditEngagementGroupMember();
+        memberBInGroup.setTenantId(tenantId);
+        memberBInGroup.setGroupId(groupB.getId());
+        memberBInGroup.setEmployeeId(memberB.id());
+        memberBInGroup = memberRepository.save(memberBInGroup);
+
+        AuditWorkItem workItemA = createWorkItem("WM-VIS-A", AuditWorkPhase.THKT);
+        createAssignment(memberAInGroup.getId(), workItemA.getId());
+        AuditWorkItem workItemB = createWorkItem("WM-VIS-B", AuditWorkPhase.THKT);
+        createAssignment(memberBInGroup.getId(), workItemB.getId());
+
+        // Thanh vien A: chi thay cong viec cua chinh minh.
+        List<AuditWorkManagementItemResponse> memberAView = workAssignmentService.list(engagement.getId(), AuditWorkPhase.THKT, null,
+                principalFor(UUID.randomUUID(), "wmma", memberA.employeeCode()));
+        assertThat(memberAView).extracting(AuditWorkManagementItemResponse::workItemCode).containsExactly("WM-VIS-A");
+
+        // Truong nhom A: thay ca nhom A, KHONG thay nhom B.
+        List<AuditWorkManagementItemResponse> groupLeadAView = workAssignmentService.list(engagement.getId(), AuditWorkPhase.THKT, null,
+                principalFor(UUID.randomUUID(), "wmgla", groupLeadA.employeeCode()));
+        assertThat(groupLeadAView).extracting(AuditWorkManagementItemResponse::workItemCode).containsExactly("WM-VIS-A");
+
+        // Truong doan: thay tat ca.
+        List<AuditWorkManagementItemResponse> teamLeadView = workAssignmentService.list(engagement.getId(), AuditWorkPhase.THKT, null,
+                principalFor(UUID.randomUUID(), "wmtl", teamLead.employeeCode()));
+        assertThat(teamLeadView).extracting(AuditWorkManagementItemResponse::workItemCode)
+                .containsExactlyInAnyOrder("WM-VIS-A", "WM-VIS-B");
     }
 
     private EmployeeResponse createEmployee(String code) {

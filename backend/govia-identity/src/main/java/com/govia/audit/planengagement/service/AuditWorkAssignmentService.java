@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,8 @@ import static com.govia.audit.masterdata.entity.AuditMasterDataCategory.BUSINESS
 public class AuditWorkAssignmentService {
 
     private static final String PROCESS_KEY = "audit_workitem_approval";
+    /** Dung chung voi AuditTtssService - quyen "thay tat ca" bo qua scoping theo truong doan/truong nhom. */
+    private static final String PERMISSION_VIEW_ALL = "AUDIT.PLAN_ENGAGEMENT.VIEW_ALL";
 
     private final AuditEngagementRepository engagementRepository;
     private final AuditEngagementGroupRepository groupRepository;
@@ -94,13 +97,15 @@ public class AuditWorkAssignmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<AuditWorkManagementItemResponse> list(UUID engagementId, AuditWorkPhase phase, UUID employeeId) {
+    public List<AuditWorkManagementItemResponse> list(UUID engagementId, AuditWorkPhase phase, UUID employeeId, CurrentUserPrincipal principal) {
         UUID tenantId = TenantContext.getTenantId();
         AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
 
         List<AuditEngagementGroup> groups = groupRepository.findByTenantIdAndAuditEngagementIdOrderByGroupCodeAsc(tenantId, engagementId);
         List<UUID> groupIds = groups.stream().map(AuditEngagementGroup::getId).toList();
         List<AuditEngagementGroupMember> members = memberRepository.findByTenantIdAndGroupIdIn(tenantId, groupIds);
+        Set<UUID> visibleEmployeeIds = resolveVisibleEmployeeIds(tenantId, engagement, groups, members, principal);
+        members = members.stream().filter(m -> visibleEmployeeIds.contains(m.getEmployeeId())).toList();
         if (employeeId != null) {
             members = members.stream().filter(m -> employeeId.equals(m.getEmployeeId())).toList();
         }
@@ -222,6 +227,38 @@ public class AuditWorkAssignmentService {
         auditLogService.record("AuditEngagementAssignment", engagementId, AuditAction.APPROVE,
                 "Truong doan phe duyet " + approvedIds.size() + " cong viec cua CKT " + engagement.getCode());
         return approvedIds;
+    }
+
+    /** Phan quyen THEO DONG cho man hinh "Quan ly cong viec" (CBKT/THKT) - cung quy tac voi
+     * AuditTtssService.resolveVisibility(): truong doan (AuditEngagement#teamLeadEmployeeId) hoac co
+     * quyen AUDIT.PLAN_ENGAGEMENT.VIEW_ALL thi thay TAT CA; truong nhom (AuditEngagementGroup#
+     * leaderEmployeeId) thay ca nhom minh phu trach (CHI nhom do, khong lan sang nhom khac); thanh
+     * vien thuong chi thay cong viec cua CHINH MINH. Khac TTSS o cho AuditEngagementAssignment gan
+     * TRUC TIEP voi employeeId (qua groupMemberId), khong can doi chieu qua UserAccount.username. */
+    private Set<UUID> resolveVisibleEmployeeIds(UUID tenantId, AuditEngagement engagement, List<AuditEngagementGroup> groups,
+                                                 List<AuditEngagementGroupMember> allMembers, CurrentUserPrincipal principal) {
+        if (principal == null || principal.employeeCode() == null) {
+            return Set.of();
+        }
+        if (principal.permissions() != null && principal.permissions().contains(PERMISSION_VIEW_ALL)) {
+            return allMembers.stream().map(AuditEngagementGroupMember::getEmployeeId).collect(Collectors.toSet());
+        }
+        UUID actorEmployeeId = employeeRepository.findByTenantIdAndEmployeeCode(tenantId, principal.employeeCode())
+                .map(Employee::getId).orElse(null);
+        if (actorEmployeeId == null) {
+            return Set.of();
+        }
+        if (actorEmployeeId.equals(engagement.getTeamLeadEmployeeId())) {
+            return allMembers.stream().map(AuditEngagementGroupMember::getEmployeeId).collect(Collectors.toSet());
+        }
+
+        List<UUID> ledGroupIds = groups.stream().filter(g -> actorEmployeeId.equals(g.getLeaderEmployeeId())).map(AuditEngagementGroup::getId).toList();
+        Set<UUID> visible = new HashSet<>();
+        visible.add(actorEmployeeId);
+        if (!ledGroupIds.isEmpty()) {
+            allMembers.stream().filter(m -> ledGroupIds.contains(m.getGroupId())).map(AuditEngagementGroupMember::getEmployeeId).forEach(visible::add);
+        }
+        return visible;
     }
 
     private void requireOwnerOrTeamLead(UUID tenantId, AuditEngagement engagement, AuditEngagementGroupMember member, String actorEmployeeCode) {
