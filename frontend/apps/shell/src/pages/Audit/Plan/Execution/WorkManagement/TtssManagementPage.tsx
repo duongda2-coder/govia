@@ -120,7 +120,12 @@ export function TtssManagementPage() {
     selected.some((i) => !i.teamRecommendationId || i.recommendationApprovalStatus === "APPROVED");
 
   const columns: TableProps<AuditTtssRecordItem>["columns"] = [
-    { title: t("auditTtss.columns.businessSegment"), dataIndex: "businessSegmentCode", width: 100, render: (v) => v ?? "-" },
+    {
+      title: t("auditTtss.columns.businessSegment"),
+      width: 100,
+      ...getSearchColumnProps("businessSegmentCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("auditTtss.columns.workItemCode"), dataIndex: "workItemCode", width: 110, render: (v) => v ?? "-" },
     {
       title: t("auditTtss.columns.processStepSummaryCode"),
@@ -152,7 +157,12 @@ export function TtssManagementPage() {
     { title: t("auditTtss.columns.customerName"), dataIndex: "customerName", width: 160, render: (v) => v ?? "-" },
     { title: t("auditTtss.columns.amount"), dataIndex: "amount", width: 130, align: "right", render: (v) => v ?? "-" },
     { title: t("auditTtss.columns.appendix"), dataIndex: "appendix", width: 160, render: (v) => v ?? "-" },
-    { title: t("auditTtss.columns.recordUsername"), dataIndex: "recordUsername", width: 140, render: (v) => v ?? "-" },
+    {
+      title: t("auditTtss.columns.recordUsername"),
+      width: 140,
+      ...getSearchColumnProps("recordUsername", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     {
       title: t("auditTtss.columns.teamRecommendation"),
       width: 200,

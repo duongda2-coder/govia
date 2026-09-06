@@ -170,10 +170,11 @@ public class AuditTtssService {
      * - Truong doan ({@link AuditEngagement#getTeamLeadEmployeeId()}) hoac co quyen
      *   AUDIT.PLAN_ENGAGEMENT.VIEW_ALL: thay/xoa/duyet duoc TAT CA nghiep vu.
      * - Truong nhom ({@link AuditEngagementGroup#getLeaderEmployeeId()}): thay/xoa/duyet duoc dong
-     *   cua CHINH MINH + cua moi thanh vien trong (cac) nhom minh lam truong nhom (doi chieu qua
-     *   UserAccount.username vi TTSS chi luu username, khong luu employeeId).
+     *   cua CHINH MINH + cua moi thanh vien trong (cac) nhom minh lam truong nhom - CHI dung nhom
+     *   minh phu trach, KHONG lan sang nhom khac (doi chieu qua UserAccount.username vi TTSS chi luu
+     *   username, khong luu employeeId).
      * - Thanh vien thuong: chi thay/xoa duoc dong do CHINH MINH upload (recordUsername = username
-     *   cua minh). */
+     *   cua minh) - KHONG thay duoc dong cua thanh vien khac trong cung nhom. */
     private TtssVisibility resolveVisibility(UUID tenantId, AuditEngagement engagement, CurrentUserPrincipal principal) {
         if (principal == null || principal.username() == null) {
             return new TtssVisibility(false, Set.of());
