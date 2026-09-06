@@ -27,7 +27,8 @@ import static com.govia.audit.masterdata.entity.AuditMasterDataCategory.BUSINESS
 /**
  * "Lưu mã kiến nghị" (Khối C, chức năng "3. Thêm kiến nghị") - catalog rieng cho tung cuoc kiem
  * toan. Luon co san dong mac dinh KNKT000/CE/"Kiến nghị chung" (dung dac ta) - tu seed neu catalog
- * cua engagement do dang rong.
+ * cua engagement do dang rong. Cac dong con lai do NGUOI DUNG tu nhap ma (KNKT001, KNKT002...),
+ * khong tu sinh (dac ta yeu cau nguoi dung nhap tay theo quy tac).
  */
 @Service
 public class AuditRecommendationService {
@@ -66,17 +67,25 @@ public class AuditRecommendationService {
         getEngagementOrThrow(tenantId, engagementId);
         ensureDefaultSeeded(tenantId, engagementId);
 
-        String nextCode = nextCode(tenantId, engagementId);
+        String code = request.code().trim().toUpperCase();
+        if (DEFAULT_CODE.equals(code)) {
+            throw new BusinessException("AUDIT_RECOMMENDATION_CODE_RESERVED",
+                    "Mã " + DEFAULT_CODE + " là mã mặc định, không thể đặt trùng", HttpStatus.BAD_REQUEST);
+        }
+        if (repository.findByTenantIdAndEngagementIdAndCode(tenantId, engagementId, code).isPresent()) {
+            throw new BusinessException("AUDIT_RECOMMENDATION_CODE_DUPLICATE", "Mã kiến nghị đã tồn tại", HttpStatus.BAD_REQUEST);
+        }
+
         AuditRecommendation recommendation = new AuditRecommendation();
         recommendation.setTenantId(tenantId);
         recommendation.setEngagementId(engagementId);
-        recommendation.setCode(nextCode);
+        recommendation.setCode(code);
         recommendation.setBusinessSegmentId(request.businessSegmentId());
         recommendation.setContent(request.content());
         recommendation = repository.save(recommendation);
 
         auditLogService.record("AuditRecommendation", recommendation.getId(), AuditAction.CREATE,
-                "Them kien nghi " + nextCode + " cho CKT");
+                "Them kien nghi " + code + " cho CKT");
         return toResponse(recommendation, segmentsById(tenantId));
     }
 
@@ -102,11 +111,6 @@ public class AuditRecommendationService {
         repository.delete(recommendation);
         auditLogService.record("AuditRecommendation", recommendationId, AuditAction.DELETE,
                 "Xoa kien nghi " + recommendation.getCode() + " cua CKT");
-    }
-
-    private String nextCode(UUID tenantId, UUID engagementId) {
-        int nextSeq = repository.findByTenantIdAndEngagementIdOrderByCodeAsc(tenantId, engagementId).size();
-        return String.format("KNKT%03d", nextSeq);
     }
 
     private void ensureDefaultSeeded(UUID tenantId, UUID engagementId) {

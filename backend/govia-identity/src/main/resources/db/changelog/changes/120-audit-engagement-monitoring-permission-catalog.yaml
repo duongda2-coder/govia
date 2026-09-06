@@ -1,0 +1,15 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: "Quản lý đợt kiểm toán" - xem toan bo CKT =====================
+  - changeSet:
+      id: 120-1-permission-audit-plan-engagement-view-all
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b1e2a3c4-1000-4a11-8b01-100000000007" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT.VIEW_ALL" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem tat ca cuoc kiem toan (khong gioi han theo doan da tham gia) - danh cho Truong/Pho KTNB, BKS" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Quản lý đợt kiểm toán" }

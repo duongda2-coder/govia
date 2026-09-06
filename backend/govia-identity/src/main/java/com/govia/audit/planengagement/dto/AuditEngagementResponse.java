@@ -36,6 +36,7 @@ public record AuditEngagementResponse(
         LocalDateTime sampleRequestStart,
         LocalDateTime sampleRequestEnd,
         LocalDateTime reportPlanStart,
-        LocalDateTime reportPlanEnd
+        LocalDateTime reportPlanEnd,
+        String teamRanking
 ) {
 }

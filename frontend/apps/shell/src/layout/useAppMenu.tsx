@@ -39,6 +39,7 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-plan-md-process-step-detail": "/audit/plan/master-data/process-step-detail",
   "audit-plan-md-exception-mapping": "/audit/plan/master-data/exception-mapping",
   "audit-plan-engagement-index": "/audit/plan/engagement",
+  "audit-plan-engagement-monitoring-index": "/audit/plan/engagement/monitoring",
   "audit-plan-exec-cm-td1": "/audit/plan/execution/cm-td1",
   "audit-plan-exec-cm-td2": "/audit/plan/execution/cm-td2",
   "audit-plan-exec-cm-ntd1": "/audit/plan/execution/cm-ntd1",
@@ -223,7 +224,10 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
         canViewAuditPlanEngagement && {
           key: "audit-plan-engagement",
           label: menuLabel(t("menu.auditPlanEngagement")),
-          children: [leaf("audit-plan-engagement-index", t("menu.auditPlanEngagementIndex"), auditPlanEngagementGroupLabel)],
+          children: [
+            leaf("audit-plan-engagement-index", t("menu.auditPlanEngagementIndex"), auditPlanEngagementGroupLabel),
+            leaf("audit-plan-engagement-monitoring-index", t("menu.auditPlanEngagementMonitoringIndex"), auditPlanEngagementGroupLabel),
+          ],
         },
         canViewAuditPlanExecution && {
           key: "audit-plan-execution",

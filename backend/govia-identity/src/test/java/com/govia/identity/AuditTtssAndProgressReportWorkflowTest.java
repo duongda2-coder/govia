@@ -17,6 +17,7 @@ import com.govia.audit.planengagement.repository.AuditEngagementGroupRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRepository;
 import com.govia.audit.planengagement.ttss.dto.AuditTtssApproveRecommendationsRequest;
 import com.govia.audit.planengagement.ttss.dto.AuditTtssLinkRecommendationRequest;
+import com.govia.audit.planengagement.ttss.dto.AuditTtssRecordResponse;
 import com.govia.audit.planengagement.ttss.entity.AuditTtssRecord;
 import com.govia.audit.planengagement.ttss.repository.AuditTtssRecordRepository;
 import com.govia.audit.planengagement.ttss.service.AuditTtssService;
@@ -149,7 +150,7 @@ class AuditTtssAndProgressReportWorkflowTest {
         AuditRecommendationResponse defaultRecommendation = recommendationService.list(engagement.getId()).get(0);
         assertThat(defaultRecommendation.code()).isEqualTo("KNKT000");
         AuditRecommendationResponse created = recommendationService.create(engagement.getId(),
-                new AuditRecommendationRequest(null, "Thieu chu ky phe duyet"));
+                new AuditRecommendationRequest("KNKT001", null, "Thieu chu ky phe duyet"));
         assertThat(created.code()).isEqualTo("KNKT001");
 
         AuditTtssRecord record = ttssRecordRepository.save(newTtssRecord(engagement.getId(), "TT100", true));
@@ -179,16 +180,31 @@ class AuditTtssAndProgressReportWorkflowTest {
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("mac dinh");
 
-        AuditRecommendationResponse inUse = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Dang duoc gan"));
+        AuditRecommendationResponse inUse = recommendationService.create(engagement.getId(), new AuditRecommendationRequest("KNKT001", null, "Dang duoc gan"));
         AuditTtssRecord record = ttssRecordRepository.save(newTtssRecord(engagement.getId(), "TT300", false));
         ttssService.linkRecommendation(engagement.getId(), new AuditTtssLinkRecommendationRequest(List.of(record.getId()), inUse.id()));
         assertThatThrownBy(() -> recommendationService.delete(engagement.getId(), inUse.id()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("dang duoc gan");
 
-        AuditRecommendationResponse unused = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Chua dung"));
+        AuditRecommendationResponse unused = recommendationService.create(engagement.getId(), new AuditRecommendationRequest("KNKT002", null, "Chua dung"));
         recommendationService.delete(engagement.getId(), unused.id());
         assertThat(recommendationService.list(engagement.getId())).extracting(AuditRecommendationResponse::id).doesNotContain(unused.id());
+    }
+
+    @Test
+    void createRecommendation_rejectsReservedAndDuplicateCode() {
+        EmployeeResponse teamLead = createEmployee("NV-C-TL-04");
+        AuditEngagement engagement = createEngagement("CKT-C-04", teamLead.id());
+
+        assertThatThrownBy(() -> recommendationService.create(engagement.getId(), new AuditRecommendationRequest("KNKT000", null, "Trung ma mac dinh")))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("mặc định");
+
+        recommendationService.create(engagement.getId(), new AuditRecommendationRequest("KNKT001", null, "Ban dau"));
+        assertThatThrownBy(() -> recommendationService.create(engagement.getId(), new AuditRecommendationRequest("KNKT001", null, "Trung ma")))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("đã tồn tại");
     }
 
     @Test
@@ -204,6 +220,88 @@ class AuditTtssAndProgressReportWorkflowTest {
         assertThatThrownBy(() -> ttssService.approveRecommendations(engagement.getId(), request, teamLeadPrincipal))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("gan kien nghi");
+    }
+
+    /** Phan quyen theo dong (recordUsername): thanh vien chi thay dong cua chinh minh, truong nhom
+     * thay dong cua CA nhom minh phu trach (nhung KHONG thay nhom khac), truong doan thay tat ca -
+     * ap dung dong nhat cho list()/delete()/approveRecommendations() (xem AuditTtssService.
+     * resolveVisibility()). */
+    @Test
+    void ttssVisibility_scopesListAndDeleteByGroupLeadershipInEngagement() {
+        EmployeeResponse teamLead = createEmployee("NV-VIS-TL");
+        EmployeeResponse groupLeadA = createEmployee("NV-VIS-GLA");
+        EmployeeResponse memberA = createEmployee("NV-VIS-MA");
+        EmployeeResponse groupLeadB = createEmployee("NV-VIS-GLB");
+        EmployeeResponse memberB = createEmployee("NV-VIS-MB");
+
+        UUID glaAccountId = createUserAccount(groupLeadA.id(), "visgla");
+        UUID maAccountId = createUserAccount(memberA.id(), "visma");
+        UUID mbAccountId = createUserAccount(memberB.id(), "vismb");
+
+        AuditEngagement engagement = createEngagement("CKT-VIS-01", teamLead.id());
+
+        AuditEngagementGroup groupA = new AuditEngagementGroup();
+        groupA.setTenantId(tenantId);
+        groupA.setAuditEngagementId(engagement.getId());
+        groupA.setGroupCode(AuditEngagementGroupCode.TINDUNG);
+        groupA.setLeaderEmployeeId(groupLeadA.id());
+        groupA = groupRepository.save(groupA);
+        AuditEngagementGroupMember memberAInGroup = new AuditEngagementGroupMember();
+        memberAInGroup.setTenantId(tenantId);
+        memberAInGroup.setGroupId(groupA.getId());
+        memberAInGroup.setEmployeeId(memberA.id());
+        memberRepository.save(memberAInGroup);
+
+        AuditEngagementGroup groupB = new AuditEngagementGroup();
+        groupB.setTenantId(tenantId);
+        groupB.setAuditEngagementId(engagement.getId());
+        groupB.setGroupCode(AuditEngagementGroupCode.NTINDUNG);
+        groupB.setLeaderEmployeeId(groupLeadB.id());
+        groupB = groupRepository.save(groupB);
+        AuditEngagementGroupMember memberBInGroup = new AuditEngagementGroupMember();
+        memberBInGroup.setTenantId(tenantId);
+        memberBInGroup.setGroupId(groupB.getId());
+        memberBInGroup.setEmployeeId(memberB.id());
+        memberRepository.save(memberBInGroup);
+
+        AuditTtssRecord recordA = newTtssRecord(engagement.getId(), "TT-VIS-A", false);
+        recordA.setRecordUsername("visma");
+        recordA = ttssRecordRepository.save(recordA);
+
+        AuditTtssRecord recordGroupLead = newTtssRecord(engagement.getId(), "TT-VIS-GLA", false);
+        recordGroupLead.setRecordUsername("visgla");
+        recordGroupLead = ttssRecordRepository.save(recordGroupLead);
+
+        AuditTtssRecord recordB = newTtssRecord(engagement.getId(), "TT-VIS-B", false);
+        recordB.setRecordUsername("vismb");
+        recordB = ttssRecordRepository.save(recordB);
+
+        // Thanh vien A: chi thay dong cua chinh minh.
+        List<AuditTtssRecordResponse> memberAView = ttssService.list(engagement.getId(), principalFor(maAccountId, "visma", memberA.employeeCode()));
+        assertThat(memberAView).extracting(AuditTtssRecordResponse::findingCode).containsExactly("TT-VIS-A");
+
+        // Truong nhom A: thay dong cua chinh minh + thanh vien trong nhom A, KHONG thay nhom B.
+        CurrentUserPrincipal groupLeadAPrincipal = principalFor(glaAccountId, "visgla", groupLeadA.employeeCode());
+        List<AuditTtssRecordResponse> groupLeadAView = ttssService.list(engagement.getId(), groupLeadAPrincipal);
+        assertThat(groupLeadAView).extracting(AuditTtssRecordResponse::findingCode)
+                .containsExactlyInAnyOrder("TT-VIS-A", "TT-VIS-GLA");
+
+        // Truong doan: thay tat ca nghiep vu.
+        List<AuditTtssRecordResponse> teamLeadView = ttssService.list(engagement.getId(),
+                principalFor(UUID.randomUUID(), "vistl", teamLead.employeeCode()));
+        assertThat(teamLeadView).extracting(AuditTtssRecordResponse::findingCode)
+                .containsExactlyInAnyOrder("TT-VIS-A", "TT-VIS-GLA", "TT-VIS-B");
+
+        // Truong nhom A KHONG the xoa dong cua thanh vien nhom B (ngoai pham vi phu trach).
+        UUID recordBId = recordB.getId();
+        assertThatThrownBy(() -> ttssService.delete(engagement.getId(), recordBId, groupLeadAPrincipal))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining("khong co quyen");
+
+        // Nhung XOA duoc dong cua thanh vien trong nhom minh.
+        UUID recordAId = recordA.getId();
+        ttssService.delete(engagement.getId(), recordAId, groupLeadAPrincipal);
+        assertThat(ttssRecordRepository.findById(recordAId)).isEmpty();
     }
 
     private AuditTtssRecord newTtssRecord(UUID engagementId, String findingCode, boolean material) {

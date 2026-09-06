@@ -71,6 +71,10 @@ export async function uploadAuditTtssFile(engagementId: string, file: File): Pro
   return { successCount: res.data.data.length, failureCount: 0, errors: [] };
 }
 
+export async function deleteAuditTtssRecord(engagementId: string, recordId: string): Promise<void> {
+  await httpClient.delete(`${base(engagementId)}/${recordId}`);
+}
+
 export async function linkAuditTtssRecommendation(engagementId: string, ttssRecordIds: string[], recommendationId: string): Promise<void> {
   await httpClient.post(`${base(engagementId)}/link-recommendation`, { ttssRecordIds, recommendationId });
 }

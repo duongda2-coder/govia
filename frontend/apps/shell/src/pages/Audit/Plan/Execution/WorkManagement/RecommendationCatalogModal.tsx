@@ -25,6 +25,7 @@ export interface RecommendationCatalogModalProps {
 }
 
 interface FormValues {
+  code: string;
   businessSegmentId?: string;
   content: string;
 }
@@ -70,13 +71,17 @@ export function RecommendationCatalogModal({ open, engagementId, onClose, onChan
     }
     setSubmitting(true);
     try {
-      await createAuditRecommendation(engagementId, { businessSegmentId: values.businessSegmentId ?? null, content: values.content });
+      await createAuditRecommendation(engagementId, {
+        code: values.code.trim().toUpperCase(),
+        businessSegmentId: values.businessSegmentId ?? null,
+        content: values.content,
+      });
       message.success(t("auditRecommendation.createSuccess"));
       form.resetFields();
       await load();
       onChanged?.();
-    } catch {
-      message.error(t("auditRecommendation.createError"));
+    } catch (err) {
+      message.error(getApiErrorMessage(err, t("auditRecommendation.createError")));
     } finally {
       setSubmitting(false);
     }
@@ -119,6 +124,16 @@ export function RecommendationCatalogModal({ open, engagementId, onClose, onChan
   return (
     <Modal title={t("auditRecommendation.title")} open={open} onCancel={onClose} footer={null} width={700} destroyOnClose>
       <Form<FormValues> form={form} layout="inline" onFinish={handleSubmit} style={{ marginBottom: 16 }}>
+        <Form.Item
+          name="code"
+          style={{ width: 130 }}
+          rules={[
+            { required: true, message: t("auditRecommendation.columns.code") },
+            { pattern: /^KNKT\d{3,}$/i, message: t("auditRecommendation.codeFormatError") },
+          ]}
+        >
+          <Input placeholder="KNKT001" />
+        </Form.Item>
         <Form.Item name="businessSegmentId" style={{ minWidth: 160 }}>
           <Select
             allowClear

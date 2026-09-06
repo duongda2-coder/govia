@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /** Thanh vien cua 1 nhom (man hinh "Danh sach thanh vien trong nhom") - toi da 3 nghiep vu duoc
@@ -32,4 +33,15 @@ public class AuditEngagementGroupMember extends BaseEntity {
 
     @Column(name = "business_segment_3_id", columnDefinition = "uuid")
     private UUID businessSegment3Id;
+
+    /** "Điểm/Xếp loại/Ghi chú thành viên" - man hinh "Quan ly dot kiem toan" > "Chi tiet doan KT",
+     * user tu nhap (khong co cong thuc tinh theo dac ta). */
+    @Column(name = "score", precision = 5, scale = 2)
+    private BigDecimal score;
+
+    @Column(name = "ranking", length = 50)
+    private String ranking;
+
+    @Column(name = "note", length = 1000)
+    private String note;
 }

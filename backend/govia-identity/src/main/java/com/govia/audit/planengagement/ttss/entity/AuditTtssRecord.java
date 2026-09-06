@@ -20,8 +20,9 @@ import java.util.UUID;
  * HOAN TOAN TACH BIET voi {@code com.govia.audit.finding.entity.AuditFinding} (entity do la nguon
  * du lieu cho AI Agent tool get_audit_findings/get_evidence, xem docs/kien-truc-ky-thuat/
  * audit-tools-contract.md - khong duoc dung chung/mo rong entity do). Moi lan "Upload file TTSS"
- * tao MOI cac dong (khong upsert theo khoa tu nhien nhu CmNtd1..14 vi TTSS khong co khoa nghiep vu
- * on dinh) - giu lai lich su theo tung lan upload.
+ * UPSERT theo khoa tu nhien workItemCode + processStepDetailId + findingCode + referenceNumber +
+ * referenceNumber2 (xem AuditTtssService.uploadKey()) - trung ca khoa thi CAP NHAT dong da co,
+ * thieu 1 trong cac truong dinh danh chinh thi luon tao dong moi.
  */
 @Getter
 @Setter

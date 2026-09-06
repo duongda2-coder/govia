@@ -11,5 +11,7 @@ import java.util.UUID;
 public interface AuditEngagementGroupRepository extends JpaRepository<AuditEngagementGroup, UUID> {
     List<AuditEngagementGroup> findByTenantIdAndAuditEngagementIdOrderByGroupCodeAsc(UUID tenantId, UUID auditEngagementId);
 
+    List<AuditEngagementGroup> findByTenantIdAndAuditEngagementIdIn(UUID tenantId, List<UUID> auditEngagementIds);
+
     Optional<AuditEngagementGroup> findByTenantIdAndAuditEngagementIdAndGroupCode(UUID tenantId, UUID auditEngagementId, AuditEngagementGroupCode groupCode);
 }

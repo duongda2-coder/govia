@@ -54,6 +54,7 @@
     "auditPlanMdExceptionMapping": "Mapping tồn tại sai sót",
     "auditPlanEngagement": "Lập kế hoạch",
     "auditPlanEngagementIndex": "Khởi tạo & Quản lý cuộc kiểm toán",
+    "auditPlanEngagementMonitoringIndex": "Quản lý đợt kiểm toán",
     "auditPlanExecution": "Thực hiện kiểm toán",
     "auditPlanExecCmTd1": "02L/BKS-KTNB (TD1)",
     "auditPlanExecCmTd2": "02G/BKS-KTNB (TD2)",
@@ -1007,6 +1008,7 @@
     "loadError": "Không tải được danh sách kiến nghị",
     "createSuccess": "Đã thêm kiến nghị",
     "createError": "Thêm kiến nghị thất bại",
+    "codeFormatError": "Mã phải theo định dạng KNKTxxx (vd KNKT001)",
     "deleteConfirmTitle": "Xóa kiến nghị này?",
     "deleteSuccess": "Đã xóa kiến nghị",
     "deleteError": "Xóa kiến nghị thất bại",
@@ -1023,25 +1025,31 @@
     "linkRecommendationSuccess": "Đã gắn kiến nghị",
     "linkRecommendationError": "Gắn kiến nghị thất bại",
     "approveConfirmTitle": "Phê duyệt kiến nghị cho {{count}} dòng đã chọn?",
+    "deleteConfirmTitle": "Xóa dòng TTSS này?",
     "columns": {
       "businessSegment": "Nghiệp vụ",
       "workItemCode": "Mã công việc",
+      "processStepSummaryCode": "Mã BQT tổng hợp",
       "processStepSummary": "Bước QT tổng hợp",
+      "processStepDetailCode": "Mã BQT chi tiết",
       "ttssContent": "Nội dung TTSS",
-      "findingCode": "Mã phát hiện",
-      "findingName": "Tên phát hiện",
+      "findingCode": "Mã TTSS",
+      "findingName": "Tên TTSS",
       "material": "Trọng yếu",
       "customerName": "Tên KH",
       "amount": "Số tiền",
       "teamRecommendation": "Kiến nghị trưởng đoàn",
       "recommendationApprovalStatus": "Phê duyệt KN",
-      "appendix": "Phụ lục"
+      "appendix": "Phụ lục",
+      "recordUsername": "Cán bộ thực hiện"
     },
     "messages": {
       "loadError": "Không tải được danh sách TTSS",
       "approveSuccess": "Đã phê duyệt kiến nghị",
       "approveError": "Phê duyệt kiến nghị thất bại",
-      "downloadTemplateError": "Tải mẫu thất bại"
+      "downloadTemplateError": "Tải mẫu thất bại",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại"
     }
   },
   "auditCmTd1": {
@@ -1624,6 +1632,64 @@
       "deleteSuccess": "Đã xóa",
       "deleteError": "Xóa thất bại",
       "saveError": "Lưu thất bại"
+    }
+  },
+  "auditEngagementMonitoring": {
+    "pageTitle": "Quản lý đợt kiểm toán",
+    "columns": {
+      "code": "Mã CKT",
+      "auditObjectUnitName": "Tên đối tượng KT",
+      "name": "Tên đợt KT",
+      "fieldworkStartDate": "Ngày bắt đầu",
+      "fieldworkEndDate": "Ngày kết thúc",
+      "decisionNumber": "Số quyết định",
+      "teamLeadEmployee": "Trưởng đoàn",
+      "memberCount": "Số thành viên đoàn",
+      "businessSegmentCount": "Số nghiệp vụ",
+      "totalFindings": "Tổng số phát hiện",
+      "totalMaterialFindings": "Phát hiện trọng yếu",
+      "recommendationCount": "Số kiến nghị",
+      "status": "Trạng thái",
+      "teamRanking": "Xếp loại đoàn"
+    },
+    "teamDetailButton": "Chi tiết đoàn KT",
+    "updateRankingButton": "Cập nhật xếp loại đoàn",
+    "updateRankingTitle": "Cập nhật xếp loại đoàn - {{code}}",
+    "detail": {
+      "title": "Chi tiết đoàn kiểm toán - {{code}}",
+      "columns": {
+        "stt": "STT",
+        "employeeName": "Tên cán bộ",
+        "roleTitle": "Chức danh",
+        "businessSegmentNames": "Mảng nghiệp vụ",
+        "totalFindings": "Tổng số phát hiện",
+        "ttssTypeCount": "Số lượng loại TTSS",
+        "totalMaterialFindings": "Số phát hiện trọng yếu",
+        "materialTtssTypeCount": "Số lượng TTSS trọng yếu",
+        "recommendationCount": "Số kiến nghị",
+        "cbktProgress": "Tiến độ CBKT",
+        "thktSampleProgress": "Tiến độ THKT (có mẫu)",
+        "thktNoSampleProgress": "Tiến độ THKT (không mẫu)",
+        "score": "Điểm thành viên",
+        "ranking": "Xếp loại thành viên",
+        "note": "Ghi chú"
+      },
+      "scoringButton": "Chấm điểm",
+      "scoringTitle": "Chấm điểm thành viên - {{name}}",
+      "progressReportButton": "Báo cáo tiến độ",
+      "otherFilesButton": "Xem file",
+      "ttssButton": "Xem chi tiết TTSS",
+      "assignmentButton": "Chi tiết phân công",
+      "ttssModalTitle": "Chi tiết TTSS - {{code}}",
+      "ttssPerformerName": "Cán bộ thực hiện TTSS"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "loadDetailError": "Không tải được chi tiết đoàn kiểm toán",
+      "updateRankingSuccess": "Đã cập nhật xếp loại đoàn",
+      "updateRankingError": "Cập nhật xếp loại đoàn thất bại",
+      "updateScoringSuccess": "Đã cập nhật điểm thành viên",
+      "updateScoringError": "Cập nhật điểm thành viên thất bại"
     }
   },
   "auditExceptionMapping": {

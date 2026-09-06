@@ -1,5 +1,7 @@
 package com.govia.audit.planengagement.ttss.service;
 
+import com.govia.audit.exceptiontype.entity.AuditExceptionType;
+import com.govia.audit.exceptiontype.repository.AuditExceptionTypeRepository;
 import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import com.govia.audit.planengagement.approval.AuditWorkApprovalChainResolver;
@@ -58,8 +60,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -68,14 +72,19 @@ import static com.govia.audit.masterdata.entity.AuditMasterDataCategory.BUSINESS
 /**
  * "Quản lý TTSS & Kiến nghị" (Khối C, sheet "Quản lý công việc" trong Tạo CKT (1).xlsx, mục C).
  * "Download Template"/"Upload file TTSS" xuat 1 dong cho MOI cong viec da phan cong (khong tu dem
- * so mau o 16 bang chon mau CmNtd1..14/CmTd1/2 - xem ghi chu trong plan). Moi lan upload TAO MOI
- * cac dong (khong upsert) va tu dong sinh 1 Báo cáo tiến độ (AuditProgressReportService.recordUpload).
+ * so mau o 16 bang chon mau CmNtd1..14/CmTd1/2 - xem ghi chu trong plan). Moi lan upload UPSERT
+ * theo khoa tu nhien (workItemCode + processStepDetailId + findingCode + referenceNumber +
+ * referenceNumber2 - xem uploadKey()) va tu dong sinh 1 Báo cáo tiến độ
+ * (AuditProgressReportService.recordUpload).
  */
 @Service
 public class AuditTtssService {
 
     private static final String PROCESS_KEY = "audit_recommendation_approval";
     private static final String ATTACHMENT_ENTITY_NAME = "AUDIT_PROGRESS_REPORT";
+    /** Dung chung voi AuditEngagementMonitoringService - quyen "thay tat ca" bo qua scoping theo
+     * truong doan/truong nhom (vd cho vai tro giam sat/QA ngoai doan kiem toan). */
+    private static final String PERMISSION_VIEW_ALL = "AUDIT.PLAN_ENGAGEMENT.VIEW_ALL";
     private static final DateTimeFormatter[] DATE_FORMATS = {
             DateTimeFormatter.ofPattern("dd.MM.yyyy"),
             DateTimeFormatter.ofPattern("d.M.yyyy"),
@@ -91,6 +100,7 @@ public class AuditTtssService {
     private final AuditMasterDataItemRepository masterDataItemRepository;
     private final AuditProcessStepSummaryRepository processStepSummaryRepository;
     private final AuditProcessStepDetailRepository processStepDetailRepository;
+    private final AuditExceptionTypeRepository exceptionTypeRepository;
     private final AuditRecommendationRepository recommendationRepository;
     private final EmployeeRepository employeeRepository;
     private final UserAccountRepository userAccountRepository;
@@ -108,6 +118,7 @@ public class AuditTtssService {
                              AuditEngagementAssignmentRepository assignmentRepository, AuditWorkItemRepository workItemRepository,
                              AuditObjectUnitRepository objectUnitRepository, AuditMasterDataItemRepository masterDataItemRepository,
                              AuditProcessStepSummaryRepository processStepSummaryRepository, AuditProcessStepDetailRepository processStepDetailRepository,
+                             AuditExceptionTypeRepository exceptionTypeRepository,
                              AuditRecommendationRepository recommendationRepository, EmployeeRepository employeeRepository,
                              UserAccountRepository userAccountRepository, AuditProgressReportService progressReportService,
                              AuditWorkApprovalChainResolver approvalChainResolver, RuntimeService runtimeService, TaskService taskService,
@@ -123,6 +134,7 @@ public class AuditTtssService {
         this.masterDataItemRepository = masterDataItemRepository;
         this.processStepSummaryRepository = processStepSummaryRepository;
         this.processStepDetailRepository = processStepDetailRepository;
+        this.exceptionTypeRepository = exceptionTypeRepository;
         this.recommendationRepository = recommendationRepository;
         this.employeeRepository = employeeRepository;
         this.userAccountRepository = userAccountRepository;
@@ -137,11 +149,62 @@ public class AuditTtssService {
     }
 
     @Transactional(readOnly = true)
-    public List<AuditTtssRecordResponse> list(UUID engagementId) {
+    public List<AuditTtssRecordResponse> list(UUID engagementId, CurrentUserPrincipal principal) {
         UUID tenantId = TenantContext.getTenantId();
-        getEngagementOrThrow(tenantId, engagementId);
+        AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
         List<AuditTtssRecord> records = ttssRepository.findByTenantIdAndEngagementIdOrderByCreatedAtAsc(tenantId, engagementId);
-        return toResponses(tenantId, records);
+        return toResponses(tenantId, scopeByVisibility(tenantId, engagement, records, principal));
+    }
+
+    /** Ket qua phan quyen THEO DONG cho 1 nguoi dung tren 1 CKT - dung chung cho list()/delete()/
+     * approveRecommendations() de dam bao xoa/duyet cung bi gioi han dung pham vi da thay o man
+     * hinh danh sach (khong the xoa/duyet 1 dong minh khong duoc phep xem). */
+    private record TtssVisibility(boolean seeAll, Set<String> visibleUsernames) {
+        boolean canSee(AuditTtssRecord record) {
+            return seeAll || (record.getRecordUsername() != null && visibleUsernames.contains(record.getRecordUsername()));
+        }
+    }
+
+    /** Phan quyen THEO DONG du lieu (khac voi PERM_AUDIT.TTSS.VIEW - quyen do chi kiem soat viec vao
+     * duoc man hinh). Ap dung cho "Cán bộ thực hiện" = {@link AuditTtssRecord#getRecordUsername()}:
+     * - Truong doan ({@link AuditEngagement#getTeamLeadEmployeeId()}) hoac co quyen
+     *   AUDIT.PLAN_ENGAGEMENT.VIEW_ALL: thay/xoa/duyet duoc TAT CA nghiep vu.
+     * - Truong nhom ({@link AuditEngagementGroup#getLeaderEmployeeId()}): thay/xoa/duyet duoc dong
+     *   cua CHINH MINH + cua moi thanh vien trong (cac) nhom minh lam truong nhom (doi chieu qua
+     *   UserAccount.username vi TTSS chi luu username, khong luu employeeId).
+     * - Thanh vien thuong: chi thay/xoa duoc dong do CHINH MINH upload (recordUsername = username
+     *   cua minh). */
+    private TtssVisibility resolveVisibility(UUID tenantId, AuditEngagement engagement, CurrentUserPrincipal principal) {
+        if (principal == null || principal.username() == null) {
+            return new TtssVisibility(false, Set.of());
+        }
+        if (principal.permissions() != null && principal.permissions().contains(PERMISSION_VIEW_ALL)) {
+            return new TtssVisibility(true, Set.of());
+        }
+        UUID actorEmployeeId = principal.employeeCode() == null ? null
+                : employeeRepository.findByTenantIdAndEmployeeCode(tenantId, principal.employeeCode()).map(Employee::getId).orElse(null);
+        if (actorEmployeeId != null && actorEmployeeId.equals(engagement.getTeamLeadEmployeeId())) {
+            return new TtssVisibility(true, Set.of());
+        }
+
+        Set<String> visibleUsernames = new HashSet<>();
+        visibleUsernames.add(principal.username());
+        if (actorEmployeeId != null) {
+            List<AuditEngagementGroup> groups = groupRepository.findByTenantIdAndAuditEngagementIdOrderByGroupCodeAsc(tenantId, engagement.getId());
+            List<UUID> ledGroupIds = groups.stream().filter(g -> actorEmployeeId.equals(g.getLeaderEmployeeId())).map(AuditEngagementGroup::getId).toList();
+            if (!ledGroupIds.isEmpty()) {
+                List<UUID> memberEmployeeIds = memberRepository.findByTenantIdAndGroupIdIn(tenantId, ledGroupIds).stream()
+                        .map(AuditEngagementGroupMember::getEmployeeId).toList();
+                userAccountRepository.findByEmployeeIdIn(memberEmployeeIds).forEach(account -> visibleUsernames.add(account.getUsername()));
+            }
+        }
+        return new TtssVisibility(false, visibleUsernames);
+    }
+
+    private List<AuditTtssRecord> scopeByVisibility(UUID tenantId, AuditEngagement engagement, List<AuditTtssRecord> records,
+                                                      CurrentUserPrincipal principal) {
+        TtssVisibility visibility = resolveVisibility(tenantId, engagement, principal);
+        return records.stream().filter(visibility::canSee).toList();
     }
 
     /** "1. Download template TTSS" - 1 dong cho MOI cong viec da duoc phan cong trong CKT nay (ca
@@ -180,8 +243,9 @@ public class AuditTtssService {
         return excelExportService.export("audit_ttss_template", templateColumns(), rows);
     }
 
-    /** "2. Upload file TTSS" - moi dong tao MOI 1 AuditTtssRecord (khong upsert), sau do tu dong
-     * sinh 1 Báo cáo tiến độ cho chinh nguoi upload. */
+    /** "2. Upload file TTSS" - moi dong UPSERT theo khoa tu nhien (xem uploadKey()): trung khoa thi
+     * CAP NHAT dong da co, khong trung thi tao dong moi - sau do tu dong sinh 1 Báo cáo tiến độ cho
+     * chinh nguoi upload. */
     @Transactional
     public List<AuditTtssRecordResponse> upload(UUID engagementId, MultipartFile file, String note, CurrentUserPrincipal principal) {
         UUID tenantId = TenantContext.getTenantId();
@@ -204,24 +268,48 @@ public class AuditTtssService {
                 .collect(Collectors.toMap(AuditProcessStepSummary::getCode, AuditProcessStepSummary::getId, (a, b) -> a));
         Map<String, UUID> stepDetailIdsByCode = processStepDetailRepository.findByTenantIdOrderByCodeAsc(tenantId).stream()
                 .collect(Collectors.toMap(AuditProcessStepDetail::getCode, AuditProcessStepDetail::getId, (a, b) -> a));
+        Map<String, String> findingNamesByCode = exceptionTypeRepository.findByTenantIdOrderByCodeAsc(tenantId).stream()
+                .collect(Collectors.toMap(AuditExceptionType::getCode, AuditExceptionType::getName, (a, b) -> a));
+
+        Map<String, AuditTtssRecord> existingByKey = new HashMap<>();
+        for (AuditTtssRecord existing : ttssRepository.findByTenantIdAndEngagementIdOrderByCreatedAtAsc(tenantId, engagementId)) {
+            String key = uploadKey(existing.getWorkItemCode(), existing.getProcessStepDetailId(), existing.getFindingCode(),
+                    existing.getReferenceNumber(), existing.getReferenceNumber2());
+            if (key != null) {
+                existingByKey.put(key, existing);
+            }
+        }
 
         List<AuditTtssRecord> saved = new ArrayList<>();
+        int updatedCount = 0;
         for (Map<String, String> row : rows) {
-            AuditTtssRecord record = new AuditTtssRecord();
-            record.setTenantId(tenantId);
-            record.setEngagementId(engagementId);
+            String workItemCode = emptyToNull(row.get("workItemCode"));
+            UUID processStepDetailId = stepDetailIdsByCode.get(emptyToNull(row.get("processStepDetailCode")));
+            String findingCode = emptyToNull(row.get("findingCode"));
+            String referenceNumber = emptyToNull(row.get("referenceNumber"));
+            String referenceNumber2 = emptyToNull(row.get("referenceNumber2"));
+            String key = uploadKey(workItemCode, processStepDetailId, findingCode, referenceNumber, referenceNumber2);
+
+            AuditTtssRecord record = key == null ? null : existingByKey.get(key);
+            boolean isUpdate = record != null;
+            if (record == null) {
+                record = new AuditTtssRecord();
+                record.setTenantId(tenantId);
+                record.setEngagementId(engagementId);
+            }
             record.setRecordUsername(principal.username());
             record.setTtssPerformerName(performerName);
             record.setBusinessSegmentId(segmentIdsByCode.get(emptyToNull(row.get("businessSegmentCode"))));
-            record.setWorkItemCode(emptyToNull(row.get("workItemCode")));
+            record.setWorkItemCode(workItemCode);
             record.setProcessStepSummaryId(stepSummaryIdsByCode.get(emptyToNull(row.get("processStepSummaryCode"))));
             record.setTtssContent(emptyToNull(row.get("ttssContent")));
-            record.setProcessStepDetailId(stepDetailIdsByCode.get(emptyToNull(row.get("processStepDetailCode"))));
-            record.setFindingCode(emptyToNull(row.get("findingCode")));
-            record.setFindingName(emptyToNull(row.get("findingName")));
+            record.setProcessStepDetailId(processStepDetailId);
+            record.setFindingCode(findingCode);
+            String findingName = emptyToNull(row.get("findingName"));
+            record.setFindingName(findingName != null ? findingName : findingNamesByCode.get(findingCode));
             record.setMaterial(!isBlank(row.get("material")));
-            record.setReferenceNumber(emptyToNull(row.get("referenceNumber")));
-            record.setReferenceNumber2(emptyToNull(row.get("referenceNumber2")));
+            record.setReferenceNumber(referenceNumber);
+            record.setReferenceNumber2(referenceNumber2);
             record.setCustomerCode(emptyToNull(row.get("customerCode")));
             record.setCustomerName(emptyToNull(row.get("customerName")));
             record.setAmount(parseDecimal(row.get("amount")));
@@ -234,11 +322,20 @@ public class AuditTtssService {
             record.setUploaderRecommendationCode(emptyToNull(row.get("uploaderRecommendationCode")));
             record.setUploaderRecommendationName(emptyToNull(row.get("uploaderRecommendationName")));
             record.setAppendix(emptyToNull(row.get("appendix")));
-            saved.add(ttssRepository.save(record));
+
+            AuditTtssRecord persisted = ttssRepository.save(record);
+            saved.add(persisted);
+            if (isUpdate) {
+                updatedCount++;
+            }
+            if (key != null) {
+                existingByKey.put(key, persisted);
+            }
         }
 
         auditLogService.record("AuditTtssRecord", engagementId, AuditAction.CREATE,
-                "Upload file TTSS: " + saved.size() + " dong cho CKT " + engagement.getCode());
+                "Upload file TTSS: " + saved.size() + " dong cho CKT " + engagement.getCode()
+                        + " (" + updatedCount + " cap nhat, " + (saved.size() - updatedCount) + " moi)");
 
         if (uploader != null) {
             UUID businessSegmentId = memberRepository.findByTenantIdAndGroupIdIn(tenantId, groupRepository
@@ -281,10 +378,14 @@ public class AuditTtssService {
         UUID tenantId = TenantContext.getTenantId();
         AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
         requireTeamLead(tenantId, engagement, principal.employeeCode());
+        TtssVisibility visibility = resolveVisibility(tenantId, engagement, principal);
 
         List<UUID> approvedIds = new ArrayList<>();
         for (UUID recordId : request.ttssRecordIds()) {
             AuditTtssRecord record = getRecordOrThrow(tenantId, engagementId, recordId);
+            if (!visibility.canSee(record)) {
+                throw new BusinessException("AUDIT_TTSS_NOT_VISIBLE", "Ban khong co quyen duyet dong TTSS nay", HttpStatus.FORBIDDEN);
+            }
             if (record.getTeamRecommendationId() == null) {
                 throw new BusinessException("AUDIT_TTSS_NOT_LINKED", "Chi duoc phe duyet dong da duoc gan kien nghi", HttpStatus.BAD_REQUEST);
             }
@@ -330,6 +431,22 @@ public class AuditTtssService {
         return approvedIds;
     }
 
+    /** Xoa 1 dong TTSS - cho phep xoa bat ke trang thai gan/duyet kien nghi (truong doan/nguoi upload
+     * tu chiu trach nhiem khi xoa), nhung CHI trong pham vi dong minh duoc phep xem (xem
+     * resolveVisibility()) - khong the xoa dong cua nguoi khac ngoai pham vi phu trach. */
+    @Transactional
+    public void delete(UUID engagementId, UUID recordId, CurrentUserPrincipal principal) {
+        UUID tenantId = TenantContext.getTenantId();
+        AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
+        AuditTtssRecord record = getRecordOrThrow(tenantId, engagementId, recordId);
+        if (!resolveVisibility(tenantId, engagement, principal).canSee(record)) {
+            throw new BusinessException("AUDIT_TTSS_NOT_VISIBLE", "Ban khong co quyen xoa dong TTSS nay", HttpStatus.FORBIDDEN);
+        }
+        ttssRepository.delete(record);
+        auditLogService.record("AuditTtssRecord", recordId, AuditAction.DELETE,
+                "Xoa dong TTSS " + (record.getFindingCode() == null ? recordId : record.getFindingCode()) + " cua CKT");
+    }
+
     private void requireTeamLead(UUID tenantId, AuditEngagement engagement, String actorEmployeeCode) {
         if (actorEmployeeCode == null) {
             throw new BusinessException("AUDIT_ENGAGEMENT_NOT_TEAM_LEAD", "Chi truong doan moi duoc phep phe duyet", HttpStatus.FORBIDDEN);
@@ -365,7 +482,9 @@ public class AuditTtssService {
      * dung file that. "recordUsername"/"ttssPerformerName" chi de LAM TIEU DE cho nguoi dung biet -
      * gia tri LUON tu dong lay tu nguoi upload, KHONG doc lai tu file (xem upload()). Cac cot
      * "*Name" cua BQT chi la ten goi y cho nguoi dien tay, khong doc lai khi import (ten duoc tra ve
-     * qua tra cuu FK trong toResponse()). */
+     * qua tra cuu FK trong toResponse()). Rieng "findingName" (Ten TTSS) neu de trong se duoc tu
+     * dong lay theo "findingCode" tu danh muc AuditExceptionType (Loai ton tai sai sot) neu co khai
+     * bao - xem upload(). */
     private List<ExportColumn> templateColumns() {
         return List.of(
                 new ExportColumn("stt", "STT"),
@@ -397,6 +516,16 @@ public class AuditTtssService {
                 new ExportColumn("approverName", "tên cán bộ phê duyệt"),
                 new ExportColumn("controllerName", "tên cán bộ-người kiểm soát"),
                 new ExportColumn("appendix", "Phụ lục"));
+    }
+
+    /** Khoa trung khi upload lai file TTSS: chi coi la "trung" (UPDATE dong cu) khi CA BA truong
+     * dinh danh chinh (ma cong viec, ma TTSS, so tham chieu) deu co gia tri - thieu 1 trong 3 thi
+     * luon tao dong moi de tranh gop nham cac dong khong du du lieu phan biet. */
+    private String uploadKey(String workItemCode, UUID processStepDetailId, String findingCode, String referenceNumber, String referenceNumber2) {
+        if (workItemCode == null || findingCode == null || referenceNumber == null) {
+            return null;
+        }
+        return String.join("|", workItemCode, String.valueOf(processStepDetailId), findingCode, referenceNumber, String.valueOf(referenceNumber2));
     }
 
     private boolean isBlank(String value) {

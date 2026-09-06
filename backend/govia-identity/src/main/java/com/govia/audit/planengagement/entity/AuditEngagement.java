@@ -97,4 +97,9 @@ public class AuditEngagement extends BaseEntity {
 
     @Column(name = "report_plan_end")
     private LocalDateTime reportPlanEnd;
+
+    /** "Xếp loại đoàn" - man hinh "Quan ly dot kiem toan", user tu nhap (khong co cong thuc tinh
+     * theo dac ta - sheet "Quan ly dot kiem toan" cua Tao CKT (2).xlsx ghi ro cot nay la "User nhap"). */
+    @Column(name = "team_ranking", length = 50)
+    private String teamRanking;
 }

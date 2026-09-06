@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,8 +38,8 @@ public class AuditTtssController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('PERM_AUDIT.TTSS.VIEW')")
-    public ApiResponse<List<AuditTtssRecordResponse>> list(@PathVariable UUID engagementId) {
-        return ApiResponse.ok(service.list(engagementId));
+    public ApiResponse<List<AuditTtssRecordResponse>> list(@PathVariable UUID engagementId, @AuthenticationPrincipal CurrentUserPrincipal principal) {
+        return ApiResponse.ok(service.list(engagementId, principal));
     }
 
     @GetMapping("/template")
@@ -56,6 +57,14 @@ public class AuditTtssController {
                                                               @RequestParam(required = false) String note,
                                                               @AuthenticationPrincipal CurrentUserPrincipal principal) {
         return ApiResponse.ok(service.upload(engagementId, file, note, principal));
+    }
+
+    @DeleteMapping("/{recordId}")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.TTSS.EDIT')")
+    public ApiResponse<Void> delete(@PathVariable UUID engagementId, @PathVariable UUID recordId,
+                                     @AuthenticationPrincipal CurrentUserPrincipal principal) {
+        service.delete(engagementId, recordId, principal);
+        return ApiResponse.ok(null);
     }
 
     @PostMapping("/link-recommendation")

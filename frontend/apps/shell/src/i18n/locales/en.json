@@ -54,6 +54,7 @@
     "auditPlanMdExceptionMapping": "Exception Mapping",
     "auditPlanEngagement": "Engagement Planning",
     "auditPlanEngagementIndex": "Create & Manage Audit Engagements",
+    "auditPlanEngagementMonitoringIndex": "Audit Engagement Monitoring",
     "auditPlanExecution": "Audit Execution",
     "auditPlanExecCmTd1": "02L/BKS-KTNB (TD1)",
     "auditPlanExecCmTd2": "02G/BKS-KTNB (TD2)",
@@ -1007,6 +1008,7 @@
     "loadError": "Failed to load recommendations",
     "createSuccess": "Recommendation added",
     "createError": "Failed to add recommendation",
+    "codeFormatError": "Code must follow the KNKTxxx format (e.g. KNKT001)",
     "deleteConfirmTitle": "Delete this recommendation?",
     "deleteSuccess": "Recommendation deleted",
     "deleteError": "Failed to delete recommendation",
@@ -1023,10 +1025,13 @@
     "linkRecommendationSuccess": "Recommendation linked",
     "linkRecommendationError": "Failed to link recommendation",
     "approveConfirmTitle": "Approve recommendation for {{count}} selected row(s)?",
+    "deleteConfirmTitle": "Delete this exception row?",
     "columns": {
       "businessSegment": "Segment",
       "workItemCode": "Work item code",
+      "processStepSummaryCode": "Process step code",
       "processStepSummary": "Process step",
+      "processStepDetailCode": "Process step detail code",
       "ttssContent": "Exception detail",
       "findingCode": "Finding code",
       "findingName": "Finding name",
@@ -1035,13 +1040,16 @@
       "amount": "Amount",
       "teamRecommendation": "Team lead recommendation",
       "recommendationApprovalStatus": "Recommendation approval",
-      "appendix": "Appendix"
+      "appendix": "Appendix",
+      "recordUsername": "Performed by"
     },
     "messages": {
       "loadError": "Failed to load exceptions",
       "approveSuccess": "Recommendation approved",
       "approveError": "Approval failed",
-      "downloadTemplateError": "Failed to download template"
+      "downloadTemplateError": "Failed to download template",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Delete failed"
     }
   },
   "auditCmTd1": {
@@ -1526,6 +1534,64 @@
       "deleteSuccess": "Deleted",
       "deleteError": "Failed to delete",
       "saveError": "Failed to save"
+    }
+  },
+  "auditEngagementMonitoring": {
+    "pageTitle": "Audit Engagement Monitoring",
+    "columns": {
+      "code": "Engagement Code",
+      "auditObjectUnitName": "Audited Entity",
+      "name": "Engagement Name",
+      "fieldworkStartDate": "Start Date",
+      "fieldworkEndDate": "End Date",
+      "decisionNumber": "Decision No.",
+      "teamLeadEmployee": "Team Lead",
+      "memberCount": "Team Members",
+      "businessSegmentCount": "Business Lines",
+      "totalFindings": "Total Findings",
+      "totalMaterialFindings": "Material Findings",
+      "recommendationCount": "Recommendations",
+      "status": "Status",
+      "teamRanking": "Team Ranking"
+    },
+    "teamDetailButton": "Team Detail",
+    "updateRankingButton": "Update Team Ranking",
+    "updateRankingTitle": "Update Team Ranking - {{code}}",
+    "detail": {
+      "title": "Audit Team Detail - {{code}}",
+      "columns": {
+        "stt": "No.",
+        "employeeName": "Employee Name",
+        "roleTitle": "Role",
+        "businessSegmentNames": "Business Lines",
+        "totalFindings": "Total Findings",
+        "ttssTypeCount": "Finding Types",
+        "totalMaterialFindings": "Material Findings",
+        "materialTtssTypeCount": "Material Finding Types",
+        "recommendationCount": "Recommendations",
+        "cbktProgress": "Preparation Progress",
+        "thktSampleProgress": "Execution Progress (Sampled)",
+        "thktNoSampleProgress": "Execution Progress (Non-sampled)",
+        "score": "Score",
+        "ranking": "Ranking",
+        "note": "Note"
+      },
+      "scoringButton": "Score",
+      "scoringTitle": "Score Member - {{name}}",
+      "progressReportButton": "Progress Report",
+      "otherFilesButton": "View Files",
+      "ttssButton": "View Findings (TTSS)",
+      "assignmentButton": "Assignment Detail",
+      "ttssModalTitle": "TTSS Detail - {{code}}",
+      "ttssPerformerName": "TTSS Performer"
+    },
+    "messages": {
+      "loadError": "Failed to load data",
+      "loadDetailError": "Failed to load team detail",
+      "updateRankingSuccess": "Team ranking updated",
+      "updateRankingError": "Failed to update team ranking",
+      "updateScoringSuccess": "Member score updated",
+      "updateScoringError": "Failed to update member score"
     }
   },
   "auditExceptionMapping": {

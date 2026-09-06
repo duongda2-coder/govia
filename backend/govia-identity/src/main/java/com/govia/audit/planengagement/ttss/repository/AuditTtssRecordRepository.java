@@ -9,5 +9,7 @@ import java.util.UUID;
 public interface AuditTtssRecordRepository extends JpaRepository<AuditTtssRecord, UUID> {
     List<AuditTtssRecord> findByTenantIdAndEngagementIdOrderByCreatedAtAsc(UUID tenantId, UUID engagementId);
 
+    List<AuditTtssRecord> findByTenantIdAndEngagementIdIn(UUID tenantId, List<UUID> engagementIds);
+
     boolean existsByTenantIdAndTeamRecommendationId(UUID tenantId, UUID teamRecommendationId);
 }

@@ -2,9 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { App, Button, Result, Select, Space, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
-import { CrudTable, getApiErrorMessage } from "@govia/ui-kit";
+import { CrudTable, getApiErrorMessage, useClientSearchColumn } from "@govia/ui-kit";
 import {
   approveAuditTtssRecommendations,
+  deleteAuditTtssRecord,
   downloadAuditTtssTemplate,
   listAuditTtssRecords,
   uploadAuditTtssFile,
@@ -24,6 +25,8 @@ export function TtssManagementPage() {
   const canView = hasPermission("AUDIT.TTSS.VIEW");
   const canEdit = hasPermission("AUDIT.TTSS.EDIT");
   const canApprove = hasPermission("AUDIT.TTSS.APPROVE");
+  const { getSearchColumnProps } = useClientSearchColumn<AuditTtssRecordItem>();
+  const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
   const [engagements, setEngagements] = useState<AuditEngagementItem[]>([]);
   const [engagementId, setEngagementId] = useState<string | undefined>(undefined);
@@ -75,8 +78,8 @@ export function TtssManagementPage() {
           message.success(t("auditTtss.messages.approveSuccess"));
           setSelected([]);
           await load(engagementId);
-        } catch {
-          message.error(t("auditTtss.messages.approveError"));
+        } catch (err) {
+          message.error(getApiErrorMessage(err, t("auditTtss.messages.approveError")));
         }
       },
     });
@@ -91,6 +94,26 @@ export function TtssManagementPage() {
     }
   };
 
+  const handleDelete = () => {
+    if (!engagementId || selected.length === 0) return;
+    modal.confirm({
+      title: selected.length > 1 ? t("common.deleteConfirmTitleCount", { count: selected.length }) : t("auditTtss.deleteConfirmTitle"),
+      okText: t("common.yes"),
+      cancelText: t("common.no"),
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await Promise.all(selected.map((item) => deleteAuditTtssRecord(engagementId, item.id)));
+          message.success(t("auditTtss.messages.deleteSuccess"));
+          setSelected([]);
+          await load(engagementId);
+        } catch (err) {
+          message.error(getApiErrorMessage(err, t("auditTtss.messages.deleteError")));
+        }
+      },
+    });
+  };
+
   const approveDisabled =
     selected.length === 0 ||
     !isTeamLead ||
@@ -99,9 +122,26 @@ export function TtssManagementPage() {
   const columns: TableProps<AuditTtssRecordItem>["columns"] = [
     { title: t("auditTtss.columns.businessSegment"), dataIndex: "businessSegmentCode", width: 100, render: (v) => v ?? "-" },
     { title: t("auditTtss.columns.workItemCode"), dataIndex: "workItemCode", width: 110, render: (v) => v ?? "-" },
+    {
+      title: t("auditTtss.columns.processStepSummaryCode"),
+      width: 130,
+      ...getSearchColumnProps("processStepSummaryCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("auditTtss.columns.processStepSummary"), dataIndex: "processStepSummaryName", width: 200, render: (v) => v ?? "-" },
+    {
+      title: t("auditTtss.columns.processStepDetailCode"),
+      width: 130,
+      ...getSearchColumnProps("processStepDetailCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("auditTtss.columns.ttssContent"), dataIndex: "ttssContent", width: 260, render: (v) => v ?? "-" },
-    { title: t("auditTtss.columns.findingCode"), dataIndex: "findingCode", width: 120, render: (v) => v ?? "-" },
+    {
+      title: t("auditTtss.columns.findingCode"),
+      width: 120,
+      ...getSearchColumnProps("findingCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
     { title: t("auditTtss.columns.findingName"), dataIndex: "findingName", width: 220, render: (v) => v ?? "-" },
     {
       title: t("auditTtss.columns.material"),
@@ -112,6 +152,7 @@ export function TtssManagementPage() {
     { title: t("auditTtss.columns.customerName"), dataIndex: "customerName", width: 160, render: (v) => v ?? "-" },
     { title: t("auditTtss.columns.amount"), dataIndex: "amount", width: 130, align: "right", render: (v) => v ?? "-" },
     { title: t("auditTtss.columns.appendix"), dataIndex: "appendix", width: 160, render: (v) => v ?? "-" },
+    { title: t("auditTtss.columns.recordUsername"), dataIndex: "recordUsername", width: 140, render: (v) => v ?? "-" },
     {
       title: t("auditTtss.columns.teamRecommendation"),
       width: 200,
@@ -164,6 +205,8 @@ export function TtssManagementPage() {
         rowKey="id"
         loading={loading}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
+        onDelete={canEdit && engagementId ? handleDelete : undefined}
+        deleteDisabled={selected.length === 0}
         onDownloadTemplate={engagementId ? handleDownloadTemplate : undefined}
         onImport={
           canEdit && engagementId

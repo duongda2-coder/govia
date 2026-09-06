@@ -34,6 +34,7 @@ export interface AuditEngagementItem {
   sampleRequestEnd: string | null;
   reportPlanStart: string | null;
   reportPlanEnd: string | null;
+  teamRanking: string | null;
 }
 
 export interface AuditEngagementRequest {

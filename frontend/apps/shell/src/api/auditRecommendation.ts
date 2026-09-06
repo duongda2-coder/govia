@@ -11,6 +11,7 @@ export interface AuditRecommendationItem {
 }
 
 export interface AuditRecommendationRequest {
+  code: string;
   businessSegmentId: string | null;
   content: string;
 }

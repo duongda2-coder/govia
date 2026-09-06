@@ -1,0 +1,29 @@
+databaseChangeLog:
+
+  # ===================== "Quản lý đợt kiểm toán" - man hinh giam sat tien do doan KT theo tung CKT
+  # (nguon: file "Tao CKT (2).xlsx", sheet "Quan ly dot kiem toan"). Cac cot con lai cua man hinh
+  # (so thanh vien, so phat hien, phat hien trong yeu, so kien nghi, tien do CBKT/THKT) deu la du
+  # lieu DEM/TINH tu cac bang da co san (audit_engagement_group_member, audit_ttss_record,
+  # audit_engagement_assignment) - khong can cot rieng. Chi "Xep loai doan" (cap CKT) va "Diem/Xep
+  # loai/Ghi chu thanh vien" (cap thanh vien) la du lieu USER NHAP moi, can them cot. =====================
+  - changeSet:
+      id: 119-1-audit-engagement-team-ranking
+      author: govia
+      comment: "Them cot team_ranking (Xep loai doan) vao audit_engagement"
+      changes:
+        - addColumn:
+            tableName: audit_engagement
+            columns:
+              - column: { name: team_ranking, type: VARCHAR(50) }
+
+  - changeSet:
+      id: 119-2-audit-engagement-group-member-scoring
+      author: govia
+      comment: "Them cot score/ranking/note (Diem, Xep loai, Ghi chu thanh vien) vao audit_engagement_group_member"
+      changes:
+        - addColumn:
+            tableName: audit_engagement_group_member
+            columns:
+              - column: { name: score, type: "DECIMAL(5,2)" }
+              - column: { name: ranking, type: VARCHAR(50) }
+              - column: { name: note, type: VARCHAR(1000) }
