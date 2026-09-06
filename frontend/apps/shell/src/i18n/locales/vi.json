@@ -1036,7 +1036,8 @@
     "messages": {
       "loadError": "Không tải được danh sách TTSS",
       "approveSuccess": "Đã phê duyệt kiến nghị",
-      "approveError": "Phê duyệt kiến nghị thất bại"
+      "approveError": "Phê duyệt kiến nghị thất bại",
+      "downloadTemplateError": "Tải mẫu thất bại"
     }
   },
   "auditCmTd1": {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { App, Button, Result, Select, Space, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
-import { CrudTable } from "@govia/ui-kit";
+import { CrudTable, getApiErrorMessage } from "@govia/ui-kit";
 import {
   approveAuditTtssRecommendations,
   downloadAuditTtssTemplate,
@@ -82,6 +82,15 @@ export function TtssManagementPage() {
     });
   };
 
+  const handleDownloadTemplate = async () => {
+    if (!engagementId) return;
+    try {
+      await downloadAuditTtssTemplate(engagementId);
+    } catch (err) {
+      message.error(getApiErrorMessage(err, t("auditTtss.messages.downloadTemplateError")));
+    }
+  };
+
   const approveDisabled =
     selected.length === 0 ||
     !isTeamLead ||
@@ -154,7 +163,7 @@ export function TtssManagementPage() {
         rowKey="id"
         loading={loading}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
-        onDownloadTemplate={engagementId ? () => downloadAuditTtssTemplate(engagementId) : undefined}
+        onDownloadTemplate={engagementId ? handleDownloadTemplate : undefined}
         onImport={
           canEdit && engagementId
             ? async (file) => {

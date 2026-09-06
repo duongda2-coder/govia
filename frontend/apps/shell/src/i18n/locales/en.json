@@ -1036,7 +1036,8 @@
     "messages": {
       "loadError": "Failed to load exceptions",
       "approveSuccess": "Recommendation approved",
-      "approveError": "Approval failed"
+      "approveError": "Approval failed",
+      "downloadTemplateError": "Failed to download template"
     }
   },
   "auditCmTd1": {
