@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { App, Button, Form, Input, Modal, Result, Select, Space, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
 import { FileTextOutlined } from "@ant-design/icons";
@@ -48,6 +48,7 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
 
   const [engagements, setEngagements] = useState<AuditEngagementItem[]>([]);
   const [engagementId, setEngagementId] = useState<string | undefined>(undefined);
+  const [employeeFilter, setEmployeeFilter] = useState<string | undefined>(undefined);
   const [items, setItems] = useState<AuditWorkManagementItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<AuditWorkManagementItem[]>([]);
@@ -79,7 +80,22 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
   useEffect(() => {
     if (canView && engagementId) load(engagementId);
     if (!engagementId) setItems([]);
+    setEmployeeFilter(undefined);
   }, [canView, engagementId, load]);
+
+  const employeeOptions = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const item of items) {
+      if (!item.employeeId) continue;
+      seen.set(item.employeeId, item.employeeUsername ?? item.employeeName ?? item.employeeId);
+    }
+    return Array.from(seen, ([value, label]) => ({ value, label }));
+  }, [items]);
+
+  const displayedItems = useMemo(
+    () => (employeeFilter ? items.filter((item) => item.employeeId === employeeFilter) : items),
+    [items, employeeFilter],
+  );
 
   const currentEngagement = engagements.find((e) => e.id === engagementId);
   const isTeamLead = !!user?.employeeCode && !!currentEngagement && user.employeeCode === currentEngagement.teamLeadEmployeeCode;
@@ -146,13 +162,13 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
     { title: t("auditWorkManagement.columns.businessSegmentCode"), dataIndex: "businessSegmentCode", width: 130, render: (v) => v ?? "-" },
     { title: t("auditWorkManagement.columns.workItemCode"), dataIndex: "workItemCode", width: 120 },
     { title: t("auditWorkManagement.columns.workItemName"), dataIndex: "workItemName" },
-    { title: t("auditWorkManagement.columns.employee"), dataIndex: "employeeUsername", width: 140, render: (v, r) => v ?? r.employeeName ?? "-" },
     {
       title: t("auditWorkManagement.columns.status"),
       dataIndex: "status",
       width: 140,
       render: (v: AssignmentStatus) => <Tag color={STATUS_COLORS[v]}>{statusLabel(v)}</Tag>,
     },
+    { title: t("auditWorkManagement.columns.employee"), dataIndex: "employeeUsername", width: 140, render: (v, r) => v ?? r.employeeName ?? "-" },
     {
       title: t("auditWorkManagement.columns.approvalStatus"),
       width: 140,
@@ -182,6 +198,18 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
           onChange={setEngagementId}
           allowClear
         />
+        <Typography.Text>{t("auditWorkManagement.employeeFilter")}</Typography.Text>
+        <Select
+          style={{ width: 220 }}
+          showSearch
+          optionFilterProp="label"
+          placeholder={t("auditWorkManagement.selectEmployee")}
+          options={employeeOptions}
+          value={employeeFilter}
+          onChange={setEmployeeFilter}
+          disabled={!engagementId}
+          allowClear
+        />
         {showProgressReport && engagementId && (
           <Button icon={<FileTextOutlined />} onClick={() => setProgressReportOpen(true)}>
             {t("auditProgressReport.title")}
@@ -191,7 +219,7 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
       <CrudTable<AuditWorkManagementItem>
         tableId={tableId}
         columns={columns}
-        dataSource={items}
+        dataSource={displayedItems}
         rowKey="assignmentId"
         loading={loading}
         onEdit={canEdit ? openEdit : undefined}
