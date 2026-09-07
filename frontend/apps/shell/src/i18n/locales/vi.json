@@ -1047,7 +1047,27 @@
       "teamRecommendation": "Kiến nghị trưởng đoàn",
       "recommendationApprovalStatus": "Phê duyệt KN",
       "appendix": "Phụ lục",
-      "recordUsername": "Cán bộ thực hiện"
+      "recordUsername": "Cán bộ thực hiện",
+      "referenceNumber": "Số tham chiếu",
+      "referenceNumber2": "Số tham chiếu 2",
+      "customerCode": "Mã khách hàng",
+      "performingUser": "User thực hiện",
+      "transactionContent": "Nội dung giao dịch",
+      "uploaderRecommendationCode": "Mã KN người upload",
+      "uploaderRecommendationName": "Loại kiến nghị",
+      "exceptionDate": "Ngày HTKN",
+      "ttssPerformerName": "Cán bộ thực hiện TTSS",
+      "relatedStaff": "Cán bộ liên quan khác",
+      "approverName": "Cán bộ phê duyệt",
+      "controllerName": "Cán bộ kiểm soát",
+      "teamRecommendationCode": "Mã KN trưởng đoàn",
+      "teamRecommendationContent": "Nội dung KN trưởng đoàn",
+      "recommendationApprovedBy": "Người phê duyệt KN",
+      "recommendationApprovedAt": "Thời điểm phê duyệt KN"
+    },
+    "detail": {
+      "buttonTooltip": "Xem chi tiết",
+      "title": "Chi tiết dòng TTSS"
     },
     "messages": {
       "loadError": "Không tải được danh sách TTSS",

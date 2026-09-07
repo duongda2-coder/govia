@@ -1047,7 +1047,27 @@
       "teamRecommendation": "Team lead recommendation",
       "recommendationApprovalStatus": "Recommendation approval",
       "appendix": "Appendix",
-      "recordUsername": "Performed by"
+      "recordUsername": "Performed by",
+      "referenceNumber": "Reference number",
+      "referenceNumber2": "Reference number 2",
+      "customerCode": "Customer code",
+      "performingUser": "Performing user",
+      "transactionContent": "Transaction detail",
+      "uploaderRecommendationCode": "Uploader recommendation code",
+      "uploaderRecommendationName": "Recommendation type",
+      "exceptionDate": "Exception date",
+      "ttssPerformerName": "Exception performer",
+      "relatedStaff": "Other related staff",
+      "approverName": "Approver",
+      "controllerName": "Controller",
+      "teamRecommendationCode": "Team lead recommendation code",
+      "teamRecommendationContent": "Team lead recommendation content",
+      "recommendationApprovedBy": "Recommendation approved by",
+      "recommendationApprovedAt": "Recommendation approved at"
+    },
+    "detail": {
+      "buttonTooltip": "View detail",
+      "title": "Exception row detail"
     },
     "messages": {
       "loadError": "Failed to load exceptions",

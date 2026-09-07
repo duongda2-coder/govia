@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Button, Result, Select, Space, Tag, Typography } from "antd";
-import type { TableProps } from "antd";
+import { App, Button, Descriptions, Modal, Result, Select, Space, Tag, Tooltip, Typography } from "antd";
+import type { DescriptionsProps, TableProps } from "antd";
+import { EyeOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { CrudTable, getApiErrorMessage, useClientSearchColumn } from "@govia/ui-kit";
 import {
@@ -35,6 +36,7 @@ export function TtssManagementPage() {
   const [selected, setSelected] = useState<AuditTtssRecordItem[]>([]);
   const [catalogOpen, setCatalogOpen] = useState(false);
   const [linkOpen, setLinkOpen] = useState(false);
+  const [detailItem, setDetailItem] = useState<AuditTtssRecordItem | null>(null);
 
   useEffect(() => {
     if (!canView) return;
@@ -121,6 +123,17 @@ export function TtssManagementPage() {
 
   const columns: TableProps<AuditTtssRecordItem>["columns"] = [
     {
+      title: "",
+      key: "detail",
+      width: 44,
+      ellipsis: false,
+      render: (_: unknown, item: AuditTtssRecordItem) => (
+        <Tooltip title={t("auditTtss.detail.buttonTooltip")}>
+          <Button type="link" icon={<EyeOutlined />} onClick={() => setDetailItem(item)} />
+        </Tooltip>
+      ),
+    },
+    {
       title: t("auditTtss.columns.businessSegment"),
       width: 100,
       ...getSearchColumnProps("businessSegmentCode", searchLabels),
@@ -140,7 +153,15 @@ export function TtssManagementPage() {
       ...getSearchColumnProps("processStepDetailCode", searchLabels),
       render: (v: string | null) => v ?? "-",
     },
-    { title: t("auditTtss.columns.ttssContent"), dataIndex: "ttssContent", width: 260, render: (v) => v ?? "-" },
+    {
+      title: t("auditTtss.columns.ttssContent"),
+      dataIndex: "ttssContent",
+      width: 260,
+      // Tat native title-tooltip (chu rat nho, kho doc) cua CrudTable, dung Tooltip cua antd (co
+      // chu binh thuong, ro rang hon) de hien noi dung day du khi ren chuot vao dong bi cat.
+      ellipsis: false,
+      render: (v: string | null) => (v ? <Typography.Text ellipsis={{ tooltip: v }}>{v}</Typography.Text> : "-"),
+    },
     {
       title: t("auditTtss.columns.findingCode"),
       width: 120,
@@ -183,6 +204,54 @@ export function TtssManagementPage() {
   if (!canView) {
     return <Result status="403" title="403" subTitle={t("common.noPermission")} />;
   }
+
+  // Man hinh chi tiet 1 dong TTSS: liet ke TOAN BO cac truong cua ban ghi (khong chi cac cot dang
+  // hien tren bang) theo chieu doc (column: 1) de hien day du ky tu cua cac truong noi dung dai
+  // (ttssContent, transactionContent...) ma bang bi cat bot vi gioi han do rong cot.
+  const detailItems: DescriptionsProps["items"] = detailItem
+    ? [
+        { key: "recordUsername", label: t("auditTtss.columns.recordUsername"), children: detailItem.recordUsername ?? "-" },
+        { key: "businessSegmentCode", label: t("auditTtss.columns.businessSegment"), children: detailItem.businessSegmentCode ?? "-" },
+        { key: "workItemCode", label: t("auditTtss.columns.workItemCode"), children: detailItem.workItemCode ?? "-" },
+        { key: "processStepSummaryCode", label: t("auditTtss.columns.processStepSummaryCode"), children: detailItem.processStepSummaryCode ?? "-" },
+        { key: "processStepSummaryName", label: t("auditTtss.columns.processStepSummary"), children: detailItem.processStepSummaryName ?? "-" },
+        { key: "processStepDetailCode", label: t("auditTtss.columns.processStepDetailCode"), children: detailItem.processStepDetailCode ?? "-" },
+        { key: "findingCode", label: t("auditTtss.columns.findingCode"), children: detailItem.findingCode ?? "-" },
+        { key: "findingName", label: t("auditTtss.columns.findingName"), children: detailItem.findingName ?? "-" },
+        { key: "material", label: t("auditTtss.columns.material"), children: detailItem.material ? <Tag color="red">X</Tag> : "-" },
+        { key: "ttssContent", label: t("auditTtss.columns.ttssContent"), children: detailItem.ttssContent ?? "-" },
+        { key: "referenceNumber", label: t("auditTtss.columns.referenceNumber"), children: detailItem.referenceNumber ?? "-" },
+        { key: "referenceNumber2", label: t("auditTtss.columns.referenceNumber2"), children: detailItem.referenceNumber2 ?? "-" },
+        { key: "customerCode", label: t("auditTtss.columns.customerCode"), children: detailItem.customerCode ?? "-" },
+        { key: "customerName", label: t("auditTtss.columns.customerName"), children: detailItem.customerName ?? "-" },
+        { key: "amount", label: t("auditTtss.columns.amount"), children: detailItem.amount ?? "-" },
+        { key: "performingUser", label: t("auditTtss.columns.performingUser"), children: detailItem.performingUser ?? "-" },
+        { key: "transactionContent", label: t("auditTtss.columns.transactionContent"), children: detailItem.transactionContent ?? "-" },
+        { key: "uploaderRecommendationCode", label: t("auditTtss.columns.uploaderRecommendationCode"), children: detailItem.uploaderRecommendationCode ?? "-" },
+        { key: "uploaderRecommendationName", label: t("auditTtss.columns.uploaderRecommendationName"), children: detailItem.uploaderRecommendationName ?? "-" },
+        { key: "exceptionDate", label: t("auditTtss.columns.exceptionDate"), children: detailItem.exceptionDate ?? "-" },
+        { key: "ttssPerformerName", label: t("auditTtss.columns.ttssPerformerName"), children: detailItem.ttssPerformerName ?? "-" },
+        { key: "relatedStaff", label: t("auditTtss.columns.relatedStaff"), children: detailItem.relatedStaff ?? "-" },
+        { key: "approverName", label: t("auditTtss.columns.approverName"), children: detailItem.approverName ?? "-" },
+        { key: "controllerName", label: t("auditTtss.columns.controllerName"), children: detailItem.controllerName ?? "-" },
+        { key: "appendix", label: t("auditTtss.columns.appendix"), children: detailItem.appendix ?? "-" },
+        { key: "teamRecommendationCode", label: t("auditTtss.columns.teamRecommendationCode"), children: detailItem.teamRecommendationCode ?? "-" },
+        { key: "teamRecommendationContent", label: t("auditTtss.columns.teamRecommendationContent"), children: detailItem.teamRecommendationContent ?? "-" },
+        {
+          key: "recommendationApprovalStatus",
+          label: t("auditTtss.columns.recommendationApprovalStatus"),
+          children: detailItem.recommendationApprovalStatus ? (
+            <Tag color={detailItem.recommendationApprovalStatus === "APPROVED" ? "success" : detailItem.recommendationApprovalStatus === "PENDING" ? "processing" : "default"}>
+              {t(`auditWorkManagement.approvalStatus.${detailItem.recommendationApprovalStatus}`)}
+            </Tag>
+          ) : (
+            "-"
+          ),
+        },
+        { key: "recommendationApprovedBy", label: t("auditTtss.columns.recommendationApprovedBy"), children: detailItem.recommendationApprovedBy ?? "-" },
+        { key: "recommendationApprovedAt", label: t("auditTtss.columns.recommendationApprovedAt"), children: detailItem.recommendationApprovedAt ?? "-" },
+      ]
+    : [];
 
   return (
     <div>
@@ -230,6 +299,10 @@ export function TtssManagementPage() {
         onApprove={canApprove && engagementId ? handleApprove : undefined}
         approveDisabled={approveDisabled}
       />
+
+      <Modal title={t("auditTtss.detail.title")} open={!!detailItem} onCancel={() => setDetailItem(null)} footer={null} width={720} destroyOnClose>
+        <Descriptions column={1} bordered size="small" items={detailItems} />
+      </Modal>
 
       <RecommendationCatalogModal open={catalogOpen} engagementId={engagementId ?? null} onClose={() => setCatalogOpen(false)} />
       <LinkRecommendationModal
