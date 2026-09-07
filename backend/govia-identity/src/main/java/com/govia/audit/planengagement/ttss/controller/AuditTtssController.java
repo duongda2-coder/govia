@@ -44,11 +44,11 @@ public class AuditTtssController {
 
     @GetMapping("/template")
     @PreAuthorize("hasAuthority('PERM_AUDIT.TTSS.VIEW')")
-    public ResponseEntity<byte[]> downloadTemplate(@PathVariable UUID engagementId) {
+    public ResponseEntity<byte[]> downloadTemplate(@PathVariable UUID engagementId, @AuthenticationPrincipal CurrentUserPrincipal principal) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"mau_upload_ttss.xlsx\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(service.downloadTemplate(engagementId));
+                .body(service.downloadTemplate(engagementId, principal));
     }
 
     @PostMapping("/upload")

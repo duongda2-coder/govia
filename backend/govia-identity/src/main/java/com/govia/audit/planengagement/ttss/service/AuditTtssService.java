@@ -112,6 +112,7 @@ public class AuditTtssService {
     private final ExcelExportService excelExportService;
     private final ExcelImportService excelImportService;
     private final AuditLogService auditLogService;
+    private final AuditTtssSampleSelectionResolver sampleSelectionResolver;
 
     public AuditTtssService(AuditTtssRecordRepository ttssRepository, AuditEngagementRepository engagementRepository,
                              AuditEngagementGroupRepository groupRepository, AuditEngagementGroupMemberRepository memberRepository,
@@ -123,7 +124,7 @@ public class AuditTtssService {
                              UserAccountRepository userAccountRepository, AuditProgressReportService progressReportService,
                              AuditWorkApprovalChainResolver approvalChainResolver, RuntimeService runtimeService, TaskService taskService,
                              WorkflowTaskService workflowTaskService, ExcelExportService excelExportService, ExcelImportService excelImportService,
-                             AuditLogService auditLogService) {
+                             AuditLogService auditLogService, AuditTtssSampleSelectionResolver sampleSelectionResolver) {
         this.ttssRepository = ttssRepository;
         this.engagementRepository = engagementRepository;
         this.groupRepository = groupRepository;
@@ -146,6 +147,7 @@ public class AuditTtssService {
         this.excelExportService = excelExportService;
         this.excelImportService = excelImportService;
         this.auditLogService = auditLogService;
+        this.sampleSelectionResolver = sampleSelectionResolver;
     }
 
     @Transactional(readOnly = true)
@@ -208,13 +210,55 @@ public class AuditTtssService {
         return records.stream().filter(visibility::canSee).toList();
     }
 
-    /** "1. Download template TTSS" - 1 dong cho MOI cong viec da duoc phan cong trong CKT nay (ca
-     * CBKT lan THKT), cac cot con lai de trong cho user dien tay. */
+    /** Ket qua phan quyen THEO DONG cho downloadTemplate() - cung 3 muc nhu {@link TtssVisibility}
+     * (truong doan/VIEW_ALL thay tat ca, truong nhom thay nhom minh phu trach, thanh vien thuong chi
+     * thay cua chinh minh) nhung xet theo employeeId cua thanh vien duoc PHAN CONG cong viec
+     * (AuditEngagementGroupMember.employeeId qua AuditEngagementAssignment.groupMemberId), khac voi
+     * TtssVisibility xet theo recordUsername cua dong TTSS DA UPLOAD - template chua co dong TTSS nao
+     * de doc recordUsername, chi co danh sach phan cong. */
+    private record AssignmentVisibility(boolean seeAll, Set<UUID> visibleEmployeeIds) {
+        boolean canSee(UUID employeeId) {
+            return seeAll || (employeeId != null && visibleEmployeeIds.contains(employeeId));
+        }
+    }
+
+    private AssignmentVisibility resolveAssignmentVisibility(UUID tenantId, AuditEngagement engagement, CurrentUserPrincipal principal) {
+        if (principal == null || principal.employeeCode() == null) {
+            return new AssignmentVisibility(false, Set.of());
+        }
+        if (principal.permissions() != null && principal.permissions().contains(PERMISSION_VIEW_ALL)) {
+            return new AssignmentVisibility(true, Set.of());
+        }
+        UUID actorEmployeeId = employeeRepository.findByTenantIdAndEmployeeCode(tenantId, principal.employeeCode()).map(Employee::getId).orElse(null);
+        if (actorEmployeeId == null) {
+            return new AssignmentVisibility(false, Set.of());
+        }
+        if (actorEmployeeId.equals(engagement.getTeamLeadEmployeeId())) {
+            return new AssignmentVisibility(true, Set.of());
+        }
+
+        Set<UUID> visibleEmployeeIds = new HashSet<>();
+        visibleEmployeeIds.add(actorEmployeeId);
+        List<AuditEngagementGroup> groups = groupRepository.findByTenantIdAndAuditEngagementIdOrderByGroupCodeAsc(tenantId, engagement.getId());
+        List<UUID> ledGroupIds = groups.stream().filter(g -> actorEmployeeId.equals(g.getLeaderEmployeeId())).map(AuditEngagementGroup::getId).toList();
+        if (!ledGroupIds.isEmpty()) {
+            memberRepository.findByTenantIdAndGroupIdIn(tenantId, ledGroupIds)
+                    .forEach(m -> visibleEmployeeIds.add(m.getEmployeeId()));
+        }
+        return new AssignmentVisibility(false, visibleEmployeeIds);
+    }
+
+    /** "1. Download template TTSS" - 1 dong cho MOI cong viec da duoc phan cong trong CKT nay MA
+     * NGUOI TAI VE DUOC PHEP THAY (xem resolveAssignmentVisibility() - cung pham vi voi
+     * list()/delete()/approveRecommendations() ben tren, tranh lo nghiep vu cua thanh vien/nhom khac
+     * nhu bug da gap: mot thanh vien chi phu trach 1 nghiep vu lai tai duoc mau co ca nghiep vu cua
+     * nguoi khac), cac cot con lai de trong cho user dien tay. */
     @Transactional(readOnly = true)
-    public byte[] downloadTemplate(UUID engagementId) {
+    public byte[] downloadTemplate(UUID engagementId, CurrentUserPrincipal principal) {
         UUID tenantId = TenantContext.getTenantId();
         AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
         AuditObjectUnit unit = objectUnitRepository.findById(engagement.getAuditObjectUnitId()).orElse(null);
+        AssignmentVisibility visibility = resolveAssignmentVisibility(tenantId, engagement, principal);
 
         List<AuditEngagementGroup> groups = groupRepository.findByTenantIdAndAuditEngagementIdOrderByGroupCodeAsc(tenantId, engagementId);
         List<UUID> groupIds = groups.stream().map(AuditEngagementGroup::getId).toList();
@@ -228,6 +272,10 @@ public class AuditTtssService {
 
         List<Map<String, Object>> rows = new ArrayList<>();
         for (AuditEngagementAssignment assignment : assignments) {
+            AuditEngagementGroupMember member = membersById.get(assignment.getGroupMemberId());
+            if (member == null || !visibility.canSee(member.getEmployeeId())) {
+                continue;
+            }
             AuditWorkItem workItem = workItems.get(assignment.getWorkItemId());
             if (workItem == null) {
                 continue;
@@ -239,9 +287,39 @@ public class AuditTtssService {
             row.put("auditObjectUnitCode", unit == null ? null : unit.getCode());
             row.put("businessSegmentCode", segment == null ? null : segment.getCode());
             row.put("workItemCode", workItem.getCode());
+            String segmentCode = segment == null ? null : segment.getCode();
+            sampleSelectionResolver.resolveUnique(tenantId, engagementId, segmentCode, member.getEmployeeId())
+                    .ifPresent(fields -> applySampleFields(row, fields));
             rows.add(row);
         }
         return excelExportService.export("audit_ttss_template", templateColumns(), rows);
+    }
+
+    /** Ghi de cac cot con trong cua 1 dong mau bang du lieu tu doc duoc AuditTtssSampleSelectionResolver
+     * (chi ghi field nao KHAC null - mot bang nguon co the chi cung cap 1 vai truong, xem crosswalk
+     * trong AuditTtssSampleSelectionResolver). */
+    private void applySampleFields(Map<String, Object> row, AuditTtssSampleSelectionResolver.SampleFields fields) {
+        if (fields.referenceNumber() != null) {
+            row.put("referenceNumber", fields.referenceNumber());
+        }
+        if (fields.referenceNumber2() != null) {
+            row.put("referenceNumber2", fields.referenceNumber2());
+        }
+        if (fields.customerCode() != null) {
+            row.put("customerCode", fields.customerCode());
+        }
+        if (fields.customerName() != null) {
+            row.put("customerName", fields.customerName());
+        }
+        if (fields.amount() != null) {
+            row.put("amount", fields.amount());
+        }
+        if (fields.performingUser() != null) {
+            row.put("performingUser", fields.performingUser());
+        }
+        if (fields.transactionContent() != null) {
+            row.put("transactionContent", fields.transactionContent());
+        }
     }
 
     /** "2. Upload file TTSS" - moi dong UPSERT theo khoa tu nhien (xem uploadKey()): trung khoa thi

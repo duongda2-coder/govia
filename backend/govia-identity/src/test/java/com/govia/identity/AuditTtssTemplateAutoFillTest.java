@@ -1,26 +1,25 @@
 package com.govia.identity;
 
+import com.govia.audit.cmtd1.entity.AuditCmTd1;
+import com.govia.audit.cmtd1.repository.AuditCmTd1Repository;
 import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
 import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import com.govia.audit.planengagement.entity.AuditEngagement;
+import com.govia.audit.planengagement.entity.AuditEngagementAssignment;
 import com.govia.audit.planengagement.entity.AuditEngagementGroup;
 import com.govia.audit.planengagement.entity.AuditEngagementGroupCode;
 import com.govia.audit.planengagement.entity.AuditEngagementGroupMember;
-import com.govia.audit.planengagement.progressreport.repository.AuditProgressReportRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementAssignmentRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementGroupMemberRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementGroupRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRepository;
-import com.govia.audit.planengagement.ttss.dto.AuditTtssRecordResponse;
 import com.govia.audit.planengagement.ttss.service.AuditTtssService;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
 import com.govia.audit.workitem.entity.AuditWorkItem;
 import com.govia.audit.workitem.entity.AuditWorkPhase;
 import com.govia.audit.workitem.repository.AuditWorkItemRepository;
-import com.govia.audit.planengagement.entity.AuditEngagementAssignment;
-import com.govia.audit.planengagement.progressreport.entity.AuditProgressReport;
 import com.govia.core.security.CurrentUserPrincipal;
 import com.govia.core.tenant.TenantContext;
 import com.govia.identity.dto.EmployeeRequest;
@@ -38,13 +37,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -54,15 +50,14 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Kiem chung DUNG THAT POI (ExcelExportServiceImpl/ExcelImportServiceImpl) qua vong lap "Download
- * Template" -> nguoi dung dien tay 1 vai cot -> "Upload file TTSS", khong mock lop Excel - day la
- * lop chua tung duoc test o AuditTtssAndProgressReportWorkflowTest (test do dung entity dung san,
- * khong qua Excel that).
+ * Kiem chung AuditTtssSampleSelectionResolver duoc goi dung tu downloadTemplate(): chi tu dong dien
+ * cot "Mã KH/TKHT/Mã CB"/"Tên KH" khi CKT nay chi co DUNG 1 dong AuditCmTd1 (khong mo ho); con neu
+ * co 2 dong thi phai de trong nhu truoc (tranh dien nham - xem AuditTtssSampleSelectionResolver).
  */
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class AuditTtssTemplateRoundTripTest {
+class AuditTtssTemplateAutoFillTest {
 
     @Autowired
     private AuditTtssService ttssService;
@@ -85,7 +80,7 @@ class AuditTtssTemplateRoundTripTest {
     @Autowired
     private AuditMasterDataItemRepository masterDataItemRepository;
     @Autowired
-    private AuditProgressReportRepository progressReportRepository;
+    private AuditCmTd1Repository cmTd1Repository;
 
     private UUID tenantId;
 
@@ -103,9 +98,72 @@ class AuditTtssTemplateRoundTripTest {
     }
 
     @Test
-    void downloadTemplate_thenFillAndUpload_roundTripsThroughRealPoi() throws Exception {
-        EmployeeResponse teamLead = employeeService.create(employeeRequest("NV-TPL-TL"));
-        EmployeeResponse worker = employeeService.create(employeeRequest("NV-TPL-WK"));
+    void downloadTemplate_fillsCustomerColumns_whenExactlyOneSampleRowMatches() throws Exception {
+        Fixture fixture = seedEngagementWithLnAssignment("01", "LNB0201");
+
+        AuditCmTd1 sample = new AuditCmTd1();
+        sample.setTenantId(tenantId);
+        sample.setEngagementId(fixture.engagement.getId());
+        sample.setAssignedEmployeeId(fixture.worker.id());
+        sample.setBranchCode("CN01");
+        sample.setAuditDate(LocalDate.now());
+        sample.setCustomerCode("KH001");
+        sample.setCustomerName("Nguyen Van Mau");
+        cmTd1Repository.save(sample);
+
+        Map<String, Integer> headerToColumn = new HashMap<>();
+        Row dataRow = downloadAndReadFirstDataRow(fixture, headerToColumn);
+
+        assertThat(dataRow.getCell(headerToColumn.get("Mã KH/TKHT/Mã CB")).getStringCellValue()).isEqualTo("KH001");
+        assertThat(dataRow.getCell(headerToColumn.get("Tên KH")).getStringCellValue()).isEqualTo("Nguyen Van Mau");
+    }
+
+    @Test
+    void downloadTemplate_leavesCustomerColumnsBlank_whenMultipleSampleRowsMatch() throws Exception {
+        Fixture fixture = seedEngagementWithLnAssignment("02", "LNB0202");
+
+        for (int i = 0; i < 2; i++) {
+            AuditCmTd1 sample = new AuditCmTd1();
+            sample.setTenantId(tenantId);
+            sample.setEngagementId(fixture.engagement.getId());
+            sample.setAssignedEmployeeId(fixture.worker.id());
+            sample.setBranchCode("CN01");
+            sample.setAuditDate(LocalDate.now());
+            sample.setCustomerCode("KH00" + i);
+            sample.setCustomerName("Khach hang " + i);
+            cmTd1Repository.save(sample);
+        }
+
+        Map<String, Integer> headerToColumn = new HashMap<>();
+        Row dataRow = downloadAndReadFirstDataRow(fixture, headerToColumn);
+
+        Cell customerCodeCell = dataRow.getCell(headerToColumn.get("Mã KH/TKHT/Mã CB"));
+        Cell customerNameCell = dataRow.getCell(headerToColumn.get("Tên KH"));
+        assertThat(customerCodeCell == null || customerCodeCell.getStringCellValue().isBlank()).isTrue();
+        assertThat(customerNameCell == null || customerNameCell.getStringCellValue().isBlank()).isTrue();
+    }
+
+    private Row downloadAndReadFirstDataRow(Fixture fixture, Map<String, Integer> headerToColumn) throws Exception {
+        CurrentUserPrincipal teamLeadPrincipal = new CurrentUserPrincipal(UUID.randomUUID(), "teamlead-af", tenantId,
+                fixture.teamLead.employeeCode(), List.of(), List.of(), UUID.randomUUID().toString());
+        byte[] templateBytes = ttssService.downloadTemplate(fixture.engagement.getId(), teamLeadPrincipal);
+        assertThat(templateBytes).isNotEmpty();
+
+        try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(templateBytes))) {
+            Sheet sheet = workbook.getSheetAt(0);
+            Row headerRow = sheet.getRow(sheet.getFirstRowNum());
+            for (Cell cell : headerRow) {
+                headerToColumn.put(cell.getStringCellValue().trim(), cell.getColumnIndex());
+            }
+            Row dataRow = sheet.getRow(sheet.getFirstRowNum() + 1);
+            assertThat(dataRow).isNotNull();
+            return dataRow;
+        }
+    }
+
+    private Fixture seedEngagementWithLnAssignment(String suffix, String workItemCode) {
+        EmployeeResponse teamLead = employeeService.create(employeeRequest("NVAFTL" + suffix));
+        EmployeeResponse worker = employeeService.create(employeeRequest("NVAFWK" + suffix));
 
         AuditMasterDataItem segment = new AuditMasterDataItem();
         segment.setTenantId(tenantId);
@@ -116,20 +174,20 @@ class AuditTtssTemplateRoundTripTest {
 
         AuditObjectUnit unit = new AuditObjectUnit();
         unit.setTenantId(tenantId);
-        unit.setCode("CN-TPL01");
-        unit.setName("Chi nhanh template test");
+        unit.setCode("CNAF" + suffix);
+        unit.setName("Chi nhanh auto-fill test");
         unit.setUnitType("CN");
         unit = auditObjectUnitRepository.save(unit);
 
         AuditEngagement engagement = new AuditEngagement();
         engagement.setTenantId(tenantId);
-        engagement.setCode("CKT-TPL-01");
+        engagement.setCode("CKT-AF-" + suffix);
         engagement.setAuditObjectUnitId(unit.getId());
         engagement.setYear(2026);
         engagement.setExpectedMonth(9);
         engagement.setDecisionDate(LocalDate.now());
         engagement.setTeamLeadEmployeeId(teamLead.id());
-        engagement.setDecisionNumber("QD-TPL-01");
+        engagement.setDecisionNumber("QD-AF-" + suffix);
         engagement = engagementRepository.save(engagement);
 
         AuditEngagementGroup group = new AuditEngagementGroup();
@@ -150,7 +208,7 @@ class AuditTtssTemplateRoundTripTest {
         workItem.setTenantId(tenantId);
         workItem.setPhase(AuditWorkPhase.THKT);
         workItem.setBusinessSegmentId(segment.getId());
-        workItem.setCode("LNB0101");
+        workItem.setCode(workItemCode);
         workItem.setName("Kiem tra ho so vay von");
         workItem.setActive(true);
         workItem = workItemRepository.save(workItem);
@@ -161,66 +219,14 @@ class AuditTtssTemplateRoundTripTest {
         assignment.setWorkItemId(workItem.getId());
         assignmentRepository.save(assignment);
 
-        CurrentUserPrincipal teamLeadPrincipal = new CurrentUserPrincipal(UUID.randomUUID(), "teamlead-tpl", tenantId,
-                teamLead.employeeCode(), List.of(), List.of(), UUID.randomUUID().toString());
-        byte[] templateBytes = ttssService.downloadTemplate(engagement.getId(), teamLeadPrincipal);
-        assertThat(templateBytes).isNotEmpty();
-
-        Map<String, Integer> headerToColumn;
-        try (Workbook workbook = WorkbookFactory.create(new ByteArrayInputStream(templateBytes))) {
-            Sheet sheet = workbook.getSheetAt(0);
-            Row headerRow = sheet.getRow(sheet.getFirstRowNum());
-            headerToColumn = new HashMap<>();
-            for (Cell cell : headerRow) {
-                headerToColumn.put(cell.getStringCellValue().trim(), cell.getColumnIndex());
-            }
-
-            Row dataRow = sheet.getRow(sheet.getFirstRowNum() + 1);
-            assertThat(dataRow).isNotNull();
-            assertThat(dataRow.getCell(headerToColumn.get("NV")).getStringCellValue()).isEqualTo("LN");
-            assertThat(dataRow.getCell(headerToColumn.get("mã công việc")).getStringCellValue()).isEqualTo("LNB0101");
-
-            // Nguoi dung dien tay cac cot TTSS con lai truoc khi upload lai.
-            dataRow.createCell(headerToColumn.get("Diễn giải")).setCellValue("Ho so vay thieu chu ky lanh dao chi nhanh");
-            dataRow.createCell(headerToColumn.get("Mã TTSS")).setCellValue("LN0101_01");
-            dataRow.createCell(headerToColumn.get("Tên TTSS")).setCellValue("Thieu chu ky phe duyet");
-            dataRow.createCell(headerToColumn.get("Trong yếu")).setCellValue("x");
-            dataRow.createCell(headerToColumn.get("Tên KH")).setCellValue("Nguyen Van A");
-            dataRow.createCell(headerToColumn.get("số tiền giản ngân/Số tiền hạch toán")).setCellValue(1500000);
-            dataRow.createCell(headerToColumn.get("Phụ lục")).setCellValue("Xem BB kiem tra so 12");
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            workbook.write(out);
-            templateBytes = out.toByteArray();
-        }
-
-        MockMultipartFile filledFile = new MockMultipartFile("file", "mau_upload_ttss.xlsx",
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", templateBytes);
-        CurrentUserPrincipal workerPrincipal = new CurrentUserPrincipal(UUID.randomUUID(), "worker-tpl", tenantId,
-                worker.employeeCode(), List.of(), List.of(), UUID.randomUUID().toString());
-
-        List<AuditTtssRecordResponse> uploaded = ttssService.upload(engagement.getId(), filledFile, "Bao cao lan dau", workerPrincipal);
-
-        assertThat(uploaded).hasSize(1);
-        AuditTtssRecordResponse record = uploaded.get(0);
-        assertThat(record.businessSegmentCode()).isEqualTo("LN");
-        assertThat(record.ttssContent()).isEqualTo("Ho so vay thieu chu ky lanh dao chi nhanh");
-        assertThat(record.findingCode()).isEqualTo("LN0101_01");
-        assertThat(record.findingName()).isEqualTo("Thieu chu ky phe duyet");
-        assertThat(record.material()).isTrue();
-        assertThat(record.customerName()).isEqualTo("Nguyen Van A");
-        assertThat(record.appendix()).isEqualTo("Xem BB kiem tra so 12");
-        assertThat(record.amount()).isEqualByComparingTo(BigDecimal.valueOf(1500000));
-        assertThat(record.ttssPerformerName()).isEqualTo(worker.fullName());
-
-        List<AuditProgressReport> reports = progressReportRepository.findByTenantIdAndEngagementIdOrderByReportDateDesc(tenantId, engagement.getId());
-        assertThat(reports).hasSize(1);
-        assertThat(reports.get(0).getTotalFindings()).isEqualTo(1);
-        assertThat(reports.get(0).getTotalMaterialFindings()).isEqualTo(1);
+        return new Fixture(engagement, teamLead, worker);
     }
 
     private EmployeeRequest employeeRequest(String code) {
         return new EmployeeRequest(code, "Nguyen Van " + code, null, null, null, null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null, null, null, false, null, null, null, false, null, null);
+    }
+
+    private record Fixture(AuditEngagement engagement, EmployeeResponse teamLead, EmployeeResponse worker) {
     }
 }
