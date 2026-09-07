@@ -891,6 +891,7 @@
       "noCapableSegments": "Cán bộ này chưa được khai báo khả năng đảm nhiệm nghiệp vụ nào (xem màn hình Khả năng đảm nhiệm)",
       "assignmentTitle": "Phân công nghiệp vụ cho thành viên - {{code}}",
       "notTeamLeadWarning": "Chỉ trưởng đoàn ({{name}}) mới được phép phân công công việc cho cuộc kiểm toán này.",
+      "readOnlyWarning": "Màn hình chỉ xem - vào từ Quản lý đợt kiểm toán, không dùng để phân công công việc.",
       "membersSectionTitle": "Danh sách thành viên",
       "assignmentSectionTitle": "Phân công cho thành viên",
       "assignmentSegment": "Mã mảng nghiệp vụ",
@@ -964,7 +965,10 @@
       "APPROVED": "Đã duyệt",
       "REJECTED": "Từ chối"
     },
-    "form": { "editTitle": "Cập nhật trạng thái công việc" },
+    "form": {
+      "statusButton": "Trạng thái công việc",
+      "statusTitle": "Cập nhật trạng thái cho {{count}} công việc đã chọn"
+    },
     "messages": {
       "loadError": "Không tải được danh sách công việc",
       "updateSuccess": "Đã cập nhật trạng thái công việc",
@@ -994,6 +998,8 @@
     "approveConfirmTitle": "Phê duyệt {{count}} báo cáo tiến độ đã chọn?",
     "approveSuccess": "Đã phê duyệt báo cáo tiến độ",
     "approveError": "Phê duyệt thất bại",
+    "noFile": "Dòng này chưa có file TTSS đính kèm",
+    "downloadError": "Tải file thất bại",
     "columns": {
       "businessSegment": "Mảng NV",
       "totalFindings": "Tổng số phát hiện",

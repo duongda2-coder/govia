@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { App, Button, Form, Input, Modal, Result, Select, Space, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
-import { FileTextOutlined } from "@ant-design/icons";
+import { EditOutlined, FileTextOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { CrudTable } from "@govia/ui-kit";
 import {
@@ -100,16 +100,20 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
   const currentEngagement = engagements.find((e) => e.id === engagementId);
   const isTeamLead = !!user?.employeeCode && !!currentEngagement && user.employeeCode === currentEngagement.teamLeadEmployeeCode;
 
-  const openEdit = () => {
-    const target = selected[0];
-    if (!target) return;
-    form.setFieldsValue({ status: target.status, note: target.note ?? undefined });
+  // Chi prefill status/note khi dung 1 dong duoc chon - chon nhieu dong thi de trong, tranh de mot
+  // gia tri cua rieng 1 dong bi ap dung nham cho ca cac dong khac khi bam luu.
+  const openStatusModal = () => {
+    if (selected.length === 0) return;
+    if (selected.length === 1) {
+      form.setFieldsValue({ status: selected[0].status, note: selected[0].note ?? undefined });
+    } else {
+      form.resetFields();
+    }
     setModalOpen(true);
   };
 
   const handleSubmit = async () => {
-    const target = selected[0];
-    if (!target || !engagementId) return;
+    if (selected.length === 0 || !engagementId) return;
     let values: FormValues;
     try {
       values = await form.validateFields();
@@ -118,7 +122,11 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
     }
     setSubmitting(true);
     try {
-      await updateAuditWorkAssignmentStatus(engagementId, target.assignmentId, { status: values.status, note: values.note ?? null });
+      await Promise.all(
+        selected.map((item) =>
+          updateAuditWorkAssignmentStatus(engagementId, item.assignmentId, { status: values.status, note: values.note ?? null }),
+        ),
+      );
       message.success(t("auditWorkManagement.messages.updateSuccess"));
       setModalOpen(false);
       setSelected([]);
@@ -210,6 +218,11 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
           disabled={!engagementId}
           allowClear
         />
+        {canEdit && (
+          <Button icon={<EditOutlined />} disabled={selected.length === 0} onClick={openStatusModal}>
+            {t("auditWorkManagement.form.statusButton")}
+          </Button>
+        )}
         {showProgressReport && engagementId && (
           <Button icon={<FileTextOutlined />} onClick={() => setProgressReportOpen(true)}>
             {t("auditProgressReport.title")}
@@ -222,8 +235,6 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
         dataSource={displayedItems}
         rowKey="assignmentId"
         loading={loading}
-        onEdit={canEdit ? openEdit : undefined}
-        editDisabled={selected.length !== 1}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
         onOtherReports={engagementId ? () => setReportFilesOpen(true) : undefined}
         onApprove={canApprove && engagementId ? handleApprove : undefined}
@@ -231,7 +242,7 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
       />
 
       <Modal
-        title={t("auditWorkManagement.form.editTitle")}
+        title={t("auditWorkManagement.form.statusTitle", { count: selected.length })}
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         onOk={handleSubmit}

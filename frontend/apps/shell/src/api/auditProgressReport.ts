@@ -25,6 +25,11 @@ export interface AuditProgressReportItem {
   approvedAt: string | null;
 }
 
+export interface AuditProgressReportAttachment {
+  id: string;
+  fileName: string;
+}
+
 function base(engagementId: string): string {
   return `/api/audit/plan/engagement/${engagementId}/work-management/progress-reports`;
 }
@@ -37,4 +42,23 @@ export async function listAuditProgressReports(engagementId: string): Promise<Au
 export async function approveAuditProgressReports(engagementId: string, reportIds: string[]): Promise<string[]> {
   const res = await httpClient.post<ApiResponse<string[]>>(`${base(engagementId)}/approve`, { reportIds });
   return res.data.data;
+}
+
+/** File TTSS goc dinh kem tu dong luc sinh dong bao cao (xem AuditProgressReportService.recordUpload
+ * - luu qua AttachmentService dung chung, entityName="AUDIT_PROGRESS_REPORT", entityId=report.id). */
+export async function listAuditProgressReportAttachments(reportId: string): Promise<AuditProgressReportAttachment[]> {
+  const res = await httpClient.get<ApiResponse<AuditProgressReportAttachment[]>>("/api/attachments", {
+    params: { entityName: "AUDIT_PROGRESS_REPORT", entityId: reportId },
+  });
+  return res.data.data;
+}
+
+export async function downloadAuditProgressReportAttachment(attachmentId: string, fileName: string): Promise<void> {
+  const res = await httpClient.get(`/api/attachments/${attachmentId}/download`, { responseType: "blob" });
+  const blobUrl = window.URL.createObjectURL(res.data as Blob);
+  const link = document.createElement("a");
+  link.href = blobUrl;
+  link.download = fileName;
+  link.click();
+  window.URL.revokeObjectURL(blobUrl);
 }

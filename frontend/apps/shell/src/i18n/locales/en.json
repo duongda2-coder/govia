@@ -891,6 +891,7 @@
       "noCapableSegments": "This employee has no declared business-segment capability (see Employee Capability screen)",
       "assignmentTitle": "Work Item Assignment - {{code}}",
       "notTeamLeadWarning": "Only the team lead ({{name}}) is allowed to assign work items for this engagement.",
+      "readOnlyWarning": "View only - opened from Engagement Monitoring, not for assigning work items.",
       "membersSectionTitle": "Members",
       "assignmentSectionTitle": "Assignments",
       "assignmentSegment": "Business Segment",
@@ -964,7 +965,10 @@
       "APPROVED": "Approved",
       "REJECTED": "Rejected"
     },
-    "form": { "editTitle": "Update work item status" },
+    "form": {
+      "statusButton": "Work status",
+      "statusTitle": "Update status for {{count}} selected work item(s)"
+    },
     "messages": {
       "loadError": "Failed to load work items",
       "updateSuccess": "Status updated",
@@ -994,6 +998,8 @@
     "approveConfirmTitle": "Approve {{count}} selected progress report(s)?",
     "approveSuccess": "Progress report approved",
     "approveError": "Approval failed",
+    "noFile": "This row has no attached TTSS file",
+    "downloadError": "Download failed",
     "columns": {
       "businessSegment": "Segment",
       "totalFindings": "Total findings",

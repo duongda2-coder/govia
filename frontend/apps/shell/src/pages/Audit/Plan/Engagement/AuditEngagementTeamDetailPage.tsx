@@ -105,7 +105,7 @@ export function AuditEngagementTeamDetailPage({ engagement, onBack }: AuditEngag
   };
 
   if (showAssignment) {
-    return <AuditEngagementAssignmentPage engagement={engagement} onBack={() => setShowAssignment(false)} />;
+    return <AuditEngagementAssignmentPage engagement={engagement} onBack={() => setShowAssignment(false)} readOnly />;
   }
 
   const columns: TableProps<AuditEngagementTeamMemberDetailItem>["columns"] = [

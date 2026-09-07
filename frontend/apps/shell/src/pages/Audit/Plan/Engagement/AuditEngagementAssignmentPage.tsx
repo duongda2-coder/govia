@@ -19,16 +19,20 @@ import { useAuth } from "../../../../auth/AuthContext";
 export interface AuditEngagementAssignmentPageProps {
   engagement: AuditEngagementItem;
   onBack: () => void;
+  /** Man hinh "Chi tiet doan KT" (Quan ly dot kiem toan) tai su dung component nay CHI DE XEM -
+   * ep readOnly=true de khong cho phan cong/xoa tu do du nguoi xem dung la truong doan CKT, tranh
+   * lan giua man giam sat va man "Khoi tao va quan ly cuoc kiem toan" (noi MOI thuc su duoc sua). */
+  readOnly?: boolean;
 }
 
 /** Man hinh "Phan cong nghiep vu cho thanh vien" - chi truong doan cua CKT moi duoc thao tac. */
 export function AuditEngagementAssignmentPage(props: AuditEngagementAssignmentPageProps) {
-  const { engagement, onBack } = props;
+  const { engagement, onBack, readOnly = false } = props;
   const { t } = useTranslation();
   const { message } = App.useApp();
   const { user, hasPermission } = useAuth();
-  const canCreate = hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.CREATE");
-  const canDelete = hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.DELETE");
+  const canCreate = hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.CREATE") && !readOnly;
+  const canDelete = hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.DELETE") && !readOnly;
   const isTeamLead = !!user?.employeeCode && user.employeeCode === engagement.teamLeadEmployeeCode;
 
   const [members, setMembers] = useState<AuditEngagementGroupMemberItem[]>([]);
@@ -157,13 +161,17 @@ export function AuditEngagementAssignmentPage(props: AuditEngagementAssignmentPa
         </Col>
       </Row>
 
-      {!isTeamLead && (
-        <Alert
-          type="warning"
-          showIcon
-          style={{ marginBottom: 16 }}
-          message={t("auditEngagement.form.notTeamLeadWarning", { name: engagement.teamLeadEmployeeName })}
-        />
+      {readOnly ? (
+        <Alert type="info" showIcon style={{ marginBottom: 16 }} message={t("auditEngagement.form.readOnlyWarning")} />
+      ) : (
+        !isTeamLead && (
+          <Alert
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message={t("auditEngagement.form.notTeamLeadWarning", { name: engagement.teamLeadEmployeeName })}
+          />
+        )
       )}
 
       <Typography.Paragraph type="secondary">

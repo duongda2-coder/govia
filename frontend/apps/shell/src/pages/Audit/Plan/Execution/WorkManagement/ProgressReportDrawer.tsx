@@ -1,10 +1,16 @@
 import { useCallback, useEffect, useState } from "react";
 import { App, Button, Drawer, Table, Tag } from "antd";
 import type { TableProps } from "antd";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, DownloadOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
-import { approveAuditProgressReports, listAuditProgressReports, type AuditProgressReportItem } from "../../../../../api/auditProgressReport";
+import {
+  approveAuditProgressReports,
+  downloadAuditProgressReportAttachment,
+  listAuditProgressReportAttachments,
+  listAuditProgressReports,
+  type AuditProgressReportItem,
+} from "../../../../../api/auditProgressReport";
 import { useAuth } from "../../../../../auth/AuthContext";
 import type { AuditEngagementItem } from "../../../../../api/auditEngagement";
 
@@ -63,6 +69,20 @@ export function ProgressReportDrawer({ open, engagementId, engagement, onClose }
     });
   };
 
+  const handleDownload = async (item: AuditProgressReportItem) => {
+    try {
+      const attachments = await listAuditProgressReportAttachments(item.id);
+      const attachment = attachments[0];
+      if (!attachment) {
+        message.warning(t("auditProgressReport.noFile"));
+        return;
+      }
+      await downloadAuditProgressReportAttachment(attachment.id, attachment.fileName);
+    } catch {
+      message.error(t("auditProgressReport.downloadError"));
+    }
+  };
+
   const selected = items.filter((i) => selectedIds.includes(i.id));
   const approveDisabled = selected.length === 0 || !isTeamLead || selected.some((i) => i.approvalStatus === "APPROVED");
 
@@ -85,6 +105,14 @@ export function ProgressReportDrawer({ open, engagementId, engagement, onClose }
         <Tag color={item.approvalStatus === "APPROVED" ? "success" : item.approvalStatus === "PENDING" ? "processing" : "default"}>
           {item.approvalStatus ? t(`auditWorkManagement.approvalStatus.${item.approvalStatus}`) : "-"}
         </Tag>
+      ),
+    },
+    {
+      title: "",
+      key: "actions",
+      width: 50,
+      render: (_: unknown, item: AuditProgressReportItem) => (
+        <Button type="link" icon={<DownloadOutlined />} onClick={() => handleDownload(item)} />
       ),
     },
   ];
