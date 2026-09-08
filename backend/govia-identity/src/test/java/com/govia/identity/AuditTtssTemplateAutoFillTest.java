@@ -50,9 +50,12 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Kiem chung AuditTtssSampleSelectionResolver duoc goi dung tu downloadTemplate(): chi tu dong dien
- * cot "Mã KH/TKHT/Mã CB"/"Tên KH" khi CKT nay chi co DUNG 1 dong AuditCmTd1 (khong mo ho); con neu
- * co 2 dong thi phai de trong nhu truoc (tranh dien nham - xem AuditTtssSampleSelectionResolver).
+ * Kiem chung downloadTemplate() xuat 1 dong TTSS cho TUNG dong mau da upload (AuditCmTd1/CmNtd*),
+ * KHONG con la 1 dong/cong viec da phan cong nhu truoc (doi theo yeu cau nguoi dung 2026-09-08 -
+ * xem javadoc AuditTtssService.downloadTemplate()): 1 dong mau -> 1 dong TTSS, tat ca deu duoc dien
+ * du lieu day du (khong con khai niem "mo ho, de trong" o muc dong mau nay nua - moi dong TTSS gan
+ * DUNG 1 dong mau cua chinh no). "Mã công việc" van chi dien duoc khi nguoi duoc phan cong dong mau
+ * do co DUNG 1 cong viec trong segment tuong ung (van co the mo ho - xem AuditTtssSampleSelectionResolver).
  */
 @SpringBootTest
 @ActiveProfiles("test")
@@ -98,7 +101,7 @@ class AuditTtssTemplateAutoFillTest {
     }
 
     @Test
-    void downloadTemplate_fillsCustomerColumns_whenExactlyOneSampleRowMatches() throws Exception {
+    void downloadTemplate_emitsOneRowFilled_whenExactlyOneSampleRowExists() throws Exception {
         Fixture fixture = seedEngagementWithLnAssignment("01", "LNB0201");
 
         AuditCmTd1 sample = new AuditCmTd1();
@@ -112,14 +115,21 @@ class AuditTtssTemplateAutoFillTest {
         cmTd1Repository.save(sample);
 
         Map<String, Integer> headerToColumn = new HashMap<>();
-        Row dataRow = downloadAndReadFirstDataRow(fixture, headerToColumn);
+        List<Row> dataRows = downloadAndReadDataRows(fixture, headerToColumn);
 
+        assertThat(dataRows).hasSize(1);
+        Row dataRow = dataRows.get(0);
+        assertThat(dataRow.getCell(headerToColumn.get("mã công việc")).getStringCellValue()).isEqualTo("LNB0201");
         assertThat(dataRow.getCell(headerToColumn.get("Mã KH/TKHT/Mã CB")).getStringCellValue()).isEqualTo("KH001");
         assertThat(dataRow.getCell(headerToColumn.get("Tên KH")).getStringCellValue()).isEqualTo("Nguyen Van Mau");
     }
 
+    /** Doi tu "de trong khi mo ho" (hanh vi cu) sang "1 dong mau -> 1 dong TTSS" (hanh vi moi) - 2
+     * dong mau cua CUNG 1 nguoi phai ra DUNG 2 dong TTSS, moi dong dien du lieu cua chinh no, va CA
+     * HAI deu dien duoc "mã công việc" (nguoi do van chi co DUNG 1 cong viec trong segment LN, viec
+     * co 2 dong mau khong lam mo ho them cot nay). */
     @Test
-    void downloadTemplate_leavesCustomerColumnsBlank_whenMultipleSampleRowsMatch() throws Exception {
+    void downloadTemplate_emitsOneRowPerSample_whenMultipleSampleRowsExist() throws Exception {
         Fixture fixture = seedEngagementWithLnAssignment("02", "LNB0202");
 
         for (int i = 0; i < 2; i++) {
@@ -135,15 +145,17 @@ class AuditTtssTemplateAutoFillTest {
         }
 
         Map<String, Integer> headerToColumn = new HashMap<>();
-        Row dataRow = downloadAndReadFirstDataRow(fixture, headerToColumn);
+        List<Row> dataRows = downloadAndReadDataRows(fixture, headerToColumn);
 
-        Cell customerCodeCell = dataRow.getCell(headerToColumn.get("Mã KH/TKHT/Mã CB"));
-        Cell customerNameCell = dataRow.getCell(headerToColumn.get("Tên KH"));
-        assertThat(customerCodeCell == null || customerCodeCell.getStringCellValue().isBlank()).isTrue();
-        assertThat(customerNameCell == null || customerNameCell.getStringCellValue().isBlank()).isTrue();
+        assertThat(dataRows).hasSize(2);
+        assertThat(dataRows).extracting(r -> r.getCell(headerToColumn.get("Mã KH/TKHT/Mã CB")).getStringCellValue())
+                .containsExactlyInAnyOrder("KH000", "KH001");
+        assertThat(dataRows).extracting(r -> r.getCell(headerToColumn.get("Tên KH")).getStringCellValue())
+                .containsExactlyInAnyOrder("Khach hang 0", "Khach hang 1");
+        assertThat(dataRows).allSatisfy(r -> assertThat(r.getCell(headerToColumn.get("mã công việc")).getStringCellValue()).isEqualTo("LNB0202"));
     }
 
-    private Row downloadAndReadFirstDataRow(Fixture fixture, Map<String, Integer> headerToColumn) throws Exception {
+    private List<Row> downloadAndReadDataRows(Fixture fixture, Map<String, Integer> headerToColumn) throws Exception {
         CurrentUserPrincipal teamLeadPrincipal = new CurrentUserPrincipal(UUID.randomUUID(), "teamlead-af", tenantId,
                 fixture.teamLead.employeeCode(), List.of(), List.of(), UUID.randomUUID().toString());
         byte[] templateBytes = ttssService.downloadTemplate(fixture.engagement.getId(), teamLeadPrincipal);
@@ -155,9 +167,14 @@ class AuditTtssTemplateAutoFillTest {
             for (Cell cell : headerRow) {
                 headerToColumn.put(cell.getStringCellValue().trim(), cell.getColumnIndex());
             }
-            Row dataRow = sheet.getRow(sheet.getFirstRowNum() + 1);
-            assertThat(dataRow).isNotNull();
-            return dataRow;
+            List<Row> dataRows = new java.util.ArrayList<>();
+            for (int i = sheet.getFirstRowNum() + 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row != null) {
+                    dataRows.add(row);
+                }
+            }
+            return dataRows;
         }
     }
 

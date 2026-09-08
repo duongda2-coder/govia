@@ -248,11 +248,15 @@ public class AuditTtssService {
         return new AssignmentVisibility(false, visibleEmployeeIds);
     }
 
-    /** "1. Download template TTSS" - 1 dong cho MOI cong viec da duoc phan cong trong CKT nay MA
+    /** "1. Download template TTSS" - 1 dong cho TUNG dong mau DA UPLOAD (16 man hinh CmNtd/CmTd) MA
      * NGUOI TAI VE DUOC PHEP THAY (xem resolveAssignmentVisibility() - cung pham vi voi
-     * list()/delete()/approveRecommendations() ben tren, tranh lo nghiep vu cua thanh vien/nhom khac
-     * nhu bug da gap: mot thanh vien chi phu trach 1 nghiep vu lai tai duoc mau co ca nghiep vu cua
-     * nguoi khac), cac cot con lai de trong cho user dien tay. */
+     * list()/delete()/approveRecommendations() ben tren, tranh lo nghiep vu cua thanh vien/nhom khac).
+     * Truoc day xuat 1 dong/cong viec da phan cong (chi tu dong dien du lieu KHI khop mau duy nhat) -
+     * doi theo yeu cau nguoi dung 2026-09-08 ("chi lay cac cong viec da phan cong, chua lay o cac
+     * mau da upload len"): 1 cong viec co 10 dong mau se ra 10 dong TTSS, moi dong dien day du tu
+     * chinh dong mau do (khong can khop duy nhat nua). "Mã công việc" van chi dien duoc khi nguoi
+     * duoc phan cong dong mau do CHI co DUNG 1 cong viec trong segment tuong ung (con lai de trong -
+     * cung 1 ly do voi resolveUnique(): khong co khoa lien ket tin cay giua dong mau va cong viec). */
     @Transactional(readOnly = true)
     public byte[] downloadTemplate(UUID engagementId, CurrentUserPrincipal principal) {
         UUID tenantId = TenantContext.getTenantId();
@@ -268,31 +272,52 @@ public class AuditTtssService {
                 members.stream().map(AuditEngagementGroupMember::getId).toList());
         Map<UUID, AuditWorkItem> workItems = workItemRepository.findAllById(assignments.stream().map(AuditEngagementAssignment::getWorkItemId).toList())
                 .stream().collect(Collectors.toMap(AuditWorkItem::getId, w -> w));
-        Map<UUID, AuditMasterDataItem> segments = segmentsById(tenantId);
 
-        List<Map<String, Object>> rows = new ArrayList<>();
+        // Khoa theo MA nghiep vu (segment CODE, khong phai id) - vi vong lap ben duoi duyet theo
+        // SUPPORTED_SEGMENT_CODES (list ma cung, khong phai danh muc AuditMasterDataItem cua tenant
+        // - xem ly do o javadoc downloadTemplate()), nen phai dich businessSegmentId cua work item
+        // sang CODE qua segmentsById() thi moi khop duoc voi ma dang duyet.
+        Map<UUID, AuditMasterDataItem> segments = segmentsById(tenantId);
+        Map<String, List<String>> workItemCodesByEmployeeSegment = new HashMap<>();
         for (AuditEngagementAssignment assignment : assignments) {
             AuditEngagementGroupMember member = membersById.get(assignment.getGroupMemberId());
-            if (member == null || !visibility.canSee(member.getEmployeeId())) {
-                continue;
-            }
             AuditWorkItem workItem = workItems.get(assignment.getWorkItemId());
-            if (workItem == null) {
+            AuditMasterDataItem segment = workItem == null ? null : segments.get(workItem.getBusinessSegmentId());
+            if (member == null || segment == null) {
                 continue;
             }
-            AuditMasterDataItem segment = segments.get(workItem.getBusinessSegmentId());
-            Map<String, Object> row = new HashMap<>();
-            row.put("stt", rows.size() + 1);
-            row.put("engagementCode", engagement.getCode());
-            row.put("auditObjectUnitCode", unit == null ? null : unit.getCode());
-            row.put("businessSegmentCode", segment == null ? null : segment.getCode());
-            row.put("workItemCode", workItem.getCode());
-            String segmentCode = segment == null ? null : segment.getCode();
-            sampleSelectionResolver.resolveUnique(tenantId, engagementId, segmentCode, member.getEmployeeId())
-                    .ifPresent(fields -> applySampleFields(row, fields));
-            rows.add(row);
+            workItemCodesByEmployeeSegment
+                    .computeIfAbsent(member.getEmployeeId() + "|" + segment.getCode(), k -> new ArrayList<>())
+                    .add(workItem.getCode());
+        }
+
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (String segmentCode : sampleSelectionResolver.supportedSegmentCodes()) {
+            for (AuditTtssSampleSelectionResolver.SampleFields fields : sampleSelectionResolver.candidatesFor(tenantId, engagementId, segmentCode)) {
+                if (!visibility.canSee(fields.assignedEmployeeId())) {
+                    continue;
+                }
+                Map<String, Object> row = new HashMap<>();
+                row.put("stt", rows.size() + 1);
+                row.put("engagementCode", engagement.getCode());
+                row.put("auditObjectUnitCode", unit == null ? null : unit.getCode());
+                row.put("businessSegmentCode", segmentCode);
+                row.put("workItemCode", uniqueWorkItemCode(workItemCodesByEmployeeSegment, fields.assignedEmployeeId(), segmentCode));
+                applySampleFields(row, fields);
+                rows.add(row);
+            }
         }
         return excelExportService.export("audit_ttss_template", templateColumns(), rows);
+    }
+
+    /** "Mã công việc" chi dien duoc khi 1 nguoi duoc phan cong DUNG 1 cong viec trong segment do -
+     * mo ho (0 hoac >1 cong viec) thi de trong cho nguoi dung tu dien, tranh gan nham. */
+    private String uniqueWorkItemCode(Map<String, List<String>> workItemCodesByEmployeeSegment, UUID employeeId, String segmentCode) {
+        if (employeeId == null || segmentCode == null) {
+            return null;
+        }
+        List<String> codes = workItemCodesByEmployeeSegment.get(employeeId + "|" + segmentCode);
+        return codes != null && codes.size() == 1 ? codes.get(0) : null;
     }
 
     /** Ghi de cac cot con trong cua 1 dong mau bang du lieu tu doc duoc AuditTtssSampleSelectionResolver

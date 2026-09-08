@@ -1,5 +1,7 @@
 package com.govia.identity;
 
+import com.govia.audit.cmtd1.entity.AuditCmTd1;
+import com.govia.audit.cmtd1.repository.AuditCmTd1Repository;
 import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
 import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
@@ -86,6 +88,8 @@ class AuditTtssTemplateRoundTripTest {
     private AuditMasterDataItemRepository masterDataItemRepository;
     @Autowired
     private AuditProgressReportRepository progressReportRepository;
+    @Autowired
+    private AuditCmTd1Repository cmTd1Repository;
 
     private UUID tenantId;
 
@@ -160,6 +164,18 @@ class AuditTtssTemplateRoundTripTest {
         assignment.setGroupMemberId(member.getId());
         assignment.setWorkItemId(workItem.getId());
         assignmentRepository.save(assignment);
+
+        // downloadTemplate() gio xuat 1 dong TTSS cho TUNG dong mau da upload (khong con la 1
+        // dong/cong viec da phan cong nhu truoc) - phai co it nhat 1 dong mau thi moi co gi de tai.
+        AuditCmTd1 sample = new AuditCmTd1();
+        sample.setTenantId(tenantId);
+        sample.setEngagementId(engagement.getId());
+        sample.setAssignedEmployeeId(worker.id());
+        sample.setBranchCode("CN01");
+        sample.setAuditDate(LocalDate.now());
+        sample.setCustomerCode("KH-TPL01");
+        sample.setCustomerName("Nguyen Van A");
+        cmTd1Repository.save(sample);
 
         CurrentUserPrincipal teamLeadPrincipal = new CurrentUserPrincipal(UUID.randomUUID(), "teamlead-tpl", tenantId,
                 teamLead.employeeCode(), List.of(), List.of(), UUID.randomUUID().toString());

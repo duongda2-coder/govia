@@ -72,6 +72,18 @@ class AuditTtssSampleSelectionResolver {
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
+    /** Toan bo ma nghiep vu ma candidatesFor() co the tra ve du lieu (khop DUNG voi tap case cua
+     * switch ben duoi) - dung boi AuditTtssService.downloadTemplate() de duyet TAT CA nguon mau co
+     * the co, KHONG duoc lay tu danh muc AuditMasterDataItem/BUSINESS_SEGMENT cua tung tenant (bug
+     * da gap: 1 tenant chi dang ky "GA"/"TD" trong danh muc thi da bo sot het du lieu mau da nhap o
+     * cac man hinh khac nhu MF/DP/CD... - danh muc nghiep vu va "co man hinh nguon mau hay khong" la
+     * 2 khai niem doc lap, danh muc co the thieu du dan mau da co du lieu that). */
+    private static final List<String> SUPPORTED_SEGMENT_CODES = List.of("GA", "DP", "CD", "IT", "TF", "AM", "FA", "LN", "MF");
+
+    List<String> supportedSegmentCodes() {
+        return SUPPORTED_SEGMENT_CODES;
+    }
+
     record SampleFields(String referenceNumber, String referenceNumber2, String customerCode, String customerName,
                          BigDecimal amount, String performingUser, String transactionContent, UUID assignedEmployeeId) {
     }
@@ -139,7 +151,12 @@ class AuditTtssSampleSelectionResolver {
         return candidates.size() == 1 ? Optional.of(candidates.get(0)) : Optional.empty();
     }
 
-    private List<SampleFields> candidatesFor(UUID tenantId, UUID engagementId, String segmentCode) {
+    /** Tra ve TOAN BO dong mau da chon (KHONG chi khi unique - khac voi resolveUnique() o tren) cho
+     * 1 segment trong CKT nay - dung boi AuditTtssService.downloadTemplate() de xuat 1 dong TTSS
+     * cho TUNG dong mau da upload (thay vi 1 dong/cong viec da phan cong nhu truoc, theo yeu cau
+     * nguoi dung 2026-09-08: "hien tai khi xuat dang chi lay cac cong viec da phan cong... chua lay
+     * o cac mau da upload len"). Goi package-private (khong private) vi ly do do. */
+    List<SampleFields> candidatesFor(UUID tenantId, UUID engagementId, String segmentCode) {
         List<SampleFields> result = new ArrayList<>();
         if (segmentCode == null) {
             return result;
