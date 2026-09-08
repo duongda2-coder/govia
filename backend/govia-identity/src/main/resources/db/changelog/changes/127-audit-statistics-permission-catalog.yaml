@@ -1,0 +1,23 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Man hinh Thong ke (ztc_thongke) =====================
+  - changeSet:
+      id: 127-1-permission-catalog-audit-statistics
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "8e49cd23-0373-4b4c-a317-27117cf80ffe" }
+              - column: { name: code, value: "AUDIT.STATISTICS.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem man hinh thong ke TTSS/kien nghi" }
+              - column: { name: resource_label, value: "Thống kê" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "66c6b7bb-5259-4917-8d63-4a568c761007" }
+              - column: { name: code, value: "AUDIT.STATISTICS.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu man hinh thong ke" }
+              - column: { name: resource_label, value: "Thống kê" }

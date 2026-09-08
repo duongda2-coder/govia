@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Lap ke hoach - Tao CKT quy trinh =====================
+  - changeSet:
+      id: 126-1-permission-catalog-audit-plan-engagement-process
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "3d34c924-2513-4427-afca-bc1dd943c959" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT_PROCESS.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh sach/chi tiet cuoc kiem toan quy trinh" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Tạo CKT quy trình" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "2ba5ee57-2b1e-4675-bdb5-f14e0c36db06" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT_PROCESS.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Tao moi cuoc kiem toan quy trinh" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Tạo CKT quy trình" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "bbc5d811-1ce2-4c20-98b9-013302619053" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT_PROCESS.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua cuoc kiem toan quy trinh" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Tạo CKT quy trình" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "afb6fa34-1c15-4bd9-a317-6a33d8dfe7a8" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT_PROCESS.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa cuoc kiem toan quy trinh" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Tạo CKT quy trình" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "bf343107-ec9f-470c-8561-f5e4b4c80d15" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT_PROCESS.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu cuoc kiem toan quy trinh" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Tạo CKT quy trình" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "687079a9-2fdd-4fb8-a2f7-02a9a7447abe" }
+              - column: { name: code, value: "AUDIT.PLAN_ENGAGEMENT_PROCESS.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu cuoc kiem toan quy trinh" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Tạo CKT quy trình" }

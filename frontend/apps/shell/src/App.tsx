@@ -26,6 +26,8 @@ import { ProcessStepDetailPage } from "./pages/Audit/Plan/ProcessStepDetailPage"
 import { ExceptionMappingPage } from "./pages/Audit/Plan/ExceptionMappingPage";
 import { AuditEngagementPage } from "./pages/Audit/Plan/Engagement/AuditEngagementPage";
 import { AuditEngagementMonitoringPage } from "./pages/Audit/Plan/Engagement/AuditEngagementMonitoringPage";
+import { AuditProcessEngagementPage } from "./pages/Audit/Plan/Engagement/ProcessEngagement/AuditProcessEngagementPage";
+import { AuditStatisticsPage } from "./pages/Audit/Plan/Engagement/AuditStatisticsPage";
 import { CmTd1Page } from "./pages/Audit/Plan/Execution/CmTd1Page";
 import { CmTd2Page } from "./pages/Audit/Plan/Execution/CmTd2Page";
 import { CmNtd1Page } from "./pages/Audit/Plan/Execution/CmNtd1Page";
@@ -120,6 +122,8 @@ function App() {
           <Route path="audit/plan/master-data/exception-mapping" element={<ExceptionMappingPage />} />
           <Route path="audit/plan/engagement" element={<AuditEngagementPage />} />
           <Route path="audit/plan/engagement/monitoring" element={<AuditEngagementMonitoringPage />} />
+          <Route path="audit/plan/engagement/process" element={<AuditProcessEngagementPage />} />
+          <Route path="audit/plan/engagement/statistics" element={<AuditStatisticsPage />} />
           <Route path="audit/plan/execution/cm-td1" element={<CmTd1Page />} />
           <Route path="audit/plan/execution/cm-td2" element={<CmTd2Page />} />
           <Route path="audit/plan/execution/cm-ntd1" element={<CmNtd1Page />} />

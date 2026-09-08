@@ -40,6 +40,8 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-plan-md-exception-mapping": "/audit/plan/master-data/exception-mapping",
   "audit-plan-engagement-index": "/audit/plan/engagement",
   "audit-plan-engagement-monitoring-index": "/audit/plan/engagement/monitoring",
+  "audit-plan-engagement-process-index": "/audit/plan/engagement/process",
+  "audit-plan-engagement-statistics-index": "/audit/plan/engagement/statistics",
   "audit-plan-exec-cm-td1": "/audit/plan/execution/cm-td1",
   "audit-plan-exec-cm-td2": "/audit/plan/execution/cm-td2",
   "audit-plan-exec-cm-ntd1": "/audit/plan/execution/cm-ntd1",
@@ -136,6 +138,8 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
   const canViewAuditPlan = hasPermission("AUDIT.PLAN_MASTER_DATA.VIEW");
   const canViewAuditPlanExecution = hasPermission("AUDIT.PLAN_EXECUTION.VIEW");
   const canViewAuditPlanEngagement = hasPermission("AUDIT.PLAN_ENGAGEMENT.VIEW");
+  const canViewAuditPlanEngagementProcess = hasPermission("AUDIT.PLAN_ENGAGEMENT_PROCESS.VIEW");
+  const canViewAuditStatistics = hasPermission("AUDIT.STATISTICS.VIEW");
   const canViewRiskScoring = hasPermission("AUDIT.RISK_SCORING.VIEW");
   const canViewRiskScoringExec = hasPermission("AUDIT.RISK_SCORING_EXEC.VIEW");
   const canViewFindings = hasPermission("AUDIT.FINDING.VIEW");
@@ -223,13 +227,18 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
             leaf("audit-plan-md-exception-mapping", t("menu.auditPlanMdExceptionMapping"), auditPlanMdGroupLabel),
           ],
         },
-        canViewAuditPlanEngagement && {
+        (canViewAuditPlanEngagement || canViewAuditPlanEngagementProcess || canViewAuditStatistics) && {
           key: "audit-plan-engagement",
           label: menuLabel(t("menu.auditPlanEngagement")),
-          children: [
-            leaf("audit-plan-engagement-index", t("menu.auditPlanEngagementIndex"), auditPlanEngagementGroupLabel),
-            leaf("audit-plan-engagement-monitoring-index", t("menu.auditPlanEngagementMonitoringIndex"), auditPlanEngagementGroupLabel),
-          ],
+          children: dropNulls([
+            canViewAuditPlanEngagement && leaf("audit-plan-engagement-index", t("menu.auditPlanEngagementIndex"), auditPlanEngagementGroupLabel),
+            canViewAuditPlanEngagement &&
+              leaf("audit-plan-engagement-monitoring-index", t("menu.auditPlanEngagementMonitoringIndex"), auditPlanEngagementGroupLabel),
+            canViewAuditPlanEngagementProcess &&
+              leaf("audit-plan-engagement-process-index", t("menu.auditPlanEngagementProcessIndex"), auditPlanEngagementGroupLabel),
+            canViewAuditStatistics &&
+              leaf("audit-plan-engagement-statistics-index", t("menu.auditPlanEngagementStatisticsIndex"), auditPlanEngagementGroupLabel),
+          ]),
         },
         canViewAuditPlanExecution && {
           key: "audit-plan-execution",
