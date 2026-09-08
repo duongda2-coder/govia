@@ -1022,7 +1022,6 @@
     "loadError": "Failed to load recommendations",
     "createSuccess": "Recommendation added",
     "createError": "Failed to add recommendation",
-    "codeFormatError": "Code must follow the KNKTxxx format (e.g. KNKT001)",
     "deleteConfirmTitle": "Delete this recommendation?",
     "deleteSuccess": "Recommendation deleted",
     "deleteError": "Failed to delete recommendation",

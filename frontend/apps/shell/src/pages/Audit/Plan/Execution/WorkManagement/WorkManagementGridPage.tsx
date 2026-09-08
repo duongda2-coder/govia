@@ -3,11 +3,12 @@ import { App, Button, Form, Input, Modal, Result, Select, Space, Tag, Typography
 import type { TableProps } from "antd";
 import { EditOutlined, FileTextOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
-import { CrudTable } from "@govia/ui-kit";
+import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
 import {
   approveAuditWorkAssignments,
   listAuditWorkManagement,
   updateAuditWorkAssignmentStatus,
+  type AssignmentApprovalStatus,
   type AssignmentStatus,
   type AuditWorkManagementItem,
   type AuditWorkPhase,
@@ -45,6 +46,8 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
   const canView = hasPermission("AUDIT.WORK_MANAGEMENT.VIEW");
   const canEdit = hasPermission("AUDIT.WORK_MANAGEMENT.EDIT");
   const canApprove = hasPermission("AUDIT.WORK_MANAGEMENT.APPROVE");
+  const { getSearchColumnProps } = useClientSearchColumn<AuditWorkManagementItem>();
+  const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
   const [engagements, setEngagements] = useState<AuditEngagementItem[]>([]);
   const [engagementId, setEngagementId] = useState<string | undefined>(undefined);
@@ -165,24 +168,49 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
     item.approvalStatus ? t(`auditWorkManagement.approvalStatus.${item.approvalStatus}`) : "-";
 
   const columns: TableProps<AuditWorkManagementItem>["columns"] = [
-    { title: t("auditWorkManagement.columns.engagementCode"), dataIndex: "engagementCode", width: 130 },
-    { title: t("auditWorkManagement.columns.engagementName"), dataIndex: "engagementName", width: 160, render: (v) => v ?? "-" },
-    { title: t("auditWorkManagement.columns.businessSegmentCode"), dataIndex: "businessSegmentCode", width: 130, render: (v) => v ?? "-" },
-    { title: t("auditWorkManagement.columns.workItemCode"), dataIndex: "workItemCode", width: 120 },
-    { title: t("auditWorkManagement.columns.workItemName"), dataIndex: "workItemName" },
+    { title: t("auditWorkManagement.columns.engagementCode"), width: 130, ...getSearchColumnProps("engagementCode", searchLabels) },
+    {
+      title: t("auditWorkManagement.columns.engagementName"),
+      width: 160,
+      ...getSearchColumnProps("engagementName", searchLabels),
+      render: (v) => v ?? "-",
+    },
+    {
+      title: t("auditWorkManagement.columns.businessSegmentCode"),
+      width: 130,
+      ...getSearchColumnProps("businessSegmentCode", searchLabels),
+      render: (v) => v ?? "-",
+    },
+    { title: t("auditWorkManagement.columns.workItemCode"), width: 120, ...getSearchColumnProps("workItemCode", searchLabels) },
+    { title: t("auditWorkManagement.columns.workItemName"), ...getSearchColumnProps("workItemName", searchLabels) },
     {
       title: t("auditWorkManagement.columns.status"),
       dataIndex: "status",
       width: 140,
+      filters: (["NOT_STARTED", "IN_PROGRESS", "DONE"] as AssignmentStatus[]).map((s) => ({ text: statusLabel(s), value: s })),
+      onFilter: (value, record) => record.status === value,
+      sorter: (a, b) => statusLabel(a.status).localeCompare(statusLabel(b.status)),
       render: (v: AssignmentStatus) => <Tag color={STATUS_COLORS[v]}>{statusLabel(v)}</Tag>,
     },
-    { title: t("auditWorkManagement.columns.employee"), dataIndex: "employeeUsername", width: 140, render: (v, r) => v ?? r.employeeName ?? "-" },
+    {
+      title: t("auditWorkManagement.columns.employee"),
+      width: 140,
+      ...getSearchColumnProps("employeeUsername", searchLabels),
+      render: (v, r) => v ?? r.employeeName ?? "-",
+    },
     {
       title: t("auditWorkManagement.columns.approvalStatus"),
+      dataIndex: "approvalStatus",
       width: 140,
+      filters: (["PENDING", "APPROVED", "REJECTED"] as AssignmentApprovalStatus[]).map((s) => ({
+        text: t(`auditWorkManagement.approvalStatus.${s}`),
+        value: s,
+      })),
+      onFilter: (value, record) => record.approvalStatus === value,
+      sorter: (a, b) => approvalLabel(a).localeCompare(approvalLabel(b)),
       render: (_: unknown, item: AuditWorkManagementItem) => approvalLabel(item),
     },
-    { title: t("auditWorkManagement.columns.note"), dataIndex: "note", render: (v) => v ?? "-" },
+    { title: t("auditWorkManagement.columns.note"), ...getSearchColumnProps("note", searchLabels), render: (v) => v ?? "-" },
   ];
 
   if (!canView) {

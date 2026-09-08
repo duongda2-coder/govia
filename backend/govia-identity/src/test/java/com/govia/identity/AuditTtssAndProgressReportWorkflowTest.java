@@ -150,7 +150,7 @@ class AuditTtssAndProgressReportWorkflowTest {
         AuditRecommendationResponse defaultRecommendation = recommendationService.list(engagement.getId()).get(0);
         assertThat(defaultRecommendation.code()).isEqualTo("KNKT000");
         AuditRecommendationResponse created = recommendationService.create(engagement.getId(),
-                new AuditRecommendationRequest("KNKT001", null, "Thieu chu ky phe duyet"));
+                new AuditRecommendationRequest(null, "Thieu chu ky phe duyet"));
         assertThat(created.code()).isEqualTo("KNKT001");
 
         AuditTtssRecord record = ttssRecordRepository.save(newTtssRecord(engagement.getId(), "TT100", true));
@@ -180,31 +180,30 @@ class AuditTtssAndProgressReportWorkflowTest {
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("mac dinh");
 
-        AuditRecommendationResponse inUse = recommendationService.create(engagement.getId(), new AuditRecommendationRequest("KNKT001", null, "Dang duoc gan"));
+        AuditRecommendationResponse inUse = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Dang duoc gan"));
         AuditTtssRecord record = ttssRecordRepository.save(newTtssRecord(engagement.getId(), "TT300", false));
         ttssService.linkRecommendation(engagement.getId(), new AuditTtssLinkRecommendationRequest(List.of(record.getId()), inUse.id()));
         assertThatThrownBy(() -> recommendationService.delete(engagement.getId(), inUse.id()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("dang duoc gan");
 
-        AuditRecommendationResponse unused = recommendationService.create(engagement.getId(), new AuditRecommendationRequest("KNKT002", null, "Chua dung"));
+        AuditRecommendationResponse unused = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Chua dung"));
         recommendationService.delete(engagement.getId(), unused.id());
         assertThat(recommendationService.list(engagement.getId())).extracting(AuditRecommendationResponse::id).doesNotContain(unused.id());
     }
 
+    /** Ma khong con do nguoi dung tu nhap - server tu sinh tiep theo sau ma lon nhat da co (ke ca
+     * KNKT000 mac dinh), luon tang dan va khong bao gio trung (xem generateNextCode()). */
     @Test
-    void createRecommendation_rejectsReservedAndDuplicateCode() {
+    void createRecommendation_autoGeneratesSequentialCode() {
         EmployeeResponse teamLead = createEmployee("NV-C-TL-04");
         AuditEngagement engagement = createEngagement("CKT-C-04", teamLead.id());
 
-        assertThatThrownBy(() -> recommendationService.create(engagement.getId(), new AuditRecommendationRequest("KNKT000", null, "Trung ma mac dinh")))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("mặc định");
+        AuditRecommendationResponse first = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Ban dau"));
+        assertThat(first.code()).isEqualTo("KNKT001");
 
-        recommendationService.create(engagement.getId(), new AuditRecommendationRequest("KNKT001", null, "Ban dau"));
-        assertThatThrownBy(() -> recommendationService.create(engagement.getId(), new AuditRecommendationRequest("KNKT001", null, "Trung ma")))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining("đã tồn tại");
+        AuditRecommendationResponse second = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Tiep theo"));
+        assertThat(second.code()).isEqualTo("KNKT002");
     }
 
     @Test

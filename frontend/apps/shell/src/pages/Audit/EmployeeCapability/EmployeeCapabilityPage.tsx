@@ -3,7 +3,7 @@ import { App, Button, Checkbox, Result, Space, Table, Typography } from "antd";
 import type { TableProps } from "antd";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
-import { StandardToolbar } from "@govia/ui-kit";
+import { StandardToolbar, useClientSearchColumn } from "@govia/ui-kit";
 import {
   approveAuditEmployeeCapability,
   bulkUpdateAuditEmployeeCapabilities,
@@ -47,6 +47,8 @@ export function EmployeeCapabilityPage() {
   const canEdit = hasPermission("AUDIT.EMPLOYEE_CAPABILITY.EDIT");
   const canExport = hasPermission("AUDIT.EMPLOYEE_CAPABILITY.EXPORT");
   const canImport = hasPermission("AUDIT.EMPLOYEE_CAPABILITY.IMPORT");
+  const { getSearchColumnProps } = useClientSearchColumn<AuditEmployeeCapabilityItem>();
+  const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
   const [rows, setRows] = useState<AuditEmployeeCapabilityItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -132,8 +134,8 @@ export function EmployeeCapabilityPage() {
     },
     {
       title: t("auditEmployeeCapability.columns.username"),
-      dataIndex: "username",
       width: 130,
+      ...getSearchColumnProps("username", searchLabels),
       render: (v: string | null) => v ?? "-",
     },
     ...CAPABILITY_COLUMNS.map((col) => ({

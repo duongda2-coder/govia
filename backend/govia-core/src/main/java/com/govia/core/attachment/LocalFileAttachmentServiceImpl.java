@@ -76,11 +76,22 @@ public class LocalFileAttachmentServiceImpl implements AttachmentService {
         return counts;
     }
 
+    /** Kiem tra file THAT SU con tren dia TRUOC khi tra Resource ve cho controller - thieu buoc nay
+     * thi ResponseEntity da ghi header (200 + Content-Disposition) roi Spring moi phat hien file
+     * khong doc duoc luc stream body, qua muon de tra loi JSON 404 sach se cho client (client nhan
+     * response bi vo/cat cut thay vi 1 loi ro rang) - day chinh la nguyen nhan bug "tai file bao cao
+     * tien do bi that bai" (storagePath cu tro toi 1 duong dan khong con ton tai, vd sau khi doi
+     * working directory luc khoi dong app - xem AttachmentStorageProperties.getRootPath()). */
     @Override
     public Resource loadAsResource(UUID attachmentId) {
         Attachment attachment = getMetadata(attachmentId);
+        Path path = Path.of(attachment.getStoragePath());
+        if (!Files.isReadable(path)) {
+            throw new BusinessException("ATTACHMENT_FILE_MISSING",
+                    "File dinh kem khong con tren dia (co the da bi xoa hoac di chuyen): " + attachment.getFileName(), HttpStatus.NOT_FOUND);
+        }
         try {
-            return new UrlResource(Path.of(attachment.getStoragePath()).toUri());
+            return new UrlResource(path.toUri());
         } catch (MalformedURLException e) {
             throw new BusinessException("ATTACHMENT_NOT_FOUND", "Khong doc duoc file", HttpStatus.NOT_FOUND);
         }

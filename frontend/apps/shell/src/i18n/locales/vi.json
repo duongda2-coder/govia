@@ -1022,7 +1022,6 @@
     "loadError": "Không tải được danh sách kiến nghị",
     "createSuccess": "Đã thêm kiến nghị",
     "createError": "Thêm kiến nghị thất bại",
-    "codeFormatError": "Mã phải theo định dạng KNKTxxx (vd KNKT001)",
     "deleteConfirmTitle": "Xóa kiến nghị này?",
     "deleteSuccess": "Đã xóa kiến nghị",
     "deleteError": "Xóa kiến nghị thất bại",

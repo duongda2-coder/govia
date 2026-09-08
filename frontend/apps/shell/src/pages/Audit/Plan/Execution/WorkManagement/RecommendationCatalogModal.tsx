@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Button, Form, Input, Modal, Select, Table } from "antd";
+import { App, Button, Form, Input, Modal, Select, Space, Table, Upload } from "antd";
 import type { TableProps } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, DownloadOutlined, UploadOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { getApiErrorMessage } from "@govia/ui-kit";
 import {
   createAuditRecommendation,
   deleteAuditRecommendation,
+  downloadAuditRecommendationTemplate,
   listAuditRecommendations,
+  uploadAuditRecommendationFile,
   type AuditRecommendationItem,
 } from "../../../../../api/auditRecommendation";
 import { listMasterDataItems, type MasterDataItem } from "../../../../../api/auditMasterData";
@@ -25,7 +27,6 @@ export interface RecommendationCatalogModalProps {
 }
 
 interface FormValues {
-  code: string;
   businessSegmentId?: string;
   content: string;
 }
@@ -40,6 +41,7 @@ export function RecommendationCatalogModal({ open, engagementId, onClose, onChan
   const [segments, setSegments] = useState<MasterDataItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [importing, setImporting] = useState(false);
   const [form] = Form.useForm<FormValues>();
 
   const load = useCallback(async () => {
@@ -72,7 +74,6 @@ export function RecommendationCatalogModal({ open, engagementId, onClose, onChan
     setSubmitting(true);
     try {
       await createAuditRecommendation(engagementId, {
-        code: values.code.trim().toUpperCase(),
         businessSegmentId: values.businessSegmentId ?? null,
         content: values.content,
       });
@@ -106,6 +107,20 @@ export function RecommendationCatalogModal({ open, engagementId, onClose, onChan
     });
   };
 
+  const handleImport = (file: File) => {
+    if (!engagementId) return false;
+    setImporting(true);
+    uploadAuditRecommendationFile(engagementId, file)
+      .then((result) => {
+        message.success(t("common.importSuccess", { count: result.successCount }));
+        return load();
+      })
+      .then(() => onChanged?.())
+      .catch((err) => message.error(getApiErrorMessage(err, t("common.importError"))))
+      .finally(() => setImporting(false));
+    return false; // ngan Upload tu dong submit file theo co che mac dinh
+  };
+
   const columns: TableProps<AuditRecommendationItem>["columns"] = [
     { title: t("auditRecommendation.columns.code"), dataIndex: "code", width: 110 },
     { title: t("auditRecommendation.columns.businessSegment"), dataIndex: "businessSegmentCode", width: 120, render: (v) => v ?? "-" },
@@ -123,17 +138,17 @@ export function RecommendationCatalogModal({ open, engagementId, onClose, onChan
 
   return (
     <Modal title={t("auditRecommendation.title")} open={open} onCancel={onClose} footer={null} width={700} destroyOnClose>
+      <Space style={{ marginBottom: 16 }}>
+        <Button icon={<DownloadOutlined />} onClick={() => engagementId && downloadAuditRecommendationTemplate(engagementId)}>
+          {t("common.downloadTemplate")}
+        </Button>
+        <Upload accept=".xlsx" showUploadList={false} beforeUpload={handleImport}>
+          <Button icon={<UploadOutlined />} loading={importing}>
+            {t("common.import")}
+          </Button>
+        </Upload>
+      </Space>
       <Form<FormValues> form={form} layout="inline" onFinish={handleSubmit} style={{ marginBottom: 16 }}>
-        <Form.Item
-          name="code"
-          style={{ width: 130 }}
-          rules={[
-            { required: true, message: t("auditRecommendation.columns.code") },
-            { pattern: /^KNKT\d{3,}$/i, message: t("auditRecommendation.codeFormatError") },
-          ]}
-        >
-          <Input placeholder="KNKT001" />
-        </Form.Item>
         <Form.Item name="businessSegmentId" style={{ minWidth: 160 }}>
           <Select
             allowClear
