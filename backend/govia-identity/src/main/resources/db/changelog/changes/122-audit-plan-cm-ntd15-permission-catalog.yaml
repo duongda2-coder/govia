@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Danh sach but toan chon mau MF (CM_NTD15) =====================
+  - changeSet:
+      id: 122-1-permission-catalog-audit-cm-ntd15
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "de605ee2-578d-4a74-97e7-c49ba5dd9d56" }
+              - column: { name: code, value: "AUDIT.CM_NTD15.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem but toan chon mau nghiep vu MF" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu MF (05D)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d2d4d19b-ebb9-4cf0-838c-4180bc166012" }
+              - column: { name: code, value: "AUDIT.CM_NTD15.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi but toan chon mau nghiep vu MF" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu MF (05D)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "69c354b3-b8e2-4c16-9540-23e2c51dfaf5" }
+              - column: { name: code, value: "AUDIT.CM_NTD15.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua but toan chon mau nghiep vu MF" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu MF (05D)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "65aab039-786b-4bec-bd43-9ce1f52a4934" }
+              - column: { name: code, value: "AUDIT.CM_NTD15.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa but toan chon mau nghiep vu MF" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu MF (05D)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "f650d7a9-f175-4ded-b63b-aa78c94c4f6d" }
+              - column: { name: code, value: "AUDIT.CM_NTD15.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu but toan chon mau nghiep vu MF" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu MF (05D)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "35e1f57b-a0c5-4e88-8491-f55c73c180df" }
+              - column: { name: code, value: "AUDIT.CM_NTD15.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu but toan chon mau nghiep vu MF" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu MF (05D)" }

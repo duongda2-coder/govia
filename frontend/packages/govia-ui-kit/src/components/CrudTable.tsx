@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type Key } from "react";
 import { Table, Card, Popover, Checkbox, Button, Empty, Alert } from "antd";
 import type { TableProps } from "antd";
 import type { AxiosInstance } from "axios";
@@ -128,6 +128,17 @@ export function CrudTable<T extends object>(props: CrudTableProps<T>) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tableId, columnKeysSignature]);
 
+  // rowSelection duoi day duoc dieu khien (controlled) qua selectedRowKeys nay - neu de antd Table
+  // tu quan ly checkbox (uncontrolled), khi trang goi setSelected([]) sau khi Sua/Xoa xong (moi
+  // trang dung CrudTable deu lam vay truoc khi load() lai du lieu) thi checkbox VAN hien dang tick
+  // (Table khong biet gi ve viec parent da reset), lam nut Sua/Xoa bi disable dù checkbox nhin nhu
+  // dang chon - phai bo tick roi tick lai moi bam duoc. Reset theo dataSource vi do la luc DUY NHAT
+  // (đổi bo loc, hoac load() lai sau CRUD) ma lua chon cu khong con hop le nua.
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+  useEffect(() => {
+    setSelectedRowKeys([]);
+  }, [dataSource]);
+
   const updatePrefs = (next: ColumnPref[]) => {
     setPrefs(next);
     if (tableId) savePrefs(tableId, next);
@@ -250,7 +261,11 @@ export function CrudTable<T extends object>(props: CrudTableProps<T>) {
         rowSelection={
           onSelectionChange
             ? {
-                onChange: (keys, rows) => onSelectionChange(keys, rows),
+                selectedRowKeys,
+                onChange: (keys, rows) => {
+                  setSelectedRowKeys(keys);
+                  onSelectionChange(keys, rows);
+                },
               }
             : undefined
         }

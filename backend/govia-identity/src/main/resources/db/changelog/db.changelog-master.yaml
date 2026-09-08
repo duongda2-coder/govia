@@ -344,3 +344,15 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/120-audit-engagement-monitoring-permission-catalog.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/121-audit-plan-cm-ntd15-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/122-audit-plan-cm-ntd15-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/123-audit-plan-cm-ntd16-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/124-audit-plan-cm-ntd16-permission-catalog.yaml
+      relativeToChangelogFile: false

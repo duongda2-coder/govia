@@ -1,0 +1,52 @@
+databaseChangeLog:
+
+  # ===================== "Thuc hien kiem toan": Danh sach cac but toan chon mau nghiep vu HDV (sheet ZTC_CM_NTD16, phu luc 03G/BKS-KTNB) =====================
+  - changeSet:
+      id: 123-1-audit-plan-cm-ntd16-schema
+      author: govia
+      comment: "Tao bang audit_cm_ntd16"
+      changes:
+        - createTable:
+            tableName: audit_cm_ntd16
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: assigned_employee_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+              - column: { name: branch_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: transaction_date, type: DATE, constraints: { nullable: false } }
+              - column: { name: posting_user, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: entry_number, type: "DECIMAL(20,2)" }
+              - column: { name: debit_amount, type: "DECIMAL(20,2)" }
+              - column: { name: credit_amount, type: "DECIMAL(20,2)" }
+              - column: { name: transaction_status, type: VARCHAR(50) }
+              - column: { name: currency, type: VARCHAR(3) }
+              - column: { name: account_number, type: VARCHAR(50) }
+              - column: { name: content, type: VARCHAR(500) }
+              - column: { name: sample_reason, type: VARCHAR(1000) }
+              - column: { name: audit_result, type: VARCHAR(120) }
+              - column: { name: recommendation_type, type: VARCHAR(120) }
+              - column: { name: transaction_staff, type: VARCHAR(120) }
+              - column: { name: control_user, type: VARCHAR(120) }
+              - column: { name: control_staff, type: VARCHAR(120) }
+              - column: { name: control_staff_title, type: VARCHAR(120) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_cm_ntd16
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_cm_ntd16_tenant
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd16, baseColumnNames: engagement_id, referencedTableName: audit_engagement, referencedColumnNames: id, constraintName: fk_audit_cm_ntd16_engagement }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd16, baseColumnNames: assigned_employee_id, referencedTableName: employee, referencedColumnNames: id, constraintName: fk_audit_cm_ntd16_assignee }
+        - addForeignKeyConstraint: { baseTableName: audit_cm_ntd16, baseColumnNames: process_step_summary_id, referencedTableName: audit_process_step_summary, referencedColumnNames: id, constraintName: fk_audit_cm_ntd16_step_summary }
+        - addUniqueConstraint:
+            tableName: audit_cm_ntd16
+            columnNames: tenant_id, branch_code, transaction_date, posting_user, entry_number
+            constraintName: uk_audit_cm_ntd16_tenant_branch_date_user_entry

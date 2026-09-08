@@ -60,7 +60,7 @@
     "auditPlanExecCmTd2": "02G/BKS-KTNB (TD2)",
     "auditPlanExecCmNtd1": "04C/BKS-KTNB (NTD1)",
     "auditPlanExecCmNtd2": "03E/BKS-KTNB (NTD2)",
-    "auditPlanExecCmNtd3": "03E/BKS-KTNB (NTD3)",
+    "auditPlanExecCmNtd3": "03C/BKS-KTNB (NTD3)",
     "auditPlanExecCmNtd4": "06B/BKS-KTNB (NTD4)",
     "auditPlanExecCmNtd6": "08B/BKS-KTNB (NTD6)",
     "auditPlanExecCmNtd7": "09B/BKS-KTNB (NTD7)",
@@ -71,6 +71,8 @@
     "auditPlanExecCmNtd12": "07F/BKS-KTNB (NTD12)",
     "auditPlanExecCmNtd13": "07D/BKS-KTNB (NTD13)",
     "auditPlanExecCmNtd14": "08C/BKS-KTNB (NTD14)",
+    "auditPlanExecCmNtd15": "05D/BKS-KTNB (NTD15)",
+    "auditPlanExecCmNtd16": "03G/BKS-KTNB (NTD16)",
     "auditPlanExecWorkManagementCbkt": "Quản lý công việc CBKT",
     "auditPlanExecWorkManagementThkt": "Quản lý công việc THKT",
     "auditPlanExecWorkManagementTtss": "Quản lý TTSS & Kiến nghị",
@@ -1253,7 +1255,7 @@
     }
   },
   "auditCmNtd3": {
-    "title": "03E/BKS-KTNB (NTD3)",
+    "title": "03C/BKS-KTNB (NTD3)",
     "columns": {
       "assignedUsername": "Username người được phân công",
       "processStepSummaryCode": "Mã BQT_TH",
@@ -1581,6 +1583,74 @@
     },
     "form": { "createTitle": "Thêm User Ipcas chấm công chọn mẫu", "editTitle": "Sửa User Ipcas chấm công chọn mẫu" },
     "deleteConfirmTitle": "Xóa bản ghi chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd15": {
+    "title": "05D/BKS-KTNB (NTD15)",
+    "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
+      "branchCode": "Mã chi nhánh",
+      "transactionDate": "Ngày giao dịch thực tế",
+      "postingUser": "User hạch toán",
+      "entryNumber": "Số bút toán",
+      "debitAmount": "Số phát sinh nợ",
+      "creditAmount": "Số phát sinh có",
+      "transactionStatus": "Mã trạng thái",
+      "currency": "Loại tiền tệ",
+      "accountNumber": "Tài khoản hạch toán",
+      "content": "Nội dung",
+      "sampleReason": "Lý do chọn mẫu",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát"
+    },
+    "form": { "createTitle": "Thêm bút toán chọn mẫu MF", "editTitle": "Sửa bút toán chọn mẫu MF" },
+    "deleteConfirmTitle": "Xóa bút toán chọn mẫu này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditCmNtd16": {
+    "title": "03G/BKS-KTNB (NTD16)",
+    "columns": {
+      "assignedUsername": "Username người được phân công",
+      "processStepSummaryCode": "Mã BQT_TH",
+      "branchCode": "Mã chi nhánh",
+      "transactionDate": "Ngày giao dịch thực tế",
+      "postingUser": "User hạch toán",
+      "entryNumber": "Số bút toán",
+      "debitAmount": "Số phát sinh nợ",
+      "creditAmount": "Số phát sinh có",
+      "transactionStatus": "Mã trạng thái",
+      "currency": "Loại tiền tệ",
+      "accountNumber": "Tài khoản hạch toán",
+      "content": "Nội dung",
+      "sampleReason": "Lý do chọn mẫu",
+      "auditResult": "Kết quả kiểm toán",
+      "recommendationType": "Dạng kiến nghị",
+      "transactionStaff": "Cán bộ giao dịch",
+      "controlUser": "User kiểm soát",
+      "controlStaff": "Cán bộ kiểm soát",
+      "controlStaffTitle": "Chức danh người kiểm soát"
+    },
+    "form": { "createTitle": "Thêm bút toán chọn mẫu HDV", "editTitle": "Sửa bút toán chọn mẫu HDV" },
+    "deleteConfirmTitle": "Xóa bút toán chọn mẫu này?",
     "messages": {
       "loadError": "Không tải được dữ liệu",
       "createSuccess": "Đã tạo",

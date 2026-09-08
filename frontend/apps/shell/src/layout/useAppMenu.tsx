@@ -55,6 +55,8 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-plan-exec-cm-ntd12": "/audit/plan/execution/cm-ntd12",
   "audit-plan-exec-cm-ntd13": "/audit/plan/execution/cm-ntd13",
   "audit-plan-exec-cm-ntd14": "/audit/plan/execution/cm-ntd14",
+  "audit-plan-exec-cm-ntd15": "/audit/plan/execution/cm-ntd15",
+  "audit-plan-exec-cm-ntd16": "/audit/plan/execution/cm-ntd16",
   "audit-plan-exec-work-management-cbkt": "/audit/plan/execution/work-management/cbkt",
   "audit-plan-exec-work-management-thkt": "/audit/plan/execution/work-management/thkt",
   "audit-plan-exec-work-management-ttss": "/audit/plan/execution/work-management/ttss",
@@ -233,7 +235,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
           key: "audit-plan-execution",
           label: menuLabel(t("menu.auditPlanExecution")),
           children: dropNulls([
-            // 15 sheet ZTC_CM_TD1/TD2/NTD1-NTD14 - moi sheet 1 muc menu/route rieng (giong Danh muc).
+            // 17 sheet ZTC_CM_TD1/TD2/NTD1-NTD16 - moi sheet 1 muc menu/route rieng (giong Danh muc).
             hasPermission("AUDIT.CM_TD1.VIEW") && leaf("audit-plan-exec-cm-td1", t("menu.auditPlanExecCmTd1"), auditPlanExecGroupLabel),
             hasPermission("AUDIT.CM_TD2.VIEW") && leaf("audit-plan-exec-cm-td2", t("menu.auditPlanExecCmTd2"), auditPlanExecGroupLabel),
             hasPermission("AUDIT.CM_NTD1.VIEW") && leaf("audit-plan-exec-cm-ntd1", t("menu.auditPlanExecCmNtd1"), auditPlanExecGroupLabel),
@@ -249,6 +251,8 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
             hasPermission("AUDIT.CM_NTD12.VIEW") && leaf("audit-plan-exec-cm-ntd12", t("menu.auditPlanExecCmNtd12"), auditPlanExecGroupLabel),
             hasPermission("AUDIT.CM_NTD13.VIEW") && leaf("audit-plan-exec-cm-ntd13", t("menu.auditPlanExecCmNtd13"), auditPlanExecGroupLabel),
             hasPermission("AUDIT.CM_NTD14.VIEW") && leaf("audit-plan-exec-cm-ntd14", t("menu.auditPlanExecCmNtd14"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD15.VIEW") && leaf("audit-plan-exec-cm-ntd15", t("menu.auditPlanExecCmNtd15"), auditPlanExecGroupLabel),
+            hasPermission("AUDIT.CM_NTD16.VIEW") && leaf("audit-plan-exec-cm-ntd16", t("menu.auditPlanExecCmNtd16"), auditPlanExecGroupLabel),
             hasPermission("AUDIT.WORK_MANAGEMENT.VIEW") &&
               leaf("audit-plan-exec-work-management-cbkt", t("menu.auditPlanExecWorkManagementCbkt"), auditPlanExecGroupLabel),
             hasPermission("AUDIT.WORK_MANAGEMENT.VIEW") &&

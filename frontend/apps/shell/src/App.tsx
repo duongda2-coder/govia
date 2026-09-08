@@ -41,6 +41,8 @@ import { CmNtd11Page } from "./pages/Audit/Plan/Execution/CmNtd11Page";
 import { CmNtd12Page } from "./pages/Audit/Plan/Execution/CmNtd12Page";
 import { CmNtd13Page } from "./pages/Audit/Plan/Execution/CmNtd13Page";
 import { CmNtd14Page } from "./pages/Audit/Plan/Execution/CmNtd14Page";
+import { CmNtd15Page } from "./pages/Audit/Plan/Execution/CmNtd15Page";
+import { CmNtd16Page } from "./pages/Audit/Plan/Execution/CmNtd16Page";
 import { CbktWorkGridPage } from "./pages/Audit/Plan/Execution/WorkManagement/CbktWorkGridPage";
 import { ThktWorkGridPage } from "./pages/Audit/Plan/Execution/WorkManagement/ThktWorkGridPage";
 import { TtssManagementPage } from "./pages/Audit/Plan/Execution/WorkManagement/TtssManagementPage";
@@ -133,6 +135,8 @@ function App() {
           <Route path="audit/plan/execution/cm-ntd12" element={<CmNtd12Page />} />
           <Route path="audit/plan/execution/cm-ntd13" element={<CmNtd13Page />} />
           <Route path="audit/plan/execution/cm-ntd14" element={<CmNtd14Page />} />
+          <Route path="audit/plan/execution/cm-ntd15" element={<CmNtd15Page />} />
+          <Route path="audit/plan/execution/cm-ntd16" element={<CmNtd16Page />} />
           <Route path="audit/plan/execution/work-management/cbkt" element={<CbktWorkGridPage />} />
           <Route path="audit/plan/execution/work-management/thkt" element={<ThktWorkGridPage />} />
           <Route path="audit/plan/execution/work-management/ttss" element={<TtssManagementPage />} />

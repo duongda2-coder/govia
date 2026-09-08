@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Thuc hien kiem toan - Danh sach but toan chon mau HDV (CM_NTD16) =====================
+  - changeSet:
+      id: 124-1-permission-catalog-audit-cm-ntd16
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "2fcd1ab6-f0de-4393-8467-2fb9bdd225e3" }
+              - column: { name: code, value: "AUDIT.CM_NTD16.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem but toan chon mau nghiep vu HDV" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu HDV (03G)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "cc155f8d-11af-4185-bea7-482a9a147d66" }
+              - column: { name: code, value: "AUDIT.CM_NTD16.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi but toan chon mau nghiep vu HDV" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu HDV (03G)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "dd32016e-da8c-4159-9e59-0dae2c76a6d8" }
+              - column: { name: code, value: "AUDIT.CM_NTD16.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua but toan chon mau nghiep vu HDV" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu HDV (03G)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "814e15b5-601a-4009-9a0a-98344aec30c5" }
+              - column: { name: code, value: "AUDIT.CM_NTD16.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa but toan chon mau nghiep vu HDV" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu HDV (03G)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "dc4dd38f-af7e-4ba1-a316-9a1ee22c6be6" }
+              - column: { name: code, value: "AUDIT.CM_NTD16.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu but toan chon mau nghiep vu HDV" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu HDV (03G)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "84a8b6fa-9877-4d8a-9cab-404e2635462b" }
+              - column: { name: code, value: "AUDIT.CM_NTD16.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu but toan chon mau nghiep vu HDV" }
+              - column: { name: resource_label, value: "Bút toán chọn mẫu HDV (03G)" }
