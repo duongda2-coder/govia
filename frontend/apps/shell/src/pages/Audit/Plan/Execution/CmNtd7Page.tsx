@@ -174,16 +174,16 @@ export function CmNtd7Page() {
   };
 
   const columns: TableProps<AuditCmNtd7Item>["columns"] = [
-    { title: t("auditCmNtd7.columns.assignedUsername"), dataIndex: "assignedUsername", width: 150, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd7.columns.processStepSummaryCode"), dataIndex: "processStepSummaryCode", width: 130, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd7.columns.assignedUsername"), width: 150, ...getSearchColumnProps("assignedUsername", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd7.columns.processStepSummaryCode"), width: 130, ...getSearchColumnProps("processStepSummaryCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd7.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
     { title: t("auditCmNtd7.columns.constructionCode"), width: 130, ...getSearchColumnProps("constructionCode", searchLabels) },
-    { title: t("auditCmNtd7.columns.constructionName"), dataIndex: "constructionName", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd7.columns.content"), dataIndex: "content", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd7.columns.documentType"), dataIndex: "documentType", width: 140, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd7.columns.completenessAssessment"), dataIndex: "completenessAssessment", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd7.columns.assessment"), dataIndex: "assessment", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd7.columns.auditResult"), dataIndex: "auditResult", render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd7.columns.constructionName"), ...getSearchColumnProps("constructionName", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd7.columns.content"), ...getSearchColumnProps("content", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd7.columns.documentType"), width: 140, ...getSearchColumnProps("documentType", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd7.columns.completenessAssessment"), ...getSearchColumnProps("completenessAssessment", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd7.columns.assessment"), ...getSearchColumnProps("assessment", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd7.columns.auditResult"), ...getSearchColumnProps("auditResult", searchLabels), render: (v: string | null) => v ?? "-" },
     {
       title: t("common.active"),
       dataIndex: "active",

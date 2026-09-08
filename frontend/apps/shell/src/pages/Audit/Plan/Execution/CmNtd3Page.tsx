@@ -196,23 +196,25 @@ export function CmNtd3Page() {
 
   const money = (v: number | null) => (v == null ? "-" : numberFormatter.format(v));
 
+  const num = (a: number | null, b: number | null) => (a ?? 0) - (b ?? 0);
+
   const columns: TableProps<AuditCmNtd3Item>["columns"] = [
-    { title: t("auditCmNtd3.columns.assignedUsername"), dataIndex: "assignedUsername", width: 150, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd3.columns.processStepSummaryCode"), dataIndex: "processStepSummaryCode", width: 130, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.assignedUsername"), width: 150, ...getSearchColumnProps("assignedUsername", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.processStepSummaryCode"), width: 130, ...getSearchColumnProps("processStepSummaryCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd3.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
-    { title: t("auditCmNtd3.columns.customerCode"), dataIndex: "customerCode", width: 140, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.customerCode"), width: 140, ...getSearchColumnProps("customerCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd3.columns.customerName"), ...getSearchColumnProps("customerName", searchLabels) },
-    { title: t("auditCmNtd3.columns.customerAddress"), dataIndex: "customerAddress", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd3.columns.corebankCustomerCode"), dataIndex: "corebankCustomerCode", width: 150, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd3.columns.currency"), dataIndex: "currency", width: 90, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd3.columns.originalCurrencyBalance"), dataIndex: "originalCurrencyBalance", width: 150, align: "right", render: money },
-    { title: t("auditCmNtd3.columns.convertedBalance"), dataIndex: "convertedBalance", width: 150, align: "right", render: money },
-    { title: t("auditCmNtd3.columns.auditResult"), dataIndex: "auditResult", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd3.columns.recommendationType"), dataIndex: "recommendationType", width: 150, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd3.columns.transactionStaff"), dataIndex: "transactionStaff", width: 150, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd3.columns.controlUser"), dataIndex: "controlUser", width: 130, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd3.columns.controlStaff"), dataIndex: "controlStaff", width: 150, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd3.columns.controlStaffTitle"), dataIndex: "controlStaffTitle", width: 170, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.customerAddress"), ...getSearchColumnProps("customerAddress", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.corebankCustomerCode"), width: 150, ...getSearchColumnProps("corebankCustomerCode", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.currency"), width: 90, ...getSearchColumnProps("currency", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.originalCurrencyBalance"), dataIndex: "originalCurrencyBalance", width: 150, align: "right", sorter: (a, b) => num(a.originalCurrencyBalance, b.originalCurrencyBalance), render: money },
+    { title: t("auditCmNtd3.columns.convertedBalance"), dataIndex: "convertedBalance", width: 150, align: "right", sorter: (a, b) => num(a.convertedBalance, b.convertedBalance), render: money },
+    { title: t("auditCmNtd3.columns.auditResult"), ...getSearchColumnProps("auditResult", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.recommendationType"), width: 150, ...getSearchColumnProps("recommendationType", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.transactionStaff"), width: 150, ...getSearchColumnProps("transactionStaff", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.controlUser"), width: 130, ...getSearchColumnProps("controlUser", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.controlStaff"), width: 150, ...getSearchColumnProps("controlStaff", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd3.columns.controlStaffTitle"), width: 170, ...getSearchColumnProps("controlStaffTitle", searchLabels), render: (v: string | null) => v ?? "-" },
     {
       title: t("common.active"),
       dataIndex: "active",

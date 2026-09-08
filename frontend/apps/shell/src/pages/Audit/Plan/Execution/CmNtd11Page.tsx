@@ -197,23 +197,25 @@ export function CmNtd11Page() {
 
   const money = (v: number | null) => (v == null ? "-" : numberFormatter.format(v));
 
+  const num = (a: number | null, b: number | null) => (a ?? 0) - (b ?? 0);
+
   const columns: TableProps<AuditCmNtd11Item>["columns"] = [
-    { title: t("auditCmNtd11.columns.assignedUsername"), dataIndex: "assignedUsername", width: 150, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd11.columns.processStepSummaryCode"), dataIndex: "processStepSummaryCode", width: 130, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd11.columns.assignedUsername"), width: 150, ...getSearchColumnProps("assignedUsername", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd11.columns.processStepSummaryCode"), width: 130, ...getSearchColumnProps("processStepSummaryCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd11.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
-    { title: t("auditCmNtd11.columns.referenceNumber"), dataIndex: "referenceNumber", width: 150 },
+    { title: t("auditCmNtd11.columns.referenceNumber"), width: 150, ...getSearchColumnProps("referenceNumber", searchLabels) },
     { title: t("auditCmNtd11.columns.customerCode"), ...getSearchColumnProps("customerCode", searchLabels) },
     { title: t("auditCmNtd11.columns.customerName"), ...getSearchColumnProps("customerName", searchLabels) },
-    { title: t("auditCmNtd11.columns.transactionDate"), dataIndex: "transactionDate", width: 130 },
-    { title: t("auditCmNtd11.columns.currency"), dataIndex: "currency", width: 100, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd11.columns.amount"), dataIndex: "amount", width: 160, align: "right", render: money },
-    { title: t("auditCmNtd11.columns.sampleReason"), dataIndex: "sampleReason", width: 130, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd11.columns.auditResult"), dataIndex: "auditResult", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd11.columns.recommendationType"), dataIndex: "recommendationType", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd11.columns.transactionStaff"), dataIndex: "transactionStaff", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd11.columns.controlUser"), dataIndex: "controlUser", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd11.columns.controlStaff"), dataIndex: "controlStaff", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd11.columns.controlStaffTitle"), dataIndex: "controlStaffTitle", render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd11.columns.transactionDate"), width: 130, ...getSearchColumnProps("transactionDate", searchLabels) },
+    { title: t("auditCmNtd11.columns.currency"), width: 100, ...getSearchColumnProps("currency", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd11.columns.amount"), dataIndex: "amount", width: 160, align: "right", sorter: (a, b) => num(a.amount, b.amount), render: money },
+    { title: t("auditCmNtd11.columns.sampleReason"), width: 130, ...getSearchColumnProps("sampleReason", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd11.columns.auditResult"), ...getSearchColumnProps("auditResult", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd11.columns.recommendationType"), ...getSearchColumnProps("recommendationType", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd11.columns.transactionStaff"), ...getSearchColumnProps("transactionStaff", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd11.columns.controlUser"), ...getSearchColumnProps("controlUser", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd11.columns.controlStaff"), ...getSearchColumnProps("controlStaff", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd11.columns.controlStaffTitle"), ...getSearchColumnProps("controlStaffTitle", searchLabels), render: (v: string | null) => v ?? "-" },
     {
       title: t("common.active"),
       dataIndex: "active",

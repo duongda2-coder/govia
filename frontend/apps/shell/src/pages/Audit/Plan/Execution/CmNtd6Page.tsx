@@ -177,17 +177,17 @@ export function CmNtd6Page() {
   };
 
   const columns: TableProps<AuditCmNtd6Item>["columns"] = [
-    { title: t("auditCmNtd6.columns.assignedUsername"), dataIndex: "assignedUsername", width: 150, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd6.columns.processStepSummaryCode"), dataIndex: "processStepSummaryCode", width: 130, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd6.columns.assignedUsername"), width: 150, ...getSearchColumnProps("assignedUsername", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd6.columns.processStepSummaryCode"), width: 130, ...getSearchColumnProps("processStepSummaryCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd6.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
-    { title: t("auditCmNtd6.columns.staffCode"), dataIndex: "staffCode", width: 140, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd6.columns.staffCode"), width: 140, ...getSearchColumnProps("staffCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd6.columns.staffName"), ...getSearchColumnProps("staffName", searchLabels) },
-    { title: t("auditCmNtd6.columns.ipcasUser"), dataIndex: "ipcasUser", width: 130 },
-    { title: t("auditCmNtd6.columns.adUser"), dataIndex: "adUser", width: 130, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd6.columns.securityDevice"), dataIndex: "securityDevice", width: 140, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd6.columns.sampleReason"), dataIndex: "sampleReason", width: 140, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd6.columns.sampleCode"), dataIndex: "sampleCode", width: 140, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd6.columns.auditResult"), dataIndex: "auditResult", render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd6.columns.ipcasUser"), width: 130, ...getSearchColumnProps("ipcasUser", searchLabels) },
+    { title: t("auditCmNtd6.columns.adUser"), width: 130, ...getSearchColumnProps("adUser", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd6.columns.securityDevice"), width: 140, ...getSearchColumnProps("securityDevice", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd6.columns.sampleReason"), width: 140, ...getSearchColumnProps("sampleReason", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd6.columns.sampleCode"), width: 140, ...getSearchColumnProps("sampleCode", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd6.columns.auditResult"), ...getSearchColumnProps("auditResult", searchLabels), render: (v: string | null) => v ?? "-" },
     {
       title: t("common.active"),
       dataIndex: "active",

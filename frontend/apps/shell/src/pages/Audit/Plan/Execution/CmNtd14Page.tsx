@@ -194,22 +194,24 @@ export function CmNtd14Page() {
 
   const count = (v: number | null) => (v == null ? "-" : numberFormatter.format(v));
 
+  const num = (a: number | null, b: number | null) => (a ?? 0) - (b ?? 0);
+
   const columns: TableProps<AuditCmNtd14Item>["columns"] = [
-    { title: t("auditCmNtd14.columns.assignedUsername"), dataIndex: "assignedUsername", width: 150, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd14.columns.processStepSummaryCode"), dataIndex: "processStepSummaryCode", width: 130, render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd14.columns.assignedUsername"), width: 150, ...getSearchColumnProps("assignedUsername", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd14.columns.processStepSummaryCode"), width: 130, ...getSearchColumnProps("processStepSummaryCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditCmNtd14.columns.branchCode"), width: 110, ...getSearchColumnProps("branchCode", searchLabels) },
-    { title: t("auditCmNtd14.columns.attendanceDate"), dataIndex: "attendanceDate", width: 120 },
+    { title: t("auditCmNtd14.columns.attendanceDate"), width: 120, ...getSearchColumnProps("attendanceDate", searchLabels) },
     { title: t("auditCmNtd14.columns.staffCode"), ...getSearchColumnProps("staffCode", searchLabels) },
     { title: t("auditCmNtd14.columns.staffName"), ...getSearchColumnProps("staffName", searchLabels) },
-    { title: t("auditCmNtd14.columns.attendanceCode"), dataIndex: "attendanceCode", width: 100, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd14.columns.description"), dataIndex: "description", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd14.columns.matchedTransactionCount"), dataIndex: "matchedTransactionCount", width: 130, align: "right", render: count },
-    { title: t("auditCmNtd14.columns.unmatchedTransactionCount"), dataIndex: "unmatchedTransactionCount", width: 130, align: "right", render: count },
-    { title: t("auditCmNtd14.columns.adjustedTransactionCount"), dataIndex: "adjustedTransactionCount", width: 130, align: "right", render: count },
-    { title: t("auditCmNtd14.columns.userCode"), dataIndex: "userCode", width: 130, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd14.columns.note"), dataIndex: "note", render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd14.columns.sampleReason"), dataIndex: "sampleReason", width: 130, render: (v: string | null) => v ?? "-" },
-    { title: t("auditCmNtd14.columns.auditResult"), dataIndex: "auditResult", render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd14.columns.attendanceCode"), width: 100, ...getSearchColumnProps("attendanceCode", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd14.columns.description"), ...getSearchColumnProps("description", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd14.columns.matchedTransactionCount"), dataIndex: "matchedTransactionCount", width: 130, align: "right", sorter: (a, b) => num(a.matchedTransactionCount, b.matchedTransactionCount), render: count },
+    { title: t("auditCmNtd14.columns.unmatchedTransactionCount"), dataIndex: "unmatchedTransactionCount", width: 130, align: "right", sorter: (a, b) => num(a.unmatchedTransactionCount, b.unmatchedTransactionCount), render: count },
+    { title: t("auditCmNtd14.columns.adjustedTransactionCount"), dataIndex: "adjustedTransactionCount", width: 130, align: "right", sorter: (a, b) => num(a.adjustedTransactionCount, b.adjustedTransactionCount), render: count },
+    { title: t("auditCmNtd14.columns.userCode"), width: 130, ...getSearchColumnProps("userCode", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd14.columns.note"), ...getSearchColumnProps("note", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd14.columns.sampleReason"), width: 130, ...getSearchColumnProps("sampleReason", searchLabels), render: (v: string | null) => v ?? "-" },
+    { title: t("auditCmNtd14.columns.auditResult"), ...getSearchColumnProps("auditResult", searchLabels), render: (v: string | null) => v ?? "-" },
     {
       title: t("common.active"),
       dataIndex: "active",
