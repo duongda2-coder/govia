@@ -35,11 +35,21 @@ export interface WorkManagementGridPageProps {
   title: string;
   /** Chi THKT co nut "Báo cáo tiến độ" (Khối B) - xem dac ta. */
   showProgressReport?: boolean;
+  /** Chi THKT: sap xep mac dinh theo Can bo thuc hien -> Nghiep vu -> Ma cong viec (theo dac ta man
+   * hinh "Quan ly cong viec THKT"), thay vi giu nguyen thu tu tra ve tu API. */
+  sortByAssigneeFirst?: boolean;
+}
+
+function compareNullable(a: string | null, b: string | null): number {
+  if (a == null && b == null) return 0;
+  if (a == null) return 1;
+  if (b == null) return -1;
+  return a.localeCompare(b);
 }
 
 /** Grid dung chung cho "Quản lý công việc CBKT" va "Quản lý công việc THKT" (sheet cung ten trong
  * Tạo CKT (1).xlsx) - chi khac nhau o phase truyen vao, cot va hanh vi con lai giong het nhau. */
-export function WorkManagementGridPage({ phase, tableId, title, showProgressReport }: WorkManagementGridPageProps) {
+export function WorkManagementGridPage({ phase, tableId, title, showProgressReport, sortByAssigneeFirst }: WorkManagementGridPageProps) {
   const { t } = useTranslation();
   const { message, modal } = App.useApp();
   const { user, hasPermission } = useAuth();
@@ -95,10 +105,16 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
     return Array.from(seen, ([value, label]) => ({ value, label }));
   }, [items]);
 
-  const displayedItems = useMemo(
-    () => (employeeFilter ? items.filter((item) => item.employeeId === employeeFilter) : items),
-    [items, employeeFilter],
-  );
+  const displayedItems = useMemo(() => {
+    const filtered = employeeFilter ? items.filter((item) => item.employeeId === employeeFilter) : items;
+    if (!sortByAssigneeFirst) return filtered;
+    return [...filtered].sort(
+      (a, b) =>
+        compareNullable(a.employeeUsername ?? a.employeeName, b.employeeUsername ?? b.employeeName) ||
+        compareNullable(a.businessSegmentCode, b.businessSegmentCode) ||
+        compareNullable(a.workItemCode, b.workItemCode),
+    );
+  }, [items, employeeFilter, sortByAssigneeFirst]);
 
   const currentEngagement = engagements.find((e) => e.id === engagementId);
   const isTeamLead = !!user?.employeeCode && !!currentEngagement && user.employeeCode === currentEngagement.teamLeadEmployeeCode;
