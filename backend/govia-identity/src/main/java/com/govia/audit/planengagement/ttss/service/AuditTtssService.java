@@ -293,25 +293,35 @@ public class AuditTtssService {
         }
 
         List<Map<String, Object>> rows = new ArrayList<>();
-        // Nhung cap (nhan vien, nghiep vu) DA co it nhat 1 dong tu du lieu "chon mau" thuc te ben
-        // duoi - dung o vong lap thu 2 de KHONG them dong "trong" trung lap cho nghiep vu da duoc
-        // dai dien day du boi du lieu mau that (xem ghi chu o vong lap thu 2).
-        Set<String> employeeSegmentsWithSampleData = new HashSet<>();
+        // Nhung cap (nhan vien, nghiep vu, MA CONG VIEC) DA co it nhat 1 dong tu du lieu "chon mau"
+        // thuc te ben duoi VA duoc gan duy nhat cho dung cong viec do (workItemCode != null, xem
+        // uniqueWorkItemCode()) - dung o vong lap thu 2 de KHONG them dong "trong" trung lap cho
+        // CHINH cong viec da duoc dai dien day du (xem ghi chu o vong lap thu 2). Khoa THEO CONG
+        // VIEC (khong chi employeeId|segmentCode) - vi 1 nhan vien co the duoc phan cong NHIEU
+        // cong viec trong CUNG 1 nghiep vu, va chi 1 trong so do co du lieu chon mau thuc te; khoa
+        // theo segment se lam "bien mat" cac cong viec con lai chua co du lieu mau (bug da gap
+        // 2026-09-10: xuat mau con thieu cong viec du da phan cong THKT).
+        Set<String> employeeSegmentWorkItemsWithSampleData = new HashSet<>();
         for (String segmentCode : sampleSelectionResolver.supportedSegmentCodes()) {
             for (AuditTtssSampleSelectionResolver.SampleFields fields : sampleSelectionResolver.candidatesFor(tenantId, engagementId, segmentCode)) {
                 if (!visibility.canSee(fields.assignedEmployeeId())) {
                     continue;
                 }
+                String resolvedWorkItemCode = uniqueWorkItemCode(workItemCodesByEmployeeSegment, fields.assignedEmployeeId(), segmentCode);
                 Map<String, Object> row = new HashMap<>();
                 row.put("stt", rows.size() + 1);
                 row.put("engagementCode", engagement.getCode());
                 row.put("auditObjectUnitCode", unit == null ? null : unit.getCode());
                 row.put("businessSegmentCode", segmentCode);
-                row.put("workItemCode", uniqueWorkItemCode(workItemCodesByEmployeeSegment, fields.assignedEmployeeId(), segmentCode));
+                row.put("workItemCode", resolvedWorkItemCode);
                 applySampleFields(row, fields);
                 rows.add(row);
-                if (fields.assignedEmployeeId() != null) {
-                    employeeSegmentsWithSampleData.add(fields.assignedEmployeeId() + "|" + segmentCode);
+                // Chi coi la "da dai dien" khi khop DUY NHAT duoc dung 1 cong viec - neu 1 nhan vien
+                // co >1 cong viec trong segment nay (resolvedWorkItemCode == null vi mo ho), KHONG
+                // danh dau cong viec nao la "da co du lieu" ca, de vong lap thu 2 van them du dong
+                // bare cho tung cong viec (dam bao khong thieu cong viec nao).
+                if (fields.assignedEmployeeId() != null && resolvedWorkItemCode != null) {
+                    employeeSegmentWorkItemsWithSampleData.add(fields.assignedEmployeeId() + "|" + segmentCode + "|" + resolvedWorkItemCode);
                 }
             }
         }
@@ -322,10 +332,9 @@ public class AuditTtssService {
         // duoc phan cong 1 cong viec THKT khong dam bao nghiep vu do da co du lieu chon mau (cong
         // viec hasSampleSelection=false thi KHONG BAO GIO co du lieu o 16 bang chon mau, nen se
         // vinh vien khong xuat hien o vong lap tren) - phai them 1 dong rieng cho MOI cong viec
-        // THKT da phan cong (bat ke hasSampleSelection) CHI cho (nhan vien, nghiep vu) nao CHUA
-        // duoc dai dien boi du lieu mau that o tren, tranh tao dong "trong" trung lap khi nghiep
-        // vu do da co du lieu day du (bug da gap: tai khoan duoc phan cong 3 nghiep vu nhung xuat
-        // mau chi thay dung 1 nghiep vu da co du lieu chon mau, 2 nghiep vu con lai bien mat).
+        // THKT da phan cong (bat ke hasSampleSelection) CHI cho (nhan vien, nghiep vu, cong viec)
+        // nao CHUA duoc dai dien day du boi du lieu mau that o tren, tranh tao dong "trong" trung
+        // lap khi CHINH cong viec do da co du lieu day du.
         for (AuditEngagementAssignment assignment : assignments) {
             AuditEngagementGroupMember member = membersById.get(assignment.getGroupMemberId());
             AuditWorkItem workItem = workItems.get(assignment.getWorkItemId());
@@ -336,7 +345,8 @@ public class AuditTtssService {
                 continue;
             }
             AuditMasterDataItem segment = segments.get(workItem.getBusinessSegmentId());
-            if (segment != null && employeeSegmentsWithSampleData.contains(member.getEmployeeId() + "|" + segment.getCode())) {
+            if (segment != null
+                    && employeeSegmentWorkItemsWithSampleData.contains(member.getEmployeeId() + "|" + segment.getCode() + "|" + workItem.getCode())) {
                 continue;
             }
             Map<String, Object> row = new HashMap<>();

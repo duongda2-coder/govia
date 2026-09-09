@@ -155,6 +155,69 @@ class AuditTtssTemplateAutoFillTest {
         assertThat(dataRows).allSatisfy(r -> assertThat(r.getCell(headerToColumn.get("mã công việc")).getStringCellValue()).isEqualTo("LNB0202"));
     }
 
+    /** Regression cho bug "xuat mau van thieu cong viec" bao cao 2026-09-10: 1 nhan vien duoc phan
+     * cong 2 cong viec THKT trong CUNG 1 nghiep vu (LN), nhung CHI 1 cong viec co du lieu "chon
+     * mau" thuc te (AuditCmTd1). Truoc fix, khoa "da co du lieu" chi theo (nhan vien, nghiep vu) nen
+     * ca 2 cong viec bi coi la "da dai dien" boi 1 dong mau do -> cong viec thu 2 (khong co mau)
+     * bien mat khoi file xuat. Sau fix, khoa phai theo tung cong viec: cong viec co mau van ra 1
+     * dong day du (workItemCode de trong vi mo ho - 2 cong viec cung nghiep vu), CON CA HAI cong
+     * viec deu phai co it nhat 1 dong bare trong file xuat (khong duoc thieu cong viec nao). */
+    @Test
+    void downloadTemplate_doesNotDropWorkItem_whenSiblingWorkItemInSameSegmentHasSampleData() throws Exception {
+        Fixture fixture = seedEngagementWithLnAssignment("03", "LNB0301");
+        AuditWorkItem secondWorkItem = addWorkItemAssignment(fixture, "LN", "LNB0302");
+
+        AuditCmTd1 sample = new AuditCmTd1();
+        sample.setTenantId(tenantId);
+        sample.setEngagementId(fixture.engagement.getId());
+        sample.setAssignedEmployeeId(fixture.worker.id());
+        sample.setBranchCode("CN01");
+        sample.setAuditDate(LocalDate.now());
+        sample.setCustomerCode("KH001");
+        sample.setCustomerName("Nguyen Van Mau");
+        cmTd1Repository.save(sample);
+
+        Map<String, Integer> headerToColumn = new HashMap<>();
+        List<Row> dataRows = downloadAndReadDataRows(fixture, headerToColumn);
+
+        List<String> workItemCodes = dataRows.stream()
+                .map(r -> r.getCell(headerToColumn.get("mã công việc")))
+                .map(c -> c == null || c.getCellType() == org.apache.poi.ss.usermodel.CellType.BLANK ? null : c.getStringCellValue())
+                .toList();
+        // Ca 2 cong viec da phan cong deu phai xuat hien (bare row cho cong viec chua co mau,
+        // du dong mau thuc te khong dien duoc "mã công việc" vi mo ho giua 2 cong viec).
+        assertThat(workItemCodes).contains("LNB0301", "LNB0302");
+        assertThat(dataRows).hasSize(3);
+        assertThat(secondWorkItem.getCode()).isEqualTo("LNB0302");
+    }
+
+    private AuditWorkItem addWorkItemAssignment(Fixture fixture, String segmentCode, String workItemCode) {
+        AuditMasterDataItem segment = masterDataItemRepository
+                .findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT).stream()
+                .filter(s -> segmentCode.equals(s.getCode()))
+                .findFirst().orElseThrow();
+        AuditEngagementGroupMember member = memberRepository.findByTenantIdAndGroupIdIn(tenantId,
+                groupRepository.findByTenantIdAndAuditEngagementIdOrderByGroupCodeAsc(tenantId, fixture.engagement.getId()).stream()
+                        .map(AuditEngagementGroup::getId).toList())
+                .stream().filter(m -> fixture.worker.id().equals(m.getEmployeeId())).findFirst().orElseThrow();
+
+        AuditWorkItem workItem = new AuditWorkItem();
+        workItem.setTenantId(tenantId);
+        workItem.setPhase(AuditWorkPhase.THKT);
+        workItem.setBusinessSegmentId(segment.getId());
+        workItem.setCode(workItemCode);
+        workItem.setName("Kiem tra ho so vay von 2");
+        workItem.setActive(true);
+        workItem = workItemRepository.save(workItem);
+
+        AuditEngagementAssignment assignment = new AuditEngagementAssignment();
+        assignment.setTenantId(tenantId);
+        assignment.setGroupMemberId(member.getId());
+        assignment.setWorkItemId(workItem.getId());
+        assignmentRepository.save(assignment);
+        return workItem;
+    }
+
     private List<Row> downloadAndReadDataRows(Fixture fixture, Map<String, Integer> headerToColumn) throws Exception {
         CurrentUserPrincipal teamLeadPrincipal = new CurrentUserPrincipal(UUID.randomUUID(), "teamlead-af", tenantId,
                 fixture.teamLead.employeeCode(), List.of(), List.of(), UUID.randomUUID().toString());
