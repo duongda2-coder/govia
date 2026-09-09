@@ -1,3 +1,4 @@
+import axios from "axios";
 import type { ApiResponse } from "@govia/ui-kit";
 import { httpClient } from "./client";
 import type { AssignmentApprovalStatus } from "./auditWorkManagement";
@@ -54,11 +55,26 @@ export async function listAuditProgressReportAttachments(reportId: string): Prom
 }
 
 export async function downloadAuditProgressReportAttachment(attachmentId: string, fileName: string): Promise<void> {
-  const res = await httpClient.get(`/api/attachments/${attachmentId}/download`, { responseType: "blob" });
-  const blobUrl = window.URL.createObjectURL(res.data as Blob);
-  const link = document.createElement("a");
-  link.href = blobUrl;
-  link.download = fileName;
-  link.click();
-  window.URL.revokeObjectURL(blobUrl);
+  try {
+    const res = await httpClient.get(`/api/attachments/${attachmentId}/download`, { responseType: "blob" });
+    const blobUrl = window.URL.createObjectURL(res.data as Blob);
+    const link = document.createElement("a");
+    link.href = blobUrl;
+    link.download = fileName;
+    link.click();
+    window.URL.revokeObjectURL(blobUrl);
+  } catch (err) {
+    // responseType "blob" ap dung ca cho response LOI - err.response.data la 1 Blob (chua JSON dang
+    // text) thay vi object da parse, nen getApiErrorMessage() luon fallback ve thong bao chung chung
+    // du backend tra ve message cu the (vd "File dinh kem khong con tren dia..."). Doc lai thanh JSON
+    // truoc khi nem tiep de UI hien dung ly do that su.
+    if (axios.isAxiosError(err) && err.response?.data instanceof Blob) {
+      try {
+        err.response.data = JSON.parse(await err.response.data.text());
+      } catch {
+        // khong parse duoc (vd loi mang tra ve HTML) - giu nguyen blob, getApiErrorMessage fallback binh thuong
+      }
+    }
+    throw err;
+  }
 }

@@ -4,6 +4,7 @@ import type { TableProps } from "antd";
 import { CheckCircleOutlined, DownloadOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
+import { getApiErrorMessage } from "@govia/ui-kit";
 import {
   approveAuditProgressReports,
   downloadAuditProgressReportAttachment,
@@ -39,8 +40,8 @@ export function ProgressReportDrawer({ open, engagementId, engagement, onClose }
     setLoading(true);
     try {
       setItems(await listAuditProgressReports(engagementId));
-    } catch {
-      message.error(t("auditProgressReport.loadError"));
+    } catch (err) {
+      message.error(getApiErrorMessage(err, t("auditProgressReport.loadError")));
     } finally {
       setLoading(false);
     }
@@ -62,8 +63,8 @@ export function ProgressReportDrawer({ open, engagementId, engagement, onClose }
           message.success(t("auditProgressReport.approveSuccess"));
           setSelectedIds([]);
           await load();
-        } catch {
-          message.error(t("auditProgressReport.approveError"));
+        } catch (err) {
+          message.error(getApiErrorMessage(err, t("auditProgressReport.approveError")));
         }
       },
     });
@@ -78,8 +79,8 @@ export function ProgressReportDrawer({ open, engagementId, engagement, onClose }
         return;
       }
       await downloadAuditProgressReportAttachment(attachment.id, attachment.fileName);
-    } catch {
-      message.error(t("auditProgressReport.downloadError"));
+    } catch (err) {
+      message.error(getApiErrorMessage(err, t("auditProgressReport.downloadError")));
     }
   };
 
