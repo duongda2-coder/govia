@@ -20,6 +20,7 @@ import com.govia.audit.planengagement.repository.AuditEngagementGroupMemberRepos
 import com.govia.audit.planengagement.repository.AuditEngagementGroupRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRepository;
 import com.govia.audit.workitem.entity.AuditWorkItem;
+import com.govia.audit.workitem.entity.AuditWorkPhase;
 import com.govia.audit.workitem.repository.AuditWorkItemRepository;
 import com.govia.core.audit.AuditAction;
 import com.govia.core.audit.AuditLogService;
@@ -302,7 +303,12 @@ public class AuditEngagementTeamService {
         if (segmentIds.isEmpty()) {
             return List.of();
         }
-        return workItemRepository.findByTenantIdAndActiveTrueAndBusinessSegmentIdIn(tenantId, segmentIds);
+        // THKT khong nhan cong viec co "chon mau" (duoc xu ly rieng o cac man hinh chon mau CM_TD1/
+        // CM_NTD1-16, khong qua "Quan ly cong viec THKT") - CBKT/DCKT van nhan nhu cu, xem
+        // AuditWorkAssignmentService.list() cho phan loc tuong tu o tang hien thi.
+        return workItemRepository.findByTenantIdAndActiveTrueAndBusinessSegmentIdIn(tenantId, segmentIds).stream()
+                .filter(w -> w.getPhase() != AuditWorkPhase.THKT || !w.isHasSampleSelection())
+                .toList();
     }
 
     private void requireTeamLead(UUID tenantId, AuditEngagement engagement, String actorEmployeeCode) {

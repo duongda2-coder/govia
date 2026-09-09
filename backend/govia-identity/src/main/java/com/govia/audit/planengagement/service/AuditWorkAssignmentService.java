@@ -125,7 +125,12 @@ public class AuditWorkAssignmentService {
         return assignments.stream()
                 .filter(a -> {
                     AuditWorkItem workItem = workItems.get(a.getWorkItemId());
-                    return workItem != null && workItem.getPhase() == phase;
+                    if (workItem == null || workItem.getPhase() != phase) {
+                        return false;
+                    }
+                    // THKT khong lay cong viec co "chon mau" (workflow chon mau rieng o cac man hinh
+                    // CM_TD1/CM_NTD1-16 xu ly, khong qua "Quan ly cong viec THKT") - CBKT/DCKT khong doi.
+                    return phase != AuditWorkPhase.THKT || !workItem.isHasSampleSelection();
                 })
                 .map(a -> toResponse(a, engagement, membersById.get(a.getGroupMemberId()), workItems, segments, employees, usernames))
                 .toList();
