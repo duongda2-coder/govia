@@ -29,6 +29,7 @@ import com.govia.audit.processstep.repository.AuditProcessStepSummaryRepository;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
 import com.govia.audit.workitem.entity.AuditWorkItem;
+import com.govia.audit.workitem.entity.AuditWorkPhase;
 import com.govia.audit.workitem.repository.AuditWorkItemRepository;
 import com.govia.core.export.ExcelExportService;
 import com.govia.core.export.ExcelImportService;
@@ -292,6 +293,10 @@ public class AuditTtssService {
         }
 
         List<Map<String, Object>> rows = new ArrayList<>();
+        // Nhung cap (nhan vien, nghiep vu) DA co it nhat 1 dong tu du lieu "chon mau" thuc te ben
+        // duoi - dung o vong lap thu 2 de KHONG them dong "trong" trung lap cho nghiep vu da duoc
+        // dai dien day du boi du lieu mau that (xem ghi chu o vong lap thu 2).
+        Set<String> employeeSegmentsWithSampleData = new HashSet<>();
         for (String segmentCode : sampleSelectionResolver.supportedSegmentCodes()) {
             for (AuditTtssSampleSelectionResolver.SampleFields fields : sampleSelectionResolver.candidatesFor(tenantId, engagementId, segmentCode)) {
                 if (!visibility.canSee(fields.assignedEmployeeId())) {
@@ -305,7 +310,42 @@ public class AuditTtssService {
                 row.put("workItemCode", uniqueWorkItemCode(workItemCodesByEmployeeSegment, fields.assignedEmployeeId(), segmentCode));
                 applySampleFields(row, fields);
                 rows.add(row);
+                if (fields.assignedEmployeeId() != null) {
+                    employeeSegmentsWithSampleData.add(fields.assignedEmployeeId() + "|" + segmentCode);
+                }
             }
+        }
+
+        // "Cộng với TẤT CẢ các công việc được phân công ở phần Quản lý công việc THKT, bỏ điều
+        // kiện cột có chọn mẫu bằng 'không' (lấy tất)" - yeu cau nguoi dung 2026-09-09. Vong lap
+        // tren chi xuat duoc nghiep vu DA CO du lieu "chon mau" thuc te (candidatesFor()) - nhung
+        // duoc phan cong 1 cong viec THKT khong dam bao nghiep vu do da co du lieu chon mau (cong
+        // viec hasSampleSelection=false thi KHONG BAO GIO co du lieu o 16 bang chon mau, nen se
+        // vinh vien khong xuat hien o vong lap tren) - phai them 1 dong rieng cho MOI cong viec
+        // THKT da phan cong (bat ke hasSampleSelection) CHI cho (nhan vien, nghiep vu) nao CHUA
+        // duoc dai dien boi du lieu mau that o tren, tranh tao dong "trong" trung lap khi nghiep
+        // vu do da co du lieu day du (bug da gap: tai khoan duoc phan cong 3 nghiep vu nhung xuat
+        // mau chi thay dung 1 nghiep vu da co du lieu chon mau, 2 nghiep vu con lai bien mat).
+        for (AuditEngagementAssignment assignment : assignments) {
+            AuditEngagementGroupMember member = membersById.get(assignment.getGroupMemberId());
+            AuditWorkItem workItem = workItems.get(assignment.getWorkItemId());
+            if (member == null || workItem == null || workItem.getPhase() != AuditWorkPhase.THKT) {
+                continue;
+            }
+            if (!visibility.canSee(member.getEmployeeId())) {
+                continue;
+            }
+            AuditMasterDataItem segment = segments.get(workItem.getBusinessSegmentId());
+            if (segment != null && employeeSegmentsWithSampleData.contains(member.getEmployeeId() + "|" + segment.getCode())) {
+                continue;
+            }
+            Map<String, Object> row = new HashMap<>();
+            row.put("stt", rows.size() + 1);
+            row.put("engagementCode", engagement.getCode());
+            row.put("auditObjectUnitCode", unit == null ? null : unit.getCode());
+            row.put("businessSegmentCode", segment == null ? null : segment.getCode());
+            row.put("workItemCode", workItem.getCode());
+            rows.add(row);
         }
         return excelExportService.export("audit_ttss_template", templateColumns(), rows);
     }
