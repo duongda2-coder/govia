@@ -25,6 +25,7 @@ interface FormValues {
   teamLeadEmployeeId: string;
   decisionNumber: string;
   name?: string;
+  workSetCode?: string;
 }
 
 export interface AuditProcessEngagementFormProps {
@@ -61,6 +62,7 @@ export function AuditProcessEngagementForm(props: AuditProcessEngagementFormProp
         teamLeadEmployeeId: engagement.teamLeadEmployeeId,
         decisionNumber: engagement.decisionNumber,
         name: engagement.name ?? undefined,
+        workSetCode: engagement.workSetCode ?? undefined,
       });
     } else {
       form.resetFields();
@@ -86,6 +88,7 @@ export function AuditProcessEngagementForm(props: AuditProcessEngagementFormProp
         teamLeadEmployeeId: values.teamLeadEmployeeId,
         decisionNumber: values.decisionNumber,
         name: values.name ?? null,
+        workSetCode: values.workSetCode ?? null,
       };
       let saved: AuditProcessEngagementItem;
       if (engagement) {
@@ -199,7 +202,12 @@ export function AuditProcessEngagementForm(props: AuditProcessEngagementFormProp
               <Input maxLength={50} />
             </Form.Item>
           </Col>
-          <Col span={16}>
+          <Col span={8}>
+            <Form.Item name="workSetCode" label={t("auditProcessEngagement.columns.workSetCode")}>
+              <Input maxLength={50} />
+            </Form.Item>
+          </Col>
+          <Col span={8}>
             <Form.Item name="name" label={t("auditProcessEngagement.columns.name")}>
               <Input maxLength={255} />
             </Form.Item>

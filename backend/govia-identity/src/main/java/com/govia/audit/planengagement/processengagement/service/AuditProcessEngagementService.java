@@ -177,7 +177,7 @@ public class AuditProcessEngagementService {
 
                 AuditProcessEngagementRequest request = new AuditProcessEngagementRequest(
                         segment.getId(), parseInt(row.get("year")), parseInt(row.get("expectedMonth")), parseDate(row.get("decisionDate")),
-                        lead.getId(), row.get("decisionNumber"), emptyToNull(row.get("name")));
+                        lead.getId(), row.get("decisionNumber"), emptyToNull(row.get("name")), emptyToNull(row.get("workSetCode")));
                 create(request);
                 success++;
             } catch (Exception e) {
@@ -210,6 +210,7 @@ public class AuditProcessEngagementService {
         item.setTeamLeadEmployeeId(request.teamLeadEmployeeId());
         item.setDecisionNumber(request.decisionNumber());
         item.setName(request.name());
+        item.setWorkSetCode(request.workSetCode());
     }
 
     private AuditProcessEngagement getOwnedOrThrow(UUID tenantId, UUID id) {
@@ -251,7 +252,8 @@ public class AuditProcessEngagementService {
                 new ExportColumn("teamLeadEmployeeCode", "Mã trưởng đoàn"),
                 new ExportColumn("teamLeadEmployeeName", "Trưởng đoàn"),
                 new ExportColumn("decisionNumber", "Số QĐ kiểm toán"),
-                new ExportColumn("name", "Tên đợt kiểm toán"));
+                new ExportColumn("name", "Tên đợt kiểm toán"),
+                new ExportColumn("workSetCode", "Mã bộ công việc"));
     }
 
     private List<Map<String, Object>> exportRows() {
@@ -273,6 +275,7 @@ public class AuditProcessEngagementService {
             row.put("teamLeadEmployeeName", lead == null ? null : lead.getFullName());
             row.put("decisionNumber", item.getDecisionNumber());
             row.put("name", item.getName());
+            row.put("workSetCode", item.getWorkSetCode());
             return row;
         }).toList();
     }
@@ -284,7 +287,7 @@ public class AuditProcessEngagementService {
                 segment == null ? null : segment.getCode(), segment == null ? null : segment.getName(),
                 item.getYear(), item.getExpectedMonth(), item.getDecisionDate(), item.getTeamLeadEmployeeId(),
                 lead == null ? null : lead.getEmployeeCode(), lead == null ? null : lead.getFullName(),
-                item.getDecisionNumber(), item.getName());
+                item.getDecisionNumber(), item.getName(), item.getWorkSetCode());
     }
 
     private boolean isBlank(String value) {

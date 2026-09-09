@@ -15,6 +15,7 @@ export interface AuditProcessEngagementItem {
   teamLeadEmployeeName: string | null;
   decisionNumber: string;
   name: string | null;
+  workSetCode: string | null;
 }
 
 export interface AuditProcessEngagementRequest {
@@ -25,6 +26,7 @@ export interface AuditProcessEngagementRequest {
   teamLeadEmployeeId: string;
   decisionNumber: string;
   name?: string | null;
+  workSetCode?: string | null;
 }
 
 export interface TeamLeadOption {

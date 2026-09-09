@@ -1,0 +1,12 @@
+databaseChangeLog:
+
+  # ===================== "Tao CKT quy trinh": them cot "Ma bo cong viec" =====================
+  - changeSet:
+      id: 140-1-audit-process-engagement-add-work-set-code
+      author: govia
+      comment: "Them cot work_set_code vao audit_process_engagement"
+      changes:
+        - addColumn:
+            tableName: audit_process_engagement
+            columns:
+              - column: { name: work_set_code, type: VARCHAR(50) }

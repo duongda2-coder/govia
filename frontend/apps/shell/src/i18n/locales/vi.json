@@ -1084,7 +1084,8 @@
       "expectedMonth": "Tháng dự kiến",
       "decisionDate": "Ngày QĐKT",
       "teamLeadEmployee": "Trưởng đoàn",
-      "decisionNumber": "Số QĐ kiểm toán"
+      "decisionNumber": "Số QĐ kiểm toán",
+      "workSetCode": "Mã bộ công việc"
     },
     "deleteConfirmTitle": "Xóa cuộc kiểm toán này?",
     "form": {

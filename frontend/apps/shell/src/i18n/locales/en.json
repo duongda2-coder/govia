@@ -1084,7 +1084,8 @@
       "expectedMonth": "Expected Month",
       "decisionDate": "Decision Date",
       "teamLeadEmployee": "Team Lead",
-      "decisionNumber": "Decision Number"
+      "decisionNumber": "Decision Number",
+      "workSetCode": "Work Set Code"
     },
     "deleteConfirmTitle": "Delete this audit engagement?",
     "form": {

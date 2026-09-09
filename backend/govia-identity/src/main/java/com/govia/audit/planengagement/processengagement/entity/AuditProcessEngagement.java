@@ -47,4 +47,7 @@ public class AuditProcessEngagement extends BaseEntity {
 
     @Column(name = "name", length = 255)
     private String name;
+
+    @Column(name = "work_set_code", length = 50)
+    private String workSetCode;
 }

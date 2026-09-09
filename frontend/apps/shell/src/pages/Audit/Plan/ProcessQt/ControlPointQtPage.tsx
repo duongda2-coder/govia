@@ -12,9 +12,8 @@ import {
   updateAuditControlPointQt,
   type AuditControlPointQtItem,
   type AuditControlPointQtRequest,
-  type AuditControlType,
-  type AuditLevel,
 } from "../../../../api/auditControlPointQt";
+import type { AuditControlType, AuditLevel } from "../../../../api/auditControlPoint";
 import { listMasterDataItems, type MasterDataItem } from "../../../../api/auditMasterData";
 import { useAuth } from "../../../../auth/AuthContext";
 

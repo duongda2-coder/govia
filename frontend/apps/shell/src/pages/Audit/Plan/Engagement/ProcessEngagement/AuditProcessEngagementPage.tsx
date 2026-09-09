@@ -138,6 +138,7 @@ export function AuditProcessEngagementPage() {
     { title: t("auditProcessEngagement.columns.expectedMonth"), dataIndex: "expectedMonth", width: 130, sorter: (a, b) => a.expectedMonth - b.expectedMonth },
     { title: t("auditProcessEngagement.columns.decisionDate"), width: 120, ...getSearchColumnProps("decisionDate", searchLabels) },
     { title: t("auditProcessEngagement.columns.decisionNumber"), width: 150, ...getSearchColumnProps("decisionNumber", searchLabels) },
+    { title: t("auditProcessEngagement.columns.workSetCode"), width: 150, ...getSearchColumnProps("workSetCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditProcessEngagement.columns.teamLeadEmployee"), ...getSearchColumnProps("teamLeadEmployeeName", searchLabels), render: (v: string | null) => v ?? "-" },
   ];
 

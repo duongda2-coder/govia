@@ -15,6 +15,7 @@ public record AuditProcessEngagementRequest(
         @NotNull LocalDate decisionDate,
         @NotNull UUID teamLeadEmployeeId,
         @NotBlank @Size(max = 50) String decisionNumber,
-        @Size(max = 255) String name
+        @Size(max = 255) String name,
+        @Size(max = 50) String workSetCode
 ) {
 }

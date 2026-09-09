@@ -16,6 +16,7 @@ public record AuditProcessEngagementResponse(
         String teamLeadEmployeeCode,
         String teamLeadEmployeeName,
         String decisionNumber,
-        String name
+        String name,
+        String workSetCode
 ) {
 }
