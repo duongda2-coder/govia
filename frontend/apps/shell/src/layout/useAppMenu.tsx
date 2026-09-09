@@ -38,6 +38,12 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-plan-md-process-step-summary": "/audit/plan/master-data/process-step-summary",
   "audit-plan-md-process-step-detail": "/audit/plan/master-data/process-step-detail",
   "audit-plan-md-exception-mapping": "/audit/plan/master-data/exception-mapping",
+  "audit-plan-md-qt-work-item": "/audit/plan/master-data-qt/work-item",
+  "audit-plan-md-qt-exception-type": "/audit/plan/master-data-qt/exception-type",
+  "audit-plan-md-qt-control-point": "/audit/plan/master-data-qt/control-point",
+  "audit-plan-md-qt-process-step-summary": "/audit/plan/master-data-qt/process-step-summary",
+  "audit-plan-md-qt-process-step-detail": "/audit/plan/master-data-qt/process-step-detail",
+  "audit-plan-md-qt-exception-mapping": "/audit/plan/master-data-qt/exception-mapping",
   "audit-plan-engagement-index": "/audit/plan/engagement",
   "audit-plan-engagement-monitoring-index": "/audit/plan/engagement/monitoring",
   "audit-plan-engagement-process-index": "/audit/plan/engagement/process",
@@ -147,6 +153,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
   const auditGroupLabel = t("menu.audit");
   const auditMdGroupLabel = `${auditGroupLabel} / ${t("menu.auditMasterData")}`;
   const auditPlanMdGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanMasterData")}`;
+  const auditPlanMdQtGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanMasterDataQt")}`;
   const auditPlanEngagementGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanEngagement")}`;
   const auditPlanExecGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanExecution")}`;
   const auditRsGroupLabel = `${auditGroupLabel} / ${t("menu.riskScoring")} / ${t("menu.riskScoringMasterData")}`;
@@ -226,6 +233,24 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
             leaf("audit-plan-md-process-step-detail", t("menu.auditPlanMdProcessStepDetail"), auditPlanMdGroupLabel),
             leaf("audit-plan-md-exception-mapping", t("menu.auditPlanMdExceptionMapping"), auditPlanMdGroupLabel),
           ],
+        },
+        {
+          key: "audit-plan-master-data-qt",
+          label: menuLabel(t("menu.auditPlanMasterDataQt")),
+          children: dropNulls([
+            hasPermission("AUDIT.WORK_ITEM_QT.VIEW") &&
+              leaf("audit-plan-md-qt-work-item", t("menu.auditPlanMdQtWorkItem"), auditPlanMdQtGroupLabel),
+            hasPermission("AUDIT.EXCEPTION_TYPE_QT.VIEW") &&
+              leaf("audit-plan-md-qt-exception-type", t("menu.auditPlanMdQtExceptionType"), auditPlanMdQtGroupLabel),
+            hasPermission("AUDIT.CONTROL_POINT_QT.VIEW") &&
+              leaf("audit-plan-md-qt-control-point", t("menu.auditPlanMdQtControlPoint"), auditPlanMdQtGroupLabel),
+            hasPermission("AUDIT.PROCESS_STEP_SUMMARY_QT.VIEW") &&
+              leaf("audit-plan-md-qt-process-step-summary", t("menu.auditPlanMdQtProcessStepSummary"), auditPlanMdQtGroupLabel),
+            hasPermission("AUDIT.PROCESS_STEP_DETAIL_QT.VIEW") &&
+              leaf("audit-plan-md-qt-process-step-detail", t("menu.auditPlanMdQtProcessStepDetail"), auditPlanMdQtGroupLabel),
+            hasPermission("AUDIT.EXCEPTION_MAPPING_QT.VIEW") &&
+              leaf("audit-plan-md-qt-exception-mapping", t("menu.auditPlanMdQtExceptionMapping"), auditPlanMdQtGroupLabel),
+          ]),
         },
         (canViewAuditPlanEngagement || canViewAuditPlanEngagementProcess || canViewAuditStatistics) && {
           key: "audit-plan-engagement",

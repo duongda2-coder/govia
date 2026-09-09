@@ -52,6 +52,13 @@
     "auditPlanMdProcessStepSummary": "Process Step Summary",
     "auditPlanMdProcessStepDetail": "Process Step Detail",
     "auditPlanMdExceptionMapping": "Exception Mapping",
+    "auditPlanMasterDataQt": "Process Audit Master Data",
+    "auditPlanMdQtWorkItem": "Process Audit Work Item",
+    "auditPlanMdQtExceptionType": "Process Audit Exception Type",
+    "auditPlanMdQtControlPoint": "Process Audit Control Point",
+    "auditPlanMdQtProcessStepSummary": "Process Step Summary (Process Audit)",
+    "auditPlanMdQtProcessStepDetail": "Process Step Detail (Process Audit)",
+    "auditPlanMdQtExceptionMapping": "Process Exception Mapping",
     "auditPlanEngagement": "Engagement Planning",
     "auditPlanEngagementIndex": "Create & Manage Audit Engagements",
     "auditPlanEngagementMonitoringIndex": "Audit Engagement Monitoring",
@@ -174,7 +181,10 @@
     "module": "Module",
     "noPermission": "You do not have permission to access this screen. Contact your administrator to be granted access.",
     "deleteConfirmTitleCount": "Delete {{count}} selected items?",
-    "actions": "Actions"
+    "actions": "Actions",
+    "selectYear": "Select year",
+    "processButton": "Process",
+    "backToStandard": "Back to standard catalog"
   },
   "attachment": {
     "upload": "Upload attachment",
@@ -801,6 +811,155 @@
       "editTitle": "Edit Work Item"
     },
     "deleteConfirmTitle": "Delete this work item?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditWorkItemQt": {
+    "title": "Process Audit Work Item Code Catalog",
+    "columns": {
+      "phase": "Phase",
+      "businessSegment": "Business Segment",
+      "code": "Work Item Code",
+      "detailCode": "Detail Code",
+      "name": "Work Item Name",
+      "applicableYear": "Year",
+      "workSetCode": "Work Set Code",
+      "workType": "Work Type"
+    },
+    "form": {
+      "createTitle": "Add Process Work Item",
+      "editTitle": "Edit Process Work Item"
+    },
+    "deleteConfirmTitle": "Delete this process work item?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditExceptionTypeQt": {
+    "title": "Process Audit Exception Type Catalog",
+    "columns": {
+      "businessSegment": "Business Segment",
+      "code": "Exception Code",
+      "name": "Exception Name",
+      "category": "Category",
+      "impactLevel": "Impact Level",
+      "classificationBasis": "Classification Basis"
+    },
+    "form": {
+      "createTitle": "Add Process Exception Type",
+      "editTitle": "Edit Process Exception Type"
+    },
+    "deleteConfirmTitle": "Delete this process exception type?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditControlPointQt": {
+    "title": "Process Audit Control Point Catalog",
+    "columns": {
+      "code": "Control Point Code",
+      "name": "Control Point Name",
+      "businessSegment": "Business Segment",
+      "possibleRisk": "Possible Risk",
+      "controlPointByStep": "Control Point by Process Step",
+      "actualControl": "Actual Control at Unit",
+      "controlType": "Control Type",
+      "controlFrequency": "Control Frequency",
+      "auditProcedure": "Audit Procedure",
+      "residualRiskAssessment": "Residual Risk Assessment",
+      "processRegulation": "Process/Regulation Used",
+      "referenceClause": "Reference Clause",
+      "processEffectiveness": "Process Effectiveness",
+      "controlEffectivenessAssessment": "Control Effectiveness Assessment",
+      "controlEfficiencyAssessment": "Control Efficiency Assessment"
+    },
+    "form": {
+      "createTitle": "Add Process Control Point",
+      "editTitle": "Edit Process Control Point"
+    },
+    "deleteConfirmTitle": "Delete this process control point?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditProcessStepSummaryQt": {
+    "title": "Process Step Summary Catalog",
+    "columns": {
+      "businessSegment": "Business Segment",
+      "code": "Process Step Summary Code",
+      "name": "Process Step Summary Name",
+      "workItem": "Work Item Code"
+    },
+    "form": {
+      "createTitle": "Add Process Step Summary",
+      "editTitle": "Edit Process Step Summary"
+    },
+    "deleteConfirmTitle": "Delete this process step summary?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditProcessStepDetailQt": {
+    "title": "Process Step Detail Catalog",
+    "columns": {
+      "businessSegment": "Business Segment",
+      "processStepSummary": "Process Step Summary",
+      "controlPoint": "Control Point",
+      "code": "Process Step Detail Code"
+    },
+    "form": {
+      "createTitle": "Add Process Step Detail",
+      "editTitle": "Edit Process Step Detail"
+    },
+    "deleteConfirmTitle": "Delete this process step detail?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditExceptionMappingQt": {
+    "title": "Process Exception Mapping Catalog",
+    "columns": {
+      "businessSegment": "Business Segment Code",
+      "processStepDetail": "Process Step Detail Code",
+      "exceptionTypeCode": "Exception Code",
+      "exceptionTypeName": "Exception Name"
+    },
+    "form": {
+      "createTitle": "Add Process Exception Mapping",
+      "editTitle": "Edit Process Exception Mapping"
+    },
+    "deleteConfirmTitle": "Delete this process exception mapping?",
     "messages": {
       "loadError": "Failed to load data",
       "createSuccess": "Created",

@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Danh muc Buoc quy trinh tong hop (quy trinh) =====================
+  - changeSet:
+      id: 135-1-permission-catalog-audit-process-step-summary-qt
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1a2b3c4d-0004-4004-8004-000000000001" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY_QT.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc buoc quy trinh tong hop (quy trinh)" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp (quy trình)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1a2b3c4d-0004-4004-8004-000000000002" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY_QT.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi danh muc buoc quy trinh tong hop (quy trinh)" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp (quy trình)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1a2b3c4d-0004-4004-8004-000000000003" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY_QT.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua danh muc buoc quy trinh tong hop (quy trinh)" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp (quy trình)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1a2b3c4d-0004-4004-8004-000000000004" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY_QT.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa danh muc buoc quy trinh tong hop (quy trinh)" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp (quy trình)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1a2b3c4d-0004-4004-8004-000000000005" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY_QT.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat du lieu danh muc buoc quy trinh tong hop (quy trinh)" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp (quy trình)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1a2b3c4d-0004-4004-8004-000000000006" }
+              - column: { name: code, value: "AUDIT.PROCESS_STEP_SUMMARY_QT.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import du lieu danh muc buoc quy trinh tong hop (quy trinh)" }
+              - column: { name: resource_label, value: "Bước quy trình tổng hợp (quy trình)" }

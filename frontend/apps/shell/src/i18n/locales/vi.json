@@ -52,6 +52,13 @@
     "auditPlanMdProcessStepSummary": "Bước quy trình tổng hợp",
     "auditPlanMdProcessStepDetail": "Bước quy trình chi tiết",
     "auditPlanMdExceptionMapping": "Mapping tồn tại sai sót",
+    "auditPlanMasterDataQt": "Danh mục Kiểm toán quy trình",
+    "auditPlanMdQtWorkItem": "Công việc kiểm toán quy trình",
+    "auditPlanMdQtExceptionType": "Tồn tại sai sót quy trình",
+    "auditPlanMdQtControlPoint": "Chốt kiểm soát quy trình",
+    "auditPlanMdQtProcessStepSummary": "Bước quy trình tổng hợp (QT)",
+    "auditPlanMdQtProcessStepDetail": "Bước quy trình chi tiết (QT)",
+    "auditPlanMdQtExceptionMapping": "Mapping tồn tại sai sót quy trình",
     "auditPlanEngagement": "Lập kế hoạch",
     "auditPlanEngagementIndex": "Khởi tạo & Quản lý cuộc kiểm toán",
     "auditPlanEngagementMonitoringIndex": "Quản lý đợt kiểm toán",
@@ -174,7 +181,10 @@
     "module": "Module",
     "noPermission": "Bạn không có quyền truy cập màn hình này. Liên hệ quản trị viên để được cấp quyền.",
     "deleteConfirmTitleCount": "Xóa {{count}} mục đã chọn?",
-    "actions": "Thao tác"
+    "actions": "Thao tác",
+    "selectYear": "Chọn năm",
+    "processButton": "Quy trình",
+    "backToStandard": "Về danh mục chuẩn"
   },
   "attachment": {
     "upload": "Tải lên tệp đính kèm",
@@ -801,6 +811,155 @@
       "editTitle": "Sửa công việc kiểm toán"
     },
     "deleteConfirmTitle": "Xóa công việc kiểm toán này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditWorkItemQt": {
+    "title": "Danh mục Bảng mã công việc quy trình",
+    "columns": {
+      "phase": "Giai đoạn",
+      "businessSegment": "Mảng nghiệp vụ",
+      "code": "Mã công việc",
+      "detailCode": "Mã chi tiết",
+      "name": "Tên công việc",
+      "applicableYear": "Năm",
+      "workSetCode": "Mã bộ công việc",
+      "workType": "Loại CV"
+    },
+    "form": {
+      "createTitle": "Thêm công việc quy trình",
+      "editTitle": "Sửa công việc quy trình"
+    },
+    "deleteConfirmTitle": "Xóa công việc quy trình này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditExceptionTypeQt": {
+    "title": "Danh mục Tồn tại sai sót quy trình",
+    "columns": {
+      "businessSegment": "Mảng nghiệp vụ",
+      "code": "Mã phát hiện",
+      "name": "Tên phát hiện",
+      "category": "Loại phát hiện",
+      "impactLevel": "Mức độ ảnh hưởng",
+      "classificationBasis": "Căn cứ phân loại"
+    },
+    "form": {
+      "createTitle": "Thêm tồn tại sai sót quy trình",
+      "editTitle": "Sửa tồn tại sai sót quy trình"
+    },
+    "deleteConfirmTitle": "Xóa tồn tại sai sót quy trình này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditControlPointQt": {
+    "title": "Danh mục Chốt kiểm soát quy trình",
+    "columns": {
+      "code": "Mã CKS",
+      "name": "Tên CKS",
+      "businessSegment": "Mảng nghiệp vụ",
+      "possibleRisk": "Rủi ro có thể xảy ra",
+      "controlPointByStep": "Chốt kiểm soát theo bước quy trình",
+      "actualControl": "Kiểm soát thực tế tại đơn vị",
+      "controlType": "Loại hình KS",
+      "controlFrequency": "Tần suất kiểm soát",
+      "auditProcedure": "Thủ tục kiểm toán",
+      "residualRiskAssessment": "Đánh giá rủi ro còn lại",
+      "processRegulation": "Quy trình, Quy định sử dụng",
+      "referenceClause": "Điều khoản tham chiếu",
+      "processEffectiveness": "Hiệu lực quy trình",
+      "controlEffectivenessAssessment": "Đánh giá hiệu lực chốt KS",
+      "controlEfficiencyAssessment": "Đánh giá hiệu quả chốt KS"
+    },
+    "form": {
+      "createTitle": "Thêm chốt kiểm soát quy trình",
+      "editTitle": "Sửa chốt kiểm soát quy trình"
+    },
+    "deleteConfirmTitle": "Xóa chốt kiểm soát quy trình này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditProcessStepSummaryQt": {
+    "title": "Danh mục Bước quy trình tổng hợp",
+    "columns": {
+      "businessSegment": "Mảng nghiệp vụ",
+      "code": "Mã bước quy trình tổng hợp",
+      "name": "Tên bước quy trình tổng hợp",
+      "workItem": "Mã công việc"
+    },
+    "form": {
+      "createTitle": "Thêm bước quy trình tổng hợp",
+      "editTitle": "Sửa bước quy trình tổng hợp"
+    },
+    "deleteConfirmTitle": "Xóa bước quy trình tổng hợp này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditProcessStepDetailQt": {
+    "title": "Danh mục Bước quy trình chi tiết",
+    "columns": {
+      "businessSegment": "Mảng nghiệp vụ",
+      "processStepSummary": "Bước quy trình tổng hợp",
+      "controlPoint": "Chốt kiểm soát",
+      "code": "Mã BQT chi tiết"
+    },
+    "form": {
+      "createTitle": "Thêm bước quy trình chi tiết",
+      "editTitle": "Sửa bước quy trình chi tiết"
+    },
+    "deleteConfirmTitle": "Xóa bước quy trình chi tiết này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditExceptionMappingQt": {
+    "title": "Danh mục Mapping tồn tại sai sót quy trình",
+    "columns": {
+      "businessSegment": "Mã mảng nv",
+      "processStepDetail": "Mã BQT_CT",
+      "exceptionTypeCode": "Mã TTSS",
+      "exceptionTypeName": "Tên TTSS"
+    },
+    "form": {
+      "createTitle": "Thêm mapping tồn tại sai sót quy trình",
+      "editTitle": "Sửa mapping tồn tại sai sót quy trình"
+    },
+    "deleteConfirmTitle": "Xóa mapping tồn tại sai sót quy trình này?",
     "messages": {
       "loadError": "Không tải được dữ liệu",
       "createSuccess": "Đã tạo",

@@ -1,0 +1,51 @@
+databaseChangeLog:
+
+  # ===================== Danh muc "Buoc quy trinh chi tiet" (sheet ZTC_BQT_MAP_QT) =====================
+  - changeSet:
+      id: 136-1-audit-plan-process-step-detail-qt-schema
+      author: govia
+      comment: "Tao bang audit_process_step_detail_qt"
+      changes:
+        - createTable:
+            tableName: audit_process_step_detail_qt
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: process_step_summary_id, type: UUID }
+              - column: { name: control_point_id, type: UUID }
+              - column: { name: code, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_process_step_detail_qt
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_psdq_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_process_step_detail_qt
+            baseColumnNames: business_segment_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_psdq_business_segment
+        - addForeignKeyConstraint:
+            baseTableName: audit_process_step_detail_qt
+            baseColumnNames: process_step_summary_id
+            referencedTableName: audit_process_step_summary_qt
+            referencedColumnNames: id
+            constraintName: fk_audit_psdq_process_step_summary
+        - addForeignKeyConstraint:
+            baseTableName: audit_process_step_detail_qt
+            baseColumnNames: control_point_id
+            referencedTableName: audit_control_point_qt
+            referencedColumnNames: id
+            constraintName: fk_audit_psdq_control_point
+        - addUniqueConstraint:
+            tableName: audit_process_step_detail_qt
+            columnNames: tenant_id, code
+            constraintName: uk_audit_psdq_tenant_code

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Col, Form, Input, InputNumber, Modal, Result, Row, Select, Switch, Typography } from "antd";
+import { App, Button, Col, Form, Input, InputNumber, Modal, Result, Row, Select, Switch, Typography } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { CrudTable, useClientSearchColumn, useScreenLock } from "@govia/ui-kit";
 import {
   createAuditWorkItem,
@@ -40,6 +41,7 @@ export function WorkItemPage() {
   const { t } = useTranslation();
   const { message, modal } = App.useApp();
   const { hasPermission, user } = useAuth();
+  const navigate = useNavigate();
   const lock = useScreenLock(SCREEN_KEY, httpClient, user?.userId);
   const canView = hasPermission("AUDIT.WORK_ITEM.VIEW");
   const canCreate = hasPermission("AUDIT.WORK_ITEM.CREATE");
@@ -212,7 +214,14 @@ export function WorkItemPage() {
 
   return (
     <div>
-      <Typography.Title level={4}>{t("auditWorkItem.title")}</Typography.Title>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Typography.Title level={4} style={{ margin: 0 }}>
+          {t("auditWorkItem.title")}
+        </Typography.Title>
+        <Button danger onClick={() => navigate("/audit/plan/master-data-qt/work-item")}>
+          {t("common.processButton")}
+        </Button>
+      </div>
       <CrudTable<AuditWorkItemItem>
         tableId={SCREEN_KEY}
         screenLock={{ screenKey: SCREEN_KEY, httpClient, currentUserId: user?.userId }}

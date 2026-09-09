@@ -19,6 +19,12 @@ import { ControlPointPage } from "./pages/Audit/ControlPoint/ControlPointPage";
 import { EmployeeCapabilityPage } from "./pages/Audit/EmployeeCapability/EmployeeCapabilityPage";
 import { AppendixPage } from "./pages/Audit/Appendix/AppendixPage";
 import { WorkItemPage } from "./pages/Audit/Plan/WorkItemPage";
+import { WorkItemQtPage } from "./pages/Audit/Plan/ProcessQt/WorkItemQtPage";
+import { ExceptionTypeQtPage } from "./pages/Audit/Plan/ProcessQt/ExceptionTypeQtPage";
+import { ControlPointQtPage } from "./pages/Audit/Plan/ProcessQt/ControlPointQtPage";
+import { ProcessStepSummaryQtPage } from "./pages/Audit/Plan/ProcessQt/ProcessStepSummaryQtPage";
+import { ProcessStepDetailQtPage } from "./pages/Audit/Plan/ProcessQt/ProcessStepDetailQtPage";
+import { ExceptionMappingQtPage } from "./pages/Audit/Plan/ProcessQt/ExceptionMappingQtPage";
 import { BranchStaffPage } from "./pages/Audit/Plan/BranchStaffPage";
 import { ExceptionTypePage } from "./pages/Audit/Plan/ExceptionTypePage";
 import { ProcessStepSummaryPage } from "./pages/Audit/Plan/ProcessStepSummaryPage";
@@ -120,6 +126,12 @@ function App() {
           <Route path="audit/plan/master-data/process-step-summary" element={<ProcessStepSummaryPage />} />
           <Route path="audit/plan/master-data/process-step-detail" element={<ProcessStepDetailPage />} />
           <Route path="audit/plan/master-data/exception-mapping" element={<ExceptionMappingPage />} />
+          <Route path="audit/plan/master-data-qt/work-item" element={<WorkItemQtPage />} />
+          <Route path="audit/plan/master-data-qt/exception-type" element={<ExceptionTypeQtPage />} />
+          <Route path="audit/plan/master-data-qt/control-point" element={<ControlPointQtPage />} />
+          <Route path="audit/plan/master-data-qt/process-step-summary" element={<ProcessStepSummaryQtPage />} />
+          <Route path="audit/plan/master-data-qt/process-step-detail" element={<ProcessStepDetailQtPage />} />
+          <Route path="audit/plan/master-data-qt/exception-mapping" element={<ExceptionMappingQtPage />} />
           <Route path="audit/plan/engagement" element={<AuditEngagementPage />} />
           <Route path="audit/plan/engagement/monitoring" element={<AuditEngagementMonitoringPage />} />
           <Route path="audit/plan/engagement/process" element={<AuditProcessEngagementPage />} />

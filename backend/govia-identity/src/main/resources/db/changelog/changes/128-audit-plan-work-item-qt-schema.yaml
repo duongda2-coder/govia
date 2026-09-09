@@ -1,0 +1,43 @@
+databaseChangeLog:
+
+  # ===================== Danh muc "Bang ma cong viec quy trinh" (sheet ZTC_CV_QT) =====================
+  - changeSet:
+      id: 128-1-audit-plan-work-item-qt-schema
+      author: govia
+      comment: "Tao bang audit_work_item_qt"
+      changes:
+        - createTable:
+            tableName: audit_work_item_qt
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: phase, type: VARCHAR(20) }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: detail_code, type: VARCHAR(20) }
+              - column: { name: name, type: VARCHAR(1000), constraints: { nullable: false } }
+              - column: { name: applicable_year, type: INT }
+              - column: { name: work_set_code, type: VARCHAR(50) }
+              - column: { name: work_type, type: VARCHAR(20) }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_work_item_qt
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_wiq_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_work_item_qt
+            baseColumnNames: business_segment_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_wiq_business_segment
+        - addUniqueConstraint:
+            tableName: audit_work_item_qt
+            columnNames: tenant_id, code
+            constraintName: uk_audit_wiq_tenant_code

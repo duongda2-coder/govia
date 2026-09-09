@@ -365,3 +365,39 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/127-audit-statistics-permission-catalog.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/128-audit-plan-work-item-qt-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/129-audit-plan-work-item-qt-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/130-audit-plan-exception-type-qt-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/131-audit-plan-exception-type-qt-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/132-audit-control-point-qt-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/133-audit-control-point-qt-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/134-audit-plan-process-step-summary-qt-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/135-audit-plan-process-step-summary-qt-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/136-audit-plan-process-step-detail-qt-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/137-audit-plan-process-step-detail-qt-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/138-audit-plan-exception-mapping-qt-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/139-audit-plan-exception-mapping-qt-permission-catalog.yaml
+      relativeToChangelogFile: false
