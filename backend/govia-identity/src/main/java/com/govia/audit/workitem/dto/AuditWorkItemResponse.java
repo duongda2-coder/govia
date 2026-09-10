@@ -14,7 +14,6 @@ public record AuditWorkItemResponse(
         String detailCode,
         String name,
         Integer applicableYear,
-        String workSetCode,
         String workType,
         boolean active,
         boolean hasSampleSelection

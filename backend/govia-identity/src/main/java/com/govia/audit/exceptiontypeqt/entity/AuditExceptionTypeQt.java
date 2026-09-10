@@ -44,6 +44,9 @@ public class AuditExceptionTypeQt extends BaseEntity {
     @Column(name = "classification_basis", length = 255)
     private String classificationBasis;
 
+    @Column(name = "applicable_year")
+    private Integer applicableYear;
+
     @Column(name = "active", nullable = false)
     private boolean active = true;
 }

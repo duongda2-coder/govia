@@ -31,6 +31,9 @@ public class AuditProcessStepSummaryQt extends BaseEntity {
     @Column(name = "work_item_id", columnDefinition = "uuid")
     private UUID workItemId;
 
+    @Column(name = "applicable_year")
+    private Integer applicableYear;
+
     @Column(name = "active", nullable = false)
     private boolean active = true;
 }

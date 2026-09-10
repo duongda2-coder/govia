@@ -6,6 +6,9 @@ import java.util.UUID;
 
 public record AuditWorkItemQtResponse(
         UUID id,
+        UUID auditObjectCategoryId,
+        String auditObjectCategoryCode,
+        String auditObjectCategoryName,
         AuditWorkPhase phase,
         UUID businessSegmentId,
         String businessSegmentCode,
@@ -16,6 +19,7 @@ public record AuditWorkItemQtResponse(
         Integer applicableYear,
         String workSetCode,
         String workType,
-        boolean active
+        boolean active,
+        boolean hasSampleSelection
 ) {
 }

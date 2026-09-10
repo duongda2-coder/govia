@@ -14,6 +14,7 @@ public record AuditExceptionTypeQtRequest(
         AuditExceptionCategory category,
         AuditLevel impactLevel,
         @Size(max = 255) String classificationBasis,
+        Integer applicableYear,
         boolean active
 ) {
 }

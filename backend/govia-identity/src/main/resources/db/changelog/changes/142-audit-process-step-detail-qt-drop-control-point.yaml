@@ -1,0 +1,14 @@
+databaseChangeLog:
+
+  # ===================== Bo cot chot kiem soat thua khoi "Buoc quy trinh chi tiet" quy trinh (sheet ZTC_BQT_MAP_QT) =====================
+  - changeSet:
+      id: 142-1-audit-process-step-detail-qt-drop-control-point
+      author: govia
+      comment: "Xoa fk va cot control_point_id khoi audit_process_step_detail_qt (Ma BQT chi tiet chinh la ma CKS)"
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: audit_process_step_detail_qt
+            constraintName: fk_audit_psdq_control_point
+        - dropColumn:
+            tableName: audit_process_step_detail_qt
+            columnName: control_point_id

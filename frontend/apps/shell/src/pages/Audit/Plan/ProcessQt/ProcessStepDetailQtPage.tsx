@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Col, Form, Input, Modal, Result, Row, Select, Switch, Typography } from "antd";
+import { App, Col, Form, Input, InputNumber, Modal, Result, Row, Select, Space, Switch, Typography } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
@@ -15,22 +15,21 @@ import {
   type AuditProcessStepDetailQtRequest,
   type AuditProcessStepSummaryQtItem,
 } from "../../../../api/auditProcessStepQt";
-import { listAuditControlPointsQt, type AuditControlPointQtItem } from "../../../../api/auditControlPointQt";
 import { listMasterDataItems, type MasterDataItem } from "../../../../api/auditMasterData";
 import { useAuth } from "../../../../auth/AuthContext";
 
 interface FormValues {
   businessSegmentId?: string;
   processStepSummaryId?: string;
-  controlPointId?: string;
   code: string;
+  applicableYear?: number;
   active: boolean;
 }
 
 /** Danh muc "Buoc quy trinh chi tiet" (sheet ZTC_BQT_MAP_QT) - trong nhom "Danh muc Kiem toan
- * quy trinh" cua "Lap ke hoach". Mo phong AuditProcessStepDetail (ProcessStepDetailPage), nhung
- * (khac ban goc) giu lai lien ket toi Chot kiem soat quy trinh (ControlPointQtPage/ZTC_CKS_QT)
- * vi sheet nguon yeu cau ro "Ma BQT chi tiet - Link tu ztc_cks". */
+ * quy trinh" cua "Lap ke hoach". Mo phong AuditProcessStepDetail (ProcessStepDetailPage). Da bo
+ * cot lien ket Chot kiem soat quy trinh (giong migration 095 cua ban goc): "Ma BQT chi tiet"
+ * chinh la ma CKS nen cot rieng la thua. */
 export function ProcessStepDetailQtPage() {
   const { t } = useTranslation();
   const { message, modal } = App.useApp();
@@ -47,7 +46,8 @@ export function ProcessStepDetailQtPage() {
   const [items, setItems] = useState<AuditProcessStepDetailQtItem[]>([]);
   const [businessSegments, setBusinessSegments] = useState<MasterDataItem[]>([]);
   const [summaries, setSummaries] = useState<AuditProcessStepSummaryQtItem[]>([]);
-  const [controlPoints, setControlPoints] = useState<AuditControlPointQtItem[]>([]);
+  const [years, setYears] = useState<MasterDataItem[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<AuditProcessStepDetailQtItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -58,16 +58,16 @@ export function ProcessStepDetailQtPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [list, segmentList, summaryList, controlPointList] = await Promise.all([
+      const [list, segmentList, summaryList, yearList] = await Promise.all([
         listAuditProcessStepDetailsQt(),
         listMasterDataItems("BUSINESS_SEGMENT"),
         listAuditProcessStepSummariesQt(),
-        listAuditControlPointsQt(),
+        listMasterDataItems("YEAR"),
       ]);
       setItems(list);
       setBusinessSegments(segmentList);
       setSummaries(summaryList);
-      setControlPoints(controlPointList);
+      setYears(yearList);
     } catch {
       message.error(t("auditProcessStepDetailQt.messages.loadError"));
     } finally {
@@ -82,7 +82,7 @@ export function ProcessStepDetailQtPage() {
   const openCreate = () => {
     setEditing(null);
     form.resetFields();
-    form.setFieldsValue({ active: true });
+    form.setFieldsValue({ active: true, applicableYear: selectedYear });
     setModalOpen(true);
   };
 
@@ -93,8 +93,8 @@ export function ProcessStepDetailQtPage() {
     form.setFieldsValue({
       businessSegmentId: target.businessSegmentId ?? undefined,
       processStepSummaryId: target.processStepSummaryId ?? undefined,
-      controlPointId: target.controlPointId ?? undefined,
       code: target.code,
+      applicableYear: target.applicableYear ?? undefined,
       active: target.active,
     });
     setModalOpen(true);
@@ -112,8 +112,8 @@ export function ProcessStepDetailQtPage() {
       const request: AuditProcessStepDetailQtRequest = {
         businessSegmentId: values.businessSegmentId ?? null,
         processStepSummaryId: values.processStepSummaryId ?? null,
-        controlPointId: values.controlPointId ?? null,
         code: values.code,
+        applicableYear: values.applicableYear ?? null,
         active: values.active,
       };
       if (editing) {
@@ -156,6 +156,8 @@ export function ProcessStepDetailQtPage() {
     });
   };
 
+  const displayedItems = selectedYear == null ? items : items.filter((i) => i.applicableYear === selectedYear);
+
   const columns: TableProps<AuditProcessStepDetailQtItem>["columns"] = [
     {
       title: t("auditProcessStepDetailQt.columns.businessSegment"),
@@ -168,12 +170,8 @@ export function ProcessStepDetailQtPage() {
       width: 220,
       render: (_, record) => (record.processStepSummaryCode ? `${record.processStepSummaryCode} - ${record.processStepSummaryName}` : "-"),
     },
-    {
-      title: t("auditProcessStepDetailQt.columns.controlPoint"),
-      width: 220,
-      render: (_, record) => (record.controlPointCode ? `${record.controlPointCode} - ${record.controlPointName}` : "-"),
-    },
     { title: t("auditProcessStepDetailQt.columns.code"), width: 160, ...getSearchColumnProps("code", searchLabels) },
+    { title: t("auditProcessStepDetailQt.columns.applicableYear"), dataIndex: "applicableYear", width: 100, render: (v: number | null) => v ?? "-" },
     {
       title: t("common.active"),
       dataIndex: "active",
@@ -189,11 +187,25 @@ export function ProcessStepDetailQtPage() {
 
   return (
     <div>
-      <Typography.Title level={4}>{t("auditProcessStepDetailQt.title")}</Typography.Title>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Typography.Title level={4} style={{ margin: 0 }}>
+          {t("auditProcessStepDetailQt.title")}
+        </Typography.Title>
+        <Space>
+          <Select
+            allowClear
+            placeholder={t("common.selectYear")}
+            style={{ width: 120 }}
+            value={selectedYear}
+            onChange={(v) => setSelectedYear(v)}
+            options={years.map((y) => ({ value: Number(y.code), label: y.code }))}
+          />
+        </Space>
+      </div>
       <CrudTable<AuditProcessStepDetailQtItem>
         tableId="audit.plan.processStepDetailQt"
         columns={columns}
-        dataSource={items}
+        dataSource={displayedItems}
         rowKey="id"
         loading={loading}
         onAdd={canCreate ? openCreate : undefined}
@@ -250,17 +262,18 @@ export function ProcessStepDetailQtPage() {
               options={summaries.map((s) => ({ value: s.id, label: `${s.code} - ${s.name}` }))}
             />
           </Form.Item>
-          <Form.Item name="controlPointId" label={t("auditProcessStepDetailQt.columns.controlPoint")}>
-            <Select
-              allowClear
-              showSearch
-              optionFilterProp="label"
-              options={controlPoints.map((c) => ({ value: c.id, label: `${c.code} - ${c.name}` }))}
-            />
-          </Form.Item>
-          <Form.Item name="active" label={t("common.active")} valuePropName="checked">
-            <Switch />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="applicableYear" label={t("auditProcessStepDetailQt.columns.applicableYear")}>
+                <InputNumber style={{ width: "100%" }} min={2000} max={2100} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="active" label={t("common.active")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </div>

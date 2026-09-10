@@ -4,6 +4,9 @@ import type { AuditWorkPhase } from "./auditWorkItem";
 
 export interface AuditWorkItemQtItem {
   id: string;
+  auditObjectCategoryId: string | null;
+  auditObjectCategoryCode: string | null;
+  auditObjectCategoryName: string | null;
   phase: AuditWorkPhase | null;
   businessSegmentId: string | null;
   businessSegmentCode: string | null;
@@ -15,9 +18,11 @@ export interface AuditWorkItemQtItem {
   workSetCode: string | null;
   workType: string | null;
   active: boolean;
+  hasSampleSelection: boolean;
 }
 
 export interface AuditWorkItemQtRequest {
+  auditObjectCategoryId: string | null;
   phase: AuditWorkPhase | null;
   businessSegmentId: string | null;
   code: string;
@@ -27,6 +32,7 @@ export interface AuditWorkItemQtRequest {
   workSetCode: string | null;
   workType: string | null;
   active: boolean;
+  hasSampleSelection: boolean;
 }
 
 const BASE = "/api/audit/plan/master-data-qt/work-item";

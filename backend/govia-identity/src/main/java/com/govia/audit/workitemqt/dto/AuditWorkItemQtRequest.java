@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 
 public record AuditWorkItemQtRequest(
+        UUID auditObjectCategoryId,
         AuditWorkPhase phase,
         UUID businessSegmentId,
         @NotBlank @Size(max = 10) String code,
@@ -15,6 +16,7 @@ public record AuditWorkItemQtRequest(
         Integer applicableYear,
         String workSetCode,
         String workType,
-        boolean active
+        boolean active,
+        boolean hasSampleSelection
 ) {
 }

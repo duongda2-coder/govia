@@ -8,6 +8,7 @@ public record AuditExceptionMappingQtRequest(
         UUID businessSegmentId,
         @NotNull UUID processStepDetailId,
         @NotNull UUID exceptionTypeId,
+        Integer applicableYear,
         boolean active
 ) {
 }

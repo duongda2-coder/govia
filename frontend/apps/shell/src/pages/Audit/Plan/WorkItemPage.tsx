@@ -28,7 +28,6 @@ interface FormValues {
   detailCode?: string;
   name: string;
   applicableYear?: number;
-  workSetCode?: string;
   workType?: string;
   active: boolean;
   hasSampleSelection: boolean;
@@ -106,7 +105,6 @@ export function WorkItemPage() {
       detailCode: target.detailCode ?? undefined,
       name: target.name,
       applicableYear: target.applicableYear ?? undefined,
-      workSetCode: target.workSetCode ?? undefined,
       workType: target.workType ?? undefined,
       active: target.active,
       hasSampleSelection: target.hasSampleSelection,
@@ -130,7 +128,6 @@ export function WorkItemPage() {
         detailCode: values.detailCode ?? null,
         name: values.name,
         applicableYear: values.applicableYear ?? null,
-        workSetCode: values.workSetCode ?? null,
         workType: values.workType ?? null,
         active: values.active,
         hasSampleSelection: values.hasSampleSelection,
@@ -190,7 +187,6 @@ export function WorkItemPage() {
     { title: t("auditWorkItem.columns.detailCode"), width: 120, ...getSearchColumnProps("detailCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditWorkItem.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("auditWorkItem.columns.applicableYear"), dataIndex: "applicableYear", width: 100, render: (v: number | null) => v ?? "-" },
-    { title: t("auditWorkItem.columns.workSetCode"), dataIndex: "workSetCode", width: 140, render: (v: string | null) => v ?? "-" },
     { title: t("auditWorkItem.columns.workType"), dataIndex: "workType", width: 120, render: (v: string | null) => v ?? "-" },
     {
       title: t("auditWorkItem.columns.hasSampleSelection"),
@@ -299,13 +295,6 @@ export function WorkItemPage() {
                 <InputNumber style={{ width: "100%" }} min={2000} max={2100} />
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Form.Item name="workSetCode" label={t("auditWorkItem.columns.workSetCode")}>
-                <Input maxLength={20} />
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="workType" label={t("auditWorkItem.columns.workType")}>
                 <Input maxLength={20} />

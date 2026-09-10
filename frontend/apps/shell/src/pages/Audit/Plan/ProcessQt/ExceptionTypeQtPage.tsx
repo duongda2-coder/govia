@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Button, Col, Form, Input, Modal, Result, Row, Select, Switch, Typography } from "antd";
+import { App, Button, Col, Form, Input, InputNumber, Modal, Result, Row, Select, Space, Switch, Typography } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -25,6 +25,7 @@ interface FormValues {
   category?: AuditExceptionCategory;
   impactLevel?: AuditLevel;
   classificationBasis?: string;
+  applicableYear?: number;
   active: boolean;
 }
 
@@ -50,6 +51,8 @@ export function ExceptionTypeQtPage() {
 
   const [items, setItems] = useState<AuditExceptionTypeQtItem[]>([]);
   const [businessSegments, setBusinessSegments] = useState<MasterDataItem[]>([]);
+  const [years, setYears] = useState<MasterDataItem[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<AuditExceptionTypeQtItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -60,9 +63,14 @@ export function ExceptionTypeQtPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [list, segmentList] = await Promise.all([listAuditExceptionTypesQt(), listMasterDataItems("BUSINESS_SEGMENT")]);
+      const [list, segmentList, yearList] = await Promise.all([
+        listAuditExceptionTypesQt(),
+        listMasterDataItems("BUSINESS_SEGMENT"),
+        listMasterDataItems("YEAR"),
+      ]);
       setItems(list);
       setBusinessSegments(segmentList);
+      setYears(yearList);
     } catch {
       message.error(t("auditExceptionTypeQt.messages.loadError"));
     } finally {
@@ -77,7 +85,7 @@ export function ExceptionTypeQtPage() {
   const openCreate = () => {
     setEditing(null);
     form.resetFields();
-    form.setFieldsValue({ active: true });
+    form.setFieldsValue({ active: true, applicableYear: selectedYear });
     setModalOpen(true);
   };
 
@@ -92,6 +100,7 @@ export function ExceptionTypeQtPage() {
       category: target.category ?? undefined,
       impactLevel: target.impactLevel ?? undefined,
       classificationBasis: target.classificationBasis ?? undefined,
+      applicableYear: target.applicableYear ?? undefined,
       active: target.active,
     });
     setModalOpen(true);
@@ -113,6 +122,7 @@ export function ExceptionTypeQtPage() {
         category: values.category ?? null,
         impactLevel: values.impactLevel ?? null,
         classificationBasis: values.classificationBasis ?? null,
+        applicableYear: values.applicableYear ?? null,
         active: values.active,
       };
       if (editing) {
@@ -153,6 +163,8 @@ export function ExceptionTypeQtPage() {
     });
   };
 
+  const displayedItems = selectedYear == null ? items : items.filter((i) => i.applicableYear === selectedYear);
+
   const columns: TableProps<AuditExceptionTypeQtItem>["columns"] = [
     {
       title: t("auditExceptionTypeQt.columns.businessSegment"),
@@ -175,6 +187,7 @@ export function ExceptionTypeQtPage() {
       render: (v: AuditLevel | null) => (v ? t(`auditExceptionType.level.${v}`) : "-"),
     },
     { title: t("auditExceptionTypeQt.columns.classificationBasis"), dataIndex: "classificationBasis", render: (v: string | null) => v ?? "-" },
+    { title: t("auditExceptionTypeQt.columns.applicableYear"), dataIndex: "applicableYear", width: 100, render: (v: number | null) => v ?? "-" },
     {
       title: t("common.active"),
       dataIndex: "active",
@@ -194,12 +207,22 @@ export function ExceptionTypeQtPage() {
         <Typography.Title level={4} style={{ margin: 0 }}>
           {t("auditExceptionTypeQt.title")}
         </Typography.Title>
-        <Button onClick={() => navigate("/audit/plan/master-data/exception-type")}>{t("common.backToStandard")}</Button>
+        <Space>
+          <Select
+            allowClear
+            placeholder={t("common.selectYear")}
+            style={{ width: 120 }}
+            value={selectedYear}
+            onChange={(v) => setSelectedYear(v)}
+            options={years.map((y) => ({ value: Number(y.code), label: y.code }))}
+          />
+          <Button onClick={() => navigate("/audit/plan/master-data/exception-type")}>{t("common.backToStandard")}</Button>
+        </Space>
       </div>
       <CrudTable<AuditExceptionTypeQtItem>
         tableId="audit.plan.exceptionTypeQt"
         columns={columns}
-        dataSource={items}
+        dataSource={displayedItems}
         rowKey="id"
         loading={loading}
         onAdd={canCreate ? openCreate : undefined}
@@ -266,9 +289,18 @@ export function ExceptionTypeQtPage() {
           <Form.Item name="classificationBasis" label={t("auditExceptionTypeQt.columns.classificationBasis")}>
             <Input maxLength={255} />
           </Form.Item>
-          <Form.Item name="active" label={t("common.active")} valuePropName="checked">
-            <Switch />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="applicableYear" label={t("auditExceptionTypeQt.columns.applicableYear")}>
+                <InputNumber style={{ width: "100%" }} min={2000} max={2100} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="active" label={t("common.active")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </div>

@@ -15,6 +15,7 @@ public record AuditExceptionTypeQtResponse(
         AuditExceptionCategory category,
         AuditLevel impactLevel,
         String classificationBasis,
+        Integer applicableYear,
         boolean active
 ) {
 }

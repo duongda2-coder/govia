@@ -12,6 +12,7 @@ public record AuditExceptionMappingQtResponse(
         UUID exceptionTypeId,
         String exceptionTypeCode,
         String exceptionTypeName,
+        Integer applicableYear,
         boolean active
 ) {
 }

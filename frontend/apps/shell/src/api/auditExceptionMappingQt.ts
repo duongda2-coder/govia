@@ -11,6 +11,7 @@ export interface AuditExceptionMappingQtItem {
   exceptionTypeId: string;
   exceptionTypeCode: string | null;
   exceptionTypeName: string | null;
+  applicableYear: number | null;
   active: boolean;
 }
 
@@ -18,6 +19,7 @@ export interface AuditExceptionMappingQtRequest {
   businessSegmentId: string | null;
   processStepDetailId: string;
   exceptionTypeId: string;
+  applicableYear: number | null;
   active: boolean;
 }
 

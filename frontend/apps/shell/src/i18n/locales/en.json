@@ -797,7 +797,6 @@
       "detailCode": "Detail Code",
       "name": "Work Item Name",
       "applicableYear": "Year",
-      "workSetCode": "Work Set Code",
       "workType": "Work Type",
       "hasSampleSelection": "Has Sample Selection"
     },
@@ -823,6 +822,7 @@
   "auditWorkItemQt": {
     "title": "Process Audit Work Item Code Catalog",
     "columns": {
+      "auditObjectCategory": "Object Type",
       "phase": "Phase",
       "businessSegment": "Business Segment",
       "code": "Work Item Code",
@@ -830,7 +830,8 @@
       "name": "Work Item Name",
       "applicableYear": "Year",
       "workSetCode": "Work Set Code",
-      "workType": "Work Type"
+      "workType": "Work Type",
+      "hasSampleSelection": "Has Sample Selection"
     },
     "form": {
       "createTitle": "Add Process Work Item",
@@ -854,7 +855,8 @@
       "name": "Exception Name",
       "category": "Category",
       "impactLevel": "Impact Level",
-      "classificationBasis": "Classification Basis"
+      "classificationBasis": "Classification Basis",
+      "applicableYear": "Year"
     },
     "form": {
       "createTitle": "Add Process Exception Type",
@@ -909,7 +911,8 @@
       "businessSegment": "Business Segment",
       "code": "Process Step Summary Code",
       "name": "Process Step Summary Name",
-      "workItem": "Work Item Code"
+      "workItem": "Work Item Code",
+      "applicableYear": "Year"
     },
     "form": {
       "createTitle": "Add Process Step Summary",
@@ -930,8 +933,8 @@
     "columns": {
       "businessSegment": "Business Segment",
       "processStepSummary": "Process Step Summary",
-      "controlPoint": "Control Point",
-      "code": "Process Step Detail Code"
+      "code": "Process Step Detail Code",
+      "applicableYear": "Year"
     },
     "form": {
       "createTitle": "Add Process Step Detail",
@@ -953,7 +956,8 @@
       "businessSegment": "Business Segment Code",
       "processStepDetail": "Process Step Detail Code",
       "exceptionTypeCode": "Exception Code",
-      "exceptionTypeName": "Exception Name"
+      "exceptionTypeName": "Exception Name",
+      "applicableYear": "Year"
     },
     "form": {
       "createTitle": "Add Process Exception Mapping",

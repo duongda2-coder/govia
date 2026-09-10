@@ -404,3 +404,15 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/140-audit-process-engagement-add-work-set-code.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/141-audit-work-item-drop-work-set-code.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/142-audit-process-step-detail-qt-drop-control-point.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/143-audit-qt-add-applicable-year.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/144-audit-work-item-qt-add-object-category-and-sample-selection.yaml
+      relativeToChangelogFile: false

@@ -135,10 +135,22 @@ class AuditTtssAndProgressReportWorkflowTest {
         assertThat(notificationOutboxRepository.findAll())
                 .anySatisfy(n -> assertThat(n.getRecipientUserId()).isEqualTo(teamLeadAccountId.toString()));
 
-        // Lan bao cao thu 2 cho cung nguoi/mang NV phai tang len 2.
-        AuditProgressReportResponse secondReport = progressReportService.recordUpload(engagement.getId(), worker.id(), null,
-                List.of(r3), "Bao cao dot 2", "worker01", null);
-        assertThat(secondReport.reportRound()).isEqualTo(2);
+        // Upload lan 2 CUNG NGAY cho cung nguoi/mang NV van chi tinh la Lan bao cao 1.
+        AuditProgressReportResponse secondReportSameDay = progressReportService.recordUpload(engagement.getId(), worker.id(), null,
+                List.of(r3), "Bao cao dot 2 cung ngay", "worker01", null);
+        assertThat(secondReportSameDay.reportRound()).isEqualTo(1);
+
+        // Gia lap bao cao dau tien la CUA NGAY HOM QUA -> upload hom nay phai sang Lan bao cao 2.
+        var firstReportEntity = progressReportRepository.findById(report.id()).orElseThrow();
+        firstReportEntity.setReportDate(LocalDate.now().minusDays(1));
+        progressReportRepository.save(firstReportEntity);
+        var secondReportSameDayEntity = progressReportRepository.findById(secondReportSameDay.id()).orElseThrow();
+        secondReportSameDayEntity.setReportDate(LocalDate.now().minusDays(1));
+        progressReportRepository.save(secondReportSameDayEntity);
+
+        AuditProgressReportResponse nextDayReport = progressReportService.recordUpload(engagement.getId(), worker.id(), null,
+                List.of(r3), "Bao cao ngay hom sau", "worker01", null);
+        assertThat(nextDayReport.reportRound()).isEqualTo(2);
     }
 
     @Test

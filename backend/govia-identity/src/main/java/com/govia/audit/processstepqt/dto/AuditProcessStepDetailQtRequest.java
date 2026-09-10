@@ -8,8 +8,8 @@ import java.util.UUID;
 public record AuditProcessStepDetailQtRequest(
         UUID businessSegmentId,
         UUID processStepSummaryId,
-        UUID controlPointId,
         @NotBlank @Size(max = 50) String code,
+        Integer applicableYear,
         boolean active
 ) {
 }

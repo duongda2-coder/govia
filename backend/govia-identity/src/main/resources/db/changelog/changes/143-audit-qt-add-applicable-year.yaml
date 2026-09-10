@@ -1,0 +1,42 @@
+databaseChangeLog:
+
+  # ===================== Them cot Nam (loc theo nam) con thieu o 4 danh muc Kiem toan quy trinh =====================
+  - changeSet:
+      id: 143-1-audit-exception-type-qt-add-applicable-year
+      author: govia
+      comment: "Them cot applicable_year vao audit_exception_type_qt (giong Danh muc Bang ma cong viec quy trinh)"
+      changes:
+        - addColumn:
+            tableName: audit_exception_type_qt
+            columns:
+              - column: { name: applicable_year, type: INT }
+
+  - changeSet:
+      id: 143-2-audit-process-step-summary-qt-add-applicable-year
+      author: govia
+      comment: "Them cot applicable_year vao audit_process_step_summary_qt"
+      changes:
+        - addColumn:
+            tableName: audit_process_step_summary_qt
+            columns:
+              - column: { name: applicable_year, type: INT }
+
+  - changeSet:
+      id: 143-3-audit-process-step-detail-qt-add-applicable-year
+      author: govia
+      comment: "Them cot applicable_year vao audit_process_step_detail_qt"
+      changes:
+        - addColumn:
+            tableName: audit_process_step_detail_qt
+            columns:
+              - column: { name: applicable_year, type: INT }
+
+  - changeSet:
+      id: 143-4-audit-exception-mapping-qt-add-applicable-year
+      author: govia
+      comment: "Them cot applicable_year vao audit_exception_mapping_qt"
+      changes:
+        - addColumn:
+            tableName: audit_exception_mapping_qt
+            columns:
+              - column: { name: applicable_year, type: INT }

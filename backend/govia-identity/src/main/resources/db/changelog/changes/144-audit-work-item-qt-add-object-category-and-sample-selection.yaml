@@ -1,0 +1,28 @@
+databaseChangeLog:
+
+  # ===================== Them cot "Loai doi tuong" (dau tien) va "Co chon mau" con thieu o Bang ma cong viec quy trinh =====================
+  - changeSet:
+      id: 144-1-audit-work-item-qt-add-audit-object-category
+      author: govia
+      comment: "Them cot audit_object_category_id (link Loai doi tuong kiem toan) vao audit_work_item_qt"
+      changes:
+        - addColumn:
+            tableName: audit_work_item_qt
+            columns:
+              - column: { name: audit_object_category_id, type: UUID }
+        - addForeignKeyConstraint:
+            baseTableName: audit_work_item_qt
+            baseColumnNames: audit_object_category_id
+            referencedTableName: risk_score_audit_object_category
+            referencedColumnNames: id
+            constraintName: fk_audit_wiq_object_category
+
+  - changeSet:
+      id: 144-2-audit-work-item-qt-add-has-sample-selection
+      author: govia
+      comment: "Them cot has_sample_selection vao audit_work_item_qt (giong Danh muc Cong viec kiem toan)"
+      changes:
+        - addColumn:
+            tableName: audit_work_item_qt
+            columns:
+              - column: { name: has_sample_selection, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }

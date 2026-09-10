@@ -3,6 +3,8 @@ package com.govia.audit.workitemqt.service;
 import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
 import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
+import com.govia.audit.riskscoring.masterdata.entity.AuditObjectCategory;
+import com.govia.audit.riskscoring.masterdata.repository.AuditObjectCategoryRepository;
 import com.govia.audit.workitem.entity.AuditWorkPhase;
 import com.govia.audit.workitemqt.dto.AuditWorkItemQtRequest;
 import com.govia.audit.workitemqt.dto.AuditWorkItemQtResponse;
@@ -38,16 +40,19 @@ public class AuditWorkItemQtService {
 
     private final AuditWorkItemQtRepository repository;
     private final AuditMasterDataItemRepository masterDataItemRepository;
+    private final AuditObjectCategoryRepository auditObjectCategoryRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
     private final ExcelImportService excelImportService;
 
     public AuditWorkItemQtService(AuditWorkItemQtRepository repository, AuditMasterDataItemRepository masterDataItemRepository,
-                                   AuditLogService auditLogService, ExcelExportService excelExportService,
-                                   WordExportService wordExportService, ExcelImportService excelImportService) {
+                                   AuditObjectCategoryRepository auditObjectCategoryRepository, AuditLogService auditLogService,
+                                   ExcelExportService excelExportService, WordExportService wordExportService,
+                                   ExcelImportService excelImportService) {
         this.repository = repository;
         this.masterDataItemRepository = masterDataItemRepository;
+        this.auditObjectCategoryRepository = auditObjectCategoryRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
@@ -58,7 +63,8 @@ public class AuditWorkItemQtService {
     public List<AuditWorkItemQtResponse> list() {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, AuditMasterDataItem> segments = businessSegmentsById(tenantId);
-        return repository.findByTenantIdOrderByCodeAsc(tenantId).stream().map(item -> toResponse(item, segments)).toList();
+        Map<UUID, AuditObjectCategory> objectCategories = objectCategoriesById(tenantId);
+        return repository.findByTenantIdOrderByCodeAsc(tenantId).stream().map(item -> toResponse(item, segments, objectCategories)).toList();
     }
 
     @Transactional
@@ -66,6 +72,7 @@ public class AuditWorkItemQtService {
         UUID tenantId = TenantContext.getTenantId();
         checkNoDuplicateCode(tenantId, request.code(), null);
         validateBusinessSegment(tenantId, request.businessSegmentId());
+        validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
 
         AuditWorkItemQt item = new AuditWorkItemQt();
         item.setTenantId(tenantId);
@@ -73,7 +80,7 @@ public class AuditWorkItemQtService {
         item = repository.save(item);
 
         auditLogService.record("AuditWorkItemQt", item.getId(), AuditAction.CREATE, "Tao cong viec quy trinh: " + item.getCode());
-        return toResponse(item, businessSegmentsById(tenantId));
+        return toResponse(item, businessSegmentsById(tenantId), objectCategoriesById(tenantId));
     }
 
     @Transactional
@@ -82,12 +89,13 @@ public class AuditWorkItemQtService {
         AuditWorkItemQt item = getOwnedOrThrow(tenantId, id);
         checkNoDuplicateCode(tenantId, request.code(), id);
         validateBusinessSegment(tenantId, request.businessSegmentId());
+        validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
 
         applyRequest(item, request);
         item = repository.save(item);
 
         auditLogService.record("AuditWorkItemQt", item.getId(), AuditAction.UPDATE, "Cap nhat cong viec quy trinh: " + item.getCode());
-        return toResponse(item, businessSegmentsById(tenantId));
+        return toResponse(item, businessSegmentsById(tenantId), objectCategoriesById(tenantId));
     }
 
     @Transactional
@@ -121,6 +129,8 @@ public class AuditWorkItemQtService {
         Map<String, UUID> segmentIdsByCode = new HashMap<>();
         masterDataItemRepository.findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT)
                 .forEach(s -> segmentIdsByCode.put(s.getCode(), s.getId()));
+        Map<String, UUID> objectCategoryIdsByCode = new HashMap<>();
+        auditObjectCategoryRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> objectCategoryIdsByCode.put(c.getCode(), c.getId()));
 
         int success = 0;
         List<ImportResult.ImportRowError> errors = new ArrayList<>();
@@ -135,12 +145,14 @@ public class AuditWorkItemQtService {
                 }
                 String segmentCode = row.get("businessSegmentCode");
                 UUID businessSegmentId = isBlank(segmentCode) ? null : segmentIdsByCode.get(segmentCode.trim());
+                String objectCategoryCode = row.get("auditObjectCategoryCode");
+                UUID auditObjectCategoryId = isBlank(objectCategoryCode) ? null : objectCategoryIdsByCode.get(objectCategoryCode.trim());
 
                 Optional<AuditWorkItemQt> existing = repository.findByTenantIdAndCode(tenantId, code.trim());
-                AuditWorkItemQtRequest request = new AuditWorkItemQtRequest(
+                AuditWorkItemQtRequest request = new AuditWorkItemQtRequest(auditObjectCategoryId,
                         parseEnum(AuditWorkPhase.class, row.get("phase")), businessSegmentId, code.trim(), emptyToNull(row.get("detailCode")),
                         name.trim(), parseInt(row.get("applicableYear")), emptyToNull(row.get("workSetCode")), emptyToNull(row.get("workType")),
-                        existing.map(AuditWorkItemQt::isActive).orElse(true));
+                        existing.map(AuditWorkItemQt::isActive).orElse(true), parseBoolean(row.get("hasSampleSelection")));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
                 } else {
@@ -158,6 +170,7 @@ public class AuditWorkItemQtService {
     }
 
     private void applyRequest(AuditWorkItemQt item, AuditWorkItemQtRequest request) {
+        item.setAuditObjectCategoryId(request.auditObjectCategoryId());
         item.setPhase(request.phase());
         item.setBusinessSegmentId(request.businessSegmentId());
         item.setCode(request.code());
@@ -167,6 +180,7 @@ public class AuditWorkItemQtService {
         item.setWorkSetCode(request.workSetCode());
         item.setWorkType(request.workType());
         item.setActive(request.active());
+        item.setHasSampleSelection(request.hasSampleSelection());
     }
 
     private void checkNoDuplicateCode(UUID tenantId, String code, UUID excludingId) {
@@ -186,6 +200,15 @@ public class AuditWorkItemQtService {
                 .orElseThrow(() -> new BusinessException("BUSINESS_SEGMENT_NOT_FOUND", "Khong tim thay mang nghiep vu"));
     }
 
+    private void validateAuditObjectCategory(UUID tenantId, UUID auditObjectCategoryId) {
+        if (auditObjectCategoryId == null) {
+            return;
+        }
+        auditObjectCategoryRepository.findById(auditObjectCategoryId)
+                .filter(item -> item.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("AUDIT_OBJECT_CATEGORY_NOT_FOUND", "Khong tim thay loai doi tuong kiem toan"));
+    }
+
     private AuditWorkItemQt getOwnedOrThrow(UUID tenantId, UUID id) {
         return repository.findById(id)
                 .filter(item -> item.getTenantId().equals(tenantId))
@@ -197,8 +220,14 @@ public class AuditWorkItemQtService {
                 .stream().collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i));
     }
 
+    private Map<UUID, AuditObjectCategory> objectCategoriesById(UUID tenantId) {
+        return auditObjectCategoryRepository.findByTenantIdOrderByCodeAsc(tenantId).stream()
+                .collect(Collectors.toMap(AuditObjectCategory::getId, i -> i));
+    }
+
     private List<ExportColumn> exportColumns() {
         return List.of(
+                new ExportColumn("auditObjectCategoryCode", "Loại đối tượng"),
                 new ExportColumn("phase", "Giai đoạn"),
                 new ExportColumn("businessSegmentCode", "Mảng nghiệp vụ"),
                 new ExportColumn("code", "Mã công việc"),
@@ -206,15 +235,19 @@ public class AuditWorkItemQtService {
                 new ExportColumn("name", "Tên công việc"),
                 new ExportColumn("applicableYear", "Năm"),
                 new ExportColumn("workSetCode", "Mã bộ công việc"),
-                new ExportColumn("workType", "Loại CV"));
+                new ExportColumn("workType", "Loại CV"),
+                new ExportColumn("hasSampleSelection", "Có chọn mẫu"));
     }
 
     private List<Map<String, Object>> exportRows() {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, AuditMasterDataItem> segments = businessSegmentsById(tenantId);
+        Map<UUID, AuditObjectCategory> objectCategories = objectCategoriesById(tenantId);
         return repository.findByTenantIdOrderByCodeAsc(tenantId).stream()
                 .map(item -> {
                     Map<String, Object> row = new HashMap<>();
+                    AuditObjectCategory objectCategory = objectCategories.get(item.getAuditObjectCategoryId());
+                    row.put("auditObjectCategoryCode", objectCategory == null ? null : objectCategory.getCode());
                     row.put("phase", item.getPhase());
                     row.put("businessSegmentCode", codeOf(segments.get(item.getBusinessSegmentId())));
                     row.put("code", item.getCode());
@@ -223,6 +256,7 @@ public class AuditWorkItemQtService {
                     row.put("applicableYear", item.getApplicableYear());
                     row.put("workSetCode", item.getWorkSetCode());
                     row.put("workType", item.getWorkType());
+                    row.put("hasSampleSelection", item.isHasSampleSelection() ? "Y" : "N");
                     return row;
                 }).toList();
     }
@@ -237,6 +271,10 @@ public class AuditWorkItemQtService {
 
     private String emptyToNull(String value) {
         return isBlank(value) ? null : value.trim();
+    }
+
+    private boolean parseBoolean(String value) {
+        return "true".equalsIgnoreCase(value) || "1".equals(value) || "Y".equalsIgnoreCase(value);
     }
 
     private Integer parseInt(String value) {
@@ -261,11 +299,16 @@ public class AuditWorkItemQtService {
         }
     }
 
-    private AuditWorkItemQtResponse toResponse(AuditWorkItemQt item, Map<UUID, AuditMasterDataItem> segments) {
+    private AuditWorkItemQtResponse toResponse(AuditWorkItemQt item, Map<UUID, AuditMasterDataItem> segments,
+                                                Map<UUID, AuditObjectCategory> objectCategories) {
         AuditMasterDataItem segment = item.getBusinessSegmentId() == null ? null : segments.get(item.getBusinessSegmentId());
-        return new AuditWorkItemQtResponse(item.getId(), item.getPhase(), item.getBusinessSegmentId(),
+        AuditObjectCategory objectCategory = item.getAuditObjectCategoryId() == null ? null : objectCategories.get(item.getAuditObjectCategoryId());
+        return new AuditWorkItemQtResponse(item.getId(),
+                item.getAuditObjectCategoryId(), objectCategory == null ? null : objectCategory.getCode(),
+                objectCategory == null ? null : objectCategory.getName(),
+                item.getPhase(), item.getBusinessSegmentId(),
                 segment == null ? null : segment.getCode(), segment == null ? null : segment.getName(),
                 item.getCode(), item.getDetailCode(), item.getName(), item.getApplicableYear(), item.getWorkSetCode(), item.getWorkType(),
-                item.isActive());
+                item.isActive(), item.isHasSampleSelection());
     }
 }

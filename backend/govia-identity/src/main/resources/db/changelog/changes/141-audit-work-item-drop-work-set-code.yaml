@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  # ===================== Bo cot "Ma bo cong viec" thua khoi "Cong viec kiem toan" (sheet ZTC_CV) =====================
+  - changeSet:
+      id: 141-1-audit-work-item-drop-work-set-code
+      author: govia
+      comment: "Xoa cot work_set_code khoi audit_work_item (thua, trung voi code)"
+      changes:
+        - dropColumn:
+            tableName: audit_work_item
+            columnName: work_set_code

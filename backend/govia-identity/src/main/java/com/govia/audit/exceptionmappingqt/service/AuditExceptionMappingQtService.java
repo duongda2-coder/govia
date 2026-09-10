@@ -167,7 +167,7 @@ public class AuditExceptionMappingQtService {
                 Optional<AuditExceptionMappingQt> existing =
                         repository.findByTenantIdAndProcessStepDetailIdAndExceptionTypeId(tenantId, processStepDetailId, exceptionTypeId);
                 AuditExceptionMappingQtRequest request = new AuditExceptionMappingQtRequest(businessSegmentId, processStepDetailId, exceptionTypeId,
-                        existing.map(AuditExceptionMappingQt::isActive).orElse(true));
+                        parseInt(row.get("applicableYear")), existing.map(AuditExceptionMappingQt::isActive).orElse(true));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
                 } else {
@@ -188,6 +188,7 @@ public class AuditExceptionMappingQtService {
         item.setBusinessSegmentId(request.businessSegmentId());
         item.setProcessStepDetailId(request.processStepDetailId());
         item.setExceptionTypeId(request.exceptionTypeId());
+        item.setApplicableYear(request.applicableYear());
         item.setActive(request.active());
     }
 
@@ -246,7 +247,8 @@ public class AuditExceptionMappingQtService {
                 new ExportColumn("businessSegmentCode", "Mã mảng nv"),
                 new ExportColumn("processStepDetailCode", "Mã BQT_CT"),
                 new ExportColumn("exceptionTypeCode", "Mã TTSS"),
-                new ExportColumn("exceptionTypeName", "Tên TTSS"));
+                new ExportColumn("exceptionTypeName", "Tên TTSS"),
+                new ExportColumn("applicableYear", "Năm"));
     }
 
     private List<Map<String, Object>> exportRows() {
@@ -263,6 +265,7 @@ public class AuditExceptionMappingQtService {
                     AuditExceptionTypeQt exceptionType = exceptionTypes.get(item.getExceptionTypeId());
                     row.put("exceptionTypeCode", exceptionType == null ? null : exceptionType.getCode());
                     row.put("exceptionTypeName", exceptionType == null ? null : exceptionType.getName());
+                    row.put("applicableYear", item.getApplicableYear());
                     return row;
                 }).toList();
     }
@@ -275,6 +278,17 @@ public class AuditExceptionMappingQtService {
         return value == null || value.isBlank();
     }
 
+    private Integer parseInt(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private AuditExceptionMappingQtResponse toResponse(AuditExceptionMappingQt item, Map<UUID, AuditMasterDataItem> segments,
                                                          Map<UUID, AuditProcessStepDetailQt> details, Map<UUID, AuditExceptionTypeQt> exceptionTypes) {
         AuditMasterDataItem segment = item.getBusinessSegmentId() == null ? null : segments.get(item.getBusinessSegmentId());
@@ -284,6 +298,6 @@ public class AuditExceptionMappingQtService {
                 segment == null ? null : segment.getCode(), segment == null ? null : segment.getName(),
                 item.getProcessStepDetailId(), detail == null ? null : detail.getCode(),
                 item.getExceptionTypeId(), exceptionType == null ? null : exceptionType.getCode(), exceptionType == null ? null : exceptionType.getName(),
-                item.isActive());
+                item.getApplicableYear(), item.isActive());
     }
 }

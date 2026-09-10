@@ -10,10 +10,8 @@ public record AuditProcessStepDetailQtResponse(
         UUID processStepSummaryId,
         String processStepSummaryCode,
         String processStepSummaryName,
-        UUID controlPointId,
-        String controlPointCode,
-        String controlPointName,
         String code,
+        Integer applicableYear,
         boolean active
 ) {
 }

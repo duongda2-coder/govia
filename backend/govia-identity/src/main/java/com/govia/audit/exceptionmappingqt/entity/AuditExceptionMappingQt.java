@@ -28,6 +28,9 @@ public class AuditExceptionMappingQt extends BaseEntity {
     @Column(name = "exception_type_id", nullable = false, columnDefinition = "uuid")
     private UUID exceptionTypeId;
 
+    @Column(name = "applicable_year")
+    private Integer applicableYear;
+
     @Column(name = "active", nullable = false)
     private boolean active = true;
 }

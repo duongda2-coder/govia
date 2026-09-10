@@ -797,7 +797,6 @@
       "detailCode": "Mã chi tiết",
       "name": "Tên công việc",
       "applicableYear": "Năm",
-      "workSetCode": "Mã bộ công việc",
       "workType": "Loại CV",
       "hasSampleSelection": "Có chọn mẫu"
     },
@@ -823,6 +822,7 @@
   "auditWorkItemQt": {
     "title": "Danh mục Bảng mã công việc quy trình",
     "columns": {
+      "auditObjectCategory": "Loại đối tượng",
       "phase": "Giai đoạn",
       "businessSegment": "Mảng nghiệp vụ",
       "code": "Mã công việc",
@@ -830,7 +830,8 @@
       "name": "Tên công việc",
       "applicableYear": "Năm",
       "workSetCode": "Mã bộ công việc",
-      "workType": "Loại CV"
+      "workType": "Loại CV",
+      "hasSampleSelection": "Có chọn mẫu"
     },
     "form": {
       "createTitle": "Thêm công việc quy trình",
@@ -854,7 +855,8 @@
       "name": "Tên phát hiện",
       "category": "Loại phát hiện",
       "impactLevel": "Mức độ ảnh hưởng",
-      "classificationBasis": "Căn cứ phân loại"
+      "classificationBasis": "Căn cứ phân loại",
+      "applicableYear": "Năm"
     },
     "form": {
       "createTitle": "Thêm tồn tại sai sót quy trình",
@@ -909,7 +911,8 @@
       "businessSegment": "Mảng nghiệp vụ",
       "code": "Mã bước quy trình tổng hợp",
       "name": "Tên bước quy trình tổng hợp",
-      "workItem": "Mã công việc"
+      "workItem": "Mã công việc",
+      "applicableYear": "Năm"
     },
     "form": {
       "createTitle": "Thêm bước quy trình tổng hợp",
@@ -930,8 +933,8 @@
     "columns": {
       "businessSegment": "Mảng nghiệp vụ",
       "processStepSummary": "Bước quy trình tổng hợp",
-      "controlPoint": "Chốt kiểm soát",
-      "code": "Mã BQT chi tiết"
+      "code": "Mã BQT chi tiết",
+      "applicableYear": "Năm"
     },
     "form": {
       "createTitle": "Thêm bước quy trình chi tiết",
@@ -953,7 +956,8 @@
       "businessSegment": "Mã mảng nv",
       "processStepDetail": "Mã BQT_CT",
       "exceptionTypeCode": "Mã TTSS",
-      "exceptionTypeName": "Tên TTSS"
+      "exceptionTypeName": "Tên TTSS",
+      "applicableYear": "Năm"
     },
     "form": {
       "createTitle": "Thêm mapping tồn tại sai sót quy trình",

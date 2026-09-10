@@ -13,7 +13,6 @@ export interface AuditWorkItemItem {
   detailCode: string | null;
   name: string;
   applicableYear: number | null;
-  workSetCode: string | null;
   workType: string | null;
   active: boolean;
   hasSampleSelection: boolean;
@@ -26,7 +25,6 @@ export interface AuditWorkItemRequest {
   detailCode: string | null;
   name: string;
   applicableYear: number | null;
-  workSetCode: string | null;
   workType: string | null;
   active: boolean;
   hasSampleSelection: boolean;

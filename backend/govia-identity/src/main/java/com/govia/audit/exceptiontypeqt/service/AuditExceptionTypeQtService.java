@@ -140,7 +140,8 @@ public class AuditExceptionTypeQtService {
                 Optional<AuditExceptionTypeQt> existing = repository.findByTenantIdAndCode(tenantId, code.trim());
                 AuditExceptionTypeQtRequest request = new AuditExceptionTypeQtRequest(businessSegmentId, code.trim(), name.trim(),
                         parseEnum(AuditExceptionCategory.class, row.get("category")), parseEnum(AuditLevel.class, row.get("impactLevel")),
-                        emptyToNull(row.get("classificationBasis")), existing.map(AuditExceptionTypeQt::isActive).orElse(true));
+                        emptyToNull(row.get("classificationBasis")), parseInt(row.get("applicableYear")),
+                        existing.map(AuditExceptionTypeQt::isActive).orElse(true));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
                 } else {
@@ -164,6 +165,7 @@ public class AuditExceptionTypeQtService {
         item.setCategory(request.category());
         item.setImpactLevel(request.impactLevel());
         item.setClassificationBasis(request.classificationBasis());
+        item.setApplicableYear(request.applicableYear());
         item.setActive(request.active());
     }
 
@@ -202,7 +204,8 @@ public class AuditExceptionTypeQtService {
                 new ExportColumn("name", "Tên phát hiện"),
                 new ExportColumn("category", "Loại phát hiện"),
                 new ExportColumn("impactLevel", "Mức độ ảnh hưởng"),
-                new ExportColumn("classificationBasis", "Căn cứ phân loại"));
+                new ExportColumn("classificationBasis", "Căn cứ phân loại"),
+                new ExportColumn("applicableYear", "Năm"));
     }
 
     private List<Map<String, Object>> exportRows() {
@@ -217,6 +220,7 @@ public class AuditExceptionTypeQtService {
                     row.put("category", item.getCategory());
                     row.put("impactLevel", item.getImpactLevel());
                     row.put("classificationBasis", item.getClassificationBasis());
+                    row.put("applicableYear", item.getApplicableYear());
                     return row;
                 }).toList();
     }
@@ -231,6 +235,17 @@ public class AuditExceptionTypeQtService {
 
     private String emptyToNull(String value) {
         return isBlank(value) ? null : value.trim();
+    }
+
+    private Integer parseInt(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private <E extends Enum<E>> E parseEnum(Class<E> type, String value) {
@@ -248,6 +263,7 @@ public class AuditExceptionTypeQtService {
         AuditMasterDataItem segment = item.getBusinessSegmentId() == null ? null : segments.get(item.getBusinessSegmentId());
         return new AuditExceptionTypeQtResponse(item.getId(), item.getBusinessSegmentId(),
                 segment == null ? null : segment.getCode(), segment == null ? null : segment.getName(),
-                item.getCode(), item.getName(), item.getCategory(), item.getImpactLevel(), item.getClassificationBasis(), item.isActive());
+                item.getCode(), item.getName(), item.getCategory(), item.getImpactLevel(), item.getClassificationBasis(),
+                item.getApplicableYear(), item.isActive());
     }
 }

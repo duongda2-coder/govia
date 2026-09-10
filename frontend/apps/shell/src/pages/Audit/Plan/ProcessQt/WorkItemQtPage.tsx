@@ -16,9 +16,11 @@ import {
 } from "../../../../api/auditWorkItemQt";
 import type { AuditWorkPhase } from "../../../../api/auditWorkItem";
 import { listMasterDataItems, type MasterDataItem } from "../../../../api/auditMasterData";
+import { auditObjectCategoryApi, type AuditObjectCategoryItem } from "../../../../api/riskScoring";
 import { useAuth } from "../../../../auth/AuthContext";
 
 interface FormValues {
+  auditObjectCategoryId?: string;
   phase?: AuditWorkPhase;
   businessSegmentId?: string;
   code: string;
@@ -28,6 +30,7 @@ interface FormValues {
   workSetCode?: string;
   workType?: string;
   active: boolean;
+  hasSampleSelection: boolean;
 }
 
 const PHASES: AuditWorkPhase[] = ["CBKT", "THKT", "DCKT"];
@@ -51,6 +54,7 @@ export function WorkItemQtPage() {
 
   const [items, setItems] = useState<AuditWorkItemQtItem[]>([]);
   const [businessSegments, setBusinessSegments] = useState<MasterDataItem[]>([]);
+  const [objectCategories, setObjectCategories] = useState<AuditObjectCategoryItem[]>([]);
   const [years, setYears] = useState<MasterDataItem[]>([]);
   const [selectedYear, setSelectedYear] = useState<number | undefined>(undefined);
   const [loading, setLoading] = useState(false);
@@ -71,6 +75,12 @@ export function WorkItemQtPage() {
       setItems(list);
       setBusinessSegments(segmentList);
       setYears(yearList);
+      // Danh muc rieng cua module Cham diem rui ro - khong de loi quyen o day lam sap ca man hinh.
+      try {
+        setObjectCategories(await auditObjectCategoryApi.list());
+      } catch {
+        setObjectCategories([]);
+      }
     } catch {
       message.error(t("auditWorkItemQt.messages.loadError"));
     } finally {
@@ -85,7 +95,7 @@ export function WorkItemQtPage() {
   const openCreate = () => {
     setEditing(null);
     form.resetFields();
-    form.setFieldsValue({ active: true, applicableYear: selectedYear });
+    form.setFieldsValue({ active: true, hasSampleSelection: false, applicableYear: selectedYear });
     setModalOpen(true);
   };
 
@@ -94,6 +104,7 @@ export function WorkItemQtPage() {
     if (!target) return;
     setEditing(target);
     form.setFieldsValue({
+      auditObjectCategoryId: target.auditObjectCategoryId ?? undefined,
       phase: target.phase ?? undefined,
       businessSegmentId: target.businessSegmentId ?? undefined,
       code: target.code,
@@ -103,6 +114,7 @@ export function WorkItemQtPage() {
       workSetCode: target.workSetCode ?? undefined,
       workType: target.workType ?? undefined,
       active: target.active,
+      hasSampleSelection: target.hasSampleSelection,
     });
     setModalOpen(true);
   };
@@ -117,6 +129,7 @@ export function WorkItemQtPage() {
     setSubmitting(true);
     try {
       const request: AuditWorkItemQtRequest = {
+        auditObjectCategoryId: values.auditObjectCategoryId ?? null,
         phase: values.phase ?? null,
         businessSegmentId: values.businessSegmentId ?? null,
         code: values.code,
@@ -126,6 +139,7 @@ export function WorkItemQtPage() {
         workSetCode: values.workSetCode ?? null,
         workType: values.workType ?? null,
         active: values.active,
+        hasSampleSelection: values.hasSampleSelection,
       };
       if (editing) {
         await updateAuditWorkItemQt(editing.id, request);
@@ -168,6 +182,12 @@ export function WorkItemQtPage() {
 
   const columns: TableProps<AuditWorkItemQtItem>["columns"] = [
     {
+      title: t("auditWorkItemQt.columns.auditObjectCategory"),
+      dataIndex: "auditObjectCategoryName",
+      width: 160,
+      render: (v: string | null) => v ?? "-",
+    },
+    {
       title: t("auditWorkItemQt.columns.phase"),
       dataIndex: "phase",
       width: 140,
@@ -185,6 +205,13 @@ export function WorkItemQtPage() {
     { title: t("auditWorkItemQt.columns.applicableYear"), dataIndex: "applicableYear", width: 100, render: (v: number | null) => v ?? "-" },
     { title: t("auditWorkItemQt.columns.workSetCode"), dataIndex: "workSetCode", width: 140, render: (v: string | null) => v ?? "-" },
     { title: t("auditWorkItemQt.columns.workType"), dataIndex: "workType", width: 120, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("auditWorkItemQt.columns.hasSampleSelection"),
+      dataIndex: "hasSampleSelection",
+      width: 120,
+      sorter: (a, b) => Number(a.hasSampleSelection) - Number(b.hasSampleSelection),
+      render: (v: boolean) => (v ? t("common.yes") : t("common.no")),
+    },
     {
       title: t("common.active"),
       dataIndex: "active",
@@ -253,10 +280,22 @@ export function WorkItemQtPage() {
         <Form<FormValues> form={form} layout="vertical">
           <Row gutter={16}>
             <Col span={12}>
+              <Form.Item name="auditObjectCategoryId" label={t("auditWorkItemQt.columns.auditObjectCategory")}>
+                <Select
+                  allowClear
+                  showSearch
+                  optionFilterProp="label"
+                  options={objectCategories.map((c) => ({ value: c.id, label: `${c.code} - ${c.name}` }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
               <Form.Item name="phase" label={t("auditWorkItemQt.columns.phase")}>
                 <Select allowClear options={PHASES.map((v) => ({ value: v, label: t(`auditWorkItem.phase.${v}`) }))} />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="businessSegmentId" label={t("auditWorkItemQt.columns.businessSegment")}>
                 <Select
@@ -267,13 +306,13 @@ export function WorkItemQtPage() {
                 />
               </Form.Item>
             </Col>
-          </Row>
-          <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="code" label={t("auditWorkItemQt.columns.code")} rules={[{ required: true }]}>
                 <Input maxLength={10} />
               </Form.Item>
             </Col>
+          </Row>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item name="detailCode" label={t("auditWorkItemQt.columns.detailCode")}>
                 <Input maxLength={20} />
@@ -303,6 +342,13 @@ export function WorkItemQtPage() {
             </Col>
             <Col span={12}>
               <Form.Item name="active" label={t("common.active")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="hasSampleSelection" label={t("auditWorkItemQt.columns.hasSampleSelection")} valuePropName="checked">
                 <Switch />
               </Form.Item>
             </Col>

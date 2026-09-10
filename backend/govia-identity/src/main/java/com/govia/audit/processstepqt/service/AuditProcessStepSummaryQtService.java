@@ -149,7 +149,7 @@ public class AuditProcessStepSummaryQtService {
 
                 Optional<AuditProcessStepSummaryQt> existing = repository.findByTenantIdAndCode(tenantId, code.trim());
                 AuditProcessStepSummaryQtRequest request = new AuditProcessStepSummaryQtRequest(businessSegmentId, code.trim(), name.trim(),
-                        workItemId, existing.map(AuditProcessStepSummaryQt::isActive).orElse(true));
+                        workItemId, parseInt(row.get("applicableYear")), existing.map(AuditProcessStepSummaryQt::isActive).orElse(true));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
                 } else {
@@ -171,6 +171,7 @@ public class AuditProcessStepSummaryQtService {
         item.setCode(request.code());
         item.setName(request.name());
         item.setWorkItemId(request.workItemId());
+        item.setApplicableYear(request.applicableYear());
         item.setActive(request.active());
     }
 
@@ -220,7 +221,8 @@ public class AuditProcessStepSummaryQtService {
                 new ExportColumn("businessSegmentCode", "Mảng nghiệp vụ"),
                 new ExportColumn("code", "Mã bước quy trình tổng hợp"),
                 new ExportColumn("name", "Tên bước quy trình tổng hợp"),
-                new ExportColumn("workItemCode", "Mã công việc"));
+                new ExportColumn("workItemCode", "Mã công việc"),
+                new ExportColumn("applicableYear", "Năm"));
     }
 
     private List<Map<String, Object>> exportRows() {
@@ -235,6 +237,7 @@ public class AuditProcessStepSummaryQtService {
                     row.put("name", item.getName());
                     AuditWorkItemQt workItem = workItems.get(item.getWorkItemId());
                     row.put("workItemCode", workItem == null ? null : workItem.getCode());
+                    row.put("applicableYear", item.getApplicableYear());
                     return row;
                 }).toList();
     }
@@ -247,6 +250,17 @@ public class AuditProcessStepSummaryQtService {
         return value == null || value.isBlank();
     }
 
+    private Integer parseInt(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private AuditProcessStepSummaryQtResponse toResponse(AuditProcessStepSummaryQt item, Map<UUID, AuditMasterDataItem> segments,
                                                            Map<UUID, AuditWorkItemQt> workItems) {
         AuditMasterDataItem segment = item.getBusinessSegmentId() == null ? null : segments.get(item.getBusinessSegmentId());
@@ -254,6 +268,7 @@ public class AuditProcessStepSummaryQtService {
         return new AuditProcessStepSummaryQtResponse(item.getId(), item.getBusinessSegmentId(),
                 segment == null ? null : segment.getCode(), segment == null ? null : segment.getName(),
                 item.getCode(), item.getName(), item.getWorkItemId(),
-                workItem == null ? null : workItem.getCode(), workItem == null ? null : workItem.getName(), item.isActive());
+                workItem == null ? null : workItem.getCode(), workItem == null ? null : workItem.getName(),
+                item.getApplicableYear(), item.isActive());
     }
 }

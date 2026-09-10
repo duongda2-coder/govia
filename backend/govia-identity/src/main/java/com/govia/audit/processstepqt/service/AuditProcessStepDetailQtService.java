@@ -1,7 +1,5 @@
 package com.govia.audit.processstepqt.service;
 
-import com.govia.audit.controlpointqt.entity.AuditControlPointQt;
-import com.govia.audit.controlpointqt.repository.AuditControlPointQtRepository;
 import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
 import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
@@ -42,21 +40,18 @@ public class AuditProcessStepDetailQtService {
     private final AuditProcessStepDetailQtRepository repository;
     private final AuditMasterDataItemRepository masterDataItemRepository;
     private final AuditProcessStepSummaryQtRepository processStepSummaryRepository;
-    private final AuditControlPointQtRepository controlPointRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final WordExportService wordExportService;
     private final ExcelImportService excelImportService;
 
     public AuditProcessStepDetailQtService(AuditProcessStepDetailQtRepository repository, AuditMasterDataItemRepository masterDataItemRepository,
-                                            AuditProcessStepSummaryQtRepository processStepSummaryRepository,
-                                            AuditControlPointQtRepository controlPointRepository, AuditLogService auditLogService,
+                                            AuditProcessStepSummaryQtRepository processStepSummaryRepository, AuditLogService auditLogService,
                                             ExcelExportService excelExportService, WordExportService wordExportService,
                                             ExcelImportService excelImportService) {
         this.repository = repository;
         this.masterDataItemRepository = masterDataItemRepository;
         this.processStepSummaryRepository = processStepSummaryRepository;
-        this.controlPointRepository = controlPointRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.wordExportService = wordExportService;
@@ -68,9 +63,8 @@ public class AuditProcessStepDetailQtService {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, AuditMasterDataItem> segments = businessSegmentsById(tenantId);
         Map<UUID, AuditProcessStepSummaryQt> summaries = summariesById(tenantId);
-        Map<UUID, AuditControlPointQt> controlPoints = controlPointsById(tenantId);
         return repository.findByTenantIdOrderByCodeAsc(tenantId).stream()
-                .map(item -> toResponse(item, segments, summaries, controlPoints)).toList();
+                .map(item -> toResponse(item, segments, summaries)).toList();
     }
 
     @Transactional
@@ -79,7 +73,6 @@ public class AuditProcessStepDetailQtService {
         checkNoDuplicateCode(tenantId, request.code(), null);
         validateBusinessSegment(tenantId, request.businessSegmentId());
         validateProcessStepSummary(tenantId, request.processStepSummaryId());
-        validateControlPoint(tenantId, request.controlPointId());
 
         AuditProcessStepDetailQt item = new AuditProcessStepDetailQt();
         item.setTenantId(tenantId);
@@ -87,7 +80,7 @@ public class AuditProcessStepDetailQtService {
         item = repository.save(item);
 
         auditLogService.record("AuditProcessStepDetailQt", item.getId(), AuditAction.CREATE, "Tao buoc quy trinh chi tiet: " + item.getCode());
-        return toResponse(item, businessSegmentsById(tenantId), summariesById(tenantId), controlPointsById(tenantId));
+        return toResponse(item, businessSegmentsById(tenantId), summariesById(tenantId));
     }
 
     @Transactional
@@ -97,13 +90,12 @@ public class AuditProcessStepDetailQtService {
         checkNoDuplicateCode(tenantId, request.code(), id);
         validateBusinessSegment(tenantId, request.businessSegmentId());
         validateProcessStepSummary(tenantId, request.processStepSummaryId());
-        validateControlPoint(tenantId, request.controlPointId());
 
         applyRequest(item, request);
         item = repository.save(item);
 
         auditLogService.record("AuditProcessStepDetailQt", item.getId(), AuditAction.UPDATE, "Cap nhat buoc quy trinh chi tiet: " + item.getCode());
-        return toResponse(item, businessSegmentsById(tenantId), summariesById(tenantId), controlPointsById(tenantId));
+        return toResponse(item, businessSegmentsById(tenantId), summariesById(tenantId));
     }
 
     @Transactional
@@ -139,8 +131,6 @@ public class AuditProcessStepDetailQtService {
                 .forEach(s -> segmentIdsByCode.put(s.getCode(), s.getId()));
         Map<String, UUID> summaryIdsByCode = new HashMap<>();
         processStepSummaryRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(s -> summaryIdsByCode.put(s.getCode(), s.getId()));
-        Map<String, UUID> controlPointIdsByCode = new HashMap<>();
-        controlPointRepository.findByTenantIdOrderByCodeAsc(tenantId).forEach(c -> controlPointIdsByCode.put(c.getCode(), c.getId()));
 
         int success = 0;
         List<ImportResult.ImportRowError> errors = new ArrayList<>();
@@ -156,12 +146,10 @@ public class AuditProcessStepDetailQtService {
                 UUID businessSegmentId = isBlank(segmentCode) ? null : segmentIdsByCode.get(segmentCode.trim());
                 String summaryCode = row.get("processStepSummaryCode");
                 UUID processStepSummaryId = isBlank(summaryCode) ? null : summaryIdsByCode.get(summaryCode.trim());
-                String controlPointCode = row.get("controlPointCode");
-                UUID controlPointId = isBlank(controlPointCode) ? null : controlPointIdsByCode.get(controlPointCode.trim());
 
                 Optional<AuditProcessStepDetailQt> existing = repository.findByTenantIdAndCode(tenantId, code.trim());
                 AuditProcessStepDetailQtRequest request = new AuditProcessStepDetailQtRequest(businessSegmentId, processStepSummaryId,
-                        controlPointId, code.trim(), existing.map(AuditProcessStepDetailQt::isActive).orElse(true));
+                        code.trim(), parseInt(row.get("applicableYear")), existing.map(AuditProcessStepDetailQt::isActive).orElse(true));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
                 } else {
@@ -181,8 +169,8 @@ public class AuditProcessStepDetailQtService {
     private void applyRequest(AuditProcessStepDetailQt item, AuditProcessStepDetailQtRequest request) {
         item.setBusinessSegmentId(request.businessSegmentId());
         item.setProcessStepSummaryId(request.processStepSummaryId());
-        item.setControlPointId(request.controlPointId());
         item.setCode(request.code());
+        item.setApplicableYear(request.applicableYear());
         item.setActive(request.active());
     }
 
@@ -212,15 +200,6 @@ public class AuditProcessStepDetailQtService {
                 .orElseThrow(() -> new BusinessException("AUDIT_PROCESS_STEP_SUMMARY_QT_NOT_FOUND", "Khong tim thay buoc quy trinh tong hop"));
     }
 
-    private void validateControlPoint(UUID tenantId, UUID controlPointId) {
-        if (controlPointId == null) {
-            return;
-        }
-        controlPointRepository.findById(controlPointId)
-                .filter(item -> item.getTenantId().equals(tenantId))
-                .orElseThrow(() -> new BusinessException("AUDIT_CONTROL_POINT_QT_NOT_FOUND", "Khong tim thay chot kiem soat quy trinh"));
-    }
-
     private AuditProcessStepDetailQt getOwnedOrThrow(UUID tenantId, UUID id) {
         return repository.findById(id)
                 .filter(item -> item.getTenantId().equals(tenantId))
@@ -237,33 +216,26 @@ public class AuditProcessStepDetailQtService {
                 .collect(Collectors.toMap(AuditProcessStepSummaryQt::getId, i -> i));
     }
 
-    private Map<UUID, AuditControlPointQt> controlPointsById(UUID tenantId) {
-        return controlPointRepository.findByTenantIdOrderByCodeAsc(tenantId).stream()
-                .collect(Collectors.toMap(AuditControlPointQt::getId, i -> i));
-    }
-
     private List<ExportColumn> exportColumns() {
         return List.of(
                 new ExportColumn("businessSegmentCode", "Mảng nghiệp vụ"),
                 new ExportColumn("processStepSummaryCode", "Mã bước quy trình tổng hợp"),
-                new ExportColumn("controlPointCode", "Mã chốt kiểm soát"),
-                new ExportColumn("code", "Mã BQT chi tiết"));
+                new ExportColumn("code", "Mã BQT chi tiết"),
+                new ExportColumn("applicableYear", "Năm"));
     }
 
     private List<Map<String, Object>> exportRows() {
         UUID tenantId = TenantContext.getTenantId();
         Map<UUID, AuditMasterDataItem> segments = businessSegmentsById(tenantId);
         Map<UUID, AuditProcessStepSummaryQt> summaries = summariesById(tenantId);
-        Map<UUID, AuditControlPointQt> controlPoints = controlPointsById(tenantId);
         return repository.findByTenantIdOrderByCodeAsc(tenantId).stream()
                 .map(item -> {
                     Map<String, Object> row = new HashMap<>();
                     row.put("businessSegmentCode", codeOf(segments.get(item.getBusinessSegmentId())));
                     AuditProcessStepSummaryQt summary = summaries.get(item.getProcessStepSummaryId());
                     row.put("processStepSummaryCode", summary == null ? null : summary.getCode());
-                    AuditControlPointQt controlPoint = controlPoints.get(item.getControlPointId());
-                    row.put("controlPointCode", controlPoint == null ? null : controlPoint.getCode());
                     row.put("code", item.getCode());
+                    row.put("applicableYear", item.getApplicableYear());
                     return row;
                 }).toList();
     }
@@ -276,15 +248,24 @@ public class AuditProcessStepDetailQtService {
         return value == null || value.isBlank();
     }
 
+    private Integer parseInt(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private AuditProcessStepDetailQtResponse toResponse(AuditProcessStepDetailQt item, Map<UUID, AuditMasterDataItem> segments,
-                                                          Map<UUID, AuditProcessStepSummaryQt> summaries, Map<UUID, AuditControlPointQt> controlPoints) {
+                                                          Map<UUID, AuditProcessStepSummaryQt> summaries) {
         AuditMasterDataItem segment = item.getBusinessSegmentId() == null ? null : segments.get(item.getBusinessSegmentId());
         AuditProcessStepSummaryQt summary = item.getProcessStepSummaryId() == null ? null : summaries.get(item.getProcessStepSummaryId());
-        AuditControlPointQt controlPoint = item.getControlPointId() == null ? null : controlPoints.get(item.getControlPointId());
         return new AuditProcessStepDetailQtResponse(item.getId(), item.getBusinessSegmentId(),
                 segment == null ? null : segment.getCode(), segment == null ? null : segment.getName(),
                 item.getProcessStepSummaryId(), summary == null ? null : summary.getCode(), summary == null ? null : summary.getName(),
-                item.getControlPointId(), controlPoint == null ? null : controlPoint.getCode(), controlPoint == null ? null : controlPoint.getName(),
-                item.getCode(), item.isActive());
+                item.getCode(), item.getApplicableYear(), item.isActive());
     }
 }

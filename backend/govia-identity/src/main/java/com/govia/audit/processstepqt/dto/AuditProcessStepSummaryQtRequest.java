@@ -10,6 +10,7 @@ public record AuditProcessStepSummaryQtRequest(
         @NotBlank @Size(max = 30) String code,
         @NotBlank @Size(max = 255) String name,
         UUID workItemId,
+        Integer applicableYear,
         boolean active
 ) {
 }

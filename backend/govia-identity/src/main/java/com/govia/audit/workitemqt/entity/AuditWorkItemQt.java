@@ -21,6 +21,11 @@ import java.util.UUID;
 @Table(name = "audit_work_item_qt")
 public class AuditWorkItemQt extends BaseEntity {
 
+    /** "Loai doi tuong" - link toi AuditObjectCategory (danh muc "Loai doi tuong kiem toan" cua
+     * module Cham diem rui ro), cot dau tien tren luoi. */
+    @Column(name = "audit_object_category_id", columnDefinition = "uuid")
+    private UUID auditObjectCategoryId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "phase", length = 20)
     private AuditWorkPhase phase;
@@ -51,4 +56,7 @@ public class AuditWorkItemQt extends BaseEntity {
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
+
+    @Column(name = "has_sample_selection", nullable = false)
+    private boolean hasSampleSelection = false;
 }

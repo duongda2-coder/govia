@@ -12,6 +12,7 @@ public record AuditProcessStepSummaryQtResponse(
         UUID workItemId,
         String workItemCode,
         String workItemName,
+        Integer applicableYear,
         boolean active
 ) {
 }

@@ -11,6 +11,7 @@ export interface AuditProcessStepSummaryQtItem {
   workItemId: string | null;
   workItemCode: string | null;
   workItemName: string | null;
+  applicableYear: number | null;
   active: boolean;
 }
 
@@ -19,6 +20,7 @@ export interface AuditProcessStepSummaryQtRequest {
   code: string;
   name: string;
   workItemId: string | null;
+  applicableYear: number | null;
   active: boolean;
 }
 
@@ -70,18 +72,16 @@ export interface AuditProcessStepDetailQtItem {
   processStepSummaryId: string | null;
   processStepSummaryCode: string | null;
   processStepSummaryName: string | null;
-  controlPointId: string | null;
-  controlPointCode: string | null;
-  controlPointName: string | null;
   code: string;
+  applicableYear: number | null;
   active: boolean;
 }
 
 export interface AuditProcessStepDetailQtRequest {
   businessSegmentId: string | null;
   processStepSummaryId: string | null;
-  controlPointId: string | null;
   code: string;
+  applicableYear: number | null;
   active: boolean;
 }
 

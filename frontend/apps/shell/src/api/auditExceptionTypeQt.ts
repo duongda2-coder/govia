@@ -12,6 +12,7 @@ export interface AuditExceptionTypeQtItem {
   category: AuditExceptionCategory | null;
   impactLevel: AuditLevel | null;
   classificationBasis: string | null;
+  applicableYear: number | null;
   active: boolean;
 }
 
@@ -22,6 +23,7 @@ export interface AuditExceptionTypeQtRequest {
   category: AuditExceptionCategory | null;
   impactLevel: AuditLevel | null;
   classificationBasis: string | null;
+  applicableYear: number | null;
   active: boolean;
 }
 

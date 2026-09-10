@@ -145,9 +145,9 @@ public class AuditProgressReportService {
         report.setTotalMaterialTtss(materialFindingCodes.size());
         report.setTotalSamples(sampleCounts[0]);
         report.setCompletedSamples(sampleCounts[1]);
-        report.setReportDate(LocalDate.now());
-        report.setReportRound((int) reportRepository.countByTenantIdAndEngagementIdAndBusinessSegmentIdAndReportedEmployeeId(
-                tenantId, engagementId, businessSegmentId, reportedEmployeeId) + 1);
+        LocalDate today = LocalDate.now();
+        report.setReportDate(today);
+        report.setReportRound(resolveReportRound(tenantId, engagementId, businessSegmentId, reportedEmployeeId, today));
         report.setReportedByUsername(uploaderUsername);
         report.setNote(note);
         report = reportRepository.save(report);
@@ -159,6 +159,18 @@ public class AuditProgressReportService {
         auditLogService.record("AuditProgressReport", report.getId(), AuditAction.CREATE,
                 "Sinh bao cao tien do lan " + report.getReportRound() + " tu upload TTSS cho CKT " + engagement.getCode());
         return toResponse(report, segmentsById(tenantId), employeeMap(reportedEmployeeId));
+    }
+
+    /** Upload nhieu lan trong CUNG 1 ngay chi tinh la 1 "Lan bao cao": neu to hop nay da co bao cao
+     * hom nay thi lay lai cung so lan, chi sang ngay khac moi tang. */
+    private int resolveReportRound(UUID tenantId, UUID engagementId, UUID businessSegmentId, UUID reportedEmployeeId, LocalDate today) {
+        return reportRepository
+                .findFirstByTenantIdAndEngagementIdAndBusinessSegmentIdAndReportedEmployeeIdAndReportDate(
+                        tenantId, engagementId, businessSegmentId, reportedEmployeeId, today)
+                .map(AuditProgressReport::getReportRound)
+                .orElseGet(() -> (int) reportRepository
+                        .countDistinctReportDateByTenantIdAndEngagementIdAndBusinessSegmentIdAndReportedEmployeeId(
+                                tenantId, engagementId, businessSegmentId, reportedEmployeeId) + 1);
     }
 
     /** Dem "tong so luong mau"/"so luong mau hoan thanh" - proxy qua AuditEngagementAssignment theo

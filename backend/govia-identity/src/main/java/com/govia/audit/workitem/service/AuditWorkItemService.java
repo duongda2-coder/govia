@@ -139,7 +139,7 @@ public class AuditWorkItemService {
                 Optional<AuditWorkItem> existing = repository.findByTenantIdAndCode(tenantId, code.trim());
                 AuditWorkItemRequest request = new AuditWorkItemRequest(
                         parseEnum(AuditWorkPhase.class, row.get("phase")), businessSegmentId, code.trim(), emptyToNull(row.get("detailCode")),
-                        name.trim(), parseInt(row.get("applicableYear")), emptyToNull(row.get("workSetCode")), emptyToNull(row.get("workType")),
+                        name.trim(), parseInt(row.get("applicableYear")), emptyToNull(row.get("workType")),
                         existing.map(AuditWorkItem::isActive).orElse(true), parseBoolean(row.get("hasSampleSelection")));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
@@ -164,7 +164,6 @@ public class AuditWorkItemService {
         item.setDetailCode(request.detailCode());
         item.setName(request.name());
         item.setApplicableYear(request.applicableYear());
-        item.setWorkSetCode(request.workSetCode());
         item.setWorkType(request.workType());
         item.setActive(request.active());
         item.setHasSampleSelection(request.hasSampleSelection());
@@ -206,7 +205,6 @@ public class AuditWorkItemService {
                 new ExportColumn("detailCode", "Mã chi tiết"),
                 new ExportColumn("name", "Tên công việc"),
                 new ExportColumn("applicableYear", "Năm"),
-                new ExportColumn("workSetCode", "Mã bộ công việc"),
                 new ExportColumn("workType", "Loại CV"),
                 new ExportColumn("hasSampleSelection", "Có chọn mẫu"));
     }
@@ -223,7 +221,6 @@ public class AuditWorkItemService {
                     row.put("detailCode", item.getDetailCode());
                     row.put("name", item.getName());
                     row.put("applicableYear", item.getApplicableYear());
-                    row.put("workSetCode", item.getWorkSetCode());
                     row.put("workType", item.getWorkType());
                     row.put("hasSampleSelection", item.isHasSampleSelection() ? "Y" : "N");
                     return row;
@@ -272,7 +269,7 @@ public class AuditWorkItemService {
         AuditMasterDataItem segment = item.getBusinessSegmentId() == null ? null : segments.get(item.getBusinessSegmentId());
         return new AuditWorkItemResponse(item.getId(), item.getPhase(), item.getBusinessSegmentId(),
                 segment == null ? null : segment.getCode(), segment == null ? null : segment.getName(),
-                item.getCode(), item.getDetailCode(), item.getName(), item.getApplicableYear(), item.getWorkSetCode(), item.getWorkType(),
+                item.getCode(), item.getDetailCode(), item.getName(), item.getApplicableYear(), item.getWorkType(),
                 item.isActive(), item.isHasSampleSelection());
     }
 }

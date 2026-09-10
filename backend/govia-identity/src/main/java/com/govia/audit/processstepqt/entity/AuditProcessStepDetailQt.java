@@ -10,9 +10,9 @@ import lombok.Setter;
 import java.util.UUID;
 
 /** Danh muc "Buoc quy trinh chi tiet" (sheet ZTC_BQT_MAP_QT, bang ZTB_BQT_CT_QT) - phien ban
- * "Kiem toan quy trinh" cua AuditProcessStepDetail (ZTC_BQT_MAP). Khac voi ban goc (da bo cot
- * control_point_id - xem migration 095), sheet ZTC_BQT_MAP_QT yeu cau ro "Ma BQT chi tiet" link
- * toi danh muc Chot kiem soat quy trinh (ZTC_CKS_QT), nen entity nay giu lai controlPointId. */
+ * "Kiem toan quy trinh" cua AuditProcessStepDetail (ZTC_BQT_MAP). Da bo cot control_point_id
+ * (xem migration 142, giong migration 095 cua ban goc): nguoi dung xac nhan "Ma BQT chi tiet"
+ * chinh la ma CKS nen cot lien ket rieng la thua. */
 @Getter
 @Setter
 @Entity
@@ -25,12 +25,11 @@ public class AuditProcessStepDetailQt extends BaseEntity {
     @Column(name = "process_step_summary_id", columnDefinition = "uuid")
     private UUID processStepSummaryId;
 
-    /** "Ma BQT chi tiet" - link toi AuditControlPointQt (sheet ZTC_CKS_QT). */
-    @Column(name = "control_point_id", columnDefinition = "uuid")
-    private UUID controlPointId;
-
     @Column(name = "code", nullable = false, length = 50)
     private String code;
+
+    @Column(name = "applicable_year")
+    private Integer applicableYear;
 
     @Column(name = "active", nullable = false)
     private boolean active = true;

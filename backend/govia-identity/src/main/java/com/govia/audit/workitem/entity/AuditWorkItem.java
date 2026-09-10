@@ -40,9 +40,6 @@ public class AuditWorkItem extends BaseEntity {
     @Column(name = "applicable_year")
     private Integer applicableYear;
 
-    @Column(name = "work_set_code", length = 20)
-    private String workSetCode;
-
     @Column(name = "work_type", length = 20)
     private String workType;
 
