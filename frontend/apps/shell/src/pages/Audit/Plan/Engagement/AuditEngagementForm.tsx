@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Button, Col, DatePicker, Divider, Form, Input, InputNumber, Row, Select, Space, Typography } from "antd";
+import { Alert, App, Button, Col, DatePicker, Divider, Form, Input, InputNumber, Row, Select, Space, Typography } from "antd";
 import { SaveOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
@@ -56,6 +56,19 @@ export interface AuditEngagementFormProps {
   onCancel: () => void;
   /** Bo qua (undefined) neu nguoi dung khong co quyen EDIT - nut "Sua" se khong hien o che do Xem. */
   onEdit?: () => void;
+  /** Nut "Tao CKT con" (man hinh "QL CKT quy trinh"): tao moi CKT nhung gan voi 1 CKT quy trinh cha
+   * va tien dien mot so truong tu CKT quy trinh do (nam, thang, ngay QDKT, truong doan, so QD).
+   * Bo qua (undefined) o luong tao CKT doc lap thong thuong. */
+  prefillFromProcessEngagement?: {
+    processEngagementId: string;
+    processEngagementCode: string;
+    year: number;
+    expectedMonth: number;
+    decisionDate: string;
+    teamLeadEmployeeId: string;
+    decisionNumber: string;
+    name?: string | null;
+  };
 }
 
 const toDate = (v: dayjs.Dayjs | undefined | null) => (v ? v.format("YYYY-MM-DD") : null);
@@ -63,7 +76,7 @@ const toDateTime = (v: dayjs.Dayjs | undefined | null) => (v ? v.format("YYYY-MM
 
 /** Form dung chung cho ca 3 che do Tao moi/Xem/Sua man hinh "Thong tin cuoc kiem toan" (sheet "khoi tao"). */
 export function AuditEngagementForm(props: AuditEngagementFormProps) {
-  const { mode, engagement, auditObjectUnits, employees, onSaved, onCancel, onEdit } = props;
+  const { mode, engagement, auditObjectUnits, employees, onSaved, onCancel, onEdit, prefillFromProcessEngagement } = props;
   const { t } = useTranslation();
   const { message } = App.useApp();
   const [form] = Form.useForm<FormValues>();
@@ -105,13 +118,25 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
         reportPlanStart: engagement.reportPlanStart ? dayjs(engagement.reportPlanStart) : undefined,
         reportPlanEnd: engagement.reportPlanEnd ? dayjs(engagement.reportPlanEnd) : undefined,
       });
+    } else if (prefillFromProcessEngagement) {
+      form.resetFields();
+      form.setFieldsValue({
+        year: prefillFromProcessEngagement.year,
+        expectedMonth: prefillFromProcessEngagement.expectedMonth,
+        decisionDate: dayjs(prefillFromProcessEngagement.decisionDate),
+        teamLeadEmployeeId: prefillFromProcessEngagement.teamLeadEmployeeId,
+        decisionNumber: prefillFromProcessEngagement.decisionNumber,
+        name: prefillFromProcessEngagement.name ?? undefined,
+        status: "DRAFT",
+      });
+      setSelectedUnitType(undefined);
     } else {
       form.resetFields();
       form.setFieldsValue({ year: dayjs().year(), status: "DRAFT" });
       setSelectedUnitType(undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [engagement, auditObjectUnits]);
+  }, [engagement, auditObjectUnits, prefillFromProcessEngagement]);
 
   const handleSubmit = useCallback(async () => {
     if (readOnly) return;
@@ -147,6 +172,7 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
         sampleRequestEnd: toDateTime(values.sampleRequestEnd),
         reportPlanStart: toDateTime(values.reportPlanStart),
         reportPlanEnd: toDateTime(values.reportPlanEnd),
+        processEngagementId: engagement ? undefined : prefillFromProcessEngagement?.processEngagementId ?? null,
       };
       let saved: AuditEngagementItem;
       if (engagement) {
@@ -162,7 +188,7 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
     } finally {
       setSubmitting(false);
     }
-  }, [readOnly, form, engagement, message, t, onSaved]);
+  }, [readOnly, form, engagement, message, t, onSaved, prefillFromProcessEngagement]);
 
   useEffect(() => {
     if (readOnly) return;
@@ -205,6 +231,15 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
           </Space>
         </Col>
       </Row>
+
+      {!engagement && prefillFromProcessEngagement && (
+        <Alert
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message={t("auditEngagement.form.childOfProcessEngagement", { code: prefillFromProcessEngagement.processEngagementCode })}
+        />
+      )}
 
       <Form<FormValues> form={form} layout="vertical" disabled={readOnly}>
         <Row gutter={16}>

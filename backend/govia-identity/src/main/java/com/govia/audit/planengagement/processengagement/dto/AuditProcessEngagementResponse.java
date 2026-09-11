@@ -6,6 +6,7 @@ import java.util.UUID;
 public record AuditProcessEngagementResponse(
         UUID id,
         String code,
+        String objectType,
         UUID businessSegmentId,
         String businessSegmentCode,
         String businessSegmentName,
@@ -15,8 +16,12 @@ public record AuditProcessEngagementResponse(
         UUID teamLeadEmployeeId,
         String teamLeadEmployeeCode,
         String teamLeadEmployeeName,
+        String teamLeadUsername,
         String decisionNumber,
         String name,
-        String workSetCode
+        String workSetCode,
+        String createdBy,
+        int childCount,
+        int memberCount
 ) {
 }

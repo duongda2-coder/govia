@@ -32,6 +32,10 @@ public record AuditEngagementRequest(
         LocalDateTime sampleRequestStart,
         LocalDateTime sampleRequestEnd,
         LocalDateTime reportPlanStart,
-        LocalDateTime reportPlanEnd
+        LocalDateTime reportPlanEnd,
+        /** Chi dat khi tao "CKT con" tu man hinh "QL CKT quy trinh" (nut "Tao CKT con") - server
+         * dung de sinh ma theo quy tac rieng va lien ket voi CKT quy trinh cha. Bo qua/giu nguyen
+         * khi sua (khong the "gan lai" 1 CKT da tao vao CKT quy trinh khac qua form nay). */
+        UUID processEngagementId
 ) {
 }

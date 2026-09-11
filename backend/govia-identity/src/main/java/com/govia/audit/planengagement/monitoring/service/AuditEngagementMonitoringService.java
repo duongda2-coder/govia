@@ -144,6 +144,38 @@ public class AuditEngagementMonitoringService {
         return buildMonitoringResponse(response, members, ttssRecords);
     }
 
+    // ===================== "Chi tiết đoàn" cua "QL CKT quy trinh" (Tao CKT (4).xlsx) =====================
+
+    /** 1 dong / CKT con cua 1 CKT quy trinh, cung cong thuc tong hop voi man hinh 1 nhung KHONG loc
+     * theo tham gia (day la man hinh giam sat cap CKT quy trinh, da duoc chan quyen o controller). */
+    @Transactional(readOnly = true)
+    public List<AuditEngagementMonitoringResponse> listByProcessEngagement(UUID processEngagementId) {
+        UUID tenantId = TenantContext.getTenantId();
+        List<AuditEngagement> children = engagementRepository.findByTenantIdAndProcessEngagementIdOrderByCreatedAtAsc(tenantId, processEngagementId);
+        if (children.isEmpty()) {
+            return List.of();
+        }
+        List<UUID> childIds = children.stream().map(AuditEngagement::getId).toList();
+        List<AuditEngagementGroup> groups = groupRepository.findByTenantIdAndAuditEngagementIdIn(tenantId, childIds);
+        Map<UUID, UUID> engagementIdByGroupId = groups.stream().collect(Collectors.toMap(AuditEngagementGroup::getId, AuditEngagementGroup::getAuditEngagementId));
+        List<UUID> groupIds = groups.stream().map(AuditEngagementGroup::getId).toList();
+        List<AuditEngagementGroupMember> allMembers = groupIds.isEmpty() ? List.of() : memberRepository.findByTenantIdAndGroupIdIn(tenantId, groupIds);
+        Map<UUID, List<AuditEngagementGroupMember>> membersByEngagement = new HashMap<>();
+        for (AuditEngagementGroupMember member : allMembers) {
+            UUID engagementId = engagementIdByGroupId.get(member.getGroupId());
+            if (engagementId != null) {
+                membersByEngagement.computeIfAbsent(engagementId, k -> new ArrayList<>()).add(member);
+            }
+        }
+        List<AuditTtssRecord> ttssRecords = ttssRecordRepository.findByTenantIdAndEngagementIdIn(tenantId, childIds);
+        Map<UUID, List<AuditTtssRecord>> ttssByEngagement = ttssRecords.stream().collect(Collectors.groupingBy(AuditTtssRecord::getEngagementId));
+
+        return childIds.stream()
+                .map(id -> buildMonitoringResponse(engagementService.get(id), membersByEngagement.getOrDefault(id, List.of()),
+                        ttssByEngagement.getOrDefault(id, List.of())))
+                .toList();
+    }
+
     // ===================== Man hinh 2: "Chi tiết đoàn kiểm toán" =====================
 
     @Transactional(readOnly = true)

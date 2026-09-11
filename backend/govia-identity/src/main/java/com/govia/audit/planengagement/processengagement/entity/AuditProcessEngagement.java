@@ -10,10 +10,12 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.util.UUID;
 
-/** "Cuoc kiem toan theo quy trinh/nghiep vu" (CKT quy trinh) - man hinh "Tao CKT quy trinh", sibling
- * nhe hon cua AuditEngagement (CKT theo don vi/chi nhanh): thay vi chon "Doi tuong kiem toan" (don
- * vi/chi nhanh), CKT quy trinh gan truc tiep voi 1 "Nghiep vu" (BUSINESS_SEGMENT) - nguon: file
- * "Tao CKT (3).xlsx", sheet "man hinh tao CKT quy trinh". */
+/** "Cuoc kiem toan theo quy trinh/nghiep vu" (CKT quy trinh) - man hinh "Tao CKT quy trinh": thay
+ * vi chon "Doi tuong kiem toan" (don vi/chi nhanh), CKT quy trinh gan truc tiep voi 1 "Nghiep vu"
+ * (BUSINESS_SEGMENT) - nguon: file "Tao CKT (3).xlsx", sheet "man hinh tao CKT quy trinh". Tu
+ * "Tao CKT (4).xlsx" sheet "QL CKT quy trinh": day la CHA cua nhieu {@link
+ * com.govia.audit.planengagement.entity.AuditEngagement} (CKT con, 1 cai/chi nhanh di kiem toan)
+ * lien ket qua AuditEngagement.processEngagementId. */
 @Getter
 @Setter
 @Entity
@@ -25,6 +27,11 @@ public class AuditProcessEngagement extends BaseEntity {
      * nghiep vu + nam) - xem sheet "man hinh tao CKT quy trinh": "Ma QT/HD + nghiep vu + Nam + STT". */
     @Column(name = "code", nullable = false, length = 30, unique = true)
     private String code;
+
+    /** "QT" (Quy trinh) hoac "HD" (Hoat dong) - tien to cua ma CKT, xem sheet "QL CKT quy trinh"
+     * cua "Tao CKT (4).xlsx": "co 2 loai doi tuong QT la quy trinh, HD la Hoat dong". */
+    @Column(name = "object_type", nullable = false, length = 2)
+    private String objectType = "QT";
 
     /** Nghiep vu kiem toan - AuditMasterDataItem thuoc danh muc BUSINESS_SEGMENT. */
     @Column(name = "business_segment_id", nullable = false, columnDefinition = "uuid")

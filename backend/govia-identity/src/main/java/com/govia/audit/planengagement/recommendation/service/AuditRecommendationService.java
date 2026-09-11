@@ -73,6 +73,17 @@ public class AuditRecommendationService {
         return toResponses(tenantId, repository.findByTenantIdAndEngagementIdOrderByCodeAsc(tenantId, engagementId));
     }
 
+    /** "Quản lý KN" tong hop cua man hinh "QL CKT quy trinh" - doc, khong seed dong mac dinh (chi
+     * seed khi mo tung CKT con rieng le qua list(engagementId) o tren). */
+    @Transactional(readOnly = true)
+    public List<AuditRecommendationResponse> listByEngagementIds(List<UUID> engagementIds) {
+        if (engagementIds.isEmpty()) {
+            return List.of();
+        }
+        UUID tenantId = TenantContext.getTenantId();
+        return toResponses(tenantId, repository.findByTenantIdAndEngagementIdInOrderByCodeAsc(tenantId, engagementIds));
+    }
+
     @Transactional
     public AuditRecommendationResponse create(UUID engagementId, AuditRecommendationRequest request) {
         UUID tenantId = TenantContext.getTenantId();

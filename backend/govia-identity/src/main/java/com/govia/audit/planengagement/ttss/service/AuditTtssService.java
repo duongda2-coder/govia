@@ -159,6 +159,17 @@ public class AuditTtssService {
         return toResponses(tenantId, scopeByVisibility(tenantId, engagement, records, principal));
     }
 
+    /** "Quản lý TTSS" tong hop cua man hinh "QL CKT quy trinh" - doc, khong scoping theo tham gia
+     * (man hinh giam sat cap CKT quy trinh, da chan quyen o controller). */
+    @Transactional(readOnly = true)
+    public List<AuditTtssRecordResponse> listByEngagementIds(List<UUID> engagementIds) {
+        if (engagementIds.isEmpty()) {
+            return List.of();
+        }
+        UUID tenantId = TenantContext.getTenantId();
+        return toResponses(tenantId, ttssRepository.findByTenantIdAndEngagementIdIn(tenantId, engagementIds));
+    }
+
     /** Ket qua phan quyen THEO DONG cho 1 nguoi dung tren 1 CKT - dung chung cho list()/delete()/
      * approveRecommendations() de dam bao xoa/duyet cung bi gioi han dung pham vi da thay o man
      * hinh danh sach (khong the xoa/duyet 1 dong minh khong duoc phep xem). */
@@ -733,8 +744,9 @@ public class AuditTtssService {
                 .collect(Collectors.toMap(AuditProcessStepSummary::getId, s -> s));
         Map<UUID, AuditProcessStepDetail> stepDetails = processStepDetailRepository.findByTenantIdOrderByCodeAsc(tenantId).stream()
                 .collect(Collectors.toMap(AuditProcessStepDetail::getId, s -> s));
+        List<UUID> engagementIds = records.stream().map(AuditTtssRecord::getEngagementId).distinct().toList();
         Map<UUID, AuditRecommendation> recommendations = recommendationRepository
-                .findByTenantIdAndEngagementIdOrderByCodeAsc(tenantId, records.get(0).getEngagementId()).stream()
+                .findByTenantIdAndEngagementIdInOrderByCodeAsc(tenantId, engagementIds).stream()
                 .collect(Collectors.toMap(AuditRecommendation::getId, r -> r));
         return records.stream().map(r -> toResponse(r, segments, stepSummaries, stepDetails, recommendations)).toList();
     }

@@ -13,4 +13,8 @@ public interface AuditEngagementRepository extends JpaRepository<AuditEngagement
     Optional<AuditEngagement> findByTenantIdAndCode(UUID tenantId, String code);
 
     long countByTenantIdAndAuditObjectUnitIdAndYear(UUID tenantId, UUID auditObjectUnitId, Integer year);
+
+    List<AuditEngagement> findByTenantIdAndProcessEngagementIdOrderByCreatedAtAsc(UUID tenantId, UUID processEngagementId);
+
+    long countByTenantIdAndProcessEngagementId(UUID tenantId, UUID processEngagementId);
 }

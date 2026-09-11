@@ -1,0 +1,29 @@
+databaseChangeLog:
+
+  # ===================== "QL CKT quy trinh" (Tao CKT (4).xlsx): AuditProcessEngagement tro thanh =====================
+  # ===================== "cuoc kiem toan quy trinh" CHA, gom nhieu AuditEngagement (CKT con) chi nhanh =====================
+  - changeSet:
+      id: 147-1-audit-process-engagement-add-object-type
+      author: govia
+      comment: "Them cot object_type (QT/HD) vao audit_process_engagement - truoc gio ma CKT luon hardcode tien to QT"
+      changes:
+        - addColumn:
+            tableName: audit_process_engagement
+            columns:
+              - column: { name: object_type, type: VARCHAR(2), defaultValue: QT, constraints: { nullable: false } }
+
+  - changeSet:
+      id: 147-2-audit-engagement-add-process-engagement-link
+      author: govia
+      comment: "Them cot process_engagement_id (FK) vao audit_engagement - lien ket CKT con voi CKT quy trinh cha"
+      changes:
+        - addColumn:
+            tableName: audit_engagement
+            columns:
+              - column: { name: process_engagement_id, type: UUID }
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement
+            baseColumnNames: process_engagement_id
+            referencedTableName: audit_process_engagement
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_process_engagement

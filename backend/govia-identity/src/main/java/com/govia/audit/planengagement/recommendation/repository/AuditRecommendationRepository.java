@@ -10,5 +10,7 @@ import java.util.UUID;
 public interface AuditRecommendationRepository extends JpaRepository<AuditRecommendation, UUID> {
     List<AuditRecommendation> findByTenantIdAndEngagementIdOrderByCodeAsc(UUID tenantId, UUID engagementId);
 
+    List<AuditRecommendation> findByTenantIdAndEngagementIdInOrderByCodeAsc(UUID tenantId, List<UUID> engagementIds);
+
     Optional<AuditRecommendation> findByTenantIdAndEngagementIdAndCode(UUID tenantId, UUID engagementId, String code);
 }

@@ -9,6 +9,7 @@ import java.util.UUID;
 
 /** Ma CKT KHONG co trong request - server tu sinh khi tao, bat bien khi sua. */
 public record AuditProcessEngagementRequest(
+        @NotBlank @Size(min = 2, max = 2) String objectType,
         @NotNull UUID businessSegmentId,
         @NotNull Integer year,
         @NotNull Integer expectedMonth,

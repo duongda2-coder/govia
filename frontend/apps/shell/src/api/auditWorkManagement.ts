@@ -4,6 +4,7 @@ import { httpClient } from "./client";
 export type AuditWorkPhase = "CBKT" | "THKT" | "DCKT";
 export type AssignmentStatus = "NOT_STARTED" | "IN_PROGRESS" | "DONE";
 export type AssignmentApprovalStatus = "PENDING" | "APPROVED" | "REJECTED";
+export type AuditEngagementGroupCode = "DIEUHANH" | "NTINDUNG" | "TINDUNG";
 
 export interface AuditWorkManagementItem {
   assignmentId: string;
@@ -24,6 +25,7 @@ export interface AuditWorkManagementItem {
   approvalStatus: AssignmentApprovalStatus | null;
   approvedBy: string | null;
   approvedAt: string | null;
+  groupCode: AuditEngagementGroupCode | null;
 }
 
 export interface AuditWorkAssignmentStatusUpdateRequest {

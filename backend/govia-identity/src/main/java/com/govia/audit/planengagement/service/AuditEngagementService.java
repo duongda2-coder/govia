@@ -14,6 +14,8 @@ import com.govia.audit.employeecapability.repository.AuditEmployeeCapabilityRepo
 import com.govia.audit.planengagement.repository.AuditEngagementGroupRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRelatedUnitRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRepository;
+import com.govia.audit.planengagement.processengagement.entity.AuditProcessEngagement;
+import com.govia.audit.planengagement.processengagement.repository.AuditProcessEngagementRepository;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
 import com.govia.core.audit.AuditAction;
@@ -57,6 +59,7 @@ public class AuditEngagementService {
     private final AuditEngagementRelatedUnitRepository relatedUnitRepository;
     private final AuditEngagementGroupRepository groupRepository;
     private final AuditObjectUnitRepository auditObjectUnitRepository;
+    private final AuditProcessEngagementRepository processEngagementRepository;
     private final EmployeeRepository employeeRepository;
     private final UserAccountRepository userAccountRepository;
     private final AuditEmployeeCapabilityRepository employeeCapabilityRepository;
@@ -67,6 +70,7 @@ public class AuditEngagementService {
 
     public AuditEngagementService(AuditEngagementRepository repository, AuditEngagementRelatedUnitRepository relatedUnitRepository,
                                    AuditEngagementGroupRepository groupRepository, AuditObjectUnitRepository auditObjectUnitRepository,
+                                   AuditProcessEngagementRepository processEngagementRepository,
                                    EmployeeRepository employeeRepository, UserAccountRepository userAccountRepository,
                                    AuditEmployeeCapabilityRepository employeeCapabilityRepository, AuditLogService auditLogService,
                                    ExcelExportService excelExportService, WordExportService wordExportService,
@@ -75,6 +79,7 @@ public class AuditEngagementService {
         this.relatedUnitRepository = relatedUnitRepository;
         this.groupRepository = groupRepository;
         this.auditObjectUnitRepository = auditObjectUnitRepository;
+        this.processEngagementRepository = processEngagementRepository;
         this.employeeRepository = employeeRepository;
         this.userAccountRepository = userAccountRepository;
         this.employeeCapabilityRepository = employeeCapabilityRepository;
@@ -160,7 +165,13 @@ public class AuditEngagementService {
         AuditEngagement item = new AuditEngagement();
         item.setTenantId(tenantId);
         applyRequest(item, request);
-        item.setCode(generateCode(tenantId, unit, request.year()));
+        if (request.processEngagementId() != null) {
+            AuditProcessEngagement parent = getOwnedProcessEngagementOrThrow(tenantId, request.processEngagementId());
+            item.setProcessEngagementId(parent.getId());
+            item.setCode(generateChildCode(tenantId, parent, unit));
+        } else {
+            item.setCode(generateCode(tenantId, unit, request.year()));
+        }
         item = repository.save(item);
 
         auditLogService.record("AuditEngagement", item.getId(), AuditAction.CREATE, "Tao cuoc kiem toan: " + item.getCode());
@@ -275,7 +286,7 @@ public class AuditEngagementService {
                         parseDate(row.get("planningStartDate")), parseDate(row.get("planningEndDate")),
                         parseDate(row.get("fieldworkStartDate")), parseDate(row.get("fieldworkEndDate")),
                         parseDate(row.get("reportStartDate")), parseDate(row.get("reportEndDate")),
-                        null, null, null, null, null, null);
+                        null, null, null, null, null, null, null);
                 create(request);
                 success++;
             } catch (Exception e) {
@@ -298,6 +309,24 @@ public class AuditEngagementService {
             code = unit.getUnitType() + unit.getCode() + year + String.format("%02d", existing + 2);
         }
         return code;
+    }
+
+    /** "CKT con" tao tu nut "Tao CKT con" (man hinh "QL CKT quy trinh"): ma CKT KHONG theo quy tac
+     * loai doi tuong+ma DTKT+nam+STT thong thuong, ma la ma CKT quy trinh cha + "_" + ma don vi
+     * (vd "QTAM2601_1100") - xem sheet "QL CKT quy trinh" cua "Tao CKT (4).xlsx". */
+    private String generateChildCode(UUID tenantId, AuditProcessEngagement parent, AuditObjectUnit unit) {
+        String code = parent.getCode() + "_" + unit.getCode();
+        if (repository.findByTenantIdAndCode(tenantId, code).isPresent()) {
+            throw new BusinessException("AUDIT_ENGAGEMENT_CODE_DUPLICATE",
+                    "Da co CKT con cho don vi " + unit.getCode() + " trong CKT quy trinh nay: " + code);
+        }
+        return code;
+    }
+
+    private AuditProcessEngagement getOwnedProcessEngagementOrThrow(UUID tenantId, UUID id) {
+        return processEngagementRepository.findById(id)
+                .filter(p -> p.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("AUDIT_PROCESS_ENGAGEMENT_NOT_FOUND", "Khong tim thay cuoc kiem toan quy trinh", HttpStatus.NOT_FOUND));
     }
 
     private void applyRequest(AuditEngagement item, AuditEngagementRequest request) {
@@ -423,7 +452,8 @@ public class AuditEngagementService {
                 item.getDecisionNumber(), item.getStatus(), item.getRiskRank(), item.getName(), item.getObjective(), item.getScope(),
                 item.getPlanningStartDate(), item.getPlanningEndDate(), item.getFieldworkStartDate(), item.getFieldworkEndDate(),
                 item.getReportStartDate(), item.getReportEndDate(), item.getInfoCollectionStart(), item.getInfoCollectionEnd(),
-                item.getSampleRequestStart(), item.getSampleRequestEnd(), item.getReportPlanStart(), item.getReportPlanEnd(), item.getTeamRanking());
+                item.getSampleRequestStart(), item.getSampleRequestEnd(), item.getReportPlanStart(), item.getReportPlanEnd(), item.getTeamRanking(),
+                item.getProcessEngagementId());
     }
 
     private AuditEngagementRelatedUnitResponse toRelatedUnitResponse(AuditEngagementRelatedUnit row, AuditEngagement engagement, Map<UUID, AuditObjectUnit> units) {

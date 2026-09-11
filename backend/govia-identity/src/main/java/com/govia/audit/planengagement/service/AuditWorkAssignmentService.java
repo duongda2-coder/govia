@@ -102,6 +102,7 @@ public class AuditWorkAssignmentService {
         AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
 
         List<AuditEngagementGroup> groups = groupRepository.findByTenantIdAndAuditEngagementIdOrderByGroupCodeAsc(tenantId, engagementId);
+        Map<UUID, AuditEngagementGroup> groupsById = groups.stream().collect(Collectors.toMap(AuditEngagementGroup::getId, g -> g));
         List<UUID> groupIds = groups.stream().map(AuditEngagementGroup::getId).toList();
         List<AuditEngagementGroupMember> members = memberRepository.findByTenantIdAndGroupIdIn(tenantId, groupIds);
         Set<UUID> visibleEmployeeIds = resolveVisibleEmployeeIds(tenantId, engagement, groups, members, principal);
@@ -132,8 +133,22 @@ public class AuditWorkAssignmentService {
                     // CM_TD1/CM_NTD1-16 xu ly, khong qua "Quan ly cong viec THKT") - CBKT/DCKT khong doi.
                     return phase != AuditWorkPhase.THKT || !workItem.isHasSampleSelection();
                 })
-                .map(a -> toResponse(a, engagement, membersById.get(a.getGroupMemberId()), workItems, segments, employees, usernames))
+                .map(a -> toResponse(a, engagement, membersById.get(a.getGroupMemberId()), workItems, segments, employees, usernames, groupsById))
                 .toList();
+    }
+
+    /** "Quản lý công việc" tong hop cua man hinh "QL CKT quy trinh" (Tao CKT (4).xlsx) - gom ca 3
+     * giai doan CBKT/THKT/DCKT cua TAT CA CKT con, moi CKT giu nguyen scoping theo quyen xem cua
+     * chinh no (tai su dung list() thay vi tu viet lai). */
+    @Transactional(readOnly = true)
+    public List<AuditWorkManagementItemResponse> listForEngagements(List<UUID> engagementIds, CurrentUserPrincipal principal) {
+        List<AuditWorkManagementItemResponse> result = new ArrayList<>();
+        for (UUID engagementId : engagementIds) {
+            for (AuditWorkPhase phase : AuditWorkPhase.values()) {
+                result.addAll(list(engagementId, phase, null, principal));
+            }
+        }
+        return result;
     }
 
     @Transactional
@@ -166,7 +181,8 @@ public class AuditWorkAssignmentService {
                 masterDataItemRepository.findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, BUSINESS_SEGMENT)
                         .stream().collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i)),
                 employeeRepository.findById(member.getEmployeeId()).map(e -> Map.of(e.getId(), e)).orElse(Map.of()),
-                userAccountRepository.findByEmployeeId(member.getEmployeeId()).map(a -> Map.of(member.getEmployeeId(), a.getUsername())).orElse(Map.of()));
+                userAccountRepository.findByEmployeeId(member.getEmployeeId()).map(a -> Map.of(member.getEmployeeId(), a.getUsername())).orElse(Map.of()),
+                group == null ? Map.of() : Map.of(group.getId(), group));
     }
 
     /**
@@ -311,10 +327,11 @@ public class AuditWorkAssignmentService {
 
     private AuditWorkManagementItemResponse toResponse(AuditEngagementAssignment assignment, AuditEngagement engagement, AuditEngagementGroupMember member,
                                                           Map<UUID, AuditWorkItem> workItems, Map<UUID, AuditMasterDataItem> segments,
-                                                          Map<UUID, Employee> employees, Map<UUID, String> usernames) {
+                                                          Map<UUID, Employee> employees, Map<UUID, String> usernames, Map<UUID, AuditEngagementGroup> groupsById) {
         AuditWorkItem workItem = workItems.get(assignment.getWorkItemId());
         AuditMasterDataItem segment = workItem == null ? null : segments.get(workItem.getBusinessSegmentId());
         Employee employee = member == null ? null : employees.get(member.getEmployeeId());
+        AuditEngagementGroup group = member == null ? null : groupsById.get(member.getGroupId());
         return new AuditWorkManagementItemResponse(
                 assignment.getId(), engagement.getId(), engagement.getCode(), engagement.getName(),
                 segment == null ? null : segment.getCode(),
@@ -323,6 +340,6 @@ public class AuditWorkAssignmentService {
                 member == null ? null : member.getEmployeeId(), employee == null ? null : employee.getEmployeeCode(),
                 employee == null ? null : employee.getFullName(), member == null ? null : usernames.get(member.getEmployeeId()),
                 assignment.getStatus(), assignment.getNote(), assignment.getApprovalStatus(),
-                assignment.getApprovedBy(), assignment.getApprovedAt());
+                assignment.getApprovedBy(), assignment.getApprovedAt(), group == null ? null : group.getGroupCode());
     }
 }

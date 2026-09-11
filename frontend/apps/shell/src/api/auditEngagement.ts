@@ -35,6 +35,7 @@ export interface AuditEngagementItem {
   reportPlanStart: string | null;
   reportPlanEnd: string | null;
   teamRanking: string | null;
+  processEngagementId: string | null;
 }
 
 export interface AuditEngagementRequest {
@@ -61,6 +62,8 @@ export interface AuditEngagementRequest {
   sampleRequestEnd?: string | null;
   reportPlanStart?: string | null;
   reportPlanEnd?: string | null;
+  /** Chi dat khi tao "CKT con" tu man hinh "QL CKT quy trinh" - xem AuditEngagementForm.prefillFromProcessEngagement. */
+  processEngagementId?: string | null;
 }
 
 export interface AuditEngagementRelatedUnitItem {

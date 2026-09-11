@@ -46,6 +46,12 @@ public class AuditEngagement extends BaseEntity {
     @Column(name = "decision_number", nullable = false, length = 50)
     private String decisionNumber;
 
+    /** CKT quy trinh cha (AuditProcessEngagement) neu CKT nay la "CKT con" duoc tao tu nut "Tao CKT
+     * con" cua man hinh "QL CKT quy trinh" - null neu la CKT doc lap (luong tao thong thuong). Khi
+     * co gia tri, ma CKT sinh theo quy tac rieng: ma CKT quy trinh cha + "_" + ma don vi. */
+    @Column(name = "process_engagement_id", columnDefinition = "uuid")
+    private UUID processEngagementId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private AuditEngagementStatus status = AuditEngagementStatus.DRAFT;
