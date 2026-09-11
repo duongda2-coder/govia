@@ -18,6 +18,7 @@ import com.govia.audit.planengagement.repository.AuditEngagementGroupRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRepository;
 import com.govia.audit.planengagement.service.AuditEngagementService;
 import com.govia.audit.planengagement.service.AuditEngagementTeamService;
+import com.govia.audit.planengagement.supervisionteam.repository.AuditSupervisionTeamMemberRepository;
 import com.govia.audit.planengagement.ttss.entity.AuditTtssRecord;
 import com.govia.audit.planengagement.ttss.repository.AuditTtssRecordRepository;
 import com.govia.audit.workitem.entity.AuditWorkItem;
@@ -69,13 +70,15 @@ public class AuditEngagementMonitoringService {
     private final EmployeeRepository employeeRepository;
     private final AuditEngagementService engagementService;
     private final AuditEngagementTeamService teamService;
+    private final AuditSupervisionTeamMemberRepository supervisionTeamMemberRepository;
     private final AuditLogService auditLogService;
 
     public AuditEngagementMonitoringService(AuditEngagementRepository engagementRepository, AuditEngagementGroupRepository groupRepository,
                                              AuditEngagementGroupMemberRepository memberRepository, AuditEngagementAssignmentRepository assignmentRepository,
                                              AuditWorkItemRepository workItemRepository, AuditTtssRecordRepository ttssRecordRepository,
                                              EmployeeRepository employeeRepository, AuditEngagementService engagementService,
-                                             AuditEngagementTeamService teamService, AuditLogService auditLogService) {
+                                             AuditEngagementTeamService teamService, AuditSupervisionTeamMemberRepository supervisionTeamMemberRepository,
+                                             AuditLogService auditLogService) {
         this.engagementRepository = engagementRepository;
         this.groupRepository = groupRepository;
         this.memberRepository = memberRepository;
@@ -85,6 +88,7 @@ public class AuditEngagementMonitoringService {
         this.employeeRepository = employeeRepository;
         this.engagementService = engagementService;
         this.teamService = teamService;
+        this.supervisionTeamMemberRepository = supervisionTeamMemberRepository;
         this.auditLogService = auditLogService;
     }
 
@@ -171,6 +175,36 @@ public class AuditEngagementMonitoringService {
         Map<UUID, List<AuditTtssRecord>> ttssByEngagement = ttssRecords.stream().collect(Collectors.groupingBy(AuditTtssRecord::getEngagementId));
 
         return childIds.stream()
+                .map(id -> buildMonitoringResponse(engagementService.get(id), membersByEngagement.getOrDefault(id, List.of()),
+                        ttssByEngagement.getOrDefault(id, List.of())))
+                .toList();
+    }
+
+    /** "Man hinh quan ly to giam sat" (sheet "To giam sat" cua Tao CKT (4).xlsx) - danh sach CKT ma
+     * nhan vien dang dang nhap la thanh vien to giam sat, dung lai dung cong thuc tong hop voi man
+     * hinh 1 nhung KHONG loc theo tham gia doan (da duoc AuditSupervisionTeamService loc san theo
+     * to giam sat truoc khi goi vao day). */
+    @Transactional(readOnly = true)
+    public List<AuditEngagementMonitoringResponse> listByEngagementIds(List<UUID> engagementIds) {
+        if (engagementIds.isEmpty()) {
+            return List.of();
+        }
+        UUID tenantId = TenantContext.getTenantId();
+        List<AuditEngagementGroup> groups = groupRepository.findByTenantIdAndAuditEngagementIdIn(tenantId, engagementIds);
+        Map<UUID, UUID> engagementIdByGroupId = groups.stream().collect(Collectors.toMap(AuditEngagementGroup::getId, AuditEngagementGroup::getAuditEngagementId));
+        List<UUID> groupIds = groups.stream().map(AuditEngagementGroup::getId).toList();
+        List<AuditEngagementGroupMember> allMembers = groupIds.isEmpty() ? List.of() : memberRepository.findByTenantIdAndGroupIdIn(tenantId, groupIds);
+        Map<UUID, List<AuditEngagementGroupMember>> membersByEngagement = new HashMap<>();
+        for (AuditEngagementGroupMember member : allMembers) {
+            UUID engagementId = engagementIdByGroupId.get(member.getGroupId());
+            if (engagementId != null) {
+                membersByEngagement.computeIfAbsent(engagementId, k -> new ArrayList<>()).add(member);
+            }
+        }
+        List<AuditTtssRecord> ttssRecords = ttssRecordRepository.findByTenantIdAndEngagementIdIn(tenantId, engagementIds);
+        Map<UUID, List<AuditTtssRecord>> ttssByEngagement = ttssRecords.stream().collect(Collectors.groupingBy(AuditTtssRecord::getEngagementId));
+
+        return engagementIds.stream()
                 .map(id -> buildMonitoringResponse(engagementService.get(id), membersByEngagement.getOrDefault(id, List.of()),
                         ttssByEngagement.getOrDefault(id, List.of())))
                 .toList();
@@ -352,6 +386,8 @@ public class AuditEngagementMonitoringService {
                 participantEngagementIds.add(engagementId);
             }
         });
+        supervisionTeamMemberRepository.findByTenantIdAndEmployeeId(TenantContext.getTenantId(), currentEmployeeId)
+                .forEach(m -> participantEngagementIds.add(m.getEngagementId()));
         return all.stream().filter(e -> participantEngagementIds.contains(e.id())).toList();
     }
 
@@ -371,6 +407,9 @@ public class AuditEngagementMonitoringService {
             List<UUID> groupIds = groups.stream().map(AuditEngagementGroup::getId).toList();
             List<AuditEngagementGroupMember> members = groupIds.isEmpty() ? List.of() : memberRepository.findByTenantIdAndGroupIdIn(tenantId, groupIds);
             if (members.stream().anyMatch(m -> currentEmployeeId.equals(m.getEmployeeId()))) {
+                return;
+            }
+            if (supervisionTeamMemberRepository.existsByTenantIdAndEngagementIdAndEmployeeId(tenantId, engagement.getId(), currentEmployeeId)) {
                 return;
             }
         }

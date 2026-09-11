@@ -1,0 +1,39 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: "To giam sat" =====================
+  - changeSet:
+      id: 149-1-permission-audit-supervision-team-view
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "99361ce2-3682-4c99-940f-6854070bc7b9" }
+              - column: { name: code, value: "AUDIT.SUPERVISION_TEAM.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem to giam sat, ket qua danh gia va cac CKT dang giam sat" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Tổ giám sát" }
+  - changeSet:
+      id: 149-2-permission-audit-supervision-team-manage
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "293d8ad8-b76f-442b-b91c-861a5d5fd01b" }
+              - column: { name: code, value: "AUDIT.SUPERVISION_TEAM.MANAGE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Chon/thay doi thanh vien to giam sat cua CKT (chi nguoi tao CKT moi thuc hien duoc)" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Tổ giám sát" }
+  - changeSet:
+      id: 149-3-permission-audit-supervision-team-evaluate
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1c20cbb3-0c9f-4b3f-9714-20026c3829f3" }
+              - column: { name: code, value: "AUDIT.SUPERVISION_TEAM.EVALUATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "To giam sat tu ghi danh gia cua chinh minh cho CKT" }
+              - column: { name: resource_label, value: "Lập kế hoạch - Tổ giám sát" }

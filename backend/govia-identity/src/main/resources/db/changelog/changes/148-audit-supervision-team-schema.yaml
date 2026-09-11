@@ -1,0 +1,87 @@
+databaseChangeLog:
+
+  # ===================== "To giam sat" (sheet cung ten cua Tao CKT (4).xlsx) =====================
+  - changeSet:
+      id: 148-1-audit-supervision-team-member-schema
+      author: govia
+      comment: "Tao bang audit_supervision_team_member"
+      changes:
+        - createTable:
+            tableName: audit_supervision_team_member
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: engagement_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: employee_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_supervision_team_member
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_supervision_team_member_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_supervision_team_member
+            baseColumnNames: engagement_id
+            referencedTableName: audit_engagement
+            referencedColumnNames: id
+            constraintName: fk_audit_supervision_team_member_engagement
+        - addForeignKeyConstraint:
+            baseTableName: audit_supervision_team_member
+            baseColumnNames: employee_id
+            referencedTableName: employee
+            referencedColumnNames: id
+            constraintName: fk_audit_supervision_team_member_employee
+        - addUniqueConstraint:
+            tableName: audit_supervision_team_member
+            columnNames: tenant_id, engagement_id, employee_id
+            constraintName: uk_audit_supervision_team_member_tenant_engagement_employee
+
+  - changeSet:
+      id: 148-2-audit-supervision-evaluation-schema
+      author: govia
+      comment: "Tao bang audit_supervision_evaluation"
+      changes:
+        - createTable:
+            tableName: audit_supervision_evaluation
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: engagement_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: employee_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: progress, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: content_assured, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: quality_assured, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: note, type: VARCHAR(1000) }
+              - column: { name: evaluated_at, type: TIMESTAMP }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_supervision_evaluation
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_supervision_evaluation_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_supervision_evaluation
+            baseColumnNames: engagement_id
+            referencedTableName: audit_engagement
+            referencedColumnNames: id
+            constraintName: fk_audit_supervision_evaluation_engagement
+        - addForeignKeyConstraint:
+            baseTableName: audit_supervision_evaluation
+            baseColumnNames: employee_id
+            referencedTableName: employee
+            referencedColumnNames: id
+            constraintName: fk_audit_supervision_evaluation_employee
+        - addUniqueConstraint:
+            tableName: audit_supervision_evaluation
+            columnNames: tenant_id, engagement_id, employee_id
+            constraintName: uk_audit_supervision_evaluation_tenant_engagement_employee

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { App, Button, Card, Radio, Result, Space, Typography } from "antd";
 import type { TableProps } from "antd";
-import { ApartmentOutlined, EyeOutlined, TeamOutlined } from "@ant-design/icons";
+import { ApartmentOutlined, EyeOutlined, SafetyCertificateOutlined, TeamOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn, useScreenLock } from "@govia/ui-kit";
 import {
@@ -21,6 +21,7 @@ import { useAuth } from "../../../../auth/AuthContext";
 import { AuditEngagementForm } from "./AuditEngagementForm";
 import { AuditEngagementGroupsDrawer } from "./AuditEngagementGroupsDrawer";
 import { AuditEngagementAssignmentPage } from "./AuditEngagementAssignmentPage";
+import { AuditSupervisionTeamDrawer } from "./AuditSupervisionTeamDrawer";
 
 const SCREEN_KEY = "audit.plan.engagement";
 
@@ -40,6 +41,7 @@ export function AuditEngagementPage() {
   const canExport = hasPermission("AUDIT.PLAN_ENGAGEMENT.EXPORT");
   const canImport = hasPermission("AUDIT.PLAN_ENGAGEMENT.IMPORT");
   const canViewTeam = hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.VIEW");
+  const canViewSupervisionTeam = hasPermission("AUDIT.SUPERVISION_TEAM.VIEW");
   const { getSearchColumnProps } = useClientSearchColumn<AuditEngagementItem>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
@@ -47,6 +49,7 @@ export function AuditEngagementPage() {
   const [detail, setDetail] = useState<Detail>(null);
   const [assignmentItem, setAssignmentItem] = useState<AuditEngagementItem | null>(null);
   const [groupsFor, setGroupsFor] = useState<AuditEngagementItem | null>(null);
+  const [supervisionFor, setSupervisionFor] = useState<AuditEngagementItem | null>(null);
 
   const [items, setItems] = useState<AuditEngagementItem[]>([]);
   const [auditObjectUnits, setAuditObjectUnits] = useState<AuditObjectUnitOption[]>([]);
@@ -218,6 +221,13 @@ export function AuditEngagementPage() {
             <Button icon={<ApartmentOutlined />} disabled={selected.length !== 1 || !canViewTeam} onClick={() => selected[0] && setAssignmentItem(selected[0])}>
               {t("auditEngagement.form.assignmentButton")}
             </Button>
+            <Button
+              icon={<SafetyCertificateOutlined />}
+              disabled={selected.length !== 1 || !canViewSupervisionTeam}
+              onClick={() => selected[0] && setSupervisionFor(selected[0])}
+            >
+              {t("auditSupervisionTeam.chooseTeamButton")}
+            </Button>
           </Space>
           <CrudTable<AuditEngagementItem>
             tableId={SCREEN_KEY}
@@ -252,6 +262,16 @@ export function AuditEngagementPage() {
           employees={employees}
           businessSegments={businessSegments}
           onClose={() => setGroupsFor(null)}
+        />
+      )}
+
+      {supervisionFor && (
+        <AuditSupervisionTeamDrawer
+          open={!!supervisionFor}
+          engagementId={supervisionFor.id}
+          engagementCode={supervisionFor.code}
+          readOnly={supervisionFor.createdBy !== user?.username}
+          onClose={() => setSupervisionFor(null)}
         />
       )}
     </div>

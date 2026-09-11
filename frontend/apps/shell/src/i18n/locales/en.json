@@ -62,6 +62,7 @@
     "auditPlanEngagement": "Engagement Planning",
     "auditPlanEngagementIndex": "Create & Manage Audit Engagements",
     "auditPlanEngagementMonitoringIndex": "Audit Engagement Monitoring",
+    "auditPlanEngagementSupervisionTeamIndex": "Supervision Team Management",
     "auditPlanEngagementProcessIndex": "Create Process Audit Engagement",
     "auditPlanEngagementStatisticsIndex": "Statistics",
     "auditPlanExecution": "Audit Execution",
@@ -1994,6 +1995,38 @@
       "updateRankingError": "Failed to update team ranking",
       "updateScoringSuccess": "Member score updated",
       "updateScoringError": "Failed to update member score"
+    }
+  },
+  "auditSupervisionTeam": {
+    "chooseTeamButton": "Choose Supervision Team",
+    "chooseTeamTitle": "Choose Supervision Team - {{code}}",
+    "readOnlyWarning": "Only the creator of this audit engagement may choose/change its supervision team.",
+    "evaluateButton": "Supervision Team Self-Evaluation",
+    "evaluationTitle": "Supervision Team Self-Evaluation - {{code}}",
+    "notMemberWarning": "You are not a member of this audit engagement's supervision team.",
+    "evaluationResultsButton": "Supervision Evaluation Results",
+    "evaluationResultsTitle": "Supervision Evaluation Results - {{code}}",
+    "managementPageTitle": "Supervision Team Management",
+    "reportFilesButton": "Audit Team Report Files",
+    "checkSampleUploadButton": "Check Sample Upload",
+    "checkSampleUploadComingSoon": "Coming soon",
+    "columns": {
+      "employeeCode": "Employee Code",
+      "employeeName": "Employee Name",
+      "username": "User Name",
+      "selected": "Selected",
+      "evaluatedAt": "Last Evaluated At",
+      "progress": "Progress",
+      "contentAssured": "Content Assured",
+      "qualityAssured": "Quality Assured",
+      "note": "Note"
+    },
+    "messages": {
+      "loadError": "Failed to load data",
+      "saveTeamSuccess": "Supervision team saved",
+      "saveTeamError": "Failed to save supervision team",
+      "saveEvaluationSuccess": "Evaluation saved",
+      "saveEvaluationError": "Failed to save evaluation"
     }
   },
   "auditExceptionMapping": {

@@ -17,11 +17,14 @@ export interface OtherReportFilesDrawerProps {
   open: boolean;
   engagementId: string | null;
   onClose: () => void;
+  /** To giam sat chi co quyen xem/download ("To giam sat co quyen xem (ko co quyen sua)") - an het
+   * nut Upload va Xoa du la file cua ai, xem AuditSupervisionTeamManagementPage. */
+  readOnly?: boolean;
 }
 
 /** "1. File báo cáo khác" (man hinh "Quản lý công việc"): dung chung cho ca CBKT va THKT cua 1
  * cuoc kiem toan. Chi nguoi da upload moi thay nut xoa cho file cua chinh minh (dung dac ta). */
-export function OtherReportFilesDrawer({ open, engagementId, onClose }: OtherReportFilesDrawerProps) {
+export function OtherReportFilesDrawer({ open, engagementId, onClose, readOnly = false }: OtherReportFilesDrawerProps) {
   const { t } = useTranslation();
   const { message } = App.useApp();
   const { user } = useAuth();
@@ -90,7 +93,7 @@ export function OtherReportFilesDrawer({ open, engagementId, onClose }: OtherRep
       render: (_: unknown, item: AuditWorkReportFile) => (
         <>
           <Button type="link" icon={<DownloadOutlined />} onClick={() => downloadAuditWorkReportFile(item.id, item.fileName)} />
-          {item.uploadedByUsername === user?.username && (
+          {!readOnly && item.uploadedByUsername === user?.username && (
             <Button type="link" danger icon={<DeleteOutlined />} onClick={() => handleDelete(item)} />
           )}
         </>
@@ -100,11 +103,13 @@ export function OtherReportFilesDrawer({ open, engagementId, onClose }: OtherRep
 
   return (
     <Drawer title={t("auditWorkManagement.reportFiles.title")} open={open} onClose={onClose} width={760} destroyOnClose>
-      <Upload beforeUpload={handleUpload} showUploadList={false}>
-        <Button icon={<UploadOutlined />} loading={uploading}>
-          {t("attachment.upload")}
-        </Button>
-      </Upload>
+      {!readOnly && (
+        <Upload beforeUpload={handleUpload} showUploadList={false}>
+          <Button icon={<UploadOutlined />} loading={uploading}>
+            {t("attachment.upload")}
+          </Button>
+        </Upload>
+      )}
       <Table<AuditWorkReportFile>
         style={{ marginTop: 16 }}
         rowKey="id"

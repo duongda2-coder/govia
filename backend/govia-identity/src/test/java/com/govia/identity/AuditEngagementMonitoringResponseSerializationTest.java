@@ -24,7 +24,7 @@ class AuditEngagementMonitoringResponseSerializationTest {
         UUID id = UUID.randomUUID();
         AuditEngagementResponse engagement = new AuditEngagementResponse(id, "CN15002026001", UUID.randomUUID(), "DTKT01", "Chi nhanh test",
                 "CN", 2026, 6, null, UUID.randomUUID(), "NV001", "Nguyen Van A", "QD01", AuditEngagementStatus.PLANNED, null, "Dot KT test",
-                null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Tot", null);
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null, "Tot", null, "nvA");
 
         AuditEngagementMonitoringResponse response = new AuditEngagementMonitoringResponse(engagement, 5, 3, 10, 2, 4);
 

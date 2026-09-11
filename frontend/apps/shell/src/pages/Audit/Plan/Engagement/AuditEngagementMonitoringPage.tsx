@@ -11,6 +11,7 @@ import {
 import type { AuditEngagementItem } from "../../../../api/auditEngagement";
 import { useAuth } from "../../../../auth/AuthContext";
 import { AuditEngagementTeamDetailPage } from "./AuditEngagementTeamDetailPage";
+import { AuditSupervisionEvaluationPage } from "./AuditSupervisionEvaluationPage";
 
 const SCREEN_KEY = "audit.plan.engagement.monitoring";
 
@@ -29,6 +30,7 @@ export function AuditEngagementMonitoringPage() {
   const { hasPermission } = useAuth();
   const canView = hasPermission("AUDIT.PLAN_ENGAGEMENT.VIEW");
   const canEdit = hasPermission("AUDIT.PLAN_ENGAGEMENT.EDIT");
+  const canEvaluateSupervision = hasPermission("AUDIT.SUPERVISION_TEAM.EVALUATE");
   const { getSearchColumnProps } = useClientSearchColumn<AuditEngagementMonitoringItem>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
 
@@ -36,6 +38,7 @@ export function AuditEngagementMonitoringPage() {
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<AuditEngagementMonitoringItem[]>([]);
   const [detailFor, setDetailFor] = useState<AuditEngagementMonitoringItem | null>(null);
+  const [evaluationFor, setEvaluationFor] = useState<AuditEngagementMonitoringItem | null>(null);
   const [rankingOpen, setRankingOpen] = useState(false);
   const [rankingForm] = Form.useForm<RankingFormValues>();
 
@@ -105,6 +108,10 @@ export function AuditEngagementMonitoringPage() {
     return <AuditEngagementTeamDetailPage engagement={detailFor} onBack={() => setDetailFor(null)} />;
   }
 
+  if (evaluationFor) {
+    return <AuditSupervisionEvaluationPage engagement={evaluationFor} onBack={() => setEvaluationFor(null)} />;
+  }
+
   return (
     <div>
       <Typography.Title level={4}>{t("auditEngagementMonitoring.pageTitle")}</Typography.Title>
@@ -116,6 +123,11 @@ export function AuditEngagementMonitoringPage() {
         {canEdit && (
           <Button disabled={selected.length !== 1} onClick={openRanking}>
             {t("auditEngagementMonitoring.updateRankingButton")}
+          </Button>
+        )}
+        {canEvaluateSupervision && (
+          <Button disabled={selected.length !== 1} onClick={() => selected[0] && setEvaluationFor(selected[0])}>
+            {t("auditSupervisionTeam.evaluateButton")}
           </Button>
         )}
       </Space>

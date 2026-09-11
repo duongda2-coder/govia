@@ -62,6 +62,7 @@
     "auditPlanEngagement": "Lập kế hoạch",
     "auditPlanEngagementIndex": "Khởi tạo & Quản lý cuộc kiểm toán",
     "auditPlanEngagementMonitoringIndex": "Quản lý đợt kiểm toán",
+    "auditPlanEngagementSupervisionTeamIndex": "Quản lý tổ giám sát",
     "auditPlanEngagementProcessIndex": "Tạo CKT quy trình",
     "auditPlanEngagementStatisticsIndex": "Thống kê",
     "auditPlanExecution": "Thực hiện kiểm toán",
@@ -2106,6 +2107,38 @@
       "updateRankingError": "Cập nhật xếp loại đoàn thất bại",
       "updateScoringSuccess": "Đã cập nhật điểm thành viên",
       "updateScoringError": "Cập nhật điểm thành viên thất bại"
+    }
+  },
+  "auditSupervisionTeam": {
+    "chooseTeamButton": "Chọn tổ giám sát",
+    "chooseTeamTitle": "Chọn tổ giám sát - {{code}}",
+    "readOnlyWarning": "Chỉ người tạo cuộc kiểm toán này mới được chọn/thay đổi tổ giám sát.",
+    "evaluateButton": "Tổ giám sát thực hiện đánh giá",
+    "evaluationTitle": "Tổ giám sát thực hiện đánh giá - {{code}}",
+    "notMemberWarning": "Bạn không thuộc tổ giám sát của cuộc kiểm toán này.",
+    "evaluationResultsButton": "Kết quả đánh giá của tổ giám sát",
+    "evaluationResultsTitle": "Kết quả đánh giá của tổ giám sát - {{code}}",
+    "managementPageTitle": "Quản lý tổ giám sát",
+    "reportFilesButton": "Tài liệu BC đoàn KT",
+    "checkSampleUploadButton": "Check mẫu upload",
+    "checkSampleUploadComingSoon": "Chức năng đang được phát triển, sẽ bổ sung sau",
+    "columns": {
+      "employeeCode": "Mã cán bộ",
+      "employeeName": "Tên cán bộ",
+      "username": "User Name",
+      "selected": "Chọn",
+      "evaluatedAt": "Thời gian PD giám sát",
+      "progress": "Tiến độ",
+      "contentAssured": "Đảm bảo nội dung đề cương",
+      "qualityAssured": "Đảm bảo chất lượng",
+      "note": "Ghi chú"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "saveTeamSuccess": "Đã lưu tổ giám sát",
+      "saveTeamError": "Lưu tổ giám sát thất bại",
+      "saveEvaluationSuccess": "Đã lưu đánh giá",
+      "saveEvaluationError": "Lưu đánh giá thất bại"
     }
   },
   "auditExceptionMapping": {

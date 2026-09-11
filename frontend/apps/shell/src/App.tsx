@@ -32,6 +32,7 @@ import { ProcessStepDetailPage } from "./pages/Audit/Plan/ProcessStepDetailPage"
 import { ExceptionMappingPage } from "./pages/Audit/Plan/ExceptionMappingPage";
 import { AuditEngagementPage } from "./pages/Audit/Plan/Engagement/AuditEngagementPage";
 import { AuditEngagementMonitoringPage } from "./pages/Audit/Plan/Engagement/AuditEngagementMonitoringPage";
+import { AuditSupervisionTeamManagementPage } from "./pages/Audit/Plan/Engagement/AuditSupervisionTeamManagementPage";
 import { AuditProcessEngagementPage } from "./pages/Audit/Plan/Engagement/ProcessEngagement/AuditProcessEngagementPage";
 import { AuditStatisticsPage } from "./pages/Audit/Plan/Engagement/AuditStatisticsPage";
 import { CmTd1Page } from "./pages/Audit/Plan/Execution/CmTd1Page";
@@ -134,6 +135,7 @@ function App() {
           <Route path="audit/plan/master-data-qt/exception-mapping" element={<ExceptionMappingQtPage />} />
           <Route path="audit/plan/engagement" element={<AuditEngagementPage />} />
           <Route path="audit/plan/engagement/monitoring" element={<AuditEngagementMonitoringPage />} />
+          <Route path="audit/plan/engagement/supervision-team" element={<AuditSupervisionTeamManagementPage />} />
           <Route path="audit/plan/engagement/process" element={<AuditProcessEngagementPage />} />
           <Route path="audit/plan/engagement/statistics" element={<AuditStatisticsPage />} />
           <Route path="audit/plan/execution/cm-td1" element={<CmTd1Page />} />

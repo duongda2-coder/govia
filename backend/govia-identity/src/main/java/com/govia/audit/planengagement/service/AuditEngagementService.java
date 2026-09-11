@@ -453,7 +453,7 @@ public class AuditEngagementService {
                 item.getPlanningStartDate(), item.getPlanningEndDate(), item.getFieldworkStartDate(), item.getFieldworkEndDate(),
                 item.getReportStartDate(), item.getReportEndDate(), item.getInfoCollectionStart(), item.getInfoCollectionEnd(),
                 item.getSampleRequestStart(), item.getSampleRequestEnd(), item.getReportPlanStart(), item.getReportPlanEnd(), item.getTeamRanking(),
-                item.getProcessEngagementId());
+                item.getProcessEngagementId(), item.getCreatedBy());
     }
 
     private AuditEngagementRelatedUnitResponse toRelatedUnitResponse(AuditEngagementRelatedUnit row, AuditEngagement engagement, Map<UUID, AuditObjectUnit> units) {

@@ -38,6 +38,7 @@ public record AuditEngagementResponse(
         LocalDateTime reportPlanStart,
         LocalDateTime reportPlanEnd,
         String teamRanking,
-        UUID processEngagementId
+        UUID processEngagementId,
+        String createdBy
 ) {
 }

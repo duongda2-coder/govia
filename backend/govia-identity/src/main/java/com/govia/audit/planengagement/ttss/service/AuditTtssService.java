@@ -22,6 +22,7 @@ import com.govia.audit.planengagement.ttss.dto.AuditTtssLinkRecommendationReques
 import com.govia.audit.planengagement.ttss.dto.AuditTtssRecordResponse;
 import com.govia.audit.planengagement.ttss.entity.AuditTtssRecord;
 import com.govia.audit.planengagement.ttss.repository.AuditTtssRecordRepository;
+import com.govia.audit.planengagement.supervisionteam.repository.AuditSupervisionTeamMemberRepository;
 import com.govia.audit.processstep.entity.AuditProcessStepDetail;
 import com.govia.audit.processstep.entity.AuditProcessStepSummary;
 import com.govia.audit.processstep.repository.AuditProcessStepDetailRepository;
@@ -114,6 +115,7 @@ public class AuditTtssService {
     private final ExcelImportService excelImportService;
     private final AuditLogService auditLogService;
     private final AuditTtssSampleSelectionResolver sampleSelectionResolver;
+    private final AuditSupervisionTeamMemberRepository supervisionTeamMemberRepository;
 
     public AuditTtssService(AuditTtssRecordRepository ttssRepository, AuditEngagementRepository engagementRepository,
                              AuditEngagementGroupRepository groupRepository, AuditEngagementGroupMemberRepository memberRepository,
@@ -125,7 +127,8 @@ public class AuditTtssService {
                              UserAccountRepository userAccountRepository, AuditProgressReportService progressReportService,
                              AuditWorkApprovalChainResolver approvalChainResolver, RuntimeService runtimeService, TaskService taskService,
                              WorkflowTaskService workflowTaskService, ExcelExportService excelExportService, ExcelImportService excelImportService,
-                             AuditLogService auditLogService, AuditTtssSampleSelectionResolver sampleSelectionResolver) {
+                             AuditLogService auditLogService, AuditTtssSampleSelectionResolver sampleSelectionResolver,
+                             AuditSupervisionTeamMemberRepository supervisionTeamMemberRepository) {
         this.ttssRepository = ttssRepository;
         this.engagementRepository = engagementRepository;
         this.groupRepository = groupRepository;
@@ -149,6 +152,7 @@ public class AuditTtssService {
         this.excelImportService = excelImportService;
         this.auditLogService = auditLogService;
         this.sampleSelectionResolver = sampleSelectionResolver;
+        this.supervisionTeamMemberRepository = supervisionTeamMemberRepository;
     }
 
     @Transactional(readOnly = true)
@@ -201,6 +205,9 @@ public class AuditTtssService {
         if (actorEmployeeId != null && actorEmployeeId.equals(engagement.getTeamLeadEmployeeId())) {
             return new TtssVisibility(true, Set.of());
         }
+        if (actorEmployeeId != null && supervisionTeamMemberRepository.existsByTenantIdAndEngagementIdAndEmployeeId(tenantId, engagement.getId(), actorEmployeeId)) {
+            return new TtssVisibility(true, Set.of());
+        }
 
         Set<String> visibleUsernames = new HashSet<>();
         visibleUsernames.add(principal.username());
@@ -246,6 +253,9 @@ public class AuditTtssService {
             return new AssignmentVisibility(false, Set.of());
         }
         if (actorEmployeeId.equals(engagement.getTeamLeadEmployeeId())) {
+            return new AssignmentVisibility(true, Set.of());
+        }
+        if (supervisionTeamMemberRepository.existsByTenantIdAndEngagementIdAndEmployeeId(tenantId, engagement.getId(), actorEmployeeId)) {
             return new AssignmentVisibility(true, Set.of());
         }
 
