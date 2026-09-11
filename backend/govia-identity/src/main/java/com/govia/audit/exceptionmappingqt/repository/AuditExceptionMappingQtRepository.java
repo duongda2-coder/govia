@@ -10,6 +10,6 @@ import java.util.UUID;
 public interface AuditExceptionMappingQtRepository extends JpaRepository<AuditExceptionMappingQt, UUID> {
     List<AuditExceptionMappingQt> findByTenantIdOrderByCreatedAtAsc(UUID tenantId);
 
-    Optional<AuditExceptionMappingQt> findByTenantIdAndProcessStepDetailIdAndExceptionTypeId(
-            UUID tenantId, UUID processStepDetailId, UUID exceptionTypeId);
+    Optional<AuditExceptionMappingQt> findByTenantIdAndProcessStepDetailIdAndExceptionTypeIdAndApplicableYear(
+            UUID tenantId, UUID processStepDetailId, UUID exceptionTypeId, Integer applicableYear);
 }

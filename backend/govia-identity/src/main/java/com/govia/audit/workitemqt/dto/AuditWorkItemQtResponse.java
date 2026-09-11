@@ -14,12 +14,12 @@ public record AuditWorkItemQtResponse(
         String businessSegmentCode,
         String businessSegmentName,
         String code,
-        String detailCode,
         String name,
         Integer applicableYear,
         String workSetCode,
         String workType,
         boolean active,
-        boolean hasSampleSelection
+        boolean hasSampleSelection,
+        String branchOrHeadOffice
 ) {
 }

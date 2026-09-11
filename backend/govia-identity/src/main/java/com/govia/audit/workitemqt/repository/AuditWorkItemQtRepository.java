@@ -10,5 +10,6 @@ import java.util.UUID;
 public interface AuditWorkItemQtRepository extends JpaRepository<AuditWorkItemQt, UUID> {
     List<AuditWorkItemQt> findByTenantIdOrderByCodeAsc(UUID tenantId);
 
-    Optional<AuditWorkItemQt> findByTenantIdAndCode(UUID tenantId, String code);
+    Optional<AuditWorkItemQt> findByTenantIdAndCodeAndApplicableYearAndWorkSetCode(
+            UUID tenantId, String code, Integer applicableYear, String workSetCode);
 }

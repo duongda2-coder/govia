@@ -24,13 +24,13 @@ interface FormValues {
   phase?: AuditWorkPhase;
   businessSegmentId?: string;
   code: string;
-  detailCode?: string;
   name: string;
-  applicableYear?: number;
-  workSetCode?: string;
+  applicableYear: number;
+  workSetCode: string;
   workType?: string;
   active: boolean;
   hasSampleSelection: boolean;
+  branchOrHeadOffice?: string;
 }
 
 const PHASES: AuditWorkPhase[] = ["CBKT", "THKT", "DCKT"];
@@ -108,13 +108,13 @@ export function WorkItemQtPage() {
       phase: target.phase ?? undefined,
       businessSegmentId: target.businessSegmentId ?? undefined,
       code: target.code,
-      detailCode: target.detailCode ?? undefined,
       name: target.name,
       applicableYear: target.applicableYear ?? undefined,
       workSetCode: target.workSetCode ?? undefined,
       workType: target.workType ?? undefined,
       active: target.active,
       hasSampleSelection: target.hasSampleSelection,
+      branchOrHeadOffice: target.branchOrHeadOffice ?? undefined,
     });
     setModalOpen(true);
   };
@@ -133,13 +133,13 @@ export function WorkItemQtPage() {
         phase: values.phase ?? null,
         businessSegmentId: values.businessSegmentId ?? null,
         code: values.code,
-        detailCode: values.detailCode ?? null,
         name: values.name,
-        applicableYear: values.applicableYear ?? null,
-        workSetCode: values.workSetCode ?? null,
+        applicableYear: values.applicableYear,
+        workSetCode: values.workSetCode,
         workType: values.workType ?? null,
         active: values.active,
         hasSampleSelection: values.hasSampleSelection,
+        branchOrHeadOffice: values.branchOrHeadOffice ?? null,
       };
       if (editing) {
         await updateAuditWorkItemQt(editing.id, request);
@@ -200,7 +200,6 @@ export function WorkItemQtPage() {
       render: (v: string | null) => v ?? "-",
     },
     { title: t("auditWorkItemQt.columns.code"), width: 120, ...getSearchColumnProps("code", searchLabels) },
-    { title: t("auditWorkItemQt.columns.detailCode"), width: 120, ...getSearchColumnProps("detailCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditWorkItemQt.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("auditWorkItemQt.columns.applicableYear"), dataIndex: "applicableYear", width: 100, render: (v: number | null) => v ?? "-" },
     { title: t("auditWorkItemQt.columns.workSetCode"), dataIndex: "workSetCode", width: 140, render: (v: string | null) => v ?? "-" },
@@ -211,6 +210,12 @@ export function WorkItemQtPage() {
       width: 120,
       sorter: (a, b) => Number(a.hasSampleSelection) - Number(b.hasSampleSelection),
       render: (v: boolean) => (v ? t("common.yes") : t("common.no")),
+    },
+    {
+      title: t("auditWorkItemQt.columns.branchOrHeadOffice"),
+      dataIndex: "branchOrHeadOffice",
+      width: 110,
+      render: (v: string | null) => v ?? "-",
     },
     {
       title: t("common.active"),
@@ -312,24 +317,17 @@ export function WorkItemQtPage() {
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="detailCode" label={t("auditWorkItemQt.columns.detailCode")}>
-                <Input maxLength={20} />
-              </Form.Item>
-            </Col>
-          </Row>
           <Form.Item name="name" label={t("auditWorkItemQt.columns.name")} rules={[{ required: true }]}>
             <Input.TextArea rows={2} />
           </Form.Item>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="applicableYear" label={t("auditWorkItemQt.columns.applicableYear")}>
+              <Form.Item name="applicableYear" label={t("auditWorkItemQt.columns.applicableYear")} rules={[{ required: true }]}>
                 <InputNumber style={{ width: "100%" }} min={2000} max={2100} />
               </Form.Item>
             </Col>
             <Col span={12}>
-              <Form.Item name="workSetCode" label={t("auditWorkItemQt.columns.workSetCode")}>
+              <Form.Item name="workSetCode" label={t("auditWorkItemQt.columns.workSetCode")} rules={[{ required: true }]}>
                 <Input maxLength={50} />
               </Form.Item>
             </Col>
@@ -350,6 +348,11 @@ export function WorkItemQtPage() {
             <Col span={12}>
               <Form.Item name="hasSampleSelection" label={t("auditWorkItemQt.columns.hasSampleSelection")} valuePropName="checked">
                 <Switch />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="branchOrHeadOffice" label={t("auditWorkItemQt.columns.branchOrHeadOffice")}>
+                <Input maxLength={10} />
               </Form.Item>
             </Col>
           </Row>

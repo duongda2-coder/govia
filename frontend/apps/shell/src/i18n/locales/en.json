@@ -826,12 +826,12 @@
       "phase": "Phase",
       "businessSegment": "Business Segment",
       "code": "Work Item Code",
-      "detailCode": "Detail Code",
       "name": "Work Item Name",
       "applicableYear": "Year",
       "workSetCode": "Work Set Code",
       "workType": "Work Type",
-      "hasSampleSelection": "Has Sample Selection"
+      "hasSampleSelection": "Has Sample Selection",
+      "branchOrHeadOffice": "Branch/Head Office"
     },
     "form": {
       "createTitle": "Add Process Work Item",

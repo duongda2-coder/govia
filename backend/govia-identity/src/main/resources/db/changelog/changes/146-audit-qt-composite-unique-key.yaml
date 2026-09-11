@@ -1,0 +1,70 @@
+databaseChangeLog:
+
+  # ===================== test11.9: nam (va mã bô công viec o Bang ma CV QT) phai la mot phan cua khoa =====================
+  # Cac unique constraint cu chi co (tenant_id, code) khien insert/update qua service (da sua o code)
+  # van bi DB tu choi vi trung code giua 2 nam khac nhau. Thay bang constraint bao gom applicable_year.
+
+  - changeSet:
+      id: 146-1-audit-work-item-qt-composite-unique-key
+      author: govia
+      comment: "audit_work_item_qt: unique key = tenant_id + code + applicable_year + work_set_code"
+      changes:
+        - dropUniqueConstraint:
+            tableName: audit_work_item_qt
+            constraintName: uk_audit_wiq_tenant_code
+        - addUniqueConstraint:
+            tableName: audit_work_item_qt
+            columnNames: tenant_id, code, applicable_year, work_set_code
+            constraintName: uk_audit_wiq_tenant_code_year_workset
+
+  - changeSet:
+      id: 146-2-audit-exception-type-qt-composite-unique-key
+      author: govia
+      comment: "audit_exception_type_qt: unique key = tenant_id + code + applicable_year"
+      changes:
+        - dropUniqueConstraint:
+            tableName: audit_exception_type_qt
+            constraintName: uk_audit_etq_tenant_code
+        - addUniqueConstraint:
+            tableName: audit_exception_type_qt
+            columnNames: tenant_id, code, applicable_year
+            constraintName: uk_audit_etq_tenant_code_year
+
+  - changeSet:
+      id: 146-3-audit-process-step-summary-qt-composite-unique-key
+      author: govia
+      comment: "audit_process_step_summary_qt: unique key = tenant_id + code + applicable_year"
+      changes:
+        - dropUniqueConstraint:
+            tableName: audit_process_step_summary_qt
+            constraintName: uk_audit_pssq_tenant_code
+        - addUniqueConstraint:
+            tableName: audit_process_step_summary_qt
+            columnNames: tenant_id, code, applicable_year
+            constraintName: uk_audit_pssq_tenant_code_year
+
+  - changeSet:
+      id: 146-4-audit-process-step-detail-qt-composite-unique-key
+      author: govia
+      comment: "audit_process_step_detail_qt: unique key = tenant_id + code + applicable_year"
+      changes:
+        - dropUniqueConstraint:
+            tableName: audit_process_step_detail_qt
+            constraintName: uk_audit_psdq_tenant_code
+        - addUniqueConstraint:
+            tableName: audit_process_step_detail_qt
+            columnNames: tenant_id, code, applicable_year
+            constraintName: uk_audit_psdq_tenant_code_year
+
+  - changeSet:
+      id: 146-5-audit-exception-mapping-qt-composite-unique-key
+      author: govia
+      comment: "audit_exception_mapping_qt: unique key = tenant_id + process_step_detail_id + exception_type_id + applicable_year"
+      changes:
+        - dropUniqueConstraint:
+            tableName: audit_exception_mapping_qt
+            constraintName: uk_audit_emq_tenant_detail_type
+        - addUniqueConstraint:
+            tableName: audit_exception_mapping_qt
+            columnNames: tenant_id, process_step_detail_id, exception_type_id, applicable_year
+            constraintName: uk_audit_emq_tenant_detail_type_year

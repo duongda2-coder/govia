@@ -76,7 +76,7 @@ public class AuditExceptionMappingQtService {
     @Transactional
     public AuditExceptionMappingQtResponse create(AuditExceptionMappingQtRequest request) {
         UUID tenantId = TenantContext.getTenantId();
-        checkNoDuplicate(tenantId, request.processStepDetailId(), request.exceptionTypeId(), null);
+        checkNoDuplicate(tenantId, request.processStepDetailId(), request.exceptionTypeId(), request.applicableYear(), null);
         validateBusinessSegment(tenantId, request.businessSegmentId());
         validateProcessStepDetail(tenantId, request.processStepDetailId());
         validateExceptionType(tenantId, request.exceptionTypeId());
@@ -94,7 +94,7 @@ public class AuditExceptionMappingQtService {
     public AuditExceptionMappingQtResponse update(UUID id, AuditExceptionMappingQtRequest request) {
         UUID tenantId = TenantContext.getTenantId();
         AuditExceptionMappingQt item = getOwnedOrThrow(tenantId, id);
-        checkNoDuplicate(tenantId, request.processStepDetailId(), request.exceptionTypeId(), id);
+        checkNoDuplicate(tenantId, request.processStepDetailId(), request.exceptionTypeId(), request.applicableYear(), id);
         validateBusinessSegment(tenantId, request.businessSegmentId());
         validateProcessStepDetail(tenantId, request.processStepDetailId());
         validateExceptionType(tenantId, request.exceptionTypeId());
@@ -163,11 +163,12 @@ public class AuditExceptionMappingQtService {
                 }
                 String segmentCode = row.get("businessSegmentCode");
                 UUID businessSegmentId = isBlank(segmentCode) ? null : segmentIdsByCode.get(segmentCode.trim());
+                Integer applicableYear = parseInt(row.get("applicableYear"));
 
-                Optional<AuditExceptionMappingQt> existing =
-                        repository.findByTenantIdAndProcessStepDetailIdAndExceptionTypeId(tenantId, processStepDetailId, exceptionTypeId);
+                Optional<AuditExceptionMappingQt> existing = repository.findByTenantIdAndProcessStepDetailIdAndExceptionTypeIdAndApplicableYear(
+                        tenantId, processStepDetailId, exceptionTypeId, applicableYear);
                 AuditExceptionMappingQtRequest request = new AuditExceptionMappingQtRequest(businessSegmentId, processStepDetailId, exceptionTypeId,
-                        parseInt(row.get("applicableYear")), existing.map(AuditExceptionMappingQt::isActive).orElse(true));
+                        applicableYear, existing.map(AuditExceptionMappingQt::isActive).orElse(true));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
                 } else {
@@ -192,11 +193,11 @@ public class AuditExceptionMappingQtService {
         item.setActive(request.active());
     }
 
-    private void checkNoDuplicate(UUID tenantId, UUID processStepDetailId, UUID exceptionTypeId, UUID excludingId) {
-        repository.findByTenantIdAndProcessStepDetailIdAndExceptionTypeId(tenantId, processStepDetailId, exceptionTypeId)
+    private void checkNoDuplicate(UUID tenantId, UUID processStepDetailId, UUID exceptionTypeId, Integer applicableYear, UUID excludingId) {
+        repository.findByTenantIdAndProcessStepDetailIdAndExceptionTypeIdAndApplicableYear(tenantId, processStepDetailId, exceptionTypeId, applicableYear)
                 .filter(existing -> excludingId == null || !existing.getId().equals(excludingId))
                 .ifPresent(existing -> {
-                    throw new BusinessException("AUDIT_EXCEPTION_MAPPING_QT_DUPLICATE", "Mapping nay da ton tai");
+                    throw new BusinessException("AUDIT_EXCEPTION_MAPPING_QT_DUPLICATE", "Mapping nay da ton tai cho nam " + applicableYear);
                 });
     }
 

@@ -37,11 +37,6 @@ public class AuditWorkItemQt extends BaseEntity {
     @Column(name = "code", nullable = false, length = 10)
     private String code;
 
-    /** "Ma chi tiet" - cot thu 2 trung ten "Ma bo cong viec" trong sheet nguon, mo hinh giong
-     * AuditWorkItem.detailCode (khop voi cot "Ma chi..." trong anh chup man hinh minh hoa). */
-    @Column(name = "detail_code", length = 20)
-    private String detailCode;
-
     @Column(name = "name", nullable = false, length = 1000)
     private String name;
 
@@ -59,4 +54,8 @@ public class AuditWorkItemQt extends BaseEntity {
 
     @Column(name = "has_sample_selection", nullable = false)
     private boolean hasSampleSelection = false;
+
+    /** "CN hoac HO" - chi nhanh hay hoi so ap dung, nguoi dung tu dien (khong phai danh muc). */
+    @Column(name = "branch_or_head_office", length = 10)
+    private String branchOrHeadOffice;
 }

@@ -70,7 +70,7 @@ public class AuditWorkItemQtService {
     @Transactional
     public AuditWorkItemQtResponse create(AuditWorkItemQtRequest request) {
         UUID tenantId = TenantContext.getTenantId();
-        checkNoDuplicateCode(tenantId, request.code(), null);
+        checkNoDuplicateCode(tenantId, request.code(), request.applicableYear(), request.workSetCode(), null);
         validateBusinessSegment(tenantId, request.businessSegmentId());
         validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
 
@@ -87,7 +87,7 @@ public class AuditWorkItemQtService {
     public AuditWorkItemQtResponse update(UUID id, AuditWorkItemQtRequest request) {
         UUID tenantId = TenantContext.getTenantId();
         AuditWorkItemQt item = getOwnedOrThrow(tenantId, id);
-        checkNoDuplicateCode(tenantId, request.code(), id);
+        checkNoDuplicateCode(tenantId, request.code(), request.applicableYear(), request.workSetCode(), id);
         validateBusinessSegment(tenantId, request.businessSegmentId());
         validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
 
@@ -140,19 +140,26 @@ public class AuditWorkItemQtService {
             try {
                 String code = row.get("code");
                 String name = row.get("name");
+                Integer applicableYear = parseInt(row.get("applicableYear"));
+                String workSetCode = emptyToNull(row.get("workSetCode"));
                 if (isBlank(code) || isBlank(name)) {
                     throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Ma cong viec hoac Ten cong viec");
+                }
+                if (applicableYear == null || workSetCode == null) {
+                    throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Nam hoac Ma bo cong viec (bat buoc dien)");
                 }
                 String segmentCode = row.get("businessSegmentCode");
                 UUID businessSegmentId = isBlank(segmentCode) ? null : segmentIdsByCode.get(segmentCode.trim());
                 String objectCategoryCode = row.get("auditObjectCategoryCode");
                 UUID auditObjectCategoryId = isBlank(objectCategoryCode) ? null : objectCategoryIdsByCode.get(objectCategoryCode.trim());
 
-                Optional<AuditWorkItemQt> existing = repository.findByTenantIdAndCode(tenantId, code.trim());
+                Optional<AuditWorkItemQt> existing = repository.findByTenantIdAndCodeAndApplicableYearAndWorkSetCode(
+                        tenantId, code.trim(), applicableYear, workSetCode);
                 AuditWorkItemQtRequest request = new AuditWorkItemQtRequest(auditObjectCategoryId,
-                        parseEnum(AuditWorkPhase.class, row.get("phase")), businessSegmentId, code.trim(), emptyToNull(row.get("detailCode")),
-                        name.trim(), parseInt(row.get("applicableYear")), emptyToNull(row.get("workSetCode")), emptyToNull(row.get("workType")),
-                        existing.map(AuditWorkItemQt::isActive).orElse(true), parseBoolean(row.get("hasSampleSelection")));
+                        parseEnum(AuditWorkPhase.class, row.get("phase")), businessSegmentId, code.trim(),
+                        name.trim(), applicableYear, workSetCode, emptyToNull(row.get("workType")),
+                        existing.map(AuditWorkItemQt::isActive).orElse(true), parseBoolean(row.get("hasSampleSelection")),
+                        emptyToNull(row.get("branchOrHeadOffice")));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
                 } else {
@@ -174,20 +181,21 @@ public class AuditWorkItemQtService {
         item.setPhase(request.phase());
         item.setBusinessSegmentId(request.businessSegmentId());
         item.setCode(request.code());
-        item.setDetailCode(request.detailCode());
         item.setName(request.name());
         item.setApplicableYear(request.applicableYear());
         item.setWorkSetCode(request.workSetCode());
         item.setWorkType(request.workType());
         item.setActive(request.active());
         item.setHasSampleSelection(request.hasSampleSelection());
+        item.setBranchOrHeadOffice(request.branchOrHeadOffice());
     }
 
-    private void checkNoDuplicateCode(UUID tenantId, String code, UUID excludingId) {
-        repository.findByTenantIdAndCode(tenantId, code)
+    private void checkNoDuplicateCode(UUID tenantId, String code, Integer applicableYear, String workSetCode, UUID excludingId) {
+        repository.findByTenantIdAndCodeAndApplicableYearAndWorkSetCode(tenantId, code, applicableYear, workSetCode)
                 .filter(existing -> excludingId == null || !existing.getId().equals(excludingId))
                 .ifPresent(existing -> {
-                    throw new BusinessException("AUDIT_WORK_ITEM_QT_CODE_DUPLICATE", "Ma cong viec da ton tai: " + code);
+                    throw new BusinessException("AUDIT_WORK_ITEM_QT_CODE_DUPLICATE",
+                            "Ma cong viec da ton tai cho nam " + applicableYear + " / bo cong viec " + workSetCode + ": " + code);
                 });
     }
 
@@ -231,12 +239,12 @@ public class AuditWorkItemQtService {
                 new ExportColumn("phase", "Giai đoạn"),
                 new ExportColumn("businessSegmentCode", "Mảng nghiệp vụ"),
                 new ExportColumn("code", "Mã công việc"),
-                new ExportColumn("detailCode", "Mã chi tiết"),
                 new ExportColumn("name", "Tên công việc"),
                 new ExportColumn("applicableYear", "Năm"),
                 new ExportColumn("workSetCode", "Mã bộ công việc"),
                 new ExportColumn("workType", "Loại CV"),
-                new ExportColumn("hasSampleSelection", "Có chọn mẫu"));
+                new ExportColumn("hasSampleSelection", "Có chọn mẫu"),
+                new ExportColumn("branchOrHeadOffice", "CN hoặc HO"));
     }
 
     private List<Map<String, Object>> exportRows() {
@@ -251,12 +259,12 @@ public class AuditWorkItemQtService {
                     row.put("phase", item.getPhase());
                     row.put("businessSegmentCode", codeOf(segments.get(item.getBusinessSegmentId())));
                     row.put("code", item.getCode());
-                    row.put("detailCode", item.getDetailCode());
                     row.put("name", item.getName());
                     row.put("applicableYear", item.getApplicableYear());
                     row.put("workSetCode", item.getWorkSetCode());
                     row.put("workType", item.getWorkType());
                     row.put("hasSampleSelection", item.isHasSampleSelection() ? "Y" : "N");
+                    row.put("branchOrHeadOffice", item.getBranchOrHeadOffice());
                     return row;
                 }).toList();
     }
@@ -308,7 +316,7 @@ public class AuditWorkItemQtService {
                 objectCategory == null ? null : objectCategory.getName(),
                 item.getPhase(), item.getBusinessSegmentId(),
                 segment == null ? null : segment.getCode(), segment == null ? null : segment.getName(),
-                item.getCode(), item.getDetailCode(), item.getName(), item.getApplicableYear(), item.getWorkSetCode(), item.getWorkType(),
-                item.isActive(), item.isHasSampleSelection());
+                item.getCode(), item.getName(), item.getApplicableYear(), item.getWorkSetCode(), item.getWorkType(),
+                item.isActive(), item.isHasSampleSelection(), item.getBranchOrHeadOffice());
     }
 }

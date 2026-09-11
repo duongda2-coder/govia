@@ -1,0 +1,21 @@
+databaseChangeLog:
+
+  # ===================== test11.9 item 1: bo cot thua "Ma chi tiet", them cot "CN hoac HO" =====================
+  - changeSet:
+      id: 145-1-audit-work-item-qt-drop-detail-code
+      author: govia
+      comment: "Xoa cot detail_code khoi audit_work_item_qt (thua)"
+      changes:
+        - dropColumn:
+            tableName: audit_work_item_qt
+            columnName: detail_code
+
+  - changeSet:
+      id: 145-2-audit-work-item-qt-add-branch-or-head-office
+      author: govia
+      comment: "Them cot branch_or_head_office (CN hoac HO) vao audit_work_item_qt, sau cot has_sample_selection"
+      changes:
+        - addColumn:
+            tableName: audit_work_item_qt
+            columns:
+              - column: { name: branch_or_head_office, type: VARCHAR(10) }

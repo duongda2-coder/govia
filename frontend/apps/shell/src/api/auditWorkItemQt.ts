@@ -12,13 +12,13 @@ export interface AuditWorkItemQtItem {
   businessSegmentCode: string | null;
   businessSegmentName: string | null;
   code: string;
-  detailCode: string | null;
   name: string;
   applicableYear: number | null;
   workSetCode: string | null;
   workType: string | null;
   active: boolean;
   hasSampleSelection: boolean;
+  branchOrHeadOffice: string | null;
 }
 
 export interface AuditWorkItemQtRequest {
@@ -26,13 +26,13 @@ export interface AuditWorkItemQtRequest {
   phase: AuditWorkPhase | null;
   businessSegmentId: string | null;
   code: string;
-  detailCode: string | null;
   name: string;
   applicableYear: number | null;
   workSetCode: string | null;
   workType: string | null;
   active: boolean;
   hasSampleSelection: boolean;
+  branchOrHeadOffice: string | null;
 }
 
 const BASE = "/api/audit/plan/master-data-qt/work-item";

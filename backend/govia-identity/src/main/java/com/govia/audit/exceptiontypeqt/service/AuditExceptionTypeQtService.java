@@ -65,7 +65,7 @@ public class AuditExceptionTypeQtService {
     @Transactional
     public AuditExceptionTypeQtResponse create(AuditExceptionTypeQtRequest request) {
         UUID tenantId = TenantContext.getTenantId();
-        checkNoDuplicateCode(tenantId, request.code(), null);
+        checkNoDuplicateCode(tenantId, request.code(), request.applicableYear(), null);
         validateBusinessSegment(tenantId, request.businessSegmentId());
 
         AuditExceptionTypeQt item = new AuditExceptionTypeQt();
@@ -81,7 +81,7 @@ public class AuditExceptionTypeQtService {
     public AuditExceptionTypeQtResponse update(UUID id, AuditExceptionTypeQtRequest request) {
         UUID tenantId = TenantContext.getTenantId();
         AuditExceptionTypeQt item = getOwnedOrThrow(tenantId, id);
-        checkNoDuplicateCode(tenantId, request.code(), id);
+        checkNoDuplicateCode(tenantId, request.code(), request.applicableYear(), id);
         validateBusinessSegment(tenantId, request.businessSegmentId());
 
         applyRequest(item, request);
@@ -136,11 +136,12 @@ public class AuditExceptionTypeQtService {
                 }
                 String segmentCode = row.get("businessSegmentCode");
                 UUID businessSegmentId = isBlank(segmentCode) ? null : segmentIdsByCode.get(segmentCode.trim());
+                Integer applicableYear = parseInt(row.get("applicableYear"));
 
-                Optional<AuditExceptionTypeQt> existing = repository.findByTenantIdAndCode(tenantId, code.trim());
+                Optional<AuditExceptionTypeQt> existing = repository.findByTenantIdAndCodeAndApplicableYear(tenantId, code.trim(), applicableYear);
                 AuditExceptionTypeQtRequest request = new AuditExceptionTypeQtRequest(businessSegmentId, code.trim(), name.trim(),
                         parseEnum(AuditExceptionCategory.class, row.get("category")), parseEnum(AuditLevel.class, row.get("impactLevel")),
-                        emptyToNull(row.get("classificationBasis")), parseInt(row.get("applicableYear")),
+                        emptyToNull(row.get("classificationBasis")), applicableYear,
                         existing.map(AuditExceptionTypeQt::isActive).orElse(true));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
@@ -169,11 +170,12 @@ public class AuditExceptionTypeQtService {
         item.setActive(request.active());
     }
 
-    private void checkNoDuplicateCode(UUID tenantId, String code, UUID excludingId) {
-        repository.findByTenantIdAndCode(tenantId, code)
+    private void checkNoDuplicateCode(UUID tenantId, String code, Integer applicableYear, UUID excludingId) {
+        repository.findByTenantIdAndCodeAndApplicableYear(tenantId, code, applicableYear)
                 .filter(existing -> excludingId == null || !existing.getId().equals(excludingId))
                 .ifPresent(existing -> {
-                    throw new BusinessException("AUDIT_EXCEPTION_TYPE_QT_CODE_DUPLICATE", "Ma phat hien da ton tai: " + code);
+                    throw new BusinessException("AUDIT_EXCEPTION_TYPE_QT_CODE_DUPLICATE",
+                            "Ma phat hien da ton tai cho nam " + applicableYear + ": " + code);
                 });
     }
 

@@ -10,5 +10,5 @@ import java.util.UUID;
 public interface AuditExceptionTypeQtRepository extends JpaRepository<AuditExceptionTypeQt, UUID> {
     List<AuditExceptionTypeQt> findByTenantIdOrderByCodeAsc(UUID tenantId);
 
-    Optional<AuditExceptionTypeQt> findByTenantIdAndCode(UUID tenantId, String code);
+    Optional<AuditExceptionTypeQt> findByTenantIdAndCodeAndApplicableYear(UUID tenantId, String code, Integer applicableYear);
 }

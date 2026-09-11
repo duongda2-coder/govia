@@ -826,12 +826,12 @@
       "phase": "Giai đoạn",
       "businessSegment": "Mảng nghiệp vụ",
       "code": "Mã công việc",
-      "detailCode": "Mã chi tiết",
       "name": "Tên công việc",
       "applicableYear": "Năm",
       "workSetCode": "Mã bộ công việc",
       "workType": "Loại CV",
-      "hasSampleSelection": "Có chọn mẫu"
+      "hasSampleSelection": "Có chọn mẫu",
+      "branchOrHeadOffice": "CN hoặc HO"
     },
     "form": {
       "createTitle": "Thêm công việc quy trình",

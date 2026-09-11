@@ -69,7 +69,7 @@ public class AuditProcessStepSummaryQtService {
     @Transactional
     public AuditProcessStepSummaryQtResponse create(AuditProcessStepSummaryQtRequest request) {
         UUID tenantId = TenantContext.getTenantId();
-        checkNoDuplicateCode(tenantId, request.code(), null);
+        checkNoDuplicateCode(tenantId, request.code(), request.applicableYear(), null);
         validateBusinessSegment(tenantId, request.businessSegmentId());
         validateWorkItem(tenantId, request.workItemId());
 
@@ -86,7 +86,7 @@ public class AuditProcessStepSummaryQtService {
     public AuditProcessStepSummaryQtResponse update(UUID id, AuditProcessStepSummaryQtRequest request) {
         UUID tenantId = TenantContext.getTenantId();
         AuditProcessStepSummaryQt item = getOwnedOrThrow(tenantId, id);
-        checkNoDuplicateCode(tenantId, request.code(), id);
+        checkNoDuplicateCode(tenantId, request.code(), request.applicableYear(), id);
         validateBusinessSegment(tenantId, request.businessSegmentId());
         validateWorkItem(tenantId, request.workItemId());
 
@@ -146,10 +146,11 @@ public class AuditProcessStepSummaryQtService {
                 UUID businessSegmentId = isBlank(segmentCode) ? null : segmentIdsByCode.get(segmentCode.trim());
                 String workItemCode = row.get("workItemCode");
                 UUID workItemId = isBlank(workItemCode) ? null : workItemIdsByCode.get(workItemCode.trim());
+                Integer applicableYear = parseInt(row.get("applicableYear"));
 
-                Optional<AuditProcessStepSummaryQt> existing = repository.findByTenantIdAndCode(tenantId, code.trim());
+                Optional<AuditProcessStepSummaryQt> existing = repository.findByTenantIdAndCodeAndApplicableYear(tenantId, code.trim(), applicableYear);
                 AuditProcessStepSummaryQtRequest request = new AuditProcessStepSummaryQtRequest(businessSegmentId, code.trim(), name.trim(),
-                        workItemId, parseInt(row.get("applicableYear")), existing.map(AuditProcessStepSummaryQt::isActive).orElse(true));
+                        workItemId, applicableYear, existing.map(AuditProcessStepSummaryQt::isActive).orElse(true));
                 if (existing.isPresent()) {
                     update(existing.get().getId(), request);
                 } else {
@@ -175,11 +176,12 @@ public class AuditProcessStepSummaryQtService {
         item.setActive(request.active());
     }
 
-    private void checkNoDuplicateCode(UUID tenantId, String code, UUID excludingId) {
-        repository.findByTenantIdAndCode(tenantId, code)
+    private void checkNoDuplicateCode(UUID tenantId, String code, Integer applicableYear, UUID excludingId) {
+        repository.findByTenantIdAndCodeAndApplicableYear(tenantId, code, applicableYear)
                 .filter(existing -> excludingId == null || !existing.getId().equals(excludingId))
                 .ifPresent(existing -> {
-                    throw new BusinessException("AUDIT_PROCESS_STEP_SUMMARY_QT_CODE_DUPLICATE", "Ma buoc quy trinh tong hop da ton tai: " + code);
+                    throw new BusinessException("AUDIT_PROCESS_STEP_SUMMARY_QT_CODE_DUPLICATE",
+                            "Ma buoc quy trinh tong hop da ton tai cho nam " + applicableYear + ": " + code);
                 });
     }
 

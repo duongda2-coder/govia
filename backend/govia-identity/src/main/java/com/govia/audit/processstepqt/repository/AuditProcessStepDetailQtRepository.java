@@ -10,5 +10,5 @@ import java.util.UUID;
 public interface AuditProcessStepDetailQtRepository extends JpaRepository<AuditProcessStepDetailQt, UUID> {
     List<AuditProcessStepDetailQt> findByTenantIdOrderByCodeAsc(UUID tenantId);
 
-    Optional<AuditProcessStepDetailQt> findByTenantIdAndCode(UUID tenantId, String code);
+    Optional<AuditProcessStepDetailQt> findByTenantIdAndCodeAndApplicableYear(UUID tenantId, String code, Integer applicableYear);
 }
