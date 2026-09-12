@@ -13,22 +13,33 @@ export interface AccountPermissionsDrawerProps {
   onClose: () => void;
 }
 
-const ACTIONS = ["VIEW", "CREATE", "EDIT", "DELETE", "EXPORT", "IMPORT"] as const;
+/** 6 hanh dong CRUD pho bien, luon hien truoc - xem giai thich day du o RolePermissionsDrawer. */
+const PRIMARY_ACTIONS = ["VIEW", "CREATE", "EDIT", "DELETE", "EXPORT", "IMPORT"] as const;
 
-const ACTION_LABEL_KEYS: Record<(typeof ACTIONS)[number], string> = {
+/** Cung nhan hanh dong voi RolePermissionsDrawer - hanh dong khong co trong danh sach nay se hien
+ * thi nguyen ten thay vi bi an di (xem actionLabel() ben duoi). */
+const ACTION_LABEL_KEYS: Record<string, string> = {
   VIEW: "common.view",
   CREATE: "common.add",
   EDIT: "common.edit",
   DELETE: "common.delete",
   EXPORT: "common.export",
   IMPORT: "common.import",
+  APPROVE: "common.approve",
+  MANAGE: "common.manage",
+  EVALUATE: "common.evaluate",
+  DEPLOY: "common.deploy",
+  START: "common.start",
+  CANCEL: "common.cancel",
+  COMPLETE: "common.complete",
+  VIEW_ALL: "common.viewAll",
 };
 
 interface ResourceRow {
   resource: string;
   module: string;
   label: string;
-  codes: Partial<Record<(typeof ACTIONS)[number], string>>;
+  codes: Partial<Record<string, string>>;
 }
 
 /** Parse "PEOPLE.EMPLOYEE.VIEW" -> { resource: "EMPLOYEE", action: "VIEW" } - giong RolePermissionsDrawer. */
@@ -79,12 +90,24 @@ export function AccountPermissionsDrawer({ open, account, onClose }: AccountPerm
           codes: {},
         };
       }
-      acc[parsed.resource].codes[parsed.action as (typeof ACTIONS)[number]] = permission.code;
+      acc[parsed.resource].codes[parsed.action] = permission.code;
       return acc;
     }, {}),
   )
     .map(([, row]) => row)
     .sort((a, b) => a.module.localeCompare(b.module) || a.label.localeCompare(b.label));
+
+  const actions = (() => {
+    const found = new Set<string>();
+    rows.forEach((row) => Object.keys(row.codes).forEach((a) => found.add(a)));
+    const primary = PRIMARY_ACTIONS.filter((a) => found.has(a));
+    const extra = Array.from(found)
+      .filter((a) => !(PRIMARY_ACTIONS as readonly string[]).includes(a))
+      .sort((a, b) => a.localeCompare(b));
+    return [...primary, ...extra];
+  })();
+
+  const actionLabel = (action: string) => (ACTION_LABEL_KEYS[action] ? t(ACTION_LABEL_KEYS[action]) : action);
 
   return (
     <Drawer title={t("account.viewPermissions.title", { username: account?.username })} open={open} onClose={onClose} width={720} destroyOnClose>
@@ -107,8 +130,8 @@ export function AccountPermissionsDrawer({ open, account, onClose }: AccountPerm
         columns={[
           { title: t("common.module"), dataIndex: "module", width: 110 },
           { title: t("role.screen"), dataIndex: "label" },
-          ...ACTIONS.map((action) => ({
-            title: t(ACTION_LABEL_KEYS[action]),
+          ...actions.map((action) => ({
+            title: actionLabel(action),
             key: action,
             width: 90,
             align: "center" as const,

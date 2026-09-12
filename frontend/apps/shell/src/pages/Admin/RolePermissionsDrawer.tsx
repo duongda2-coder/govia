@@ -18,22 +18,40 @@ export interface RolePermissionsDrawerProps {
   onSaved: () => void;
 }
 
-const ACTIONS = ["VIEW", "CREATE", "EDIT", "DELETE", "EXPORT", "IMPORT"] as const;
+/**
+ * Thu tu uu tien cho 6 hanh dong CRUD pho bien - luon hien truoc de giao dien on dinh. Cac
+ * module (Workflow, Audit Supervision Team, ...) co the dinh nghia them hanh dong KHAC voi ten
+ * bat ky (vd MANAGE, EVALUATE, APPROVE, DEPLOY, START, CANCEL, COMPLETE, VIEW_ALL) - nhung hanh
+ * dong nay PHAI van hien thi duoc o day, neu khong Super Admin khong co cach nao gan quyen do cho
+ * vai tro (nut/chuc nang lien quan se "an" voi user thuong dau da duoc "phan quyen day du" tren
+ * cac hanh dong da biet). Xem PRIMARY_ACTIONS/ACTION_LABEL_KEYS/actionLabel() ben duoi.
+ */
+const PRIMARY_ACTIONS = ["VIEW", "CREATE", "EDIT", "DELETE", "EXPORT", "IMPORT"] as const;
 
-const ACTION_LABEL_KEYS: Record<(typeof ACTIONS)[number], string> = {
+/** Nhan hien thi cho cac hanh dong da biet - hanh dong la nhung khong co trong danh sach nay se
+ * hien thi nguyen ten (xem actionLabel()) thay vi bi an di. */
+const ACTION_LABEL_KEYS: Record<string, string> = {
   VIEW: "common.view",
   CREATE: "common.add",
   EDIT: "common.edit",
   DELETE: "common.delete",
   EXPORT: "common.export",
   IMPORT: "common.import",
+  APPROVE: "common.approve",
+  MANAGE: "common.manage",
+  EVALUATE: "common.evaluate",
+  DEPLOY: "common.deploy",
+  START: "common.start",
+  CANCEL: "common.cancel",
+  COMPLETE: "common.complete",
+  VIEW_ALL: "common.viewAll",
 };
 
 interface ResourceRow {
   resource: string;
   module: string;
   label: string;
-  codes: Partial<Record<(typeof ACTIONS)[number], string>>;
+  codes: Partial<Record<string, string>>;
 }
 
 /** Parse "PEOPLE.EMPLOYEE.VIEW" -> { resource: "EMPLOYEE", action: "VIEW" }. */
@@ -84,7 +102,7 @@ export function RolePermissionsDrawer({ open, role, onClose, onSaved }: RolePerm
           codes: {},
         };
       }
-      acc[parsed.resource].codes[parsed.action as (typeof ACTIONS)[number]] = permission.code;
+      acc[parsed.resource].codes[parsed.action] = permission.code;
       return acc;
     }, {}),
   )
@@ -92,11 +110,32 @@ export function RolePermissionsDrawer({ open, role, onClose, onSaved }: RolePerm
     .sort((a, b) => a.module.localeCompare(b.module) || a.label.localeCompare(b.label));
 
   /**
-   * Moi hanh dong (Them/Sua/Xoa/Xuat/Import) deu thao tac TU man hinh danh sach, nen khong co
-   * y nghia neu thieu quyen Xem: bat 1 hanh dong khac se tu dong bat kem Xem; tat Xem se tat
-   * luon cac hanh dong khac cua man hinh do (tranh gan quyen "mo khoa" ma khong vao duoc man hinh).
+   * Danh sach cot hanh dong hien thi: 6 hanh dong CRUD pho bien truoc (theo dung thu tu cu de
+   * khong xao tron giao dien), sau do la cac hanh dong "khac" (MANAGE/EVALUATE/APPROVE/...) thuc
+   * su co trong danh muc quyen, xep theo bang chu cai - PHAI tinh dong tu `rows`, khong hardcode,
+   * neu khong quyen nao dung ten hanh dong moi se khong co cach nao gan duoc (loi da gap: nut
+   * "Danh gia" cua To giam sat khong hien voi user thuong du da "phan quyen day du" - vi
+   * AUDIT.SUPERVISION_TEAM.EVALUATE/MANAGE khong co checkbox de gan).
    */
-  const toggle = (row: ResourceRow, action: (typeof ACTIONS)[number], value: boolean) => {
+  const actions = (() => {
+    const found = new Set<string>();
+    rows.forEach((row) => Object.keys(row.codes).forEach((a) => found.add(a)));
+    const primary = PRIMARY_ACTIONS.filter((a) => found.has(a));
+    const extra = Array.from(found)
+      .filter((a) => !(PRIMARY_ACTIONS as readonly string[]).includes(a))
+      .sort((a, b) => a.localeCompare(b));
+    return [...primary, ...extra];
+  })();
+
+  const actionLabel = (action: string) => (ACTION_LABEL_KEYS[action] ? t(ACTION_LABEL_KEYS[action]) : action);
+
+  /**
+   * Moi hanh dong deu thao tac TU man hinh danh sach, nen khong co y nghia neu thieu quyen Xem:
+   * bat 1 hanh dong khac se tu dong bat kem Xem; tat Xem se tat luon TAT CA hanh dong khac cua
+   * man hinh do - ke ca cac hanh dong "khong chuan" nhu MANAGE/EVALUATE (tranh gan quyen "mo khoa"
+   * ma khong vao duoc man hinh).
+   */
+  const toggle = (row: ResourceRow, action: string, value: boolean) => {
     const code = row.codes[action];
     if (!code) return;
     setChecked((prev) => {
@@ -107,8 +146,7 @@ export function RolePermissionsDrawer({ open, role, onClose, onSaved }: RolePerm
       } else {
         next.delete(code);
         if (action === "VIEW") {
-          ACTIONS.forEach((a) => {
-            const otherCode = row.codes[a];
+          Object.values(row.codes).forEach((otherCode) => {
             if (otherCode) next.delete(otherCode);
           });
         }
@@ -179,8 +217,8 @@ export function RolePermissionsDrawer({ open, role, onClose, onSaved }: RolePerm
             title: t("role.screen"),
             dataIndex: "label",
           },
-          ...ACTIONS.map((action) => ({
-            title: t(ACTION_LABEL_KEYS[action]),
+          ...actions.map((action) => ({
+            title: actionLabel(action),
             key: action,
             width: 90,
             align: "center" as const,
