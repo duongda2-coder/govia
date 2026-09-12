@@ -15,6 +15,7 @@ import {
 } from "../../../../../api/auditProcessEngagement";
 import { listMasterDataItems, type MasterDataItem } from "../../../../../api/auditMasterData";
 import { listAuditObjectUnitOptions, listEmployeeOptions, type AuditObjectUnitOption, type EmployeeOption } from "../../../../../api/auditEngagement";
+import { listAuditWorkItemsQt } from "../../../../../api/auditWorkItemQt";
 import { httpClient } from "../../../../../api/client";
 import { useAuth } from "../../../../../auth/AuthContext";
 import { AuditProcessEngagementForm } from "./AuditProcessEngagementForm";
@@ -64,24 +65,27 @@ export function AuditProcessEngagementPage() {
   const [teamLeads, setTeamLeads] = useState<TeamLeadOption[]>([]);
   const [auditObjectUnits, setAuditObjectUnits] = useState<AuditObjectUnitOption[]>([]);
   const [employees, setEmployees] = useState<EmployeeOption[]>([]);
+  const [workItemCodes, setWorkItemCodes] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<AuditProcessEngagementItem[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [engagements, segments, leads, units, employeeOptions] = await Promise.all([
+      const [engagements, segments, leads, units, employeeOptions, workItemsQt] = await Promise.all([
         listAuditProcessEngagements(),
         listMasterDataItems("BUSINESS_SEGMENT"),
         listTeamLeadOptions(),
         listAuditObjectUnitOptions(),
         listEmployeeOptions(),
+        listAuditWorkItemsQt(),
       ]);
       setItems(engagements);
       setBusinessSegments(segments);
       setTeamLeads(leads);
       setAuditObjectUnits(units);
       setEmployees(employeeOptions);
+      setWorkItemCodes(Array.from(new Set(workItemsQt.map((w) => w.code))).sort());
     } catch {
       message.error(t("auditProcessEngagement.messages.loadError"));
     } finally {
@@ -185,6 +189,7 @@ export function AuditProcessEngagementPage() {
         engagement={detail.item}
         businessSegments={businessSegments}
         teamLeads={teamLeads}
+        workItemCodes={workItemCodes}
         onCancel={backToList}
         onEdit={canEdit ? () => startEdit(detail.item) : undefined}
         onSaved={handleSaved}
@@ -271,6 +276,7 @@ export function AuditProcessEngagementPage() {
           engagement={null}
           businessSegments={businessSegments}
           teamLeads={teamLeads}
+          workItemCodes={workItemCodes}
           onCancel={backToList}
           onSaved={handleSaved}
         />

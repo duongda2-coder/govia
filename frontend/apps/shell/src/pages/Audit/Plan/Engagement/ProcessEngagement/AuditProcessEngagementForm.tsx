@@ -36,6 +36,9 @@ export interface AuditProcessEngagementFormProps {
   engagement: AuditProcessEngagementItem | null;
   businessSegments: MasterDataItem[];
   teamLeads: TeamLeadOption[];
+  /** Danh sach "Ma cong viec" (cot code) tu Danh muc "Bang ma cong viec quy trinh" (WorkItemQt) -
+   * dung lam options cho Select "Ma bo cong viec", thay vi nguoi dung go tu do. */
+  workItemCodes: string[];
   onSaved: (item: AuditProcessEngagementItem) => void;
   onCancel: () => void;
   /** Bo qua (undefined) neu nguoi dung khong co quyen EDIT - nut "Sua" se khong hien o che do Xem. */
@@ -47,7 +50,7 @@ const toDate = (v: dayjs.Dayjs | undefined | null) => (v ? v.format("YYYY-MM-DD"
 /** Form dung chung cho ca 3 che do Tao moi/Xem/Sua man hinh "Tao CKT quy trinh" (sheet "man hinh tao
  * CKT quy trinh" cua Tao CKT (3).xlsx) - cung bo cuc voi AuditEngagementForm (sibling CKT chi nhanh). */
 export function AuditProcessEngagementForm(props: AuditProcessEngagementFormProps) {
-  const { mode, engagement, businessSegments, teamLeads, onSaved, onCancel, onEdit } = props;
+  const { mode, engagement, businessSegments, teamLeads, workItemCodes, onSaved, onCancel, onEdit } = props;
   const { t } = useTranslation();
   const { message } = App.useApp();
   const [form] = Form.useForm<FormValues>();
@@ -214,7 +217,15 @@ export function AuditProcessEngagementForm(props: AuditProcessEngagementFormProp
           </Col>
           <Col span={8}>
             <Form.Item name="workSetCode" label={t("auditProcessEngagement.columns.workSetCode")}>
-              <Input maxLength={50} />
+              <Select
+                allowClear
+                showSearch
+                optionFilterProp="label"
+                options={Array.from(new Set(engagement?.workSetCode ? [...workItemCodes, engagement.workSetCode] : workItemCodes)).map((c) => ({
+                  value: c,
+                  label: c,
+                }))}
+              />
             </Form.Item>
           </Col>
           <Col span={8}>
