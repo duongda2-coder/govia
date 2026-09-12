@@ -7,16 +7,16 @@ import { CrudTable } from "@govia/ui-kit";
 import {
   addGroup,
   deleteGroup,
+  getGroupCodeOptions,
   listGroups,
   type AuditEngagementGroupCode,
+  type AuditEngagementGroupCodeOptions,
   type AuditEngagementGroupItem,
 } from "../../../../api/auditEngagementTeam";
 import type { EmployeeOption } from "../../../../api/auditEngagement";
 import type { MasterDataItem } from "../../../../api/auditMasterData";
 import { useAuth } from "../../../../auth/AuthContext";
 import { AuditEngagementGroupMembersDrawer } from "./AuditEngagementGroupMembersDrawer";
-
-const ALL_GROUP_CODES: AuditEngagementGroupCode[] = ["DIEUHANH", "NTINDUNG", "TINDUNG"];
 
 interface FormValues {
   groupCode: AuditEngagementGroupCode;
@@ -42,6 +42,7 @@ export function AuditEngagementGroupsDrawer(props: AuditEngagementGroupsDrawerPr
   const canDelete = hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.DELETE");
 
   const [items, setItems] = useState<AuditEngagementGroupItem[]>([]);
+  const [codeOptions, setCodeOptions] = useState<AuditEngagementGroupCodeOptions>({ processScoped: false, codes: [] });
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<AuditEngagementGroupItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -53,7 +54,9 @@ export function AuditEngagementGroupsDrawer(props: AuditEngagementGroupsDrawerPr
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setItems(await listGroups(engagementId));
+      const [groups, options] = await Promise.all([listGroups(engagementId), getGroupCodeOptions(engagementId)]);
+      setItems(groups);
+      setCodeOptions(options);
     } catch {
       message.error(t("auditEngagement.messages.loadError"));
     } finally {
@@ -65,11 +68,13 @@ export function AuditEngagementGroupsDrawer(props: AuditEngagementGroupsDrawerPr
     if (open) load();
     if (!open) {
       setItems([]);
+      setCodeOptions({ processScoped: false, codes: [] });
       setSelected([]);
     }
   }, [open, load]);
 
   const usedCodes = new Set(items.map((g) => g.groupCode));
+  const availableCodes = codeOptions.codes.filter((c) => !usedCodes.has(c));
   const groupLeaderCapableEmployees = employees.filter((e) => e.truongNhomCapable);
 
   const openCreate = () => {
@@ -151,7 +156,7 @@ export function AuditEngagementGroupsDrawer(props: AuditEngagementGroupsDrawerPr
           dataSource={items}
           rowKey="id"
           loading={loading}
-          onAdd={canCreate && usedCodes.size < 3 ? openCreate : undefined}
+          onAdd={canCreate && availableCodes.length > 0 ? openCreate : undefined}
           onDelete={canDelete ? handleDelete : undefined}
           deleteDisabled={selected.length === 0}
           onSelectionChange={(_keys, rows) => setSelected(rows)}
@@ -168,7 +173,7 @@ export function AuditEngagementGroupsDrawer(props: AuditEngagementGroupsDrawerPr
         >
           <Form<FormValues> form={form} layout="vertical">
             <Form.Item name="groupCode" label={t("auditEngagement.form.groupName")} rules={[{ required: true }]}>
-              <Select options={ALL_GROUP_CODES.filter((c) => !usedCodes.has(c)).map((c) => ({ value: c, label: c }))} />
+              <Select options={availableCodes.map((c) => ({ value: c, label: c }))} />
             </Form.Item>
             <Form.Item name="leaderEmployeeId" label={t("auditEngagement.form.groupLeaderName")} rules={[{ required: true }]}>
               <Select
@@ -187,6 +192,7 @@ export function AuditEngagementGroupsDrawer(props: AuditEngagementGroupsDrawerPr
         group={membersGroup}
         employees={employees}
         businessSegments={businessSegments}
+        processScoped={codeOptions.processScoped}
         onClose={() => setMembersOpen(false)}
         onChanged={load}
       />

@@ -25,7 +25,6 @@ interface FormValues {
   phase?: AuditWorkPhase;
   businessSegmentId?: string;
   code: string;
-  detailCode?: string;
   name: string;
   applicableYear?: number;
   workType?: string;
@@ -102,7 +101,6 @@ export function WorkItemPage() {
       phase: target.phase ?? undefined,
       businessSegmentId: target.businessSegmentId ?? undefined,
       code: target.code,
-      detailCode: target.detailCode ?? undefined,
       name: target.name,
       applicableYear: target.applicableYear ?? undefined,
       workType: target.workType ?? undefined,
@@ -125,7 +123,6 @@ export function WorkItemPage() {
         phase: values.phase ?? null,
         businessSegmentId: values.businessSegmentId ?? null,
         code: values.code,
-        detailCode: values.detailCode ?? null,
         name: values.name,
         applicableYear: values.applicableYear ?? null,
         workType: values.workType ?? null,
@@ -184,7 +181,6 @@ export function WorkItemPage() {
       render: (v: string | null) => v ?? "-",
     },
     { title: t("auditWorkItem.columns.code"), width: 120, ...getSearchColumnProps("code", searchLabels) },
-    { title: t("auditWorkItem.columns.detailCode"), width: 120, ...getSearchColumnProps("detailCode", searchLabels), render: (v: string | null) => v ?? "-" },
     { title: t("auditWorkItem.columns.name"), ...getSearchColumnProps("name", searchLabels) },
     { title: t("auditWorkItem.columns.applicableYear"), dataIndex: "applicableYear", width: 100, render: (v: number | null) => v ?? "-" },
     { title: t("auditWorkItem.columns.workType"), dataIndex: "workType", width: 120, render: (v: string | null) => v ?? "-" },
@@ -274,18 +270,9 @@ export function WorkItemPage() {
               </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="code" label={t("auditWorkItem.columns.code")} rules={[{ required: true }]}>
-                <Input maxLength={10} />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="detailCode" label={t("auditWorkItem.columns.detailCode")}>
-                <Input maxLength={20} />
-              </Form.Item>
-            </Col>
-          </Row>
+          <Form.Item name="code" label={t("auditWorkItem.columns.code")} rules={[{ required: true }]}>
+            <Input maxLength={10} />
+          </Form.Item>
           <Form.Item name="name" label={t("auditWorkItem.columns.name")} rules={[{ required: true }]}>
             <Input.TextArea rows={2} />
           </Form.Item>

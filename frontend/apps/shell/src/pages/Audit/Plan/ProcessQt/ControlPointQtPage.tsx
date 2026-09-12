@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Col, Form, Input, Modal, Result, Row, Select, Switch, Typography } from "antd";
+import { App, Col, Form, Input, InputNumber, Modal, Result, Row, Select, Space, Switch, Typography } from "antd";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
@@ -33,6 +33,7 @@ interface FormValues {
   processEffectiveness?: string;
   controlEffectivenessAssessment?: string;
   controlEfficiencyAssessment?: string;
+  applicableYear?: number;
   active: boolean;
 }
 
@@ -57,6 +58,8 @@ export function ControlPointQtPage() {
 
   const [items, setItems] = useState<AuditControlPointQtItem[]>([]);
   const [businessSegments, setBusinessSegments] = useState<MasterDataItem[]>([]);
+  const [years, setYears] = useState<MasterDataItem[]>([]);
+  const [selectedYear, setSelectedYear] = useState<number | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<AuditControlPointQtItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -67,9 +70,14 @@ export function ControlPointQtPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [list, segmentList] = await Promise.all([listAuditControlPointsQt(), listMasterDataItems("BUSINESS_SEGMENT")]);
+      const [list, segmentList, yearList] = await Promise.all([
+        listAuditControlPointsQt(),
+        listMasterDataItems("BUSINESS_SEGMENT"),
+        listMasterDataItems("YEAR"),
+      ]);
       setItems(list);
       setBusinessSegments(segmentList);
+      setYears(yearList);
     } catch {
       message.error(t("auditControlPointQt.messages.loadError"));
     } finally {
@@ -84,7 +92,7 @@ export function ControlPointQtPage() {
   const openCreate = () => {
     setEditing(null);
     form.resetFields();
-    form.setFieldsValue({ active: true });
+    form.setFieldsValue({ active: true, applicableYear: selectedYear });
     setModalOpen(true);
   };
 
@@ -108,6 +116,7 @@ export function ControlPointQtPage() {
       processEffectiveness: target.processEffectiveness ?? undefined,
       controlEffectivenessAssessment: target.controlEffectivenessAssessment ?? undefined,
       controlEfficiencyAssessment: target.controlEfficiencyAssessment ?? undefined,
+      applicableYear: target.applicableYear ?? undefined,
       active: target.active,
     });
     setModalOpen(true);
@@ -138,6 +147,7 @@ export function ControlPointQtPage() {
         processEffectiveness: values.processEffectiveness ?? null,
         controlEffectivenessAssessment: values.controlEffectivenessAssessment ?? null,
         controlEfficiencyAssessment: values.controlEfficiencyAssessment ?? null,
+        applicableYear: values.applicableYear ?? null,
         active: values.active,
       };
       if (editing) {
@@ -178,6 +188,8 @@ export function ControlPointQtPage() {
     });
   };
 
+  const displayedItems = selectedYear == null ? items : items.filter((i) => i.applicableYear === selectedYear);
+
   const columns: TableProps<AuditControlPointQtItem>["columns"] = [
     { title: t("auditControlPointQt.columns.code"), width: 130, ...getSearchColumnProps("code", searchLabels) },
     { title: t("auditControlPointQt.columns.name"), ...getSearchColumnProps("name", searchLabels) },
@@ -201,6 +213,12 @@ export function ControlPointQtPage() {
       render: (v: AuditLevel | null) => (v ? t(`auditControlPoint.level.${v}`) : "-"),
     },
     {
+      title: t("auditControlPointQt.columns.applicableYear"),
+      dataIndex: "applicableYear",
+      width: 100,
+      render: (v: number | null) => v ?? "-",
+    },
+    {
       title: t("common.active"),
       dataIndex: "active",
       width: 110,
@@ -215,11 +233,25 @@ export function ControlPointQtPage() {
 
   return (
     <div>
-      <Typography.Title level={4}>{t("auditControlPointQt.title")}</Typography.Title>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Typography.Title level={4} style={{ margin: 0 }}>
+          {t("auditControlPointQt.title")}
+        </Typography.Title>
+        <Space>
+          <Select
+            allowClear
+            placeholder={t("common.selectYear")}
+            style={{ width: 120 }}
+            value={selectedYear}
+            onChange={(v) => setSelectedYear(v)}
+            options={years.map((y) => ({ value: Number(y.code), label: y.code }))}
+          />
+        </Space>
+      </div>
       <CrudTable<AuditControlPointQtItem>
         tableId="audit.plan.controlPointQt"
         columns={columns}
-        dataSource={items}
+        dataSource={displayedItems}
         rowKey="id"
         loading={loading}
         onAdd={canCreate ? openCreate : undefined}
@@ -319,9 +351,18 @@ export function ControlPointQtPage() {
           <Form.Item name="controlEfficiencyAssessment" label={t("auditControlPointQt.columns.controlEfficiencyAssessment")}>
             <Input.TextArea rows={2} />
           </Form.Item>
-          <Form.Item name="active" label={t("common.active")} valuePropName="checked">
-            <Switch />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="applicableYear" label={t("auditControlPointQt.columns.applicableYear")}>
+                <InputNumber style={{ width: "100%" }} min={2000} max={2100} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="active" label={t("common.active")} valuePropName="checked">
+                <Switch />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </div>

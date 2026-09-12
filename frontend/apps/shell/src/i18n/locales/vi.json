@@ -795,7 +795,6 @@
       "phase": "Giai đoạn",
       "businessSegment": "Mảng nghiệp vụ",
       "code": "Mã công việc",
-      "detailCode": "Mã chi tiết",
       "name": "Tên công việc",
       "applicableYear": "Năm",
       "workType": "Loại CV",
@@ -890,7 +889,8 @@
       "referenceClause": "Điều khoản tham chiếu",
       "processEffectiveness": "Hiệu lực quy trình",
       "controlEffectivenessAssessment": "Đánh giá hiệu lực chốt KS",
-      "controlEfficiencyAssessment": "Đánh giá hiệu quả chốt KS"
+      "controlEfficiencyAssessment": "Đánh giá hiệu quả chốt KS",
+      "applicableYear": "Năm"
     },
     "form": {
       "createTitle": "Thêm chốt kiểm soát quy trình",

@@ -3,7 +3,6 @@ package com.govia.identity;
 import com.govia.audit.planengagement.entity.AssignmentApprovalStatus;
 import com.govia.audit.planengagement.entity.AuditEngagement;
 import com.govia.audit.planengagement.entity.AuditEngagementGroup;
-import com.govia.audit.planengagement.entity.AuditEngagementGroupCode;
 import com.govia.audit.planengagement.entity.AuditEngagementGroupMember;
 import com.govia.audit.planengagement.progressreport.dto.AuditProgressReportApproveRequest;
 import com.govia.audit.planengagement.progressreport.dto.AuditProgressReportResponse;
@@ -254,7 +253,7 @@ class AuditTtssAndProgressReportWorkflowTest {
         AuditEngagementGroup groupA = new AuditEngagementGroup();
         groupA.setTenantId(tenantId);
         groupA.setAuditEngagementId(engagement.getId());
-        groupA.setGroupCode(AuditEngagementGroupCode.TINDUNG);
+        groupA.setGroupCode("TINDUNG");
         groupA.setLeaderEmployeeId(groupLeadA.id());
         groupA = groupRepository.save(groupA);
         AuditEngagementGroupMember memberAInGroup = new AuditEngagementGroupMember();
@@ -266,7 +265,7 @@ class AuditTtssAndProgressReportWorkflowTest {
         AuditEngagementGroup groupB = new AuditEngagementGroup();
         groupB.setTenantId(tenantId);
         groupB.setAuditEngagementId(engagement.getId());
-        groupB.setGroupCode(AuditEngagementGroupCode.NTINDUNG);
+        groupB.setGroupCode("NTINDUNG");
         groupB.setLeaderEmployeeId(groupLeadB.id());
         groupB = groupRepository.save(groupB);
         AuditEngagementGroupMember memberBInGroup = new AuditEngagementGroupMember();
@@ -364,7 +363,7 @@ class AuditTtssAndProgressReportWorkflowTest {
         AuditEngagementGroup group = new AuditEngagementGroup();
         group.setTenantId(tenantId);
         group.setAuditEngagementId(engagement.getId());
-        group.setGroupCode(AuditEngagementGroupCode.TINDUNG);
+        group.setGroupCode("TINDUNG");
         group.setLeaderEmployeeId(leaderEmployeeId);
         group = groupRepository.save(group);
 

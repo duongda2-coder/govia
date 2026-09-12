@@ -2,6 +2,7 @@ package com.govia.audit.planengagement.controller;
 
 import com.govia.audit.planengagement.dto.AssignWorkItemsRequest;
 import com.govia.audit.planengagement.dto.AuditEngagementAssignmentResponse;
+import com.govia.audit.planengagement.dto.AuditEngagementGroupCodeOptionsResponse;
 import com.govia.audit.planengagement.dto.AuditEngagementGroupMemberRequest;
 import com.govia.audit.planengagement.dto.AuditEngagementGroupMemberResponse;
 import com.govia.audit.planengagement.dto.AuditEngagementGroupRequest;
@@ -40,6 +41,12 @@ public class AuditEngagementTeamController {
     @PreAuthorize("hasAuthority('PERM_AUDIT.PLAN_ENGAGEMENT_TEAM.VIEW')")
     public ApiResponse<List<AuditEngagementGroupResponse>> listGroups(@PathVariable UUID engagementId) {
         return ApiResponse.ok(service.listGroups(engagementId));
+    }
+
+    @GetMapping("/groups/code-options")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.PLAN_ENGAGEMENT_TEAM.VIEW')")
+    public ApiResponse<AuditEngagementGroupCodeOptionsResponse> groupCodeOptions(@PathVariable UUID engagementId) {
+        return ApiResponse.ok(service.groupCodeOptions(engagementId));
     }
 
     @PostMapping("/groups")

@@ -23,6 +23,7 @@ public record AuditControlPointQtRequest(
         String processEffectiveness,
         String controlEffectivenessAssessment,
         String controlEfficiencyAssessment,
+        Integer applicableYear,
         boolean active
 ) {
 }

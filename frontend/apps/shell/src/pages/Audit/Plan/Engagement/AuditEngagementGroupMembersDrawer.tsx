@@ -28,13 +28,16 @@ export interface AuditEngagementGroupMembersDrawerProps {
   group: AuditEngagementGroupItem | null;
   employees: EmployeeOption[];
   businessSegments: MasterDataItem[];
+  /** True neu CKT nay la CKT quy trinh (chi 1 nghiep vu duy nhat = group.groupCode) - khi do "Nghiep
+   * vu" cua thanh vien chi duoc chon dung nghiep vu nay, xem AuditEngagementGroupsDrawer. */
+  processScoped?: boolean;
   onClose: () => void;
   onChanged: () => void;
 }
 
 /** Man hinh "Danh sach thanh vien trong nhom" (nut "Xem thanh vien nhom" o Drawer nhom). */
 export function AuditEngagementGroupMembersDrawer(props: AuditEngagementGroupMembersDrawerProps) {
-  const { open, engagementId, group, employees, businessSegments, onClose, onChanged } = props;
+  const { open, engagementId, group, employees, businessSegments, processScoped, onClose, onChanged } = props;
   const { t } = useTranslation();
   const { message, modal } = App.useApp();
   const { hasPermission } = useAuth();
@@ -149,6 +152,7 @@ export function AuditEngagementGroupMembersDrawer(props: AuditEngagementGroupMem
     const capableCodes = new Set(employee?.capableSegmentCodes ?? []);
     return businessSegments
       .filter((s) => capableCodes.has(s.code) && !excludeIds.includes(s.id))
+      .filter((s) => !processScoped || s.code === group?.groupCode)
       .map((s) => ({ value: s.id, label: `${s.code} - ${s.name}` }));
   };
 

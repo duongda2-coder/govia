@@ -4,7 +4,6 @@ import com.govia.audit.planengagement.entity.AssignmentStatus;
 import com.govia.audit.planengagement.entity.AuditEngagement;
 import com.govia.audit.planengagement.entity.AuditEngagementAssignment;
 import com.govia.audit.planengagement.entity.AuditEngagementGroup;
-import com.govia.audit.planengagement.entity.AuditEngagementGroupCode;
 import com.govia.audit.planengagement.entity.AuditEngagementGroupMember;
 import com.govia.audit.planengagement.monitoring.dto.AuditEngagementMonitoringResponse;
 import com.govia.audit.planengagement.monitoring.dto.AuditEngagementTeamMemberDetailResponse;
@@ -258,7 +257,7 @@ class AuditEngagementMonitoringServiceTest {
         AuditEngagementGroup group = new AuditEngagementGroup();
         group.setTenantId(tenantId);
         group.setAuditEngagementId(engagement.getId());
-        group.setGroupCode(AuditEngagementGroupCode.TINDUNG);
+        group.setGroupCode("TINDUNG");
         group.setLeaderEmployeeId(leaderEmployeeId);
         return groupRepository.save(group);
     }

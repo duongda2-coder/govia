@@ -64,7 +64,7 @@ public class AuditControlPointQtService {
     @Transactional
     public AuditControlPointQtResponse create(AuditControlPointQtRequest request) {
         UUID tenantId = TenantContext.getTenantId();
-        checkNoDuplicateCode(tenantId, request.code(), null);
+        checkNoDuplicateCode(tenantId, request.code(), request.applicableYear(), null);
         validateBusinessSegment(tenantId, request.businessSegmentId());
 
         AuditControlPointQt item = new AuditControlPointQt();
@@ -80,7 +80,7 @@ public class AuditControlPointQtService {
     public AuditControlPointQtResponse update(UUID id, AuditControlPointQtRequest request) {
         UUID tenantId = TenantContext.getTenantId();
         AuditControlPointQt item = getOwnedOrThrow(tenantId, id);
-        checkNoDuplicateCode(tenantId, request.code(), id);
+        checkNoDuplicateCode(tenantId, request.code(), request.applicableYear(), id);
         validateBusinessSegment(tenantId, request.businessSegmentId());
 
         applyRequest(item, request);
@@ -135,13 +135,15 @@ public class AuditControlPointQtService {
                 }
                 String segmentCode = row.get("businessSegmentCode");
                 UUID businessSegmentId = isBlank(segmentCode) ? null : segmentIdsByCode.get(segmentCode.trim());
+                Integer applicableYear = parseInt(row.get("applicableYear"));
                 create(new AuditControlPointQtRequest(businessSegmentId, code.trim(), name.trim(),
                         emptyToNull(row.get("possibleRisk")), emptyToNull(row.get("controlPointByStep")),
                         emptyToNull(row.get("actualControl")), parseEnum(AuditControlType.class, row.get("controlType")),
                         parseEnum(AuditLevel.class, row.get("controlFrequency")), emptyToNull(row.get("auditProcedure")),
                         emptyToNull(row.get("residualRiskAssessment")), emptyToNull(row.get("processRegulation")),
                         emptyToNull(row.get("referenceClause")), emptyToNull(row.get("processEffectiveness")),
-                        emptyToNull(row.get("controlEffectivenessAssessment")), emptyToNull(row.get("controlEfficiencyAssessment")), true));
+                        emptyToNull(row.get("controlEffectivenessAssessment")), emptyToNull(row.get("controlEfficiencyAssessment")),
+                        applicableYear, true));
                 success++;
             } catch (Exception e) {
                 errors.add(new ImportResult.ImportRowError(rowNumber, e.getMessage()));
@@ -169,14 +171,16 @@ public class AuditControlPointQtService {
         item.setProcessEffectiveness(request.processEffectiveness());
         item.setControlEffectivenessAssessment(request.controlEffectivenessAssessment());
         item.setControlEfficiencyAssessment(request.controlEfficiencyAssessment());
+        item.setApplicableYear(request.applicableYear());
         item.setActive(request.active());
     }
 
-    private void checkNoDuplicateCode(UUID tenantId, String code, UUID excludingId) {
-        repository.findByTenantIdAndCode(tenantId, code)
+    private void checkNoDuplicateCode(UUID tenantId, String code, Integer applicableYear, UUID excludingId) {
+        repository.findByTenantIdAndCodeAndApplicableYear(tenantId, code, applicableYear)
                 .filter(existing -> excludingId == null || !existing.getId().equals(excludingId))
                 .ifPresent(existing -> {
-                    throw new BusinessException("AUDIT_CONTROL_POINT_QT_CODE_DUPLICATE", "Ma chot kiem soat da ton tai: " + code);
+                    throw new BusinessException("AUDIT_CONTROL_POINT_QT_CODE_DUPLICATE",
+                            "Ma chot kiem soat da ton tai cho nam " + applicableYear + ": " + code);
                 });
     }
 
@@ -216,7 +220,8 @@ public class AuditControlPointQtService {
                 new ExportColumn("referenceClause", "Điều khoản tham chiếu"),
                 new ExportColumn("processEffectiveness", "Hiệu lực quy trình"),
                 new ExportColumn("controlEffectivenessAssessment", "Đánh giá hiệu lực chốt KS"),
-                new ExportColumn("controlEfficiencyAssessment", "Đánh giá hiệu quả chốt KS"));
+                new ExportColumn("controlEfficiencyAssessment", "Đánh giá hiệu quả chốt KS"),
+                new ExportColumn("applicableYear", "Năm"));
     }
 
     private List<Map<String, Object>> exportRows() {
@@ -240,6 +245,7 @@ public class AuditControlPointQtService {
                     row.put("processEffectiveness", item.getProcessEffectiveness());
                     row.put("controlEffectivenessAssessment", item.getControlEffectivenessAssessment());
                     row.put("controlEfficiencyAssessment", item.getControlEfficiencyAssessment());
+                    row.put("applicableYear", item.getApplicableYear());
                     return row;
                 }).toList();
     }
@@ -254,6 +260,17 @@ public class AuditControlPointQtService {
 
     private String emptyToNull(String value) {
         return isBlank(value) ? null : value.trim();
+    }
+
+    private Integer parseInt(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return Integer.valueOf(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private <E extends Enum<E>> E parseEnum(Class<E> type, String value) {
@@ -274,6 +291,7 @@ public class AuditControlPointQtService {
                 item.getCode(), item.getName(), item.getPossibleRisk(), item.getControlPointByStep(), item.getActualControl(),
                 item.getControlType(), item.getControlFrequency(), item.getAuditProcedure(), item.getResidualRiskAssessment(),
                 item.getProcessRegulation(), item.getReferenceClause(), item.getProcessEffectiveness(),
-                item.getControlEffectivenessAssessment(), item.getControlEfficiencyAssessment(), item.isActive());
+                item.getControlEffectivenessAssessment(), item.getControlEfficiencyAssessment(),
+                item.getApplicableYear(), item.isActive());
     }
 }

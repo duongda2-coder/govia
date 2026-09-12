@@ -10,5 +10,5 @@ import java.util.UUID;
 public interface AuditControlPointQtRepository extends JpaRepository<AuditControlPointQt, UUID> {
     List<AuditControlPointQt> findByTenantIdOrderByCodeAsc(UUID tenantId);
 
-    Optional<AuditControlPointQt> findByTenantIdAndCode(UUID tenantId, String code);
+    Optional<AuditControlPointQt> findByTenantIdAndCodeAndApplicableYear(UUID tenantId, String code, Integer applicableYear);
 }

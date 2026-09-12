@@ -2,7 +2,6 @@ package com.govia.audit.planengagement.dto;
 
 import com.govia.audit.planengagement.entity.AssignmentApprovalStatus;
 import com.govia.audit.planengagement.entity.AssignmentStatus;
-import com.govia.audit.planengagement.entity.AuditEngagementGroupCode;
 import com.govia.audit.workitem.entity.AuditWorkPhase;
 
 import java.time.Instant;
@@ -30,6 +29,6 @@ public record AuditWorkManagementItemResponse(
         Instant approvedAt,
         /** "Mã nhóm" - dung cho man hinh tong hop "Quản lý công việc" cua "QL CKT quy trinh" (Tao
          * CKT (4).xlsx); man hinh 1-CKT khong can vi da chia man hinh rieng theo giai doan. */
-        AuditEngagementGroupCode groupCode
+        String groupCode
 ) {
 }

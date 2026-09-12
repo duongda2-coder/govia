@@ -8,7 +8,6 @@ import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import com.govia.audit.planengagement.entity.AuditEngagement;
 import com.govia.audit.planengagement.entity.AuditEngagementAssignment;
 import com.govia.audit.planengagement.entity.AuditEngagementGroup;
-import com.govia.audit.planengagement.entity.AuditEngagementGroupCode;
 import com.govia.audit.planengagement.entity.AuditEngagementGroupMember;
 import com.govia.audit.planengagement.repository.AuditEngagementAssignmentRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementGroupMemberRepository;
@@ -273,7 +272,7 @@ class AuditTtssTemplateAutoFillTest {
         AuditEngagementGroup group = new AuditEngagementGroup();
         group.setTenantId(tenantId);
         group.setAuditEngagementId(engagement.getId());
-        group.setGroupCode(AuditEngagementGroupCode.TINDUNG);
+        group.setGroupCode("TINDUNG");
         group.setLeaderEmployeeId(teamLead.id());
         group = groupRepository.save(group);
 

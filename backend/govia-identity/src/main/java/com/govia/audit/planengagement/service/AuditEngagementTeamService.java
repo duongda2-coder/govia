@@ -6,6 +6,7 @@ import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import com.govia.audit.planengagement.dto.AssignWorkItemsRequest;
 import com.govia.audit.planengagement.dto.AuditEngagementAssignmentResponse;
+import com.govia.audit.planengagement.dto.AuditEngagementGroupCodeOptionsResponse;
 import com.govia.audit.planengagement.dto.AuditEngagementGroupMemberRequest;
 import com.govia.audit.planengagement.dto.AuditEngagementGroupMemberResponse;
 import com.govia.audit.planengagement.dto.AuditEngagementGroupRequest;
@@ -15,6 +16,8 @@ import com.govia.audit.planengagement.entity.AuditEngagement;
 import com.govia.audit.planengagement.entity.AuditEngagementAssignment;
 import com.govia.audit.planengagement.entity.AuditEngagementGroup;
 import com.govia.audit.planengagement.entity.AuditEngagementGroupMember;
+import com.govia.audit.planengagement.processengagement.entity.AuditProcessEngagement;
+import com.govia.audit.planengagement.processengagement.repository.AuditProcessEngagementRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementAssignmentRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementGroupMemberRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementGroupRepository;
@@ -49,12 +52,16 @@ import static com.govia.audit.masterdata.entity.AuditMasterDataCategory.BUSINESS
 @Service
 public class AuditEngagementTeamService {
 
+    /** 3 nhom co dinh cho CKT thuong (khong thuoc CKT quy trinh nao) - xem validGroupCodes(). */
+    private static final Set<String> DEFAULT_GROUP_CODES = Set.of("DIEUHANH", "NTINDUNG", "TINDUNG");
+
     private final AuditEngagementRepository engagementRepository;
     private final AuditEngagementGroupRepository groupRepository;
     private final AuditEngagementGroupMemberRepository memberRepository;
     private final AuditEngagementAssignmentRepository assignmentRepository;
     private final AuditWorkItemRepository workItemRepository;
     private final AuditMasterDataItemRepository masterDataItemRepository;
+    private final AuditProcessEngagementRepository processEngagementRepository;
     private final EmployeeRepository employeeRepository;
     private final UserAccountRepository userAccountRepository;
     private final AuditEmployeeCapabilityRepository employeeCapabilityRepository;
@@ -63,6 +70,7 @@ public class AuditEngagementTeamService {
     public AuditEngagementTeamService(AuditEngagementRepository engagementRepository, AuditEngagementGroupRepository groupRepository,
                                        AuditEngagementGroupMemberRepository memberRepository, AuditEngagementAssignmentRepository assignmentRepository,
                                        AuditWorkItemRepository workItemRepository, AuditMasterDataItemRepository masterDataItemRepository,
+                                       AuditProcessEngagementRepository processEngagementRepository,
                                        EmployeeRepository employeeRepository, UserAccountRepository userAccountRepository,
                                        AuditEmployeeCapabilityRepository employeeCapabilityRepository, AuditLogService auditLogService) {
         this.engagementRepository = engagementRepository;
@@ -71,6 +79,7 @@ public class AuditEngagementTeamService {
         this.assignmentRepository = assignmentRepository;
         this.workItemRepository = workItemRepository;
         this.masterDataItemRepository = masterDataItemRepository;
+        this.processEngagementRepository = processEngagementRepository;
         this.employeeRepository = employeeRepository;
         this.userAccountRepository = userAccountRepository;
         this.employeeCapabilityRepository = employeeCapabilityRepository;
@@ -93,10 +102,38 @@ public class AuditEngagementTeamService {
         return groups.stream().map(g -> toGroupResponse(g, engagement, leaders, leaderUsernames, memberCountByGroup, assignmentCountByGroup)).toList();
     }
 
+    /** Cac ma nhom hop le de tao moi cho 1 CKT (chua tru ma da dung) - xem AuditEngagementGroupCodeOptionsResponse. */
+    @Transactional(readOnly = true)
+    public AuditEngagementGroupCodeOptionsResponse groupCodeOptions(UUID engagementId) {
+        UUID tenantId = TenantContext.getTenantId();
+        AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
+        boolean processScoped = engagement.getProcessEngagementId() != null;
+        List<String> codes = validGroupCodes(tenantId, engagement).stream().sorted().toList();
+        return new AuditEngagementGroupCodeOptionsResponse(processScoped, codes);
+    }
+
+    /** Ma nhom hop le cho 1 CKT: CKT thuong dung 3 ma co dinh; CKT quy trinh (co processEngagementId)
+     * chi dung DUY NHAT ma nghiep vu cua CKT quy trinh cha (vd "AM") - xem AuditEngagementGroup. */
+    private Set<String> validGroupCodes(UUID tenantId, AuditEngagement engagement) {
+        if (engagement.getProcessEngagementId() == null) {
+            return DEFAULT_GROUP_CODES;
+        }
+        return processEngagementRepository.findById(engagement.getProcessEngagementId())
+                .filter(p -> p.getTenantId().equals(tenantId))
+                .map(AuditProcessEngagement::getBusinessSegmentId)
+                .flatMap(masterDataItemRepository::findById)
+                .map(AuditMasterDataItem::getCode)
+                .map(Set::of)
+                .orElse(Set.of());
+    }
+
     @Transactional
     public AuditEngagementGroupResponse addGroup(UUID engagementId, AuditEngagementGroupRequest request) {
         UUID tenantId = TenantContext.getTenantId();
         AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
+        if (!validGroupCodes(tenantId, engagement).contains(request.groupCode())) {
+            throw new BusinessException("AUDIT_ENGAGEMENT_GROUP_CODE_INVALID", "Ma nhom khong hop le cho cuoc kiem toan nay");
+        }
         if (groupRepository.findByTenantIdAndAuditEngagementIdAndGroupCode(tenantId, engagementId, request.groupCode()).isPresent()) {
             throw new BusinessException("AUDIT_ENGAGEMENT_GROUP_DUPLICATE", "Nhom nay da ton tai trong cuoc kiem toan");
         }
@@ -373,7 +410,7 @@ public class AuditEngagementTeamService {
                                                            Map<UUID, Long> assignmentCountByGroup) {
         Employee leader = leaders.get(group.getLeaderEmployeeId());
         return new AuditEngagementGroupResponse(group.getId(), group.getAuditEngagementId(), engagement.getCode(), group.getGroupCode(),
-                group.getGroupCode().name(), group.getLeaderEmployeeId(), leader == null ? null : leader.getEmployeeCode(),
+                group.getGroupCode(), group.getLeaderEmployeeId(), leader == null ? null : leader.getEmployeeCode(),
                 leader == null ? null : leader.getFullName(), leaderUsernames.get(group.getLeaderEmployeeId()),
                 memberCountByGroup.getOrDefault(group.getId(), 0L), assignmentCountByGroup.getOrDefault(group.getId(), 0L));
     }
@@ -388,7 +425,7 @@ public class AuditEngagementTeamService {
         Map<UUID, String> usernames = usernamesByEmployeeIds(usernameLookupIds);
         return members.stream().map(member -> {
             Employee employee = employees.get(member.getEmployeeId());
-            return new AuditEngagementGroupMemberResponse(member.getId(), member.getGroupId(), group.getGroupCode(), group.getGroupCode().name(),
+            return new AuditEngagementGroupMemberResponse(member.getId(), member.getGroupId(), group.getGroupCode(), group.getGroupCode(),
                     engagement.getId(), engagement.getCode(), member.getEmployeeId(), employee == null ? null : employee.getEmployeeCode(),
                     employee == null ? null : employee.getFullName(), employee == null || employee.getOrgUnit() == null ? null : employee.getOrgUnit().getName(),
                     usernames.get(member.getEmployeeId()), group.getLeaderEmployeeId(), leader == null ? null : leader.getFullName(),
@@ -413,7 +450,7 @@ public class AuditEngagementTeamService {
         return assignments.stream().map(a -> {
             AuditWorkItem workItem = workItems.get(a.getWorkItemId());
             AuditMasterDataItem segment = workItem == null ? null : segments.get(workItem.getBusinessSegmentId());
-            return new AuditEngagementAssignmentResponse(a.getId(), member.getId(), group.getId(), group.getGroupCode().name(),
+            return new AuditEngagementAssignmentResponse(a.getId(), member.getId(), group.getId(), group.getGroupCode(),
                     member.getEmployeeId(), employee == null ? null : employee.getEmployeeCode(), employee == null ? null : employee.getFullName(),
                     a.getWorkItemId(), workItem == null ? null : workItem.getPhase(), segment == null ? null : segment.getCode(),
                     workItem == null ? null : workItem.getCode(), workItem == null ? null : workItem.getName());

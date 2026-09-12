@@ -10,7 +10,6 @@ public record AuditWorkItemRequest(
         AuditWorkPhase phase,
         UUID businessSegmentId,
         @NotBlank @Size(max = 10) String code,
-        @Size(max = 20) String detailCode,
         @NotBlank @Size(max = 1000) String name,
         Integer applicableYear,
         String workType,

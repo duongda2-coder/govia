@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  # ===================== "Danh muc Cong viec kiem toan": thua cot "Ma chi tiet" (khong dung den) =====================
+  - changeSet:
+      id: 151-1-audit-work-item-drop-detail-code
+      author: govia
+      comment: "Xoa cot detail_code khoi audit_work_item - truong tu do, chua tung duoc dung de lien ket (xem doc-comment AuditTtssSampleSelectionResolver)"
+      changes:
+        - dropColumn:
+            tableName: audit_work_item
+            columnName: detail_code

@@ -431,3 +431,9 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/149-audit-supervision-team-permission-catalog.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/150-audit-control-point-qt-add-applicable-year.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/151-audit-work-item-drop-detail-code.yaml
+      relativeToChangelogFile: false

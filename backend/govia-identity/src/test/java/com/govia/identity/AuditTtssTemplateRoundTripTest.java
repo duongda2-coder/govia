@@ -7,7 +7,6 @@ import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import com.govia.audit.planengagement.entity.AuditEngagement;
 import com.govia.audit.planengagement.entity.AuditEngagementGroup;
-import com.govia.audit.planengagement.entity.AuditEngagementGroupCode;
 import com.govia.audit.planengagement.entity.AuditEngagementGroupMember;
 import com.govia.audit.planengagement.progressreport.repository.AuditProgressReportRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementAssignmentRepository;
@@ -139,7 +138,7 @@ class AuditTtssTemplateRoundTripTest {
         AuditEngagementGroup group = new AuditEngagementGroup();
         group.setTenantId(tenantId);
         group.setAuditEngagementId(engagement.getId());
-        group.setGroupCode(AuditEngagementGroupCode.TINDUNG);
+        group.setGroupCode("TINDUNG");
         group.setLeaderEmployeeId(teamLead.id());
         group = groupRepository.save(group);
 

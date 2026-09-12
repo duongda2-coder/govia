@@ -70,6 +70,9 @@ public class AuditControlPointQt extends BaseEntity {
     @Column(name = "control_efficiency_assessment", length = 1000)
     private String controlEfficiencyAssessment;
 
+    @Column(name = "applicable_year")
+    private Integer applicableYear;
+
     @Column(name = "active", nullable = false)
     private boolean active = true;
 }

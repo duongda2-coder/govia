@@ -2,7 +2,14 @@ import type { ApiResponse } from "@govia/ui-kit";
 import type { AuditWorkPhase } from "./auditWorkItem";
 import { httpClient } from "./client";
 
-export type AuditEngagementGroupCode = "DIEUHANH" | "NTINDUNG" | "TINDUNG";
+/** Ma nhom: 3 ma co dinh (DIEUHANH/NTINDUNG/TINDUNG) cho CKT thuong, hoac ma nghiep vu (vd "AM")
+ * cho CKT quy trinh - xem groupCodeOptions() va AuditEngagementGroupCodeOptionsResponse. */
+export type AuditEngagementGroupCode = string;
+
+export interface AuditEngagementGroupCodeOptions {
+  processScoped: boolean;
+  codes: AuditEngagementGroupCode[];
+}
 
 export interface AuditEngagementGroupItem {
   id: string;
@@ -67,6 +74,11 @@ const base = (engagementId: string) => `/api/audit/plan/engagement/${engagementI
 
 export async function listGroups(engagementId: string): Promise<AuditEngagementGroupItem[]> {
   const res = await httpClient.get<ApiResponse<AuditEngagementGroupItem[]>>(`${base(engagementId)}/groups`);
+  return res.data.data;
+}
+
+export async function getGroupCodeOptions(engagementId: string): Promise<AuditEngagementGroupCodeOptions> {
+  const res = await httpClient.get<ApiResponse<AuditEngagementGroupCodeOptions>>(`${base(engagementId)}/groups/code-options`);
   return res.data.data;
 }
 

@@ -24,6 +24,7 @@ public record AuditControlPointQtResponse(
         String processEffectiveness,
         String controlEffectivenessAssessment,
         String controlEfficiencyAssessment,
+        Integer applicableYear,
         boolean active
 ) {
 }

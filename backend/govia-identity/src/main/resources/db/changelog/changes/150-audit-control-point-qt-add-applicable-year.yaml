@@ -1,0 +1,25 @@
+databaseChangeLog:
+
+  # ===================== Them cot Nam (loc theo nam) con thieu o Danh muc Chot kiem soat quy trinh =====================
+  - changeSet:
+      id: 150-1-audit-control-point-qt-add-applicable-year
+      author: govia
+      comment: "Them cot applicable_year vao audit_control_point_qt (giong cac danh muc QT khac)"
+      changes:
+        - addColumn:
+            tableName: audit_control_point_qt
+            columns:
+              - column: { name: applicable_year, type: INT }
+
+  - changeSet:
+      id: 150-2-audit-control-point-qt-composite-unique-key
+      author: govia
+      comment: "audit_control_point_qt: unique key = tenant_id + code + applicable_year"
+      changes:
+        - dropUniqueConstraint:
+            tableName: audit_control_point_qt
+            constraintName: uk_audit_cpq_tenant_code
+        - addUniqueConstraint:
+            tableName: audit_control_point_qt
+            columnNames: tenant_id, code, applicable_year
+            constraintName: uk_audit_cpq_tenant_code_year

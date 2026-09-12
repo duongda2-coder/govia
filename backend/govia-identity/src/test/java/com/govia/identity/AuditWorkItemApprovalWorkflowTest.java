@@ -8,7 +8,6 @@ import com.govia.audit.planengagement.entity.AssignmentStatus;
 import com.govia.audit.planengagement.entity.AuditEngagement;
 import com.govia.audit.planengagement.entity.AuditEngagementAssignment;
 import com.govia.audit.planengagement.entity.AuditEngagementGroup;
-import com.govia.audit.planengagement.entity.AuditEngagementGroupCode;
 import com.govia.audit.planengagement.entity.AuditEngagementGroupMember;
 import com.govia.audit.planengagement.repository.AuditEngagementAssignmentRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementGroupMemberRepository;
@@ -186,7 +185,7 @@ class AuditWorkItemApprovalWorkflowTest {
         AuditEngagementGroup groupA = new AuditEngagementGroup();
         groupA.setTenantId(tenantId);
         groupA.setAuditEngagementId(engagement.getId());
-        groupA.setGroupCode(AuditEngagementGroupCode.TINDUNG);
+        groupA.setGroupCode("TINDUNG");
         groupA.setLeaderEmployeeId(groupLeadA.id());
         groupA = groupRepository.save(groupA);
         AuditEngagementGroupMember memberAInGroup = new AuditEngagementGroupMember();
@@ -198,7 +197,7 @@ class AuditWorkItemApprovalWorkflowTest {
         AuditEngagementGroup groupB = new AuditEngagementGroup();
         groupB.setTenantId(tenantId);
         groupB.setAuditEngagementId(engagement.getId());
-        groupB.setGroupCode(AuditEngagementGroupCode.NTINDUNG);
+        groupB.setGroupCode("NTINDUNG");
         groupB.setLeaderEmployeeId(groupLeadB.id());
         groupB = groupRepository.save(groupB);
         AuditEngagementGroupMember memberBInGroup = new AuditEngagementGroupMember();
@@ -269,7 +268,7 @@ class AuditWorkItemApprovalWorkflowTest {
         AuditEngagementGroup group = new AuditEngagementGroup();
         group.setTenantId(tenantId);
         group.setAuditEngagementId(engagement.getId());
-        group.setGroupCode(AuditEngagementGroupCode.TINDUNG);
+        group.setGroupCode("TINDUNG");
         group.setLeaderEmployeeId(leaderEmployeeId);
         group = groupRepository.save(group);
 

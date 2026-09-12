@@ -21,6 +21,7 @@ export interface AuditControlPointQtItem {
   processEffectiveness: string | null;
   controlEffectivenessAssessment: string | null;
   controlEfficiencyAssessment: string | null;
+  applicableYear: number | null;
   active: boolean;
 }
 
@@ -40,6 +41,7 @@ export interface AuditControlPointQtRequest {
   processEffectiveness: string | null;
   controlEffectivenessAssessment: string | null;
   controlEfficiencyAssessment: string | null;
+  applicableYear: number | null;
   active: boolean;
 }
 

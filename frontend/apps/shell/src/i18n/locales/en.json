@@ -795,7 +795,6 @@
       "phase": "Phase",
       "businessSegment": "Business Segment",
       "code": "Work Item Code",
-      "detailCode": "Detail Code",
       "name": "Work Item Name",
       "applicableYear": "Year",
       "workType": "Work Type",
@@ -890,7 +889,8 @@
       "referenceClause": "Reference Clause",
       "processEffectiveness": "Process Effectiveness",
       "controlEffectivenessAssessment": "Control Effectiveness Assessment",
-      "controlEfficiencyAssessment": "Control Efficiency Assessment"
+      "controlEfficiencyAssessment": "Control Efficiency Assessment",
+      "applicableYear": "Year"
     },
     "form": {
       "createTitle": "Add Process Control Point",

@@ -30,10 +30,6 @@ public class AuditWorkItem extends BaseEntity {
     @Column(name = "code", nullable = false, length = 10)
     private String code;
 
-    /** "Ma chi tiet" - ma dung de lien ket toi cac man hinh chon mau (vd CmTd1, CmNtd1...). */
-    @Column(name = "detail_code", length = 20)
-    private String detailCode;
-
     @Column(name = "name", nullable = false, length = 1000)
     private String name;
 

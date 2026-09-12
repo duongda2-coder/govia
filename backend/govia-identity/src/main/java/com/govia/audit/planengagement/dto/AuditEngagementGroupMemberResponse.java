@@ -1,13 +1,11 @@
 package com.govia.audit.planengagement.dto;
 
-import com.govia.audit.planengagement.entity.AuditEngagementGroupCode;
-
 import java.util.UUID;
 
 public record AuditEngagementGroupMemberResponse(
         UUID id,
         UUID groupId,
-        AuditEngagementGroupCode groupCode,
+        String groupCode,
         String groupName,
         UUID auditEngagementId,
         String engagementCode,

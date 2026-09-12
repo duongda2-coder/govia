@@ -10,7 +10,6 @@ export interface AuditWorkItemItem {
   businessSegmentCode: string | null;
   businessSegmentName: string | null;
   code: string;
-  detailCode: string | null;
   name: string;
   applicableYear: number | null;
   workType: string | null;
@@ -22,7 +21,6 @@ export interface AuditWorkItemRequest {
   phase: AuditWorkPhase | null;
   businessSegmentId: string | null;
   code: string;
-  detailCode: string | null;
   name: string;
   applicableYear: number | null;
   workType: string | null;

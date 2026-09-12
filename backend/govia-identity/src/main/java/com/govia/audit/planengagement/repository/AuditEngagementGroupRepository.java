@@ -1,7 +1,6 @@
 package com.govia.audit.planengagement.repository;
 
 import com.govia.audit.planengagement.entity.AuditEngagementGroup;
-import com.govia.audit.planengagement.entity.AuditEngagementGroupCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -13,5 +12,5 @@ public interface AuditEngagementGroupRepository extends JpaRepository<AuditEngag
 
     List<AuditEngagementGroup> findByTenantIdAndAuditEngagementIdIn(UUID tenantId, List<UUID> auditEngagementIds);
 
-    Optional<AuditEngagementGroup> findByTenantIdAndAuditEngagementIdAndGroupCode(UUID tenantId, UUID auditEngagementId, AuditEngagementGroupCode groupCode);
+    Optional<AuditEngagementGroup> findByTenantIdAndAuditEngagementIdAndGroupCode(UUID tenantId, UUID auditEngagementId, String groupCode);
 }
