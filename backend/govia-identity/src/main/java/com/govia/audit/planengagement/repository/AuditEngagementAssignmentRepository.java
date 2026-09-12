@@ -13,5 +13,7 @@ public interface AuditEngagementAssignmentRepository extends JpaRepository<Audit
 
     boolean existsByGroupMemberIdAndWorkItemId(UUID groupMemberId, UUID workItemId);
 
+    boolean existsByGroupMemberIdAndWorkItemQtId(UUID groupMemberId, UUID workItemQtId);
+
     void deleteByGroupMemberId(UUID groupMemberId);
 }

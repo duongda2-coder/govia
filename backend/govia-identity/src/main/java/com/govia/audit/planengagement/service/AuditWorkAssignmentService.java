@@ -19,6 +19,8 @@ import com.govia.audit.planengagement.repository.AuditEngagementRepository;
 import com.govia.audit.workitem.entity.AuditWorkItem;
 import com.govia.audit.workitem.entity.AuditWorkPhase;
 import com.govia.audit.workitem.repository.AuditWorkItemRepository;
+import com.govia.audit.workitemqt.entity.AuditWorkItemQt;
+import com.govia.audit.workitemqt.repository.AuditWorkItemQtRepository;
 import com.govia.core.audit.AuditAction;
 import com.govia.core.audit.AuditLogService;
 import com.govia.core.security.CurrentUserPrincipal;
@@ -66,6 +68,7 @@ public class AuditWorkAssignmentService {
     private final AuditEngagementGroupMemberRepository memberRepository;
     private final AuditEngagementAssignmentRepository assignmentRepository;
     private final AuditWorkItemRepository workItemRepository;
+    private final AuditWorkItemQtRepository workItemQtRepository;
     private final AuditMasterDataItemRepository masterDataItemRepository;
     private final EmployeeRepository employeeRepository;
     private final UserAccountRepository userAccountRepository;
@@ -77,7 +80,8 @@ public class AuditWorkAssignmentService {
 
     public AuditWorkAssignmentService(AuditEngagementRepository engagementRepository, AuditEngagementGroupRepository groupRepository,
                                        AuditEngagementGroupMemberRepository memberRepository, AuditEngagementAssignmentRepository assignmentRepository,
-                                       AuditWorkItemRepository workItemRepository, AuditMasterDataItemRepository masterDataItemRepository,
+                                       AuditWorkItemRepository workItemRepository, AuditWorkItemQtRepository workItemQtRepository,
+                                       AuditMasterDataItemRepository masterDataItemRepository,
                                        EmployeeRepository employeeRepository, UserAccountRepository userAccountRepository,
                                        AuditWorkApprovalChainResolver approvalChainResolver, RuntimeService runtimeService,
                                        TaskService taskService, WorkflowTaskService workflowTaskService, AuditLogService auditLogService) {
@@ -86,6 +90,7 @@ public class AuditWorkAssignmentService {
         this.memberRepository = memberRepository;
         this.assignmentRepository = assignmentRepository;
         this.workItemRepository = workItemRepository;
+        this.workItemQtRepository = workItemQtRepository;
         this.masterDataItemRepository = masterDataItemRepository;
         this.employeeRepository = employeeRepository;
         this.userAccountRepository = userAccountRepository;
@@ -114,8 +119,12 @@ public class AuditWorkAssignmentService {
         Map<UUID, AuditEngagementGroupMember> membersById = members.stream().collect(Collectors.toMap(AuditEngagementGroupMember::getId, m -> m));
 
         List<AuditEngagementAssignment> assignments = assignmentRepository.findByTenantIdAndGroupMemberIdIn(tenantId, memberIds);
-        Map<UUID, AuditWorkItem> workItems = workItemRepository.findAllById(assignments.stream().map(AuditEngagementAssignment::getWorkItemId).toList())
+        Map<UUID, AuditWorkItem> workItems = workItemRepository.findAllById(assignments.stream().map(AuditEngagementAssignment::getWorkItemId)
+                        .filter(java.util.Objects::nonNull).toList())
                 .stream().collect(Collectors.toMap(AuditWorkItem::getId, w -> w));
+        Map<UUID, AuditWorkItemQt> workItemsQt = workItemQtRepository.findAllById(assignments.stream().map(AuditEngagementAssignment::getWorkItemQtId)
+                        .filter(java.util.Objects::nonNull).toList())
+                .stream().collect(Collectors.toMap(AuditWorkItemQt::getId, w -> w));
         Map<UUID, AuditMasterDataItem> segments = masterDataItemRepository.findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, BUSINESS_SEGMENT)
                 .stream().collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i));
         Map<UUID, Employee> employees = employeeRepository.findAllById(members.stream().map(AuditEngagementGroupMember::getEmployeeId).toList())
@@ -125,15 +134,15 @@ public class AuditWorkAssignmentService {
 
         return assignments.stream()
                 .filter(a -> {
-                    AuditWorkItem workItem = workItems.get(a.getWorkItemId());
-                    if (workItem == null || workItem.getPhase() != phase) {
+                    WorkItemView view = resolveWorkItem(a, workItems, workItemsQt);
+                    if (view == null || view.phase() != phase) {
                         return false;
                     }
                     // THKT khong lay cong viec co "chon mau" (workflow chon mau rieng o cac man hinh
                     // CM_TD1/CM_NTD1-16 xu ly, khong qua "Quan ly cong viec THKT") - CBKT/DCKT khong doi.
-                    return phase != AuditWorkPhase.THKT || !workItem.isHasSampleSelection();
+                    return phase != AuditWorkPhase.THKT || !view.hasSampleSelection();
                 })
-                .map(a -> toResponse(a, engagement, membersById.get(a.getGroupMemberId()), workItems, segments, employees, usernames, groupsById))
+                .map(a -> toResponse(a, engagement, membersById.get(a.getGroupMemberId()), workItems, workItemsQt, segments, employees, usernames, groupsById))
                 .toList();
     }
 
@@ -176,8 +185,11 @@ public class AuditWorkAssignmentService {
                 "Cap nhat trang thai cong viec: " + request.status());
 
         AuditEngagementGroup group = groupRepository.findById(member.getGroupId()).orElse(null);
-        return toResponse(assignment, engagement, member,
-                workItemRepository.findAllById(List.of(assignment.getWorkItemId())).stream().collect(Collectors.toMap(AuditWorkItem::getId, w -> w)),
+        Map<UUID, AuditWorkItem> workItems = assignment.getWorkItemId() == null ? Map.of()
+                : workItemRepository.findById(assignment.getWorkItemId()).map(w -> Map.of(w.getId(), w)).orElse(Map.of());
+        Map<UUID, AuditWorkItemQt> workItemsQt = assignment.getWorkItemQtId() == null ? Map.of()
+                : workItemQtRepository.findById(assignment.getWorkItemQtId()).map(w -> Map.of(w.getId(), w)).orElse(Map.of());
+        return toResponse(assignment, engagement, member, workItems, workItemsQt,
                 masterDataItemRepository.findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, BUSINESS_SEGMENT)
                         .stream().collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i)),
                 employeeRepository.findById(member.getEmployeeId()).map(e -> Map.of(e.getId(), e)).orElse(Map.of()),
@@ -326,20 +338,36 @@ public class AuditWorkAssignmentService {
     }
 
     private AuditWorkManagementItemResponse toResponse(AuditEngagementAssignment assignment, AuditEngagement engagement, AuditEngagementGroupMember member,
-                                                          Map<UUID, AuditWorkItem> workItems, Map<UUID, AuditMasterDataItem> segments,
+                                                          Map<UUID, AuditWorkItem> workItems, Map<UUID, AuditWorkItemQt> workItemsQt,
+                                                          Map<UUID, AuditMasterDataItem> segments,
                                                           Map<UUID, Employee> employees, Map<UUID, String> usernames, Map<UUID, AuditEngagementGroup> groupsById) {
-        AuditWorkItem workItem = workItems.get(assignment.getWorkItemId());
-        AuditMasterDataItem segment = workItem == null ? null : segments.get(workItem.getBusinessSegmentId());
+        WorkItemView view = resolveWorkItem(assignment, workItems, workItemsQt);
+        AuditMasterDataItem segment = view == null ? null : segments.get(view.businessSegmentId());
+        UUID workItemId = assignment.getWorkItemQtId() != null ? assignment.getWorkItemQtId() : assignment.getWorkItemId();
         Employee employee = member == null ? null : employees.get(member.getEmployeeId());
         AuditEngagementGroup group = member == null ? null : groupsById.get(member.getGroupId());
         return new AuditWorkManagementItemResponse(
                 assignment.getId(), engagement.getId(), engagement.getCode(), engagement.getName(),
                 segment == null ? null : segment.getCode(),
-                assignment.getWorkItemId(), workItem == null ? null : workItem.getPhase(),
-                workItem == null ? null : workItem.getCode(), workItem == null ? null : workItem.getName(),
+                workItemId, view == null ? null : view.phase(),
+                view == null ? null : view.code(), view == null ? null : view.name(),
                 member == null ? null : member.getEmployeeId(), employee == null ? null : employee.getEmployeeCode(),
                 employee == null ? null : employee.getFullName(), member == null ? null : usernames.get(member.getEmployeeId()),
                 assignment.getStatus(), assignment.getNote(), assignment.getApprovalStatus(),
                 assignment.getApprovedBy(), assignment.getApprovedAt(), group == null ? null : group.getGroupCode());
+    }
+
+    /** Doc du lieu cong viec cua 1 phan cong tu DUNG catalog: workItemQtId != null nghia la phan
+     * cong cua CKT quy trinh (AuditWorkItemQt), nguoc lai la CKT thuong (AuditWorkItem). */
+    private WorkItemView resolveWorkItem(AuditEngagementAssignment assignment, Map<UUID, AuditWorkItem> workItems, Map<UUID, AuditWorkItemQt> workItemsQt) {
+        if (assignment.getWorkItemQtId() != null) {
+            AuditWorkItemQt w = workItemsQt.get(assignment.getWorkItemQtId());
+            return w == null ? null : new WorkItemView(w.getPhase(), w.getCode(), w.getName(), w.getBusinessSegmentId(), w.isHasSampleSelection());
+        }
+        AuditWorkItem w = workItems.get(assignment.getWorkItemId());
+        return w == null ? null : new WorkItemView(w.getPhase(), w.getCode(), w.getName(), w.getBusinessSegmentId(), w.isHasSampleSelection());
+    }
+
+    private record WorkItemView(AuditWorkPhase phase, String code, String name, UUID businessSegmentId, boolean hasSampleSelection) {
     }
 }

@@ -1,0 +1,36 @@
+databaseChangeLog:
+
+  # ===================== "Quan ly cong viec" CKT quy trinh phai lay tu WorkItemQt, khong phai WorkItem =====================
+  # audit_engagement_assignment.work_item_id chi FK toi audit_work_item (bang cua CKT chi nhanh/CN).
+  # Voi CKT quy trinh (AuditEngagement.processEngagementId != null), phan cong phai tro toi
+  # audit_work_item_qt thay vi audit_work_item - can 1 cot FK rieng (nullable) vi khong the dung
+  # chung 1 FK cho 2 bang khac nhau. work_item_id tro thanh nullable (dong CKT quy trinh se de null).
+  - changeSet:
+      id: 152-1-audit-engagement-assignment-work-item-id-nullable
+      author: govia
+      comment: "audit_engagement_assignment.work_item_id: cho phep null (dong CKT quy trinh se dung work_item_qt_id thay the)"
+      changes:
+        - dropNotNullConstraint:
+            tableName: audit_engagement_assignment
+            columnName: work_item_id
+            columnDataType: UUID
+
+  - changeSet:
+      id: 152-2-audit-engagement-assignment-add-work-item-qt-id
+      author: govia
+      comment: "Them cot work_item_qt_id + FK toi audit_work_item_qt"
+      changes:
+        - addColumn:
+            tableName: audit_engagement_assignment
+            columns:
+              - column: { name: work_item_qt_id, type: UUID }
+        - addForeignKeyConstraint:
+            baseTableName: audit_engagement_assignment
+            baseColumnNames: work_item_qt_id
+            referencedTableName: audit_work_item_qt
+            referencedColumnNames: id
+            constraintName: fk_audit_engagement_assignment_work_item_qt
+        - addUniqueConstraint:
+            tableName: audit_engagement_assignment
+            columnNames: group_member_id, work_item_qt_id
+            constraintName: uk_audit_engagement_assignment_qt_pair

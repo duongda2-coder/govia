@@ -12,12 +12,16 @@ import lombok.Setter;
 import java.time.Instant;
 import java.util.UUID;
 
-/** "Phan cong nghiep vu cho thanh vien" - 1 cong viec kiem toan (AuditWorkItem) duoc giao cho 1
- * thanh vien nhom. Duoc tao tu dong khi them thanh vien (theo nghiep vu 1/2/3 cua thanh vien do),
- * hoac them thu cong qua nut "Chon cong viec". Cac cot status/note/approval* phuc vu man hinh
- * "Quản lý công việc" (sheet "Tạo CKT (1).xlsx" - CBKT/THKT): user tu cap nhat trang thai, truong
- * doan phe duyet hang loat qua quy trinh Flowable "audit_workitem_approval" (xem
- * AuditWorkAssignmentService, AuditWorkApprovalChainResolver). */
+/** "Phan cong nghiep vu cho thanh vien" - 1 cong viec kiem toan duoc giao cho 1 thanh vien nhom.
+ * Duoc tao tu dong khi them thanh vien (theo nghiep vu 1/2/3 cua thanh vien do), hoac them thu
+ * cong qua nut "Chon cong viec". Voi CKT chi nhanh (CN): tro toi AuditWorkItem qua workItemId. Voi
+ * CKT quy trinh (AuditEngagement.processEngagementId != null): tro toi AuditWorkItemQt qua
+ * workItemQtId thay the (workItemId de null) - 2 bang khac nhau nen can 2 cot FK rieng, XEM
+ * AuditEngagementTeamService.eligibleWorkItems()/AuditWorkAssignmentService cho logic chon dung
+ * cot theo loai CKT. Cac cot status/note/approval* phuc vu man hinh "Quản lý công việc" (sheet
+ * "Tạo CKT (1).xlsx" - CBKT/THKT): user tu cap nhat trang thai, truong doan phe duyet hang loat
+ * qua quy trinh Flowable "audit_workitem_approval" (xem AuditWorkAssignmentService,
+ * AuditWorkApprovalChainResolver). */
 @Getter
 @Setter
 @Entity
@@ -27,8 +31,13 @@ public class AuditEngagementAssignment extends BaseEntity {
     @Column(name = "group_member_id", nullable = false, columnDefinition = "uuid")
     private UUID groupMemberId;
 
-    @Column(name = "work_item_id", nullable = false, columnDefinition = "uuid")
+    /** CKT chi nhanh (CN) - null neu day la phan cong cua CKT quy trinh (dung workItemQtId). */
+    @Column(name = "work_item_id", columnDefinition = "uuid")
     private UUID workItemId;
+
+    /** CKT quy trinh (QT) - null neu day la phan cong cua CKT chi nhanh (dung workItemId). */
+    @Column(name = "work_item_qt_id", columnDefinition = "uuid")
+    private UUID workItemQtId;
 
     /** "Trạng thái công việc" - user tu cap nhat trong man hinh Quan ly cong viec. */
     @Enumerated(EnumType.STRING)

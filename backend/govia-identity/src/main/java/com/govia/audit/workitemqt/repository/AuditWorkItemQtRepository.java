@@ -12,4 +12,10 @@ public interface AuditWorkItemQtRepository extends JpaRepository<AuditWorkItemQt
 
     Optional<AuditWorkItemQt> findByTenantIdAndCodeAndApplicableYearAndWorkSetCode(
             UUID tenantId, String code, Integer applicableYear, String workSetCode);
+
+    /** Dung de tinh "cong viec du dieu kien" cua 1 thanh vien nhom trong CKT quy trinh: theo cac
+     * nghiep vu 1/2/3 duoc giao VA dung "bo cong viec" (workSetCode) da khai bao luc tao CKT quy
+     * trinh cha - xem AuditEngagementTeamService.eligibleWorkItems(). */
+    List<AuditWorkItemQt> findByTenantIdAndActiveTrueAndBusinessSegmentIdInAndWorkSetCode(
+            UUID tenantId, List<UUID> businessSegmentIds, String workSetCode);
 }
