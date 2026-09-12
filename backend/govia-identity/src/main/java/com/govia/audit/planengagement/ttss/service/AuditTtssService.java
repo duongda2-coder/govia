@@ -17,6 +17,8 @@ import com.govia.audit.planengagement.repository.AuditEngagementAssignmentReposi
 import com.govia.audit.planengagement.repository.AuditEngagementGroupMemberRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementGroupRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRepository;
+import com.govia.audit.planengagement.service.AuditAssignmentWorkItemResolver;
+import com.govia.audit.planengagement.service.AuditAssignmentWorkItemResolver.ResolvedWorkItem;
 import com.govia.audit.planengagement.ttss.dto.AuditTtssApproveRecommendationsRequest;
 import com.govia.audit.planengagement.ttss.dto.AuditTtssLinkRecommendationRequest;
 import com.govia.audit.planengagement.ttss.dto.AuditTtssRecordResponse;
@@ -29,9 +31,7 @@ import com.govia.audit.processstep.repository.AuditProcessStepDetailRepository;
 import com.govia.audit.processstep.repository.AuditProcessStepSummaryRepository;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
-import com.govia.audit.workitem.entity.AuditWorkItem;
 import com.govia.audit.workitem.entity.AuditWorkPhase;
-import com.govia.audit.workitem.repository.AuditWorkItemRepository;
 import com.govia.core.export.ExcelExportService;
 import com.govia.core.export.ExcelImportService;
 import com.govia.core.export.ExportColumn;
@@ -97,7 +97,7 @@ public class AuditTtssService {
     private final AuditEngagementGroupRepository groupRepository;
     private final AuditEngagementGroupMemberRepository memberRepository;
     private final AuditEngagementAssignmentRepository assignmentRepository;
-    private final AuditWorkItemRepository workItemRepository;
+    private final AuditAssignmentWorkItemResolver workItemResolver;
     private final AuditObjectUnitRepository objectUnitRepository;
     private final AuditMasterDataItemRepository masterDataItemRepository;
     private final AuditProcessStepSummaryRepository processStepSummaryRepository;
@@ -119,7 +119,7 @@ public class AuditTtssService {
 
     public AuditTtssService(AuditTtssRecordRepository ttssRepository, AuditEngagementRepository engagementRepository,
                              AuditEngagementGroupRepository groupRepository, AuditEngagementGroupMemberRepository memberRepository,
-                             AuditEngagementAssignmentRepository assignmentRepository, AuditWorkItemRepository workItemRepository,
+                             AuditEngagementAssignmentRepository assignmentRepository, AuditAssignmentWorkItemResolver workItemResolver,
                              AuditObjectUnitRepository objectUnitRepository, AuditMasterDataItemRepository masterDataItemRepository,
                              AuditProcessStepSummaryRepository processStepSummaryRepository, AuditProcessStepDetailRepository processStepDetailRepository,
                              AuditExceptionTypeRepository exceptionTypeRepository,
@@ -134,7 +134,7 @@ public class AuditTtssService {
         this.groupRepository = groupRepository;
         this.memberRepository = memberRepository;
         this.assignmentRepository = assignmentRepository;
-        this.workItemRepository = workItemRepository;
+        this.workItemResolver = workItemResolver;
         this.objectUnitRepository = objectUnitRepository;
         this.masterDataItemRepository = masterDataItemRepository;
         this.processStepSummaryRepository = processStepSummaryRepository;
@@ -292,8 +292,7 @@ public class AuditTtssService {
         Map<UUID, AuditEngagementGroupMember> membersById = members.stream().collect(Collectors.toMap(AuditEngagementGroupMember::getId, m -> m));
         List<AuditEngagementAssignment> assignments = assignmentRepository.findByTenantIdAndGroupMemberIdIn(tenantId,
                 members.stream().map(AuditEngagementGroupMember::getId).toList());
-        Map<UUID, AuditWorkItem> workItems = workItemRepository.findAllById(assignments.stream().map(AuditEngagementAssignment::getWorkItemId).toList())
-                .stream().collect(Collectors.toMap(AuditWorkItem::getId, w -> w));
+        Map<UUID, ResolvedWorkItem> resolvedWorkItems = workItemResolver.resolve(assignments);
 
         // Khoa theo MA nghiep vu (segment CODE, khong phai id) - vi vong lap ben duoi duyet theo
         // SUPPORTED_SEGMENT_CODES (list ma cung, khong phai danh muc AuditMasterDataItem cua tenant
@@ -303,14 +302,14 @@ public class AuditTtssService {
         Map<String, List<String>> workItemCodesByEmployeeSegment = new HashMap<>();
         for (AuditEngagementAssignment assignment : assignments) {
             AuditEngagementGroupMember member = membersById.get(assignment.getGroupMemberId());
-            AuditWorkItem workItem = workItems.get(assignment.getWorkItemId());
-            AuditMasterDataItem segment = workItem == null ? null : segments.get(workItem.getBusinessSegmentId());
+            ResolvedWorkItem workItem = resolvedWorkItems.get(assignment.getId());
+            AuditMasterDataItem segment = workItem == null ? null : segments.get(workItem.businessSegmentId());
             if (member == null || segment == null) {
                 continue;
             }
             workItemCodesByEmployeeSegment
                     .computeIfAbsent(member.getEmployeeId() + "|" + segment.getCode(), k -> new ArrayList<>())
-                    .add(workItem.getCode());
+                    .add(workItem.code());
         }
 
         List<Map<String, Object>> rows = new ArrayList<>();
@@ -358,16 +357,16 @@ public class AuditTtssService {
         // lap khi CHINH cong viec do da co du lieu day du.
         for (AuditEngagementAssignment assignment : assignments) {
             AuditEngagementGroupMember member = membersById.get(assignment.getGroupMemberId());
-            AuditWorkItem workItem = workItems.get(assignment.getWorkItemId());
-            if (member == null || workItem == null || workItem.getPhase() != AuditWorkPhase.THKT) {
+            ResolvedWorkItem workItem = resolvedWorkItems.get(assignment.getId());
+            if (member == null || workItem == null || workItem.phase() != AuditWorkPhase.THKT) {
                 continue;
             }
             if (!visibility.canSee(member.getEmployeeId())) {
                 continue;
             }
-            AuditMasterDataItem segment = segments.get(workItem.getBusinessSegmentId());
+            AuditMasterDataItem segment = segments.get(workItem.businessSegmentId());
             if (segment != null
-                    && employeeSegmentWorkItemsWithSampleData.contains(member.getEmployeeId() + "|" + segment.getCode() + "|" + workItem.getCode())) {
+                    && employeeSegmentWorkItemsWithSampleData.contains(member.getEmployeeId() + "|" + segment.getCode() + "|" + workItem.code())) {
                 continue;
             }
             Map<String, Object> row = new HashMap<>();
@@ -375,7 +374,7 @@ public class AuditTtssService {
             row.put("engagementCode", engagement.getCode());
             row.put("auditObjectUnitCode", unit == null ? null : unit.getCode());
             row.put("businessSegmentCode", segment == null ? null : segment.getCode());
-            row.put("workItemCode", workItem.getCode());
+            row.put("workItemCode", workItem.code());
             rows.add(row);
         }
         return excelExportService.export("audit_ttss_template", templateColumns(), rows);

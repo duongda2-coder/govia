@@ -16,14 +16,14 @@ import com.govia.audit.planengagement.repository.AuditEngagementAssignmentReposi
 import com.govia.audit.planengagement.repository.AuditEngagementGroupMemberRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementGroupRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRepository;
+import com.govia.audit.planengagement.service.AuditAssignmentWorkItemResolver;
+import com.govia.audit.planengagement.service.AuditAssignmentWorkItemResolver.ResolvedWorkItem;
 import com.govia.audit.planengagement.service.AuditEngagementService;
 import com.govia.audit.planengagement.service.AuditEngagementTeamService;
 import com.govia.audit.planengagement.supervisionteam.repository.AuditSupervisionTeamMemberRepository;
 import com.govia.audit.planengagement.ttss.entity.AuditTtssRecord;
 import com.govia.audit.planengagement.ttss.repository.AuditTtssRecordRepository;
-import com.govia.audit.workitem.entity.AuditWorkItem;
 import com.govia.audit.workitem.entity.AuditWorkPhase;
-import com.govia.audit.workitem.repository.AuditWorkItemRepository;
 import com.govia.core.audit.AuditAction;
 import com.govia.core.audit.AuditLogService;
 import com.govia.core.security.CurrentUserPrincipal;
@@ -65,7 +65,7 @@ public class AuditEngagementMonitoringService {
     private final AuditEngagementGroupRepository groupRepository;
     private final AuditEngagementGroupMemberRepository memberRepository;
     private final AuditEngagementAssignmentRepository assignmentRepository;
-    private final AuditWorkItemRepository workItemRepository;
+    private final AuditAssignmentWorkItemResolver workItemResolver;
     private final AuditTtssRecordRepository ttssRecordRepository;
     private final EmployeeRepository employeeRepository;
     private final AuditEngagementService engagementService;
@@ -75,7 +75,7 @@ public class AuditEngagementMonitoringService {
 
     public AuditEngagementMonitoringService(AuditEngagementRepository engagementRepository, AuditEngagementGroupRepository groupRepository,
                                              AuditEngagementGroupMemberRepository memberRepository, AuditEngagementAssignmentRepository assignmentRepository,
-                                             AuditWorkItemRepository workItemRepository, AuditTtssRecordRepository ttssRecordRepository,
+                                             AuditAssignmentWorkItemResolver workItemResolver, AuditTtssRecordRepository ttssRecordRepository,
                                              EmployeeRepository employeeRepository, AuditEngagementService engagementService,
                                              AuditEngagementTeamService teamService, AuditSupervisionTeamMemberRepository supervisionTeamMemberRepository,
                                              AuditLogService auditLogService) {
@@ -83,7 +83,7 @@ public class AuditEngagementMonitoringService {
         this.groupRepository = groupRepository;
         this.memberRepository = memberRepository;
         this.assignmentRepository = assignmentRepository;
-        this.workItemRepository = workItemRepository;
+        this.workItemResolver = workItemResolver;
         this.ttssRecordRepository = ttssRecordRepository;
         this.employeeRepository = employeeRepository;
         this.engagementService = engagementService;
@@ -265,8 +265,7 @@ public class AuditEngagementMonitoringService {
         List<AuditEngagementAssignment> assignments = assignmentRepository.findByTenantIdAndGroupMemberIdIn(tenantId, memberIds);
         Map<UUID, List<AuditEngagementAssignment>> assignmentsByMember = assignments.stream()
                 .collect(Collectors.groupingBy(AuditEngagementAssignment::getGroupMemberId));
-        Map<UUID, AuditWorkItem> workItems = workItemRepository.findAllById(assignments.stream().map(AuditEngagementAssignment::getWorkItemId).toList())
-                .stream().collect(Collectors.toMap(AuditWorkItem::getId, w -> w));
+        Map<UUID, ResolvedWorkItem> resolved = workItemResolver.resolve(assignments);
 
         List<AuditEngagementTeamMemberDetailResponse> result = new ArrayList<>();
         int stt = 1;
@@ -274,14 +273,14 @@ public class AuditEngagementMonitoringService {
             AuditEngagementGroupMember entity = memberEntities.get(info.id());
             List<AuditTtssRecord> memberTtss = ttssByPerformerName.getOrDefault(normalizeName(info.employeeName()), List.of());
             List<AuditEngagementAssignment> memberAssignments = assignmentsByMember.getOrDefault(info.id(), List.of());
-            result.add(toDetailResponse(stt++, engagement, info, entity, memberTtss, memberAssignments, workItems));
+            result.add(toDetailResponse(stt++, engagement, info, entity, memberTtss, memberAssignments, resolved));
         }
         return result;
     }
 
     private AuditEngagementTeamMemberDetailResponse toDetailResponse(int stt, AuditEngagement engagement, AuditEngagementGroupMemberResponse info,
                                                                        AuditEngagementGroupMember entity, List<AuditTtssRecord> ttss,
-                                                                       List<AuditEngagementAssignment> assignments, Map<UUID, AuditWorkItem> workItems) {
+                                                                       List<AuditEngagementAssignment> assignments, Map<UUID, ResolvedWorkItem> resolved) {
         String roleTitle = roleTitle(engagement, info);
         String segments = joinSegments(info);
         int totalFindings = ttss.size();
@@ -290,9 +289,9 @@ public class AuditEngagementMonitoringService {
         int materialTtssTypeCount = distinctFindingCodeCount(ttss, AuditTtssRecord::isMaterial);
         int recommendationCount = (int) ttss.stream().filter(r -> r.getTeamRecommendationId() != null).count();
 
-        ProgressStat cbkt = progressFor(assignments, workItems, AuditWorkPhase.CBKT, null);
-        ProgressStat thktSample = progressFor(assignments, workItems, AuditWorkPhase.THKT, true);
-        ProgressStat thktNoSample = progressFor(assignments, workItems, AuditWorkPhase.THKT, false);
+        ProgressStat cbkt = progressFor(assignments, resolved, AuditWorkPhase.CBKT, null);
+        ProgressStat thktSample = progressFor(assignments, resolved, AuditWorkPhase.THKT, true);
+        ProgressStat thktNoSample = progressFor(assignments, resolved, AuditWorkPhase.THKT, false);
 
         return new AuditEngagementTeamMemberDetailResponse(stt, info.id(), info.employeeId(), info.employeeCode(), info.employeeName(), roleTitle, segments,
                 totalFindings, ttssTypeCount, totalMaterialFindings, materialTtssTypeCount, recommendationCount,
@@ -321,16 +320,16 @@ public class AuditEngagementMonitoringService {
     }
 
     /** hasSampleSelection == null => khong loc theo co mau/khong mau (dung cho CBKT). */
-    private ProgressStat progressFor(List<AuditEngagementAssignment> assignments, Map<UUID, AuditWorkItem> workItems, AuditWorkPhase phase,
+    private ProgressStat progressFor(List<AuditEngagementAssignment> assignments, Map<UUID, ResolvedWorkItem> resolved, AuditWorkPhase phase,
                                       Boolean hasSampleSelection) {
         int total = 0;
         int completed = 0;
         for (AuditEngagementAssignment assignment : assignments) {
-            AuditWorkItem workItem = workItems.get(assignment.getWorkItemId());
-            if (workItem == null || workItem.getPhase() != phase) {
+            ResolvedWorkItem workItem = resolved.get(assignment.getId());
+            if (workItem == null || workItem.phase() != phase) {
                 continue;
             }
-            if (hasSampleSelection != null && workItem.isHasSampleSelection() != hasSampleSelection) {
+            if (hasSampleSelection != null && workItem.hasSampleSelection() != hasSampleSelection) {
                 continue;
             }
             total++;

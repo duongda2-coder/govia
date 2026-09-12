@@ -17,9 +17,9 @@ import com.govia.audit.planengagement.repository.AuditEngagementAssignmentReposi
 import com.govia.audit.planengagement.repository.AuditEngagementGroupMemberRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementGroupRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRepository;
+import com.govia.audit.planengagement.service.AuditAssignmentWorkItemResolver;
+import com.govia.audit.planengagement.service.AuditAssignmentWorkItemResolver.ResolvedWorkItem;
 import com.govia.audit.planengagement.ttss.entity.AuditTtssRecord;
-import com.govia.audit.workitem.entity.AuditWorkItem;
-import com.govia.audit.workitem.repository.AuditWorkItemRepository;
 import com.govia.core.attachment.AttachmentService;
 import com.govia.core.audit.AuditAction;
 import com.govia.core.audit.AuditLogService;
@@ -65,7 +65,7 @@ public class AuditProgressReportService {
     private final AuditEngagementGroupRepository groupRepository;
     private final AuditEngagementGroupMemberRepository memberRepository;
     private final AuditEngagementAssignmentRepository assignmentRepository;
-    private final AuditWorkItemRepository workItemRepository;
+    private final AuditAssignmentWorkItemResolver workItemResolver;
     private final AuditMasterDataItemRepository masterDataItemRepository;
     private final EmployeeRepository employeeRepository;
     private final AttachmentService attachmentService;
@@ -77,7 +77,7 @@ public class AuditProgressReportService {
 
     public AuditProgressReportService(AuditProgressReportRepository reportRepository, AuditEngagementRepository engagementRepository,
                                        AuditEngagementGroupRepository groupRepository, AuditEngagementGroupMemberRepository memberRepository,
-                                       AuditEngagementAssignmentRepository assignmentRepository, AuditWorkItemRepository workItemRepository,
+                                       AuditEngagementAssignmentRepository assignmentRepository, AuditAssignmentWorkItemResolver workItemResolver,
                                        AuditMasterDataItemRepository masterDataItemRepository, EmployeeRepository employeeRepository,
                                        AttachmentService attachmentService, AuditWorkApprovalChainResolver approvalChainResolver,
                                        RuntimeService runtimeService, TaskService taskService, WorkflowTaskService workflowTaskService,
@@ -87,7 +87,7 @@ public class AuditProgressReportService {
         this.groupRepository = groupRepository;
         this.memberRepository = memberRepository;
         this.assignmentRepository = assignmentRepository;
-        this.workItemRepository = workItemRepository;
+        this.workItemResolver = workItemResolver;
         this.masterDataItemRepository = masterDataItemRepository;
         this.employeeRepository = employeeRepository;
         this.attachmentService = attachmentService;
@@ -188,14 +188,13 @@ public class AuditProgressReportService {
             return new int[] {0, 0};
         }
         List<AuditEngagementAssignment> assignments = assignmentRepository.findByTenantIdAndGroupMemberIdIn(tenantId, memberIds);
-        Map<UUID, AuditWorkItem> workItems = workItemRepository.findAllById(assignments.stream().map(AuditEngagementAssignment::getWorkItemId).toList())
-                .stream().collect(Collectors.toMap(AuditWorkItem::getId, w -> w));
+        Map<UUID, ResolvedWorkItem> resolved = workItemResolver.resolve(assignments);
 
         int total = 0;
         int completed = 0;
         for (AuditEngagementAssignment assignment : assignments) {
-            AuditWorkItem workItem = workItems.get(assignment.getWorkItemId());
-            if (workItem == null || (businessSegmentId != null && !businessSegmentId.equals(workItem.getBusinessSegmentId()))) {
+            ResolvedWorkItem workItem = resolved.get(assignment.getId());
+            if (workItem == null || (businessSegmentId != null && !businessSegmentId.equals(workItem.businessSegmentId()))) {
                 continue;
             }
             total++;
