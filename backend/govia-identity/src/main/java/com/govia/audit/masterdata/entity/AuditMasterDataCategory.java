@@ -23,6 +23,12 @@ public enum AuditMasterDataCategory {
     COUNTRY("Quốc gia/Địa điểm", MasterDataGroup.GENERAL),
     FISCAL_PERIOD("Kỳ tài chính", MasterDataGroup.GENERAL),
 
+    // Khu vuc dia ly (sheet ZTC_DTKT1, dung cho module Ke hoach kiem toan - KHKT)
+    GEOGRAPHIC_AREA("Khu vực địa lý", MasterDataGroup.GENERAL),
+
+    // Phien ban tai lieu (sheet ZTC_phienban, dung cho module Ke hoach kiem toan - KHKT)
+    VERSION("Phiên bản", MasterDataGroup.GENERAL),
+
     // Chuc vu (sheet ZTC_Chucvu)
     POSITION("Chức vụ", MasterDataGroup.POSITION),
 

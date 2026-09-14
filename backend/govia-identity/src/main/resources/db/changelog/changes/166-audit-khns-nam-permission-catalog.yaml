@@ -1,0 +1,23 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: "Dự kiến nhân sự thực hiện KHKT năm" (KHNS_NAM) =====================
+  - changeSet:
+      id: 166-1-permission-catalog-audit-khns-nam
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "7ffc9474-fd3b-46b2-abf7-b709dc6abf3e" }
+              - column: { name: code, value: "AUDIT.KHNS_NAM.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem du kien nhan su thuc hien kiem toan nam" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Dự kiến nhân sự năm" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "31444d29-c92a-4029-99dd-eb3555e5eca6" }
+              - column: { name: code, value: "AUDIT.KHNS_NAM.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua du kien nhan su thuc hien kiem toan nam (chuc vu, doi tuong KT, chi tiet dot)" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Dự kiến nhân sự năm" }

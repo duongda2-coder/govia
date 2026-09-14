@@ -43,9 +43,18 @@
     "auditMdUnitType": "Unit Type Catalog",
     "auditMdEmployeeCapability": "Employee Capability Catalog",
     "auditMdAppendix": "Appendix Management Catalog",
+    "auditMdGeneralCatalogs": "Currency, Country, Geographic Area...",
     "auditMdProcessStepGroup": "Process Step Catalog",
     "auditMdTtssGroup": "Exception & Recommendation Catalog",
     "auditPlanKeHoach": "Audit Plan",
+    "auditPlanMdKhktScale": "Credit & Funding Scale",
+    "auditPlanKhktBp": "Dept. Audit Object Proposal",
+    "auditPlanKhktTh": "Planning Dept. Object List",
+    "auditPlanKhktThang": "Audit Months per Year",
+    "auditPlanKhktDtkhFile": "Reference Reports for Planning",
+    "auditPlanKhnsNam": "Annual Staffing Plan",
+    "auditPlanKhnsPb": "Monthly Staff Allocation",
+    "auditPlanKhthTransfer": "Transfer to Engagements",
     "auditPlan": "Planning",
     "auditPlanMasterData": "Master Data",
     "auditPlanMdBranchStaff": "Branch Staff Position",
@@ -921,6 +930,267 @@
       "deleteSuccess": "Deleted",
       "deleteError": "Failed to delete",
       "saveError": "Failed to save"
+    }
+  },
+  "auditKhktScale": {
+    "title": "Branch Credit & Funding Scale Catalog",
+    "columns": {
+      "sortOrder": "Order",
+      "scaleName": "Scale Name",
+      "creditThreshold": "Credit Threshold (On-balance-sheet Loan)",
+      "fundingThreshold": "Funding Threshold (Funding Source)"
+    },
+    "form": {
+      "createTitle": "Add Scale Level",
+      "editTitle": "Edit Scale Level"
+    },
+    "deleteConfirmTitle": "Delete this scale level?",
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save"
+    }
+  },
+  "auditKhktBp": {
+    "title": "Annual Audit Object Proposal by Department",
+    "selectDepartment": "Select department",
+    "selectDepartmentAndYearHint": "Select a Department and Year to view the list.",
+    "exportReportButton": "Export KHKT proposal report",
+    "tabCandidate": "Proposal (Part 1)",
+    "tabConfirmed": "Confirmed (Part 2)",
+    "pickObjectButton": "Select Audit Object",
+    "confirmListButton": "Confirm List",
+    "confirmListTitle": "Confirm the proposal list?",
+    "confirmListContent": "This will overwrite all {{count}} previously confirmed objects (Part 2) for this department and year with the current Part 1 list.",
+    "deleteConfirmTitle": "Delete this proposed object?",
+    "columns": {
+      "sourceType": "Object Type",
+      "auditObjectCode": "Object Code",
+      "auditObjectName": "Object Name",
+      "auditObjectCategoryCode": "Category",
+      "riskScore": "Risk Score",
+      "rankLabel": "Rank",
+      "onBalanceSheetLoan": "On-balance-sheet Loan",
+      "fundingSource": "Funding Source",
+      "businessSegments": "Proposed Audit Areas",
+      "reviewResult": "Review Result",
+      "selectionDecision": "Decision"
+    },
+    "sourceType": {
+      "BRANCH": "Branch",
+      "OTHER": "Other"
+    },
+    "selectionDecision": {
+      "SELECTED": "Selected",
+      "NOT_SELECTED": "Not Selected"
+    },
+    "inspectionType": {
+      "TTCP": "TTCP",
+      "KTNN": "KTNN",
+      "TTGSNH": "TTGSNH",
+      "KTNB": "KTNB",
+      "GSBKS": "GS BKS",
+      "KTGSNB": "KT GSNB"
+    },
+    "picker": {
+      "title": "Select Audit Object",
+      "addSelected": "Add {{count}} selected"
+    },
+    "form": {
+      "editTitle": "Edit Proposal"
+    },
+    "messages": {
+      "loadError": "Failed to load data",
+      "createSuccess": "Added",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save",
+      "confirmSuccess": "List confirmed"
+    }
+  },
+  "auditKhktTh": {
+    "title": "Annual Audit Object List - Planning Department",
+    "selectYearHint": "Select a Year to view the list.",
+    "tabCandidate": "List (Part 1)",
+    "tabConfirmed": "Confirmed (Part 2)",
+    "syncButton": "Aggregate from BP2",
+    "exportReportButton": "Export KHKT proposal report",
+    "confirmListButton": "Confirm List",
+    "confirmListTitle": "Confirm the list?",
+    "confirmListContent": "This will overwrite all {{count}} previously confirmed objects (Part 2) for this year with the current Part 1 list.",
+    "deleteConfirmTitle": "Remove this object from the list?",
+    "columns": {
+      "sourceType": "Object Type",
+      "auditObjectCode": "Object Code",
+      "auditObjectName": "Object Name",
+      "riskScore": "Risk Score",
+      "rankLabel": "Rank",
+      "proposingDepartments": "Proposing Depts.",
+      "bpProposedSegments": "BP Proposed Areas",
+      "thBusinessSegments": "TH Proposed Areas",
+      "bpReviewResult": "Review Result (BP)",
+      "proposalBasisTh": "TH Proposal Basis",
+      "expertOpinion": "Expert Opinion",
+      "selection1": "Selection 1",
+      "selection2": "Selection 2",
+      "selection3": "Selection 3"
+    },
+    "form": {
+      "editTitle": "Edit"
+    },
+    "messages": {
+      "loadError": "Failed to load data",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Failed to delete",
+      "saveError": "Failed to save",
+      "syncSuccess": "Aggregated from BP2",
+      "confirmSuccess": "List confirmed"
+    }
+  },
+  "auditKhktThang": {
+    "title": "Declare audit months in the year",
+    "selectYearHint": "Select a Year to view the list.",
+    "columns": {
+      "auditObjectCode": "Object code",
+      "auditObjectName": "Object name",
+      "businessSegments": "Audit segments",
+      "auditObjectCategoryCode": "Category",
+      "rankLabel": "Rank",
+      "onBalanceSheetLoan": "On-balance loan",
+      "fundingSource": "Funding source",
+      "creditScale": "Credit scale",
+      "fundingScale": "Funding scale",
+      "geographicArea": "Geographic area",
+      "month": "Month {{month}}",
+      "note": "Note"
+    },
+    "form": {
+      "editTitle": "Edit",
+      "months": "Audit months"
+    },
+    "messages": {
+      "loadError": "Failed to load data",
+      "updateSuccess": "Updated",
+      "saveError": "Save failed"
+    }
+  },
+  "auditKhktDtkhFile": {
+    "title": "Reference reports from departments for the Planning Dept.",
+    "selectYearHint": "Select a Year to view the list.",
+    "deleteConfirmTitle": "Delete this file?",
+    "columns": {
+      "department": "Department",
+      "uploadedByName": "Uploaded by",
+      "fileName": "File",
+      "version": "Version",
+      "uploadedAt": "Uploaded at",
+      "note": "Note"
+    },
+    "form": {
+      "createTitle": "Upload report",
+      "editTitle": "Edit"
+    },
+    "messages": {
+      "loadError": "Failed to load data",
+      "fileRequired": "Please choose a file to attach",
+      "uploadSuccess": "Uploaded",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted",
+      "deleteError": "Delete failed",
+      "saveError": "Save failed"
+    }
+  },
+  "auditKhnsNam": {
+    "title": "Annual/batch audit staffing plan",
+    "selectYearHint": "Select a Year to view the list.",
+    "classification": {
+      "TYPE_1": "Type 1",
+      "TYPE_2": "Type 2",
+      "TYPE_3": "Type 3"
+    },
+    "role": {
+      "TEAM_LEAD": "Team Lead",
+      "GROUP_LEAD": "Group Lead",
+      "MEMBER": "Member",
+      "SUPPORT": "Support Staff"
+    },
+    "columns": {
+      "employeeCode": "Employee code",
+      "employeeName": "Employee name",
+      "positionName": "Position",
+      "departmentCode": "Department",
+      "auditorClassification": "Auditor classification",
+      "businessSegmentCode": "Assigned segment",
+      "roleInTeam": "Team role",
+      "otherDuties": "Other duties",
+      "auditObjectCodes": "Audit object codes",
+      "decisionNumber": "Decision number",
+      "decisionDate": "Decision date",
+      "expectedBatch": "Expected batch",
+      "totalTeamsCount": "Total teams",
+      "note": "Note"
+    },
+    "form": {
+      "editTitle": "Edit",
+      "monthDetail": "Batch detail (by month)"
+    },
+    "messages": {
+      "loadError": "Failed to load data",
+      "updateSuccess": "Updated",
+      "saveError": "Save failed"
+    }
+  },
+  "auditKhnsPb": {
+    "title": "Monthly staff allocation to branches",
+    "selectYearHint": "Select a Year to view the list.",
+    "editNoteButton": "Edit note",
+    "exportReportButton": "Export batch report",
+    "columns": {
+      "employeeCode": "Employee code",
+      "employeeName": "Employee name",
+      "positionName": "Position",
+      "departmentCode": "Department",
+      "auditorClassification": "Auditor classification",
+      "businessSegmentCode": "Assigned segment",
+      "otherDuties": "Other duties",
+      "totalTeamsCount": "Total teams",
+      "note": "Note"
+    },
+    "messages": {
+      "loadError": "Failed to load data",
+      "updateSuccess": "Updated",
+      "saveError": "Save failed"
+    }
+  },
+  "auditKhktTransfer": {
+    "title": "Transfer KHTH information to Audit Engagements",
+    "selectYearHint": "Select a Year to view the list.",
+    "transferButton": "Execute KHKT ({{count}})",
+    "resultTitle": "Transfer result",
+    "resultSuccess": "Created/updated engagement {{code}}",
+    "ready": "Ready",
+    "columns": {
+      "auditObjectCode": "Object code",
+      "auditObjectName": "Object name",
+      "teamLead": "Team lead",
+      "memberCount": "Members",
+      "expectedMonth": "Expected month",
+      "decisionNumber": "Decision number",
+      "decisionDate": "Decision date",
+      "expectedBatch": "Expected batch",
+      "existingEngagementCode": "Existing engagement",
+      "status": "Status"
+    },
+    "messages": {
+      "loadError": "Failed to load data",
+      "transferSuccess": "Successfully transferred {{count}} objects",
+      "transferPartial": "{{success}} succeeded, {{failure}} failed",
+      "transferError": "Transfer failed"
     }
   },
   "auditProcessStepSummaryQt": {
@@ -2146,6 +2416,9 @@
       "mainFunction": "Main Function",
       "keyFindings": "Key Findings",
       "infoUpdatedDate": "Info Updated Date",
+      "geographicArea": "Geographic Area",
+      "onBalanceSheetLoan": "On-balance-sheet Loan",
+      "fundingSource": "Funding Source",
       "companyType": "Company Type",
       "inspectionYear": "Inspection Year",
       "inspectionResult": "Inspection Result",
@@ -2182,6 +2455,24 @@
       "selectAuditObjectFirst": "Select Audit Object Category first",
       "objectSourceHint": "Decides which catalog the \"Audit Object Code\" column looks up in Other Risk Assessment",
       "businessLineCodeHint": "Must match a Business Code under Weight by Business - used to roll several quantitative criteria groups up into one business line when computing the Combined Score. Leave blank if this group doesn't need rolling up (e.g. it already maps 1:1 to a business line, or it's used by qualitative criteria)."
+    },
+    "inspectionHistory": {
+      "buttonLabel": "Inspection History",
+      "title": "Inspection History - {{name}}",
+      "createTitle": "Add Inspection History",
+      "editTitle": "Edit Inspection History",
+      "deleteConfirmTitle": "Delete this inspection history entry?",
+      "inspectionType": "Type",
+      "year": "Year",
+      "note": "Note",
+      "types": {
+        "TTCP": "Government Inspectorate",
+        "KTNN": "State Audit",
+        "TTGSNH": "Banking Supervision Inspection",
+        "KTNB": "Internal Audit",
+        "GSBKS": "Supervisory Board Oversight",
+        "KTGSNB": "Internal Control Inspection"
+      }
     },
     "deleteConfirmTitle": "Delete this item?",
     "messages": {

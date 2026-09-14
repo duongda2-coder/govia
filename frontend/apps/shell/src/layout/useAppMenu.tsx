@@ -30,6 +30,14 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-md-unit-type": "/audit/master-data/unit-type",
   "audit-md-employee-capability": "/audit/master-data/employee-capability",
   "audit-md-appendix": "/audit/master-data/appendix",
+  "audit-plan-md-khkt-scale": "/audit/plan/master-data/khkt-scale",
+  "audit-plan-khkt-bp": "/audit/plan/khkt-bp",
+  "audit-plan-khkt-th": "/audit/plan/khkt-th",
+  "audit-plan-khkt-thang": "/audit/plan/khkt-thang",
+  "audit-plan-khkt-dtkh-file": "/audit/plan/khkt-dtkh-file",
+  "audit-plan-khns-nam": "/audit/plan/khns-nam",
+  "audit-plan-khns-pb": "/audit/plan/khns-pb",
+  "audit-plan-khth-transfer": "/audit/plan/khth-transfer",
   "audit-plan-md-branch-staff": "/audit/plan/master-data/branch-staff",
   "audit-plan-md-work-item": "/audit/plan/master-data/work-item",
   "audit-plan-md-exception-type": "/audit/plan/master-data/exception-type",
@@ -167,6 +175,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
 
   // "Danh muc" (Cap 2): gom Danh muc chung + Danh muc Buoc quy trinh + Danh muc TTSS & KN + Danh muc Kiem toan quy trinh.
   const auditMdGeneralChildren = dropNulls([
+    canViewAuditMasterData && leaf("audit-md-general", t("menu.auditMdGeneralCatalogs"), auditMdGroupLabel),
     canViewAuditMasterData && leaf("audit-md-document-library", t("menu.auditMdDocumentLibrary"), auditMdGroupLabel),
     canViewRiskScoring && leaf("audit-rs-audit-objects", t("menu.riskScoringAuditObjects"), auditMdGroupLabel),
     canViewAuditMasterData && leaf("audit-md-department", t("menu.auditMdDepartment"), auditMdGroupLabel),
@@ -176,6 +185,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
     canViewAuditMasterData && leaf("audit-md-employee-capability", t("menu.auditMdEmployeeCapability"), auditMdGroupLabel),
     canViewAuditMasterData && leaf("audit-md-appendix", t("menu.auditMdAppendix"), auditMdGroupLabel),
     canViewAuditPlan && leaf("audit-plan-md-branch-staff", t("menu.auditPlanMdBranchStaff"), auditMdGroupLabel),
+    hasPermission("AUDIT.KHKT_SCALE.VIEW") && leaf("audit-plan-md-khkt-scale", t("menu.auditPlanMdKhktScale"), auditMdGroupLabel),
   ]);
   const auditMdProcessStepChildren = canViewAuditPlan
     ? [
@@ -356,8 +366,31 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
       label: menuLabel(t("menu.auditPlanExecution")),
       children: auditExecChildren,
     },
-    // Chua co man hinh nao thuoc nhom nay - de trong theo dung cau truc trong file menu mo ta.
-    { key: "audit-plan-kehoach", label: menuLabel(t("menu.auditPlanKeHoach")), children: [] },
+    (hasPermission("AUDIT.KHKT_BP.VIEW") ||
+      hasPermission("AUDIT.KHKT_TH.VIEW") ||
+      hasPermission("AUDIT.KHKT_THANG.VIEW") ||
+      hasPermission("AUDIT.KHKT_DTKH_FILE.VIEW") ||
+      hasPermission("AUDIT.KHNS_NAM.VIEW") ||
+      hasPermission("AUDIT.KHTH_TRANSFER.VIEW")) && {
+      key: "audit-plan-kehoach",
+      label: menuLabel(t("menu.auditPlanKeHoach")),
+      children: dropNulls([
+        hasPermission("AUDIT.KHKT_BP.VIEW") &&
+          leaf("audit-plan-khkt-bp", t("menu.auditPlanKhktBp"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
+        hasPermission("AUDIT.KHKT_TH.VIEW") &&
+          leaf("audit-plan-khkt-th", t("menu.auditPlanKhktTh"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
+        hasPermission("AUDIT.KHKT_THANG.VIEW") &&
+          leaf("audit-plan-khkt-thang", t("menu.auditPlanKhktThang"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
+        hasPermission("AUDIT.KHKT_DTKH_FILE.VIEW") &&
+          leaf("audit-plan-khkt-dtkh-file", t("menu.auditPlanKhktDtkhFile"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
+        hasPermission("AUDIT.KHNS_NAM.VIEW") &&
+          leaf("audit-plan-khns-nam", t("menu.auditPlanKhnsNam"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
+        hasPermission("AUDIT.KHNS_NAM.VIEW") &&
+          leaf("audit-plan-khns-pb", t("menu.auditPlanKhnsPb"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
+        hasPermission("AUDIT.KHTH_TRANSFER.VIEW") &&
+          leaf("audit-plan-khth-transfer", t("menu.auditPlanKhthTransfer"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
+      ]),
+    },
   ]);
 
   const adminGroupLabel = t("menu.admin");

@@ -310,6 +310,9 @@ export interface AuditObjectUnitItem {
   keyFindings: string | null;
   infoUpdatedDate: string | null;
   active: boolean;
+  geographicArea: string | null;
+  onBalanceSheetLoan: number | null;
+  fundingSource: number | null;
 }
 export interface AuditObjectUnitRequest {
   code: string;
@@ -328,6 +331,9 @@ export interface AuditObjectUnitRequest {
   mainFunction?: string | null;
   keyFindings?: string | null;
   active: boolean;
+  geographicArea?: string | null;
+  onBalanceSheetLoan?: number | null;
+  fundingSource?: number | null;
 }
 
 export interface AuditObjectSubsidiaryItem {

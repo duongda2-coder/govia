@@ -1,0 +1,43 @@
+databaseChangeLog:
+
+  # ===================== "Khai bao so thang kiem toan trong nam" (sheet ZTC_KHKT_THANG) =====================
+  - changeSet:
+      id: 161-1-audit-khkt-thang-schema
+      author: govia
+      comment: "Tao bang audit_khkt_thang (12 thang + ghi chu, cho 1 doi tuong kiem toan / 1 nam)"
+      changes:
+        - createTable:
+            tableName: audit_khkt_thang
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: khkt_year, type: INT, constraints: { nullable: false } }
+              - column: { name: audit_object_code, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: month1, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: month2, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: month3, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: month4, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: month5, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: month6, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: month7, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: month8, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: month9, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: month10, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: month11, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: month12, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: note, type: VARCHAR(250) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_thang
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_thang_tenant
+        - addUniqueConstraint:
+            tableName: audit_khkt_thang
+            columnNames: tenant_id, khkt_year, audit_object_code
+            constraintName: uk_audit_khkt_thang_year_object

@@ -1,0 +1,32 @@
+databaseChangeLog:
+
+  # ===================== Danh muc "Quy mo tin dung va huy dong von cua chi nhanh" (sheet ZTC_KHKT_QM) =====================
+  - changeSet:
+      id: 154-1-audit-khkt-scale-schema
+      author: govia
+      changes:
+        - createTable:
+            tableName: audit_khkt_scale
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: sort_order, type: INT, constraints: { nullable: false } }
+              - column: { name: credit_threshold, type: "DECIMAL(20,2)" }
+              - column: { name: funding_threshold, type: "DECIMAL(20,2)" }
+              - column: { name: scale_name, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: active, type: BOOLEAN, defaultValueBoolean: true, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_scale
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_scale_tenant
+        - addUniqueConstraint:
+            tableName: audit_khkt_scale
+            columnNames: tenant_id, sort_order
+            constraintName: uk_audit_khkt_scale_tenant_sort_order

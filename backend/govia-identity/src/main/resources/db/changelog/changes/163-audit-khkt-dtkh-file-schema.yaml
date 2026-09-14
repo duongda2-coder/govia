@@ -1,0 +1,40 @@
+databaseChangeLog:
+
+  # ===================== "Báo cáo tham khảo từ các bộ phận cho PKH lập dự thảo" (sheet ZTC_DTKH_FILE) =====================
+  - changeSet:
+      id: 163-1-audit-khkt-dtkh-file-schema
+      author: govia
+      comment: "Tao bang audit_khkt_dtkh_file (1 dong = 1 file dinh kem, file vat ly luu qua Attachment dung chung)"
+      changes:
+        - createTable:
+            tableName: audit_khkt_dtkh_file
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: khkt_year, type: INT, constraints: { nullable: false } }
+              - column: { name: department_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: version_id, type: UUID }
+              - column: { name: note, type: VARCHAR(250) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_dtkh_file
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_dtkh_file_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_dtkh_file
+            baseColumnNames: department_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_dtkh_file_department
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_dtkh_file
+            baseColumnNames: version_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_dtkh_file_version

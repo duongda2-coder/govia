@@ -1,0 +1,39 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: "Danh sach DTKT nam cua Phong ke hoach" (KHKT TH/TH2) =====================
+  - changeSet:
+      id: 160-1-permission-catalog-audit-khkt-th
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "8c5d9e3a-4ebf-4c2f-ad7f-3f8fbc4e6172" }
+              - column: { name: code, value: "AUDIT.KHKT_TH.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh sach DTKT nam cua Phong ke hoach (TH/TH2)" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Danh sách Phòng KH" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "8c5d9e3a-4ebf-4c2f-ad7f-3f8fbc4e6173" }
+              - column: { name: code, value: "AUDIT.KHKT_TH.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Tong hop tu BP2 va xac nhan danh sach (TH)" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Danh sách Phòng KH" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "8c5d9e3a-4ebf-4c2f-ad7f-3f8fbc4e6174" }
+              - column: { name: code, value: "AUDIT.KHKT_TH.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua can cu de xuat/y kien chuyen gia/lua chon/linh vuc TH de xuat" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Danh sách Phòng KH" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "8c5d9e3a-4ebf-4c2f-ad7f-3f8fbc4e6175" }
+              - column: { name: code, value: "AUDIT.KHKT_TH.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa DTKT nam (TH, chi khi chua xac nhan)" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Danh sách Phòng KH" }

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Col, DatePicker, Form, Input, InputNumber, Modal, Row, Select, Switch } from "antd";
+import { App, Button, Col, DatePicker, Form, Input, InputNumber, Modal, Row, Select, Space, Switch } from "antd";
 import type { TableProps } from "antd";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
@@ -13,6 +13,7 @@ import { listMasterDataItems, type MasterDataItem } from "../../../api/auditMast
 import { groupHOApi, type GroupHOItem } from "../../../api/riskScoringExec";
 import { useAuth } from "../../../auth/AuthContext";
 import { useAuditObjectOptions } from "./useAuditObjectOptions";
+import { AuditObjectInspectionHistoryDrawer } from "./AuditObjectInspectionHistoryDrawer";
 
 interface FormValues {
   code: string;
@@ -31,6 +32,9 @@ interface FormValues {
   mainFunction?: string;
   keyFindings?: string;
   active: boolean;
+  geographicArea?: string;
+  onBalanceSheetLoan?: number;
+  fundingSource?: number;
 }
 
 /** Danh muc "Doi tuong kiem toan - Don vi" (sheet ZTC_DTKT1: HO/Giam sat CC/Chi nhanh). */
@@ -51,24 +55,28 @@ export function AuditObjectUnitTable() {
   const [items, setItems] = useState<AuditObjectUnitItem[]>([]);
   const [groupHOOptions, setGroupHOOptions] = useState<GroupHOItem[]>([]);
   const [unitTypeOptions, setUnitTypeOptions] = useState<MasterDataItem[]>([]);
+  const [geographicAreaOptions, setGeographicAreaOptions] = useState<MasterDataItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<AuditObjectUnitItem[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<AuditObjectUnitItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [historyDrawerOpen, setHistoryDrawerOpen] = useState(false);
   const [form] = Form.useForm<FormValues>();
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [list, groupHOList, unitTypeList] = await Promise.all([
+      const [list, groupHOList, unitTypeList, geographicAreaList] = await Promise.all([
         auditObjectUnitApi.list(),
         groupHOApi.list(),
         listMasterDataItems("UNIT_TYPE"),
+        listMasterDataItems("GEOGRAPHIC_AREA"),
       ]);
       setItems(list);
       setGroupHOOptions(groupHOList);
       setUnitTypeOptions(unitTypeList);
+      setGeographicAreaOptions(geographicAreaList);
     } catch {
       message.error(t("riskScoring.messages.loadError"));
     } finally {
@@ -108,6 +116,9 @@ export function AuditObjectUnitTable() {
       mainFunction: target.mainFunction ?? undefined,
       keyFindings: target.keyFindings ?? undefined,
       active: target.active,
+      geographicArea: target.geographicArea ?? undefined,
+      onBalanceSheetLoan: target.onBalanceSheetLoan ?? undefined,
+      fundingSource: target.fundingSource ?? undefined,
     });
     setModalOpen(true);
   };
@@ -133,6 +144,9 @@ export function AuditObjectUnitTable() {
       mainFunction: target.mainFunction ?? undefined,
       keyFindings: target.keyFindings ?? undefined,
       active: target.active,
+      geographicArea: target.geographicArea ?? undefined,
+      onBalanceSheetLoan: target.onBalanceSheetLoan ?? undefined,
+      fundingSource: target.fundingSource ?? undefined,
     });
     setModalOpen(true);
   };
@@ -163,6 +177,9 @@ export function AuditObjectUnitTable() {
         mainFunction: values.mainFunction ?? null,
         keyFindings: values.keyFindings ?? null,
         active: values.active,
+        geographicArea: values.geographicArea ?? null,
+        onBalanceSheetLoan: values.onBalanceSheetLoan ?? null,
+        fundingSource: values.fundingSource ?? null,
       };
       if (editing) {
         await auditObjectUnitApi.update(editing.id, request);
@@ -227,6 +244,12 @@ export function AuditObjectUnitTable() {
       render: (v: string | null) => v ?? "-",
     },
     {
+      title: t("riskScoring.columns.geographicArea"),
+      dataIndex: "geographicArea",
+      width: 140,
+      render: (v: string | null) => (v ? (geographicAreaOptions.find((o) => o.code === v)?.name ?? v) : "-"),
+    },
+    {
       title: t("riskScoring.columns.infoUpdatedDate"),
       dataIndex: "infoUpdatedDate",
       width: 130,
@@ -247,6 +270,11 @@ export function AuditObjectUnitTable() {
 
   return (
     <div>
+      <Space style={{ marginBottom: 12 }}>
+        <Button disabled={selected.length !== 1} onClick={() => setHistoryDrawerOpen(true)}>
+          {t("riskScoring.inspectionHistory.buttonLabel")}
+        </Button>
+      </Space>
       <CrudTable<AuditObjectUnitItem>
         tableId="riskScoring.auditObjectUnit"
         columns={columns}
@@ -359,6 +387,28 @@ export function AuditObjectUnitTable() {
               options={groupHOOptions.map((g) => ({ value: g.id, label: `${g.code} - ${g.name}` }))}
             />
           </Form.Item>
+          <Row gutter={16}>
+            <Col span={8}>
+              <Form.Item name="geographicArea" label={t("riskScoring.columns.geographicArea")}>
+                <Select
+                  allowClear
+                  showSearch
+                  optionFilterProp="label"
+                  options={geographicAreaOptions.map((o) => ({ value: o.code, label: `${o.code} - ${o.name}` }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item name="onBalanceSheetLoan" label={t("riskScoring.columns.onBalanceSheetLoan")}>
+                <InputNumber style={{ width: "100%" }} min={0} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item name="fundingSource" label={t("riskScoring.columns.fundingSource")}>
+                <InputNumber style={{ width: "100%" }} min={0} />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="operatingRegulation" label={t("riskScoring.columns.operatingRegulation")}>
             <Input.TextArea rows={2} />
           </Form.Item>
@@ -373,6 +423,8 @@ export function AuditObjectUnitTable() {
           </Form.Item>
         </Form>
       </Modal>
+
+      <AuditObjectInspectionHistoryDrawer open={historyDrawerOpen} unit={selected[0] ?? null} onClose={() => setHistoryDrawerOpen(false)} />
     </div>
   );
 }

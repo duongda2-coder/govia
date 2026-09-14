@@ -1,5 +1,6 @@
 package com.govia.audit.riskscoring.masterdata.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -23,6 +24,9 @@ public record AuditObjectUnitResponse(
         String mainFunction,
         String keyFindings,
         LocalDate infoUpdatedDate,
-        boolean active
+        boolean active,
+        String geographicArea,
+        BigDecimal onBalanceSheetLoan,
+        BigDecimal fundingSource
 ) {
 }

@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -71,4 +72,16 @@ public class AuditObjectUnit extends BaseEntity {
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
+
+    /** Ma tham chieu toi AuditMasterDataItem (category GEOGRAPHIC_AREA) - cung pattern voi unit_type. Dung cho module KHKT. */
+    @Column(name = "geographic_area", length = 10)
+    private String geographicArea;
+
+    /** "Quy mo hoat dong cua don vi" (sheet ZTC_DTKT1) - Du no noi bang. Dung de tra Quy mo tin dung o module KHKT. */
+    @Column(name = "on_balance_sheet_loan", precision = 20, scale = 2)
+    private BigDecimal onBalanceSheetLoan;
+
+    /** "Quy mo hoat dong cua don vi" (sheet ZTC_DTKT1) - Nguon von. Dung de tra Quy mo huy dong von o module KHKT. */
+    @Column(name = "funding_source", precision = 20, scale = 2)
+    private BigDecimal fundingSource;
 }

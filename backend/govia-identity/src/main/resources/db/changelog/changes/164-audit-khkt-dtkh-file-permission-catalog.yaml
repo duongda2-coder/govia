@@ -1,0 +1,39 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: "Báo cáo tham khảo từ các bộ phận cho PKH" (KHKT DTKH_FILE) =====================
+  - changeSet:
+      id: 164-1-permission-catalog-audit-khkt-dtkh-file
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "85de5f0b-b3c6-49bf-be9b-ed789b6b5d95" }
+              - column: { name: code, value: "AUDIT.KHKT_DTKH_FILE.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem bao cao tham khao tu cac bo phan cho PKH lap du thao" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Báo cáo tham khảo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "535c9744-6a35-4f74-8b36-e5ac5291459a" }
+              - column: { name: code, value: "AUDIT.KHKT_DTKH_FILE.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Upload bao cao tham khao" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Báo cáo tham khảo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "fd832b2e-b9c0-4796-b676-a613eacf7314" }
+              - column: { name: code, value: "AUDIT.KHKT_DTKH_FILE.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua thong tin bao cao tham khao (phong/phien ban/ghi chu)" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Báo cáo tham khảo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "5118712d-1d11-45fa-9c6b-becef4fe78ba" }
+              - column: { name: code, value: "AUDIT.KHKT_DTKH_FILE.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa bao cao tham khao" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Báo cáo tham khảo" }

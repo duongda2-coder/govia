@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: "Quy mo tin dung/huy dong von cua chi nhanh" (KHKT) =====================
+  - changeSet:
+      id: 155-1-permission-catalog-audit-khkt-scale
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6a3f7b1e-2c9d-4a0e-8b5f-1d6e9a2c4f70" }
+              - column: { name: code, value: "AUDIT.KHKT_SCALE.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh muc Quy mo tin dung va huy dong von cua chi nhanh" }
+              - column: { name: resource_label, value: "Quy mô tín dụng & huy động vốn" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6a3f7b1e-2c9d-4a0e-8b5f-1d6e9a2c4f71" }
+              - column: { name: code, value: "AUDIT.KHKT_SCALE.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi Quy mo tin dung va huy dong von cua chi nhanh" }
+              - column: { name: resource_label, value: "Quy mô tín dụng & huy động vốn" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6a3f7b1e-2c9d-4a0e-8b5f-1d6e9a2c4f72" }
+              - column: { name: code, value: "AUDIT.KHKT_SCALE.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua Quy mo tin dung va huy dong von cua chi nhanh" }
+              - column: { name: resource_label, value: "Quy mô tín dụng & huy động vốn" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6a3f7b1e-2c9d-4a0e-8b5f-1d6e9a2c4f73" }
+              - column: { name: code, value: "AUDIT.KHKT_SCALE.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa Quy mo tin dung va huy dong von cua chi nhanh" }
+              - column: { name: resource_label, value: "Quy mô tín dụng & huy động vốn" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6a3f7b1e-2c9d-4a0e-8b5f-1d6e9a2c4f74" }
+              - column: { name: code, value: "AUDIT.KHKT_SCALE.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat Excel/Word Quy mo tin dung va huy dong von cua chi nhanh" }
+              - column: { name: resource_label, value: "Quy mô tín dụng & huy động vốn" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6a3f7b1e-2c9d-4a0e-8b5f-1d6e9a2c4f75" }
+              - column: { name: code, value: "AUDIT.KHKT_SCALE.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import Excel Quy mo tin dung va huy dong von cua chi nhanh" }
+              - column: { name: resource_label, value: "Quy mô tín dụng & huy động vốn" }

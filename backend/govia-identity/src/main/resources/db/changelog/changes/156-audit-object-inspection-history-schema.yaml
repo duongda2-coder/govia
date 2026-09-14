@@ -1,0 +1,40 @@
+databaseChangeLog:
+
+  # ===================== "Lich su KT" cua Doi tuong kiem toan (sheet ZTC_DTKT1, nut "Lich su KT") =====================
+  # Dung de module Ke hoach kiem toan (KHKT) tinh cac cot "T-5..T-1" cua BP/BP2/TH/TH2 (sheet ZTC_KHKT_BP).
+  - changeSet:
+      id: 156-1-audit-object-inspection-history-schema
+      author: govia
+      changes:
+        - createTable:
+            tableName: risk_score_audit_object_inspection_history
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_unit_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: inspection_type, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: inspection_year, type: INT, constraints: { nullable: false } }
+              - column: { name: note, type: VARCHAR(500) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_audit_object_inspection_history
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_object_inspection_history_tenant
+        - addForeignKeyConstraint:
+            baseTableName: risk_score_audit_object_inspection_history
+            baseColumnNames: audit_object_unit_id
+            referencedTableName: risk_score_audit_object_unit
+            referencedColumnNames: id
+            constraintName: fk_audit_object_inspection_history_unit
+        - createIndex:
+            tableName: risk_score_audit_object_inspection_history
+            indexName: idx_audit_object_inspection_history_unit_year
+            columns:
+              - column: { name: audit_object_unit_id }
+              - column: { name: inspection_year }

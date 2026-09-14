@@ -43,9 +43,18 @@
     "auditMdUnitType": "Danh mục Loại đơn vị",
     "auditMdEmployeeCapability": "Danh mục Khả năng đảm nhận lĩnh vực NV",
     "auditMdAppendix": "Danh mục Quản lý phụ lục",
+    "auditMdGeneralCatalogs": "Tiền tệ, Quốc gia, Khu vực địa lý...",
     "auditMdProcessStepGroup": "Danh mục Bước quy trình",
     "auditMdTtssGroup": "Danh mục TTSS & KN",
     "auditPlanKeHoach": "Kế hoạch kiểm toán",
+    "auditPlanMdKhktScale": "Quy mô tín dụng & huy động vốn",
+    "auditPlanKhktBp": "Đề xuất ĐTKT theo phòng",
+    "auditPlanKhktTh": "Danh sách ĐTKT Phòng Kế hoạch",
+    "auditPlanKhktThang": "Số tháng kiểm toán trong năm",
+    "auditPlanKhktDtkhFile": "Báo cáo tham khảo cho PKH",
+    "auditPlanKhnsNam": "Dự kiến nhân sự năm",
+    "auditPlanKhnsPb": "Phân bổ cán bộ theo tháng",
+    "auditPlanKhthTransfer": "Chuyển thông tin KHTH",
     "auditPlan": "Lập kế hoạch",
     "auditPlanMasterData": "Danh mục",
     "auditPlanMdBranchStaff": "Chức danh cán bộ chi nhánh",
@@ -921,6 +930,267 @@
       "deleteSuccess": "Đã xóa",
       "deleteError": "Xóa thất bại",
       "saveError": "Lưu thất bại"
+    }
+  },
+  "auditKhktScale": {
+    "title": "Danh mục Quy mô tín dụng & huy động vốn của chi nhánh",
+    "columns": {
+      "sortOrder": "STT",
+      "scaleName": "Tên quy mô",
+      "creditThreshold": "Ngưỡng tín dụng (Dư nợ nội bảng)",
+      "fundingThreshold": "Ngưỡng huy động vốn (Nguồn vốn)"
+    },
+    "form": {
+      "createTitle": "Thêm mức quy mô",
+      "editTitle": "Sửa mức quy mô"
+    },
+    "deleteConfirmTitle": "Xóa mức quy mô này?",
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã tạo",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditKhktBp": {
+    "title": "Đề xuất đối tượng kiểm toán năm theo phòng",
+    "selectDepartment": "Chọn phòng nghiệp vụ",
+    "selectDepartmentAndYearHint": "Chọn Phòng nghiệp vụ và Năm để xem danh sách.",
+    "exportReportButton": "Xuất báo cáo đề xuất KHKT",
+    "tabCandidate": "Đề xuất (Phần 1)",
+    "tabConfirmed": "Đã xác nhận (Phần 2)",
+    "pickObjectButton": "Chọn đối tượng kiểm toán",
+    "confirmListButton": "Xác nhận danh sách",
+    "confirmListTitle": "Xác nhận danh sách đề xuất?",
+    "confirmListContent": "Sẽ ghi đè toàn bộ {{count}} đối tượng đã xác nhận trước đó (Phần 2) của phòng và năm này bằng danh sách hiện tại ở Phần 1.",
+    "deleteConfirmTitle": "Xóa đối tượng đề xuất này?",
+    "columns": {
+      "sourceType": "Loại ĐTKT",
+      "auditObjectCode": "Mã ĐTKT",
+      "auditObjectName": "Tên ĐTKT",
+      "auditObjectCategoryCode": "Loại đối tượng",
+      "riskScore": "Điểm rủi ro",
+      "rankLabel": "Xếp hạng",
+      "onBalanceSheetLoan": "Dư nợ nội bảng",
+      "fundingSource": "Nguồn vốn",
+      "businessSegments": "Lĩnh vực đề xuất KT",
+      "reviewResult": "Kết quả rà soát",
+      "selectionDecision": "Lựa chọn"
+    },
+    "sourceType": {
+      "BRANCH": "Chi nhánh",
+      "OTHER": "Khác"
+    },
+    "selectionDecision": {
+      "SELECTED": "Chọn",
+      "NOT_SELECTED": "Không chọn"
+    },
+    "inspectionType": {
+      "TTCP": "TTCP",
+      "KTNN": "KTNN",
+      "TTGSNH": "TTGSNH",
+      "KTNB": "KTNB",
+      "GSBKS": "GS BKS",
+      "KTGSNB": "KT GSNB"
+    },
+    "picker": {
+      "title": "Chọn đối tượng kiểm toán",
+      "addSelected": "Thêm {{count}} đối tượng đã chọn"
+    },
+    "form": {
+      "editTitle": "Sửa đề xuất"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "createSuccess": "Đã thêm",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại",
+      "confirmSuccess": "Đã xác nhận danh sách"
+    }
+  },
+  "auditKhktTh": {
+    "title": "Danh sách đối tượng kiểm toán năm của Phòng Kế hoạch",
+    "selectYearHint": "Chọn Năm để xem danh sách.",
+    "tabCandidate": "Danh sách (Phần 1)",
+    "tabConfirmed": "Đã xác nhận (Phần 2)",
+    "syncButton": "Tổng hợp từ BP2",
+    "exportReportButton": "Xuất báo cáo đề xuất KHKT",
+    "confirmListButton": "Xác nhận danh sách",
+    "confirmListTitle": "Xác nhận danh sách?",
+    "confirmListContent": "Sẽ ghi đè toàn bộ {{count}} đối tượng đã xác nhận trước đó (Phần 2) của năm này bằng danh sách hiện tại ở Phần 1.",
+    "deleteConfirmTitle": "Xóa đối tượng này khỏi danh sách?",
+    "columns": {
+      "sourceType": "Loại ĐTKT",
+      "auditObjectCode": "Mã ĐTKT",
+      "auditObjectName": "Tên ĐTKT",
+      "riskScore": "Điểm rủi ro",
+      "rankLabel": "Xếp hạng",
+      "proposingDepartments": "Phòng đề xuất",
+      "bpProposedSegments": "BP đề xuất LVKT",
+      "thBusinessSegments": "TH đề xuất LVKT",
+      "bpReviewResult": "Kết quả rà soát (BP)",
+      "proposalBasisTh": "Căn cứ đề xuất TH",
+      "expertOpinion": "Ý kiến của chuyên gia",
+      "selection1": "Lựa chọn 1",
+      "selection2": "Lựa chọn 2",
+      "selection3": "Lựa chọn 3"
+    },
+    "form": {
+      "editTitle": "Sửa"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại",
+      "syncSuccess": "Đã tổng hợp từ BP2",
+      "confirmSuccess": "Đã xác nhận danh sách"
+    }
+  },
+  "auditKhktThang": {
+    "title": "Khai báo số tháng kiểm toán trong năm",
+    "selectYearHint": "Chọn Năm để xem danh sách.",
+    "columns": {
+      "auditObjectCode": "Mã đơn vị",
+      "auditObjectName": "Tên đơn vị",
+      "businessSegments": "Lĩnh vực kiểm toán",
+      "auditObjectCategoryCode": "Phân loại",
+      "rankLabel": "Xếp hạng",
+      "onBalanceSheetLoan": "Dư nợ nội bảng",
+      "fundingSource": "Nguồn vốn",
+      "creditScale": "Quy mô tín dụng",
+      "fundingScale": "Quy mô huy động vốn",
+      "geographicArea": "Khu vực địa lý",
+      "month": "Tháng {{month}}",
+      "note": "Ghi chú"
+    },
+    "form": {
+      "editTitle": "Sửa",
+      "months": "Các tháng kiểm toán"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "updateSuccess": "Đã cập nhật",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditKhktDtkhFile": {
+    "title": "Báo cáo tham khảo từ các bộ phận cho Phòng Kế hoạch lập dự thảo",
+    "selectYearHint": "Chọn Năm để xem danh sách.",
+    "deleteConfirmTitle": "Xóa file này?",
+    "columns": {
+      "department": "Phòng",
+      "uploadedByName": "Người upload",
+      "fileName": "File",
+      "version": "Phiên bản",
+      "uploadedAt": "Thời gian upload",
+      "note": "Ghi chú"
+    },
+    "form": {
+      "createTitle": "Upload báo cáo",
+      "editTitle": "Sửa"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "fileRequired": "Vui lòng chọn file đính kèm",
+      "uploadSuccess": "Đã upload",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa",
+      "deleteError": "Xóa thất bại",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditKhnsNam": {
+    "title": "Dự kiến nhân sự thực hiện kiểm toán năm, đợt",
+    "selectYearHint": "Chọn Năm để xem danh sách.",
+    "classification": {
+      "TYPE_1": "Loại 1",
+      "TYPE_2": "Loại 2",
+      "TYPE_3": "Loại 3"
+    },
+    "role": {
+      "TEAM_LEAD": "Trưởng đoàn",
+      "GROUP_LEAD": "Trưởng nhóm",
+      "MEMBER": "Thành viên",
+      "SUPPORT": "Cán bộ hỗ trợ"
+    },
+    "columns": {
+      "employeeCode": "Mã cán bộ",
+      "employeeName": "Tên cán bộ",
+      "positionName": "Chức danh",
+      "departmentCode": "Phòng công tác",
+      "auditorClassification": "Phân loại năng lực KTV",
+      "businessSegmentCode": "Lĩnh vực dự kiến",
+      "roleInTeam": "Chức vụ trong đoàn",
+      "otherDuties": "Công việc khác đang đảm nhận",
+      "auditObjectCodes": "Mã đối tượng KT",
+      "decisionNumber": "Số quyết định",
+      "decisionDate": "Ngày quyết định",
+      "expectedBatch": "Dự kiến thời gian",
+      "totalTeamsCount": "Tổng số đoàn",
+      "note": "Ghi chú"
+    },
+    "form": {
+      "editTitle": "Sửa",
+      "monthDetail": "Chi tiết đợt (theo tháng)"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "updateSuccess": "Đã cập nhật",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditKhnsPb": {
+    "title": "Phân bổ cán bộ cho chi nhánh theo tháng",
+    "selectYearHint": "Chọn Năm để xem danh sách.",
+    "editNoteButton": "Sửa ghi chú",
+    "exportReportButton": "Xuất báo cáo theo đợt",
+    "columns": {
+      "employeeCode": "Mã cán bộ",
+      "employeeName": "Tên cán bộ",
+      "positionName": "Chức danh",
+      "departmentCode": "Phòng công tác",
+      "auditorClassification": "Phân loại năng lực KTV",
+      "businessSegmentCode": "Lĩnh vực dự kiến",
+      "otherDuties": "Công việc khác đang đảm nhận",
+      "totalTeamsCount": "Tổng số đoàn",
+      "note": "Ghi chú"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "updateSuccess": "Đã cập nhật",
+      "saveError": "Lưu thất bại"
+    }
+  },
+  "auditKhktTransfer": {
+    "title": "Chuyển thông tin KHTH sang Cuộc kiểm toán",
+    "selectYearHint": "Chọn Năm để xem danh sách.",
+    "transferButton": "Thực hiện KHKT ({{count}})",
+    "resultTitle": "Kết quả chuyển",
+    "resultSuccess": "Đã tạo/cập nhật CKT {{code}}",
+    "ready": "Sẵn sàng",
+    "columns": {
+      "auditObjectCode": "Mã ĐTKT",
+      "auditObjectName": "Tên ĐTKT",
+      "teamLead": "Trưởng đoàn",
+      "memberCount": "Số thành viên",
+      "expectedMonth": "Tháng dự kiến",
+      "decisionNumber": "Số quyết định",
+      "decisionDate": "Ngày quyết định",
+      "expectedBatch": "Dự kiến thời gian",
+      "existingEngagementCode": "CKT đã có",
+      "status": "Trạng thái"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "transferSuccess": "Đã chuyển thành công {{count}} đối tượng",
+      "transferPartial": "Thành công {{success}}, lỗi {{failure}}",
+      "transferError": "Chuyển thất bại"
     }
   },
   "auditProcessStepSummaryQt": {
@@ -2258,6 +2528,9 @@
       "mainFunction": "Chức năng chính",
       "keyFindings": "Phát hiện trọng yếu",
       "infoUpdatedDate": "Ngày cập nhật thông tin",
+      "geographicArea": "Khu vực địa lý",
+      "onBalanceSheetLoan": "Dư nợ nội bảng",
+      "fundingSource": "Nguồn vốn",
       "companyType": "Loại hình công ty",
       "inspectionYear": "Năm kiểm tra",
       "inspectionResult": "Kết quả kiểm tra",
@@ -2294,6 +2567,24 @@
       "selectAuditObjectFirst": "Chọn Loại đối tượng kiểm toán trước",
       "objectSourceHint": "Quyết định danh mục mà cột \"Mã đối tượng KT\" sẽ tra cứu tới khi Chấm điểm rủi ro khác",
       "businessLineCodeHint": "Khớp với Mã nghiệp vụ ở Theo nghiệp vụ - dùng để gộp các nhóm chỉ tiêu định lượng cùng 1 nghiệp vụ khi tính Kết quả chấm điểm tổng hợp. Để trống nếu nhóm này không cần gộp (VD: nhóm đã ứng với đúng 1 nghiệp vụ, hoặc dùng cho chỉ tiêu định tính)."
+    },
+    "inspectionHistory": {
+      "buttonLabel": "Lịch sử KT",
+      "title": "Lịch sử KT - {{name}}",
+      "createTitle": "Thêm lịch sử KT",
+      "editTitle": "Sửa lịch sử KT",
+      "deleteConfirmTitle": "Xóa dòng lịch sử KT này?",
+      "inspectionType": "Loại hình",
+      "year": "Năm",
+      "note": "Ghi chú",
+      "types": {
+        "TTCP": "Thanh tra Chính phủ",
+        "KTNN": "Kiểm toán Nhà nước",
+        "TTGSNH": "Thanh tra giám sát Ngân hàng",
+        "KTNB": "Kiểm toán nội bộ",
+        "GSBKS": "Giám sát của Ban kiểm soát",
+        "KTGSNB": "Kiểm tra giám sát nội bộ"
+      }
     },
     "deleteConfirmTitle": "Xóa mục này?",
     "messages": {

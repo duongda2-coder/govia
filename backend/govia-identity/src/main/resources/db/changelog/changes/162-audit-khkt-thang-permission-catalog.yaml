@@ -1,0 +1,23 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: "Khai bao so thang kiem toan trong nam" (KHKT THANG) =====================
+  - changeSet:
+      id: 162-1-permission-catalog-audit-khkt-thang
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "ed124058-4570-4d4f-9131-12653a5a3f9a" }
+              - column: { name: code, value: "AUDIT.KHKT_THANG.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem khai bao so thang kiem toan trong nam" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Số tháng kiểm toán trong năm" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "9129ce3b-3601-42c1-9413-2438b7c1a302" }
+              - column: { name: code, value: "AUDIT.KHKT_THANG.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua khai bao thang kiem toan / ghi chu" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Số tháng kiểm toán trong năm" }

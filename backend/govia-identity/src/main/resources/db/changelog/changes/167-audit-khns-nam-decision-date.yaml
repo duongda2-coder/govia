@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+  # ===================== "Ngày quyết định" bo sung vao ZTC_KHNS_NAM (theo yeu cau NSD, phuc vu ChuyenThongTinKHTH) =====================
+  - changeSet:
+      id: 167-1-audit-khns-nam-decision-date
+      author: govia
+      changes:
+        - addColumn:
+            tableName: audit_khns_nam
+            columns:
+              - column: { name: decision_date, type: DATE }

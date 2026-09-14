@@ -1,0 +1,39 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: "De xuat DTKT nam theo phong" (KHKT BP/BP2) =====================
+  - changeSet:
+      id: 158-1-permission-catalog-audit-khkt-bp
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "7b4c8d2f-3daf-4b1e-9c6f-2e7fab3d5061" }
+              - column: { name: code, value: "AUDIT.KHKT_BP.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem de xuat doi tuong kiem toan nam theo phong (BP/BP2)" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Đề xuất theo phòng" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "7b4c8d2f-3daf-4b1e-9c6f-2e7fab3d5062" }
+              - column: { name: code, value: "AUDIT.KHKT_BP.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them doi tuong kiem toan de xuat va xac nhan danh sach (BP)" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Đề xuất theo phòng" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "7b4c8d2f-3daf-4b1e-9c6f-2e7fab3d5063" }
+              - column: { name: code, value: "AUDIT.KHKT_BP.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua ket qua ra soat/lua chon/linh vuc de xuat (BP)" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Đề xuất theo phòng" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "7b4c8d2f-3daf-4b1e-9c6f-2e7fab3d5064" }
+              - column: { name: code, value: "AUDIT.KHKT_BP.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa de xuat doi tuong kiem toan (BP, chi khi chua xac nhan)" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Đề xuất theo phòng" }

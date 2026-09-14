@@ -1,0 +1,184 @@
+databaseChangeLog:
+
+  # ===================== "De xuat DTKT nam theo phong" (sheet ZTC_KHKT_BP, Phan 1 + Phan 2) =====================
+  - changeSet:
+      id: 157-1-audit-khkt-bp-candidate-schema
+      author: govia
+      comment: "Tao bang audit_khkt_bp_candidate (Phan 1 - nhap/sua)"
+      changes:
+        - createTable:
+            tableName: audit_khkt_bp_candidate
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: department_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: khkt_year, type: INT, constraints: { nullable: false } }
+              - column: { name: source_type, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: audit_object_code, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: audit_object_name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: audit_object_category_code, type: VARCHAR(20) }
+              - column: { name: risk_score, type: "DECIMAL(12,4)" }
+              - column: { name: rank_label, type: VARCHAR(50) }
+              - column: { name: audit_object_unit_id, type: UUID }
+              - column: { name: on_balance_sheet_loan, type: "DECIMAL(20,2)" }
+              - column: { name: funding_source, type: "DECIMAL(20,2)" }
+              - column: { name: review_result, type: VARCHAR(250) }
+              - column: { name: selection_decision, type: VARCHAR(20) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_candidate
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_candidate_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_candidate
+            baseColumnNames: department_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_candidate_department
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_candidate
+            baseColumnNames: audit_object_unit_id
+            referencedTableName: risk_score_audit_object_unit
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_candidate_unit
+        - addUniqueConstraint:
+            tableName: audit_khkt_bp_candidate
+            columnNames: tenant_id, department_id, khkt_year, audit_object_code
+            constraintName: uk_audit_khkt_bp_candidate_dept_year_object
+
+  - changeSet:
+      id: 157-2-audit-khkt-bp-candidate-segment-schema
+      author: govia
+      comment: "Tao bang audit_khkt_bp_candidate_segment (De xuat LVKT - nhieu-nhieu)"
+      changes:
+        - createTable:
+            tableName: audit_khkt_bp_candidate_segment
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: candidate_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: business_segment_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_candidate_segment
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_candidate_segment_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_candidate_segment
+            baseColumnNames: candidate_id
+            referencedTableName: audit_khkt_bp_candidate
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_candidate_segment_candidate
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_candidate_segment
+            baseColumnNames: business_segment_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_candidate_segment_segment
+        - addUniqueConstraint:
+            tableName: audit_khkt_bp_candidate_segment
+            columnNames: tenant_id, candidate_id, business_segment_id
+            constraintName: uk_audit_khkt_bp_candidate_segment_pair
+
+  - changeSet:
+      id: 157-3-audit-khkt-bp-confirmed-schema
+      author: govia
+      comment: "Tao bang audit_khkt_bp_confirmed (Phan 2 - da xac nhan)"
+      changes:
+        - createTable:
+            tableName: audit_khkt_bp_confirmed
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: department_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: khkt_year, type: INT, constraints: { nullable: false } }
+              - column: { name: source_type, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: audit_object_code, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: audit_object_name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: audit_object_category_code, type: VARCHAR(20) }
+              - column: { name: risk_score, type: "DECIMAL(12,4)" }
+              - column: { name: rank_label, type: VARCHAR(50) }
+              - column: { name: audit_object_unit_id, type: UUID }
+              - column: { name: on_balance_sheet_loan, type: "DECIMAL(20,2)" }
+              - column: { name: funding_source, type: "DECIMAL(20,2)" }
+              - column: { name: review_result, type: VARCHAR(250) }
+              - column: { name: selection_decision, type: VARCHAR(20) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_confirmed
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_confirmed_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_confirmed
+            baseColumnNames: department_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_confirmed_department
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_confirmed
+            baseColumnNames: audit_object_unit_id
+            referencedTableName: risk_score_audit_object_unit
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_confirmed_unit
+        - addUniqueConstraint:
+            tableName: audit_khkt_bp_confirmed
+            columnNames: tenant_id, department_id, khkt_year, audit_object_code
+            constraintName: uk_audit_khkt_bp_confirmed_dept_year_object
+
+  - changeSet:
+      id: 157-4-audit-khkt-bp-confirmed-segment-schema
+      author: govia
+      comment: "Tao bang audit_khkt_bp_confirmed_segment"
+      changes:
+        - createTable:
+            tableName: audit_khkt_bp_confirmed_segment
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: confirmed_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: business_segment_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_confirmed_segment
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_confirmed_segment_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_confirmed_segment
+            baseColumnNames: confirmed_id
+            referencedTableName: audit_khkt_bp_confirmed
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_confirmed_segment_confirmed
+        - addForeignKeyConstraint:
+            baseTableName: audit_khkt_bp_confirmed_segment
+            baseColumnNames: business_segment_id
+            referencedTableName: audit_master_data_item
+            referencedColumnNames: id
+            constraintName: fk_audit_khkt_bp_confirmed_segment_segment
+        - addUniqueConstraint:
+            tableName: audit_khkt_bp_confirmed_segment
+            columnNames: tenant_id, confirmed_id, business_segment_id
+            constraintName: uk_audit_khkt_bp_confirmed_segment_pair

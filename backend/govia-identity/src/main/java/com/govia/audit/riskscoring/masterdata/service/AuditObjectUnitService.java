@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +81,7 @@ public class AuditObjectUnitService {
         validateDefenseLineGroup(tenantId, request.defenseLineGroupId());
         validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
         validateUnitType(tenantId, request.unitType());
+        validateGeographicArea(tenantId, request.geographicArea());
 
         AuditObjectUnit item = new AuditObjectUnit();
         item.setTenantId(tenantId);
@@ -99,6 +101,7 @@ public class AuditObjectUnitService {
         validateDefenseLineGroup(tenantId, request.defenseLineGroupId());
         validateAuditObjectCategory(tenantId, request.auditObjectCategoryId());
         validateUnitType(tenantId, request.unitType());
+        validateGeographicArea(tenantId, request.geographicArea());
 
         applyRequest(item, request);
         item.setInfoUpdatedDate(LocalDate.now());
@@ -162,7 +165,8 @@ public class AuditObjectUnitService {
                         emptyToNull(row.get("restructureNote")), parseInt(row.get("totalStaff")), parseInt(row.get("leaderCount")),
                         parseInt(row.get("staffCount")), parseInt(row.get("rankValue")), defenseLineGroupId,
                         emptyToNull(row.get("operatingRegulation")), emptyToNull(row.get("mainFunction")),
-                        emptyToNull(row.get("keyFindings")), true));
+                        emptyToNull(row.get("keyFindings")), true, emptyToNull(row.get("geographicArea")),
+                        parseDecimal(row.get("onBalanceSheetLoan")), parseDecimal(row.get("fundingSource"))));
                 success++;
             } catch (Exception e) {
                 errors.add(new ImportResult.ImportRowError(rowNumber, e.getMessage()));
@@ -191,6 +195,9 @@ public class AuditObjectUnitService {
         item.setMainFunction(request.mainFunction());
         item.setKeyFindings(request.keyFindings());
         item.setActive(request.active());
+        item.setGeographicArea(request.geographicArea());
+        item.setOnBalanceSheetLoan(request.onBalanceSheetLoan());
+        item.setFundingSource(request.fundingSource());
     }
 
     private void checkNoDuplicateCode(UUID tenantId, String code, UUID excludingId) {
@@ -213,6 +220,14 @@ public class AuditObjectUnitService {
     private void validateUnitType(UUID tenantId, String unitType) {
         masterDataItemRepository.findByTenantIdAndCategoryAndCode(tenantId, AuditMasterDataCategory.UNIT_TYPE, unitType)
                 .orElseThrow(() -> new BusinessException("UNIT_TYPE_NOT_FOUND", "Khong tim thay loai don vi: " + unitType));
+    }
+
+    private void validateGeographicArea(UUID tenantId, String geographicArea) {
+        if (geographicArea == null || geographicArea.isBlank()) {
+            return;
+        }
+        masterDataItemRepository.findByTenantIdAndCategoryAndCode(tenantId, AuditMasterDataCategory.GEOGRAPHIC_AREA, geographicArea)
+                .orElseThrow(() -> new BusinessException("GEOGRAPHIC_AREA_NOT_FOUND", "Khong tim thay khu vuc dia ly: " + geographicArea));
     }
 
     private void validateAuditObjectCategory(UUID tenantId, UUID auditObjectCategoryId) {
@@ -262,7 +277,10 @@ public class AuditObjectUnitService {
                 new ExportColumn("defenseLineGroupCode", "Thuoc tuyen bao ve"),
                 new ExportColumn("operatingRegulation", "Quy che to chuc hoat dong"),
                 new ExportColumn("mainFunction", "Chuc nang nhiem vu chinh"),
-                new ExportColumn("keyFindings", "Phat hien trong yeu"));
+                new ExportColumn("keyFindings", "Phat hien trong yeu"),
+                new ExportColumn("geographicArea", "Khu vuc dia ly"),
+                new ExportColumn("onBalanceSheetLoan", "Du no noi bang"),
+                new ExportColumn("fundingSource", "Nguon von"));
     }
 
     private List<Map<String, Object>> exportRows() {
@@ -287,6 +305,9 @@ public class AuditObjectUnitService {
                     row.put("operatingRegulation", item.getOperatingRegulation());
                     row.put("mainFunction", item.getMainFunction());
                     row.put("keyFindings", item.getKeyFindings());
+                    row.put("geographicArea", item.getGeographicArea());
+                    row.put("onBalanceSheetLoan", item.getOnBalanceSheetLoan());
+                    row.put("fundingSource", item.getFundingSource());
                     return row;
                 }).toList();
     }
@@ -321,12 +342,24 @@ public class AuditObjectUnitService {
         }
     }
 
+    private BigDecimal parseDecimal(String value) {
+        if (isBlank(value)) {
+            return null;
+        }
+        try {
+            return new BigDecimal(value.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private AuditObjectUnitResponse toResponse(AuditObjectUnit item, Map<UUID, String> groupCodes, Map<UUID, String> categoryCodes) {
         return new AuditObjectUnitResponse(item.getId(), item.getCode(), item.getName(), item.getUnitType(),
                 item.getAuditObjectCategoryId(), categoryCodes.get(item.getAuditObjectCategoryId()),
                 item.getEstablishedDate(), item.getRestructureDate(), item.getRestructureNote(), item.getTotalStaff(),
                 item.getLeaderCount(), item.getStaffCount(), item.getRankValue(), item.getDefenseLineGroupId(),
                 groupCodes.get(item.getDefenseLineGroupId()), item.getOperatingRegulation(), item.getMainFunction(),
-                item.getKeyFindings(), item.getInfoUpdatedDate(), item.isActive());
+                item.getKeyFindings(), item.getInfoUpdatedDate(), item.isActive(), item.getGeographicArea(),
+                item.getOnBalanceSheetLoan(), item.getFundingSource());
     }
 }

@@ -1,0 +1,23 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: "Chuyển thông tin KHTH" (day du lieu sang Cuoc kiem toan) =====================
+  - changeSet:
+      id: 168-1-permission-catalog-audit-khth-transfer
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "5583dd2d-cc6a-4a5d-9995-4a1801f0e75a" }
+              - column: { name: code, value: "AUDIT.KHTH_TRANSFER.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem danh sach doi tuong san sang chuyen thong tin KHTH sang Cuoc kiem toan" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Chuyển thông tin KHTH" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "fa18e9f7-0357-4ea1-93b5-849a2dcde921" }
+              - column: { name: code, value: "AUDIT.KHTH_TRANSFER.EXECUTE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Thuc hien chuyen thong tin KHTH: tao/ghi de Cuoc kiem toan tu du lieu KHNS_NAM" }
+              - column: { name: resource_label, value: "Kế hoạch kiểm toán - Chuyển thông tin KHTH" }

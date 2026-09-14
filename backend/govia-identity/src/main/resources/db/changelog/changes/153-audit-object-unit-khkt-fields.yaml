@@ -1,0 +1,16 @@
+databaseChangeLog:
+
+  # ===================== Them cac cot phuc vu module Ke hoach kiem toan (KHKT) vao AuditObjectUnit =====================
+  # sheet ZTC_DTKT1 > "Quy mo hoat dong cua don vi" (Du no noi bang, Nguon von) + Khu vuc dia ly, dung
+  # de THANG (ZTC_KHKT_THANG) tra cuu Quy mo tin dung/huy dong von va hien thi Khu vuc dia ly.
+  - changeSet:
+      id: 153-1-audit-object-unit-add-khkt-fields
+      author: govia
+      comment: "AuditObjectUnit: them geographic_area (Khu vuc dia ly, tham chieu AuditMasterDataItem nhu unit_type), on_balance_sheet_loan + funding_source (Du no noi bang, Nguon von)"
+      changes:
+        - addColumn:
+            tableName: risk_score_audit_object_unit
+            columns:
+              - column: { name: geographic_area, type: VARCHAR(10) }
+              - column: { name: on_balance_sheet_loan, type: "DECIMAL(20,2)" }
+              - column: { name: funding_source, type: "DECIMAL(20,2)" }

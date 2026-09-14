@@ -2,6 +2,7 @@ package com.govia.audit.riskscoring.masterdata.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -21,6 +22,9 @@ public record AuditObjectUnitRequest(
         String operatingRegulation,
         String mainFunction,
         String keyFindings,
-        boolean active
+        boolean active,
+        String geographicArea,
+        BigDecimal onBalanceSheetLoan,
+        BigDecimal fundingSource
 ) {
 }

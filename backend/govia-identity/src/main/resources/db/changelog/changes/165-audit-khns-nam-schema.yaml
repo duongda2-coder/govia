@@ -1,0 +1,87 @@
+databaseChangeLog:
+
+  # ===================== "Dự kiến nhân sự thực hiện kiểm toán năm, đợt" (sheet ZTC_KHNS_NAM) =====================
+  - changeSet:
+      id: 165-1-audit-khns-nam-schema
+      author: govia
+      comment: "Tao bang audit_khns_nam (1 dong / 1 nhan vien / 1 nam, 12 cot thang gan doi tuong kiem toan)"
+      changes:
+        - createTable:
+            tableName: audit_khns_nam
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: khkt_year, type: INT, constraints: { nullable: false } }
+              - column: { name: employee_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: role_in_team, type: VARCHAR(20) }
+              - column: { name: other_duties, type: VARCHAR(120) }
+              - column: { name: decision_number, type: VARCHAR(25) }
+              - column: { name: expected_batch, type: VARCHAR(100) }
+              - column: { name: note, type: VARCHAR(120) }
+              - column: { name: month1_audit_object_code, type: VARCHAR(20) }
+              - column: { name: month2_audit_object_code, type: VARCHAR(20) }
+              - column: { name: month3_audit_object_code, type: VARCHAR(20) }
+              - column: { name: month4_audit_object_code, type: VARCHAR(20) }
+              - column: { name: month5_audit_object_code, type: VARCHAR(20) }
+              - column: { name: month6_audit_object_code, type: VARCHAR(20) }
+              - column: { name: month7_audit_object_code, type: VARCHAR(20) }
+              - column: { name: month8_audit_object_code, type: VARCHAR(20) }
+              - column: { name: month9_audit_object_code, type: VARCHAR(20) }
+              - column: { name: month10_audit_object_code, type: VARCHAR(20) }
+              - column: { name: month11_audit_object_code, type: VARCHAR(20) }
+              - column: { name: month12_audit_object_code, type: VARCHAR(20) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_khns_nam
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_khns_nam_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_khns_nam
+            baseColumnNames: employee_id
+            referencedTableName: employee
+            referencedColumnNames: id
+            constraintName: fk_audit_khns_nam_employee
+        - addUniqueConstraint:
+            tableName: audit_khns_nam
+            columnNames: tenant_id, khkt_year, employee_id
+            constraintName: uk_audit_khns_nam_year_employee
+
+  - changeSet:
+      id: 165-2-audit-khns-nam-object-schema
+      author: govia
+      comment: "Tao bang audit_khns_nam_object (Ma doi tuong KT du kien, chon nhieu tu TH2)"
+      changes:
+        - createTable:
+            tableName: audit_khns_nam_object
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: khns_nam_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: audit_object_code, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_khns_nam_object
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_audit_khns_nam_object_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_khns_nam_object
+            baseColumnNames: khns_nam_id
+            referencedTableName: audit_khns_nam
+            referencedColumnNames: id
+            constraintName: fk_audit_khns_nam_object_plan
+        - addUniqueConstraint:
+            tableName: audit_khns_nam_object
+            columnNames: tenant_id, khns_nam_id, audit_object_code
+            constraintName: uk_audit_khns_nam_object_pair
