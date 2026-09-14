@@ -85,7 +85,9 @@ export function AuditProcessEngagementPage() {
       setTeamLeads(leads);
       setAuditObjectUnits(units);
       setEmployees(employeeOptions);
-      setWorkItemCodes(Array.from(new Set(workItemsQt.map((w) => w.code))).sort());
+      setWorkItemCodes(
+        Array.from(new Set(workItemsQt.map((w) => w.workSetCode).filter((c): c is string => !!c))).sort(),
+      );
     } catch {
       message.error(t("auditProcessEngagement.messages.loadError"));
     } finally {
