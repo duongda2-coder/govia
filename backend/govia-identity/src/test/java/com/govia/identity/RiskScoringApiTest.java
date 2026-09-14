@@ -251,7 +251,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new AuditObjectUnitRequest("1234", "Chi nhánh Thăng Long", "CN", null, null, null, null,
-                                        100, 10, 500, 1, UUID.fromString(groupId), null, null, null, true))))
+                                        100, 10, 500, 1, UUID.fromString(groupId), null, null, null, true, null, null, null))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.code").value("1234"))
                 .andExpect(jsonPath("$.data.defenseLineGroupCode").value("10"))
@@ -268,7 +268,7 @@ class RiskScoringApiTest extends AbstractApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
                                 new AuditObjectUnitRequest("1234", "Trung", "CN", null, null, null, null,
-                                        null, null, null, null, null, null, null, null, true))))
+                                        null, null, null, null, null, null, null, null, true, null, null, null))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("AUDIT_OBJECT_UNIT_CODE_DUPLICATE"));
 
