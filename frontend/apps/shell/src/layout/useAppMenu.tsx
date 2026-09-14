@@ -153,154 +153,211 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
   const canViewFindings = hasPermission("AUDIT.FINDING.VIEW");
 
   const auditGroupLabel = t("menu.audit");
-  const auditMdGroupLabel = `${auditGroupLabel} / ${t("menu.auditMasterData")}`;
-  const auditPlanMdGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanMasterData")}`;
-  const auditPlanMdQtGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanMasterDataQt")}`;
-  const auditPlanEngagementGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanEngagement")}`;
-  const auditPlanExecGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlan")} / ${t("menu.auditPlanExecution")}`;
-  const auditRsGroupLabel = `${auditGroupLabel} / ${t("menu.riskScoring")} / ${t("menu.riskScoringMasterData")}`;
-  const auditRseGroupLabel = `${auditGroupLabel} / ${t("menu.riskScoring")} / ${t("menu.riskScoringExec")}`;
+  const auditMdGroupLabel = `${auditGroupLabel} / ${t("menu.auditMasterData")} / ${t("menu.auditMdGeneral")}`;
+  const auditMdProcessStepGroupLabel = `${auditGroupLabel} / ${t("menu.auditMasterData")} / ${t("menu.auditMdProcessStepGroup")}`;
+  const auditMdTtssGroupLabel = `${auditGroupLabel} / ${t("menu.auditMasterData")} / ${t("menu.auditMdTtssGroup")}`;
+  const auditPlanMdQtGroupLabel = `${auditGroupLabel} / ${t("menu.auditMasterData")} / ${t("menu.auditPlanMasterDataQt")}`;
+  const auditRsCatalogGroupLabel = `${auditGroupLabel} / ${t("menu.riskScoring")} / ${t("menu.riskScoringCatalogGroup")}`;
+  const auditRsOtherGroupLabel = `${auditGroupLabel} / ${t("menu.riskScoring")} / ${t("menu.riskScoringOtherGroup")}`;
+  const auditRsBranchGroupLabel = `${auditGroupLabel} / ${t("menu.riskScoring")} / ${t("menu.riskScoringBranchGroup")}`;
+  const auditPlanExecSampleGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlanExecution")} / ${t("menu.auditPlanExecSampleGroup")}`;
+  const auditPlanExecInitGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlanExecution")} / ${t("menu.auditPlanExecInitGroup")}`;
+  const auditPlanExecManagementGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlanExecution")} / ${t("menu.auditPlanExecManagementGroup")}`;
+  const auditPlanExecSupervisionGroupLabel = `${auditGroupLabel} / ${t("menu.auditPlanExecution")} / ${t("menu.auditPlanExecSupervisionGroup")}`;
+
+  // "Danh muc" (Cap 2): gom Danh muc chung + Danh muc Buoc quy trinh + Danh muc TTSS & KN + Danh muc Kiem toan quy trinh.
+  const auditMdGeneralChildren = dropNulls([
+    canViewAuditMasterData && leaf("audit-md-document-library", t("menu.auditMdDocumentLibrary"), auditMdGroupLabel),
+    canViewRiskScoring && leaf("audit-rs-audit-objects", t("menu.riskScoringAuditObjects"), auditMdGroupLabel),
+    canViewAuditMasterData && leaf("audit-md-department", t("menu.auditMdDepartment"), auditMdGroupLabel),
+    canViewAuditMasterData && leaf("audit-md-year", t("menu.auditMdYear"), auditMdGroupLabel),
+    canViewAuditMasterData && leaf("audit-md-business-segment", t("menu.auditMdBusinessSegment"), auditMdGroupLabel),
+    canViewAuditMasterData && leaf("audit-md-unit-type", t("menu.auditMdUnitType"), auditMdGroupLabel),
+    canViewAuditMasterData && leaf("audit-md-employee-capability", t("menu.auditMdEmployeeCapability"), auditMdGroupLabel),
+    canViewAuditMasterData && leaf("audit-md-appendix", t("menu.auditMdAppendix"), auditMdGroupLabel),
+    canViewAuditPlan && leaf("audit-plan-md-branch-staff", t("menu.auditPlanMdBranchStaff"), auditMdGroupLabel),
+  ]);
+  const auditMdProcessStepChildren = canViewAuditPlan
+    ? [
+        leaf("audit-plan-md-control-point", t("menu.auditMdControlPoint"), auditMdProcessStepGroupLabel),
+        leaf("audit-plan-md-work-item", t("menu.auditPlanMdWorkItem"), auditMdProcessStepGroupLabel),
+        leaf("audit-plan-md-process-step-summary", t("menu.auditPlanMdProcessStepSummary"), auditMdProcessStepGroupLabel),
+        leaf("audit-plan-md-process-step-detail", t("menu.auditPlanMdProcessStepDetail"), auditMdProcessStepGroupLabel),
+      ]
+    : [];
+  const auditMdTtssChildren = canViewAuditPlan
+    ? [
+        leaf("audit-plan-md-exception-type", t("menu.auditPlanMdExceptionType"), auditMdTtssGroupLabel),
+        leaf("audit-plan-md-recommendation-type", t("menu.auditPlanMdRecommendationType"), auditMdTtssGroupLabel),
+        leaf("audit-plan-md-exception-mapping", t("menu.auditPlanMdExceptionMapping"), auditMdTtssGroupLabel),
+      ]
+    : [];
+  const auditMdQtChildren = dropNulls([
+    hasPermission("AUDIT.CONTROL_POINT_QT.VIEW") &&
+      leaf("audit-plan-md-qt-control-point", t("menu.auditPlanMdQtControlPoint"), auditPlanMdQtGroupLabel),
+    hasPermission("AUDIT.WORK_ITEM_QT.VIEW") &&
+      leaf("audit-plan-md-qt-work-item", t("menu.auditPlanMdQtWorkItem"), auditPlanMdQtGroupLabel),
+    hasPermission("AUDIT.PROCESS_STEP_SUMMARY_QT.VIEW") &&
+      leaf("audit-plan-md-qt-process-step-summary", t("menu.auditPlanMdQtProcessStepSummary"), auditPlanMdQtGroupLabel),
+    hasPermission("AUDIT.PROCESS_STEP_DETAIL_QT.VIEW") &&
+      leaf("audit-plan-md-qt-process-step-detail", t("menu.auditPlanMdQtProcessStepDetail"), auditPlanMdQtGroupLabel),
+    hasPermission("AUDIT.EXCEPTION_TYPE_QT.VIEW") &&
+      leaf("audit-plan-md-qt-exception-type", t("menu.auditPlanMdQtExceptionType"), auditPlanMdQtGroupLabel),
+    hasPermission("AUDIT.EXCEPTION_MAPPING_QT.VIEW") &&
+      leaf("audit-plan-md-qt-exception-mapping", t("menu.auditPlanMdQtExceptionMapping"), auditPlanMdQtGroupLabel),
+  ]);
+  const auditMdChildren = dropNulls([
+    auditMdGeneralChildren.length > 0 && {
+      key: "audit-md-general-group",
+      label: menuLabel(t("menu.auditMdGeneral")),
+      children: auditMdGeneralChildren,
+    },
+    auditMdProcessStepChildren.length > 0 && {
+      key: "audit-md-process-step-group",
+      label: menuLabel(t("menu.auditMdProcessStepGroup")),
+      children: auditMdProcessStepChildren,
+    },
+    auditMdTtssChildren.length > 0 && {
+      key: "audit-md-ttss-group",
+      label: menuLabel(t("menu.auditMdTtssGroup")),
+      children: auditMdTtssChildren,
+    },
+    auditMdQtChildren.length > 0 && {
+      key: "audit-plan-master-data-qt",
+      label: menuLabel(t("menu.auditPlanMasterDataQt")),
+      children: auditMdQtChildren,
+    },
+  ]);
+
+  // "Cham diem rui ro" (Cap 2): gom Danh muc cham diem + Cham diem rui ro khac CN + Cham diem rui ro CN.
+  const auditRsCatalogChildren = dropNulls([
+    canViewAuditMasterData && leaf("audit-md-risk", t("menu.auditMdRisk"), auditRsCatalogGroupLabel),
+    canViewRiskScoring && leaf("audit-rs-groups", t("menu.riskScoringGroups"), auditRsCatalogGroupLabel),
+    canViewRiskScoring && leaf("audit-rs-criteria", t("menu.riskScoringCriteria"), auditRsCatalogGroupLabel),
+    canViewRiskScoring && leaf("audit-rs-weight", t("menu.riskScoringWeight"), auditRsCatalogGroupLabel),
+    canViewRiskScoring && leaf("audit-rs-coefficient-matrix", t("menu.riskScoringCoefficientMatrix"), auditRsCatalogGroupLabel),
+    canViewRiskScoring && leaf("audit-rs-user-assignment", t("menu.riskScoringUserAssignment"), auditRsCatalogGroupLabel),
+  ]);
+  const auditRsOtherChildren = canViewRiskScoringExec
+    ? [
+        leaf("audit-rse-group-ho", t("menu.riskScoringExecGroupHO"), auditRsOtherGroupLabel),
+        leaf("audit-rse-risk-type-ho", t("menu.riskScoringExecRiskTypeHO"), auditRsOtherGroupLabel),
+        leaf("audit-rse-criteria-other", t("menu.riskScoringExecCriteriaOther"), auditRsOtherGroupLabel),
+        leaf("audit-rse-criteria-other-scale", t("menu.riskScoringExecCriteriaOtherScale"), auditRsOtherGroupLabel),
+        leaf("audit-rse-assessment-other", t("menu.riskScoringExecAssessmentOther"), auditRsOtherGroupLabel),
+        leaf("audit-rse-assessment-other-ranking", t("menu.riskScoringExecAssessmentOtherRanking"), auditRsOtherGroupLabel),
+        leaf("audit-rse-assessment-other-expert-rank", t("menu.riskScoringExecAssessmentOtherExpertRank"), auditRsOtherGroupLabel),
+      ]
+    : [];
+  const auditRsBranchChildren = canViewRiskScoringExec
+    ? dropNulls([
+        leaf("audit-rse-dashboard", t("menu.riskScoringExecDashboard"), auditRsBranchGroupLabel),
+        canViewFindings && leaf("audit-rse-findings", t("menu.riskScoringExecFindings"), auditRsBranchGroupLabel),
+        leaf("audit-rse-hsrr", t("menu.riskScoringExecHsrr"), auditRsBranchGroupLabel),
+        leaf("audit-rse-branch-score-dl", t("menu.riskScoringExecBranchScoreQuantitative"), auditRsBranchGroupLabel),
+        leaf("audit-rse-branch-score-dt", t("menu.riskScoringExecBranchScoreQualitative"), auditRsBranchGroupLabel),
+        leaf("audit-rse-branch-score-all", t("menu.riskScoringExecBranchScoreCombined"), auditRsBranchGroupLabel),
+        leaf("audit-rse-branch-score-expert-rank", t("menu.riskScoringExecBranchScoreExpertRank"), auditRsBranchGroupLabel),
+      ])
+    : [];
+  const auditRsChildren = dropNulls([
+    auditRsCatalogChildren.length > 0 && {
+      key: "audit-rs-catalog-group",
+      label: menuLabel(t("menu.riskScoringCatalogGroup")),
+      children: auditRsCatalogChildren,
+    },
+    auditRsOtherChildren.length > 0 && {
+      key: "audit-rs-other-group",
+      label: menuLabel(t("menu.riskScoringOtherGroup")),
+      children: auditRsOtherChildren,
+    },
+    auditRsBranchChildren.length > 0 && {
+      key: "audit-rs-branch-group",
+      label: menuLabel(t("menu.riskScoringBranchGroup")),
+      children: auditRsBranchChildren,
+    },
+  ]);
+
+  // "Thuc hien kiem toan" (Cap 2): gom Quan ly mau chon + Khoi tao + Quan ly cuoc KT + To giam sat.
+  const auditExecSampleChildren = canViewAuditPlanExecution
+    ? dropNulls([
+        // 17 sheet ZTC_CM_TD1/TD2/NTD1-NTD16 - moi sheet 1 muc menu/route rieng.
+        hasPermission("AUDIT.CM_TD1.VIEW") && leaf("audit-plan-exec-cm-td1", t("menu.auditPlanExecCmTd1"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_TD2.VIEW") && leaf("audit-plan-exec-cm-td2", t("menu.auditPlanExecCmTd2"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD1.VIEW") && leaf("audit-plan-exec-cm-ntd1", t("menu.auditPlanExecCmNtd1"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD2.VIEW") && leaf("audit-plan-exec-cm-ntd2", t("menu.auditPlanExecCmNtd2"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD3.VIEW") && leaf("audit-plan-exec-cm-ntd3", t("menu.auditPlanExecCmNtd3"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD4.VIEW") && leaf("audit-plan-exec-cm-ntd4", t("menu.auditPlanExecCmNtd4"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD6.VIEW") && leaf("audit-plan-exec-cm-ntd6", t("menu.auditPlanExecCmNtd6"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD7.VIEW") && leaf("audit-plan-exec-cm-ntd7", t("menu.auditPlanExecCmNtd7"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD8.VIEW") && leaf("audit-plan-exec-cm-ntd8", t("menu.auditPlanExecCmNtd8"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD9.VIEW") && leaf("audit-plan-exec-cm-ntd9", t("menu.auditPlanExecCmNtd9"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD10.VIEW") && leaf("audit-plan-exec-cm-ntd10", t("menu.auditPlanExecCmNtd10"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD11.VIEW") && leaf("audit-plan-exec-cm-ntd11", t("menu.auditPlanExecCmNtd11"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD12.VIEW") && leaf("audit-plan-exec-cm-ntd12", t("menu.auditPlanExecCmNtd12"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD13.VIEW") && leaf("audit-plan-exec-cm-ntd13", t("menu.auditPlanExecCmNtd13"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD14.VIEW") && leaf("audit-plan-exec-cm-ntd14", t("menu.auditPlanExecCmNtd14"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD15.VIEW") && leaf("audit-plan-exec-cm-ntd15", t("menu.auditPlanExecCmNtd15"), auditPlanExecSampleGroupLabel),
+        hasPermission("AUDIT.CM_NTD16.VIEW") && leaf("audit-plan-exec-cm-ntd16", t("menu.auditPlanExecCmNtd16"), auditPlanExecSampleGroupLabel),
+      ])
+    : [];
+  const auditExecInitChildren = dropNulls([
+    canViewAuditPlanEngagement && leaf("audit-plan-engagement-index", t("menu.auditPlanEngagementIndex"), auditPlanExecInitGroupLabel),
+    canViewAuditPlanEngagementProcess &&
+      leaf("audit-plan-engagement-process-index", t("menu.auditPlanEngagementProcessIndex"), auditPlanExecInitGroupLabel),
+  ]);
+  const auditExecManagementChildren = dropNulls([
+    canViewAuditPlanEngagement &&
+      leaf("audit-plan-engagement-monitoring-index", t("menu.auditPlanEngagementMonitoringIndex"), auditPlanExecManagementGroupLabel),
+    canViewAuditPlanExecution &&
+      hasPermission("AUDIT.WORK_MANAGEMENT.VIEW") &&
+      leaf("audit-plan-exec-work-management-cbkt", t("menu.auditPlanExecWorkManagementCbkt"), auditPlanExecManagementGroupLabel),
+    canViewAuditPlanExecution &&
+      hasPermission("AUDIT.WORK_MANAGEMENT.VIEW") &&
+      leaf("audit-plan-exec-work-management-thkt", t("menu.auditPlanExecWorkManagementThkt"), auditPlanExecManagementGroupLabel),
+    canViewAuditPlanExecution &&
+      hasPermission("AUDIT.TTSS.VIEW") &&
+      leaf("audit-plan-exec-work-management-ttss", t("menu.auditPlanExecWorkManagementTtss"), auditPlanExecManagementGroupLabel),
+    canViewAuditStatistics &&
+      leaf("audit-plan-engagement-statistics-index", t("menu.auditPlanEngagementStatisticsIndex"), auditPlanExecManagementGroupLabel),
+  ]);
+  const auditExecSupervisionChildren = dropNulls([
+    canViewAuditSupervisionTeam &&
+      leaf("audit-plan-engagement-supervision-team-index", t("menu.auditPlanEngagementSupervisionTeamIndex"), auditPlanExecSupervisionGroupLabel),
+  ]);
+  const auditExecChildren = dropNulls([
+    auditExecSampleChildren.length > 0 && {
+      key: "audit-plan-exec-sample-group",
+      label: menuLabel(t("menu.auditPlanExecSampleGroup")),
+      children: auditExecSampleChildren,
+    },
+    auditExecInitChildren.length > 0 && {
+      key: "audit-plan-exec-init-group",
+      label: menuLabel(t("menu.auditPlanExecInitGroup")),
+      children: auditExecInitChildren,
+    },
+    auditExecManagementChildren.length > 0 && {
+      key: "audit-plan-exec-management-group",
+      label: menuLabel(t("menu.auditPlanExecManagementGroup")),
+      children: auditExecManagementChildren,
+    },
+    auditExecSupervisionChildren.length > 0 && {
+      key: "audit-plan-exec-supervision-group",
+      label: menuLabel(t("menu.auditPlanExecSupervisionGroup")),
+      children: auditExecSupervisionChildren,
+    },
+  ]);
 
   const auditChildren = dropNulls([
-    canViewAuditMasterData && {
-      key: "audit-master-data",
-      label: menuLabel(t("menu.auditMasterData")),
-      children: [
-        leaf("audit-md-risk", t("menu.auditMdRisk"), auditMdGroupLabel),
-        leaf("audit-md-general", t("menu.auditMdGeneral"), auditMdGroupLabel),
-        leaf("audit-md-document-library", t("menu.auditMdDocumentLibrary"), auditMdGroupLabel),
-        leaf("audit-md-control-point", t("menu.auditMdControlPoint"), auditMdGroupLabel),
-        leaf("audit-md-department", t("menu.auditMdDepartment"), auditMdGroupLabel),
-        leaf("audit-md-year", t("menu.auditMdYear"), auditMdGroupLabel),
-        leaf("audit-md-business-segment", t("menu.auditMdBusinessSegment"), auditMdGroupLabel),
-        leaf("audit-md-unit-type", t("menu.auditMdUnitType"), auditMdGroupLabel),
-        leaf("audit-md-employee-capability", t("menu.auditMdEmployeeCapability"), auditMdGroupLabel),
-        leaf("audit-md-appendix", t("menu.auditMdAppendix"), auditMdGroupLabel),
-      ],
+    auditMdChildren.length > 0 && { key: "audit-master-data", label: menuLabel(t("menu.auditMasterData")), children: auditMdChildren },
+    auditRsChildren.length > 0 && { key: "audit-risk-scoring", label: menuLabel(t("menu.riskScoring")), children: auditRsChildren },
+    auditExecChildren.length > 0 && {
+      key: "audit-plan-execution",
+      label: menuLabel(t("menu.auditPlanExecution")),
+      children: auditExecChildren,
     },
-    (canViewRiskScoring || canViewRiskScoringExec) && {
-      key: "audit-risk-scoring",
-      label: menuLabel(t("menu.riskScoring")),
-      children: dropNulls([
-        canViewRiskScoring && {
-          key: "audit-rs-master-data",
-          label: menuLabel(t("menu.riskScoringMasterData")),
-          children: [
-            leaf("audit-rs-groups", t("menu.riskScoringGroups"), auditRsGroupLabel),
-            leaf("audit-rs-criteria", t("menu.riskScoringCriteria"), auditRsGroupLabel),
-            leaf("audit-rs-weight", t("menu.riskScoringWeight"), auditRsGroupLabel),
-            leaf("audit-rs-coefficient-matrix", t("menu.riskScoringCoefficientMatrix"), auditRsGroupLabel),
-            leaf("audit-rs-user-assignment", t("menu.riskScoringUserAssignment"), auditRsGroupLabel),
-            leaf("audit-rs-audit-objects", t("menu.riskScoringAuditObjects"), auditRsGroupLabel),
-          ],
-        },
-        canViewRiskScoringExec && {
-          key: "audit-rse-master-data",
-          label: menuLabel(t("menu.riskScoringExec")),
-          children: dropNulls([
-            // Them tab moi vao day khi xu ly them sheet cua "2. Cham diem.xlsx" - moi sheet la 1 muc
-            // menu/route rieng (giong Master Data CDRR), khong phai tab trong 1 trang.
-            leaf("audit-rse-dashboard", t("menu.riskScoringExecDashboard"), auditRseGroupLabel),
-            canViewFindings && leaf("audit-rse-findings", t("menu.riskScoringExecFindings"), auditRseGroupLabel),
-            leaf("audit-rse-group-ho", t("menu.riskScoringExecGroupHO"), auditRseGroupLabel),
-            leaf("audit-rse-risk-type-ho", t("menu.riskScoringExecRiskTypeHO"), auditRseGroupLabel),
-            leaf("audit-rse-criteria-other", t("menu.riskScoringExecCriteriaOther"), auditRseGroupLabel),
-            leaf("audit-rse-criteria-other-scale", t("menu.riskScoringExecCriteriaOtherScale"), auditRseGroupLabel),
-            leaf("audit-rse-assessment-other", t("menu.riskScoringExecAssessmentOther"), auditRseGroupLabel),
-            leaf("audit-rse-assessment-other-ranking", t("menu.riskScoringExecAssessmentOtherRanking"), auditRseGroupLabel),
-            leaf("audit-rse-assessment-other-expert-rank", t("menu.riskScoringExecAssessmentOtherExpertRank"), auditRseGroupLabel),
-            leaf("audit-rse-hsrr", t("menu.riskScoringExecHsrr"), auditRseGroupLabel),
-            leaf("audit-rse-branch-score-dl", t("menu.riskScoringExecBranchScoreQuantitative"), auditRseGroupLabel),
-            leaf("audit-rse-branch-score-dt", t("menu.riskScoringExecBranchScoreQualitative"), auditRseGroupLabel),
-            leaf("audit-rse-branch-score-all", t("menu.riskScoringExecBranchScoreCombined"), auditRseGroupLabel),
-            leaf("audit-rse-branch-score-expert-rank", t("menu.riskScoringExecBranchScoreExpertRank"), auditRseGroupLabel),
-          ]),
-        },
-      ]),
-    },
-    canViewAuditPlan && {
-      key: "audit-plan",
-      label: menuLabel(t("menu.auditPlan")),
-      children: dropNulls([
-        {
-          key: "audit-plan-master-data",
-          label: menuLabel(t("menu.auditPlanMasterData")),
-          children: [
-            leaf("audit-plan-md-branch-staff", t("menu.auditPlanMdBranchStaff"), auditPlanMdGroupLabel),
-            leaf("audit-plan-md-work-item", t("menu.auditPlanMdWorkItem"), auditPlanMdGroupLabel),
-            leaf("audit-plan-md-exception-type", t("menu.auditPlanMdExceptionType"), auditPlanMdGroupLabel),
-            leaf("audit-plan-md-control-point", t("menu.auditMdControlPoint"), auditPlanMdGroupLabel),
-            leaf("audit-plan-md-recommendation-type", t("menu.auditPlanMdRecommendationType"), auditPlanMdGroupLabel),
-            leaf("audit-plan-md-process-step-summary", t("menu.auditPlanMdProcessStepSummary"), auditPlanMdGroupLabel),
-            leaf("audit-plan-md-process-step-detail", t("menu.auditPlanMdProcessStepDetail"), auditPlanMdGroupLabel),
-            leaf("audit-plan-md-exception-mapping", t("menu.auditPlanMdExceptionMapping"), auditPlanMdGroupLabel),
-          ],
-        },
-        {
-          key: "audit-plan-master-data-qt",
-          label: menuLabel(t("menu.auditPlanMasterDataQt")),
-          children: dropNulls([
-            hasPermission("AUDIT.WORK_ITEM_QT.VIEW") &&
-              leaf("audit-plan-md-qt-work-item", t("menu.auditPlanMdQtWorkItem"), auditPlanMdQtGroupLabel),
-            hasPermission("AUDIT.EXCEPTION_TYPE_QT.VIEW") &&
-              leaf("audit-plan-md-qt-exception-type", t("menu.auditPlanMdQtExceptionType"), auditPlanMdQtGroupLabel),
-            hasPermission("AUDIT.CONTROL_POINT_QT.VIEW") &&
-              leaf("audit-plan-md-qt-control-point", t("menu.auditPlanMdQtControlPoint"), auditPlanMdQtGroupLabel),
-            hasPermission("AUDIT.PROCESS_STEP_SUMMARY_QT.VIEW") &&
-              leaf("audit-plan-md-qt-process-step-summary", t("menu.auditPlanMdQtProcessStepSummary"), auditPlanMdQtGroupLabel),
-            hasPermission("AUDIT.PROCESS_STEP_DETAIL_QT.VIEW") &&
-              leaf("audit-plan-md-qt-process-step-detail", t("menu.auditPlanMdQtProcessStepDetail"), auditPlanMdQtGroupLabel),
-            hasPermission("AUDIT.EXCEPTION_MAPPING_QT.VIEW") &&
-              leaf("audit-plan-md-qt-exception-mapping", t("menu.auditPlanMdQtExceptionMapping"), auditPlanMdQtGroupLabel),
-          ]),
-        },
-        (canViewAuditPlanEngagement || canViewAuditPlanEngagementProcess || canViewAuditStatistics || canViewAuditSupervisionTeam) && {
-          key: "audit-plan-engagement",
-          label: menuLabel(t("menu.auditPlanEngagement")),
-          children: dropNulls([
-            canViewAuditPlanEngagement && leaf("audit-plan-engagement-index", t("menu.auditPlanEngagementIndex"), auditPlanEngagementGroupLabel),
-            canViewAuditPlanEngagement &&
-              leaf("audit-plan-engagement-monitoring-index", t("menu.auditPlanEngagementMonitoringIndex"), auditPlanEngagementGroupLabel),
-            canViewAuditSupervisionTeam &&
-              leaf("audit-plan-engagement-supervision-team-index", t("menu.auditPlanEngagementSupervisionTeamIndex"), auditPlanEngagementGroupLabel),
-            canViewAuditPlanEngagementProcess &&
-              leaf("audit-plan-engagement-process-index", t("menu.auditPlanEngagementProcessIndex"), auditPlanEngagementGroupLabel),
-            canViewAuditStatistics &&
-              leaf("audit-plan-engagement-statistics-index", t("menu.auditPlanEngagementStatisticsIndex"), auditPlanEngagementGroupLabel),
-          ]),
-        },
-        canViewAuditPlanExecution && {
-          key: "audit-plan-execution",
-          label: menuLabel(t("menu.auditPlanExecution")),
-          children: dropNulls([
-            // 17 sheet ZTC_CM_TD1/TD2/NTD1-NTD16 - moi sheet 1 muc menu/route rieng (giong Danh muc).
-            hasPermission("AUDIT.CM_TD1.VIEW") && leaf("audit-plan-exec-cm-td1", t("menu.auditPlanExecCmTd1"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_TD2.VIEW") && leaf("audit-plan-exec-cm-td2", t("menu.auditPlanExecCmTd2"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD1.VIEW") && leaf("audit-plan-exec-cm-ntd1", t("menu.auditPlanExecCmNtd1"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD2.VIEW") && leaf("audit-plan-exec-cm-ntd2", t("menu.auditPlanExecCmNtd2"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD3.VIEW") && leaf("audit-plan-exec-cm-ntd3", t("menu.auditPlanExecCmNtd3"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD4.VIEW") && leaf("audit-plan-exec-cm-ntd4", t("menu.auditPlanExecCmNtd4"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD6.VIEW") && leaf("audit-plan-exec-cm-ntd6", t("menu.auditPlanExecCmNtd6"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD7.VIEW") && leaf("audit-plan-exec-cm-ntd7", t("menu.auditPlanExecCmNtd7"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD8.VIEW") && leaf("audit-plan-exec-cm-ntd8", t("menu.auditPlanExecCmNtd8"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD9.VIEW") && leaf("audit-plan-exec-cm-ntd9", t("menu.auditPlanExecCmNtd9"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD10.VIEW") && leaf("audit-plan-exec-cm-ntd10", t("menu.auditPlanExecCmNtd10"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD11.VIEW") && leaf("audit-plan-exec-cm-ntd11", t("menu.auditPlanExecCmNtd11"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD12.VIEW") && leaf("audit-plan-exec-cm-ntd12", t("menu.auditPlanExecCmNtd12"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD13.VIEW") && leaf("audit-plan-exec-cm-ntd13", t("menu.auditPlanExecCmNtd13"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD14.VIEW") && leaf("audit-plan-exec-cm-ntd14", t("menu.auditPlanExecCmNtd14"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD15.VIEW") && leaf("audit-plan-exec-cm-ntd15", t("menu.auditPlanExecCmNtd15"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.CM_NTD16.VIEW") && leaf("audit-plan-exec-cm-ntd16", t("menu.auditPlanExecCmNtd16"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.WORK_MANAGEMENT.VIEW") &&
-              leaf("audit-plan-exec-work-management-cbkt", t("menu.auditPlanExecWorkManagementCbkt"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.WORK_MANAGEMENT.VIEW") &&
-              leaf("audit-plan-exec-work-management-thkt", t("menu.auditPlanExecWorkManagementThkt"), auditPlanExecGroupLabel),
-            hasPermission("AUDIT.TTSS.VIEW") &&
-              leaf("audit-plan-exec-work-management-ttss", t("menu.auditPlanExecWorkManagementTtss"), auditPlanExecGroupLabel),
-          ]),
-        },
-      ]),
-    },
+    // Chua co man hinh nao thuoc nhom nay - de trong theo dung cau truc trong file menu mo ta.
+    { key: "audit-plan-kehoach", label: menuLabel(t("menu.auditPlanKeHoach")), children: [] },
   ]);
 
   const adminGroupLabel = t("menu.admin");
