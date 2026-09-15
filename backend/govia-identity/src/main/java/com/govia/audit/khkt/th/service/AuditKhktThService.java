@@ -14,6 +14,7 @@ import com.govia.audit.khkt.th.repository.AuditKhktThCandidateRepository;
 import com.govia.audit.khkt.th.repository.AuditKhktThCandidateSegmentRepository;
 import com.govia.audit.khkt.th.repository.AuditKhktThConfirmedRepository;
 import com.govia.audit.khkt.th.repository.AuditKhktThConfirmedSegmentRepository;
+import com.govia.audit.khkt.common.entity.AuditKhktApprovalStatus;
 import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
 import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
@@ -80,6 +81,8 @@ public class AuditKhktThService {
                 row.getAuditObjectName(), row.getAuditObjectCategoryCode(), row.getRiskScore(), row.getRankLabel(),
                 row.getOnBalanceSheetLoan(), row.getFundingSource(), row.getBpReviewResult(), row.getProposalBasisTh(),
                 row.getExpertOpinion(), row.isSelection1(), row.isSelection2(), row.isSelection3(),
+                row.getAuditScope(), row.getAdhocAuditOrSupervision(), row.getPlanAdjustment(), row.getAdjustmentReason(),
+                row.getKhktgsAfterAdjustment(), null,
                 thSegmentsByRow.getOrDefault(row.getId(), List.of()), bpAggregates.get(row.getAuditObjectCode()), segments)).toList();
     }
 
@@ -94,6 +97,8 @@ public class AuditKhktThService {
                 row.getAuditObjectName(), row.getAuditObjectCategoryCode(), row.getRiskScore(), row.getRankLabel(),
                 row.getOnBalanceSheetLoan(), row.getFundingSource(), row.getBpReviewResult(), row.getProposalBasisTh(),
                 row.getExpertOpinion(), row.isSelection1(), row.isSelection2(), row.isSelection3(),
+                row.getAuditScope(), row.getAdhocAuditOrSupervision(), row.getPlanAdjustment(), row.getAdjustmentReason(),
+                row.getKhktgsAfterAdjustment(), row.getApprovalStatus(),
                 thSegmentsByRow.getOrDefault(row.getId(), List.of()), bpAggregates.get(row.getAuditObjectCode()), segments)).toList();
     }
 
@@ -151,6 +156,11 @@ public class AuditKhktThService {
         item.setSelection1(request.selection1());
         item.setSelection2(request.selection2());
         item.setSelection3(request.selection3());
+        item.setAuditScope(request.auditScope());
+        item.setAdhocAuditOrSupervision(request.adhocAuditOrSupervision());
+        item.setPlanAdjustment(request.planAdjustment());
+        item.setAdjustmentReason(request.adjustmentReason());
+        item.setKhktgsAfterAdjustment(request.khktgsAfterAdjustment());
         item = candidateRepository.save(item);
         replaceCandidateSegments(tenantId, item.getId(), request.thBusinessSegmentIds());
 
@@ -205,6 +215,12 @@ public class AuditKhktThService {
             confirmed.setSelection1(candidate.isSelection1());
             confirmed.setSelection2(candidate.isSelection2());
             confirmed.setSelection3(candidate.isSelection3());
+            confirmed.setAuditScope(candidate.getAuditScope());
+            confirmed.setAdhocAuditOrSupervision(candidate.getAdhocAuditOrSupervision());
+            confirmed.setPlanAdjustment(candidate.getPlanAdjustment());
+            confirmed.setAdjustmentReason(candidate.getAdjustmentReason());
+            confirmed.setKhktgsAfterAdjustment(candidate.getKhktgsAfterAdjustment());
+            confirmed.setApprovalStatus(AuditKhktApprovalStatus.PENDING);
             confirmed = confirmedRepository.save(confirmed);
 
             for (UUID segmentId : segmentsByRow.getOrDefault(candidate.getId(), List.of())) {
@@ -218,6 +234,21 @@ public class AuditKhktThService {
 
         auditLogService.record("AuditKhktThConfirmed", null, AuditAction.CREATE,
                 "Xac nhan danh sach DTKT nam KHKT (TH) nam " + year + ": " + candidates.size() + " doi tuong");
+    }
+
+    /** Nut "Phe duyet"/"Chua phe duyet" o Phan 2 (AR - "Trang thai"). */
+    @Transactional
+    public AuditKhktThRowResponse setApprovalStatus(UUID id, boolean approved) {
+        UUID tenantId = TenantContext.getTenantId();
+        AuditKhktThConfirmed item = confirmedRepository.findById(id)
+                .filter(row -> row.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("AUDIT_KHKT_TH_CONFIRMED_NOT_FOUND", "Khong tim thay dong da xac nhan", HttpStatus.NOT_FOUND));
+        item.setApprovalStatus(approved ? AuditKhktApprovalStatus.APPROVED : AuditKhktApprovalStatus.PENDING);
+        item = confirmedRepository.save(item);
+
+        auditLogService.record("AuditKhktThConfirmed", item.getId(), AuditAction.UPDATE,
+                (approved ? "Phe duyet" : "Bo phe duyet") + " DTKT nam KHKT (TH2): " + item.getAuditObjectCode());
+        return listConfirmed(item.getYear()).stream().filter(r -> r.id().equals(id)).findFirst().orElseThrow();
     }
 
     private void replaceCandidateSegments(UUID tenantId, UUID candidateId, List<UUID> businessSegmentIds) {
@@ -307,6 +338,10 @@ public class AuditKhktThService {
                                                java.math.BigDecimal riskScore, String rankLabel, java.math.BigDecimal onBalanceSheetLoan,
                                                java.math.BigDecimal fundingSource, String bpReviewResult, String proposalBasisTh,
                                                String expertOpinion, boolean selection1, boolean selection2, boolean selection3,
+                                               String auditScope, com.govia.audit.khkt.common.entity.AuditKhktSelectionChoice adhocAuditOrSupervision,
+                                               com.govia.audit.khkt.common.entity.AuditKhktSelectionChoice planAdjustment, String adjustmentReason,
+                                               com.govia.audit.khkt.common.entity.AuditKhktSelectionChoice khktgsAfterAdjustment,
+                                               AuditKhktApprovalStatus approvalStatus,
                                                List<UUID> thSegmentIds, BpAggregate bpAggregate, Map<UUID, AuditMasterDataItem> segments) {
         List<String> thSegmentCodes = thSegmentIds.stream().map(segments::get).filter(Objects::nonNull)
                 .map(AuditMasterDataItem::getCode).toList();
@@ -314,6 +349,7 @@ public class AuditKhktThService {
         List<String> bpProposedSegmentCodes = bpAggregate == null ? List.of() : List.copyOf(bpAggregate.segmentCodes());
         return new AuditKhktThRowResponse(id, year, sourceType, auditObjectCode, auditObjectName, auditObjectCategoryCode,
                 riskScore, rankLabel, onBalanceSheetLoan, fundingSource, bpReviewResult, proposalBasisTh, expertOpinion,
-                selection1, selection2, selection3, proposingDepartmentCodes, bpProposedSegmentCodes, thSegmentCodes);
+                selection1, selection2, selection3, auditScope, adhocAuditOrSupervision, planAdjustment, adjustmentReason,
+                khktgsAfterAdjustment, approvalStatus, proposingDepartmentCodes, bpProposedSegmentCodes, thSegmentCodes);
     }
 }

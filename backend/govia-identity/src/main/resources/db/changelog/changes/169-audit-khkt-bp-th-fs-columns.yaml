@@ -1,0 +1,69 @@
+databaseChangeLog:
+
+  # ===================== Bo sung cac cot con thieu so voi FS (sheet ZTC_KHKT_BP/ZTC_KHKT_TH):
+  # Can cu de xuat, Lua chon khi da ky ban hanh, Lua chon du kien, Linh vuc kiem toan, Kiem toan/
+  # giam sat dot xuat, Dieu chinh ke hoach, Ly do dieu chinh, KHKTGS sau dieu chinh, Trang thai =====
+
+  - changeSet:
+      id: 169-1-audit-khkt-bp-candidate-fs-columns
+      author: govia
+      comment: "Bo sung cot con thieu (theo FS) cho audit_khkt_bp_candidate"
+      changes:
+        - addColumn:
+            tableName: audit_khkt_bp_candidate
+            columns:
+              - column: { name: proposal_basis, type: VARCHAR(500) }
+              - column: { name: approved_selection, type: VARCHAR(10) }
+              - column: { name: expected_selection, type: VARCHAR(10) }
+              - column: { name: audit_scope, type: VARCHAR(100) }
+              - column: { name: adhoc_audit_or_supervision, type: VARCHAR(10) }
+              - column: { name: plan_adjustment, type: VARCHAR(10) }
+              - column: { name: adjustment_reason, type: VARCHAR(255) }
+              - column: { name: khktgs_after_adjustment, type: VARCHAR(10) }
+
+  - changeSet:
+      id: 169-2-audit-khkt-bp-confirmed-fs-columns
+      author: govia
+      comment: "Bo sung cot con thieu (theo FS) cho audit_khkt_bp_confirmed, gom ca Trang thai"
+      changes:
+        - addColumn:
+            tableName: audit_khkt_bp_confirmed
+            columns:
+              - column: { name: proposal_basis, type: VARCHAR(500) }
+              - column: { name: approved_selection, type: VARCHAR(10) }
+              - column: { name: expected_selection, type: VARCHAR(10) }
+              - column: { name: audit_scope, type: VARCHAR(100) }
+              - column: { name: adhoc_audit_or_supervision, type: VARCHAR(10) }
+              - column: { name: plan_adjustment, type: VARCHAR(10) }
+              - column: { name: adjustment_reason, type: VARCHAR(255) }
+              - column: { name: khktgs_after_adjustment, type: VARCHAR(10) }
+              - column: { name: approval_status, type: VARCHAR(20), defaultValue: PENDING, constraints: { nullable: false } }
+
+  - changeSet:
+      id: 169-3-audit-khkt-th-candidate-fs-columns
+      author: govia
+      comment: "Bo sung cot con thieu (theo FS) cho audit_khkt_th_candidate"
+      changes:
+        - addColumn:
+            tableName: audit_khkt_th_candidate
+            columns:
+              - column: { name: audit_scope, type: VARCHAR(100) }
+              - column: { name: adhoc_audit_or_supervision, type: VARCHAR(10) }
+              - column: { name: plan_adjustment, type: VARCHAR(10) }
+              - column: { name: adjustment_reason, type: VARCHAR(255) }
+              - column: { name: khktgs_after_adjustment, type: VARCHAR(10) }
+
+  - changeSet:
+      id: 169-4-audit-khkt-th-confirmed-fs-columns
+      author: govia
+      comment: "Bo sung cot con thieu (theo FS) cho audit_khkt_th_confirmed, gom ca Trang thai"
+      changes:
+        - addColumn:
+            tableName: audit_khkt_th_confirmed
+            columns:
+              - column: { name: audit_scope, type: VARCHAR(100) }
+              - column: { name: adhoc_audit_or_supervision, type: VARCHAR(10) }
+              - column: { name: plan_adjustment, type: VARCHAR(10) }
+              - column: { name: adjustment_reason, type: VARCHAR(255) }
+              - column: { name: khktgs_after_adjustment, type: VARCHAR(10) }
+              - column: { name: approval_status, type: VARCHAR(20), defaultValue: PENDING, constraints: { nullable: false } }

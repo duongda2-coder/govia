@@ -3,6 +3,10 @@ import { httpClient } from "./client";
 
 export type AuditKhktSourceType = "BRANCH" | "OTHER";
 export type AuditKhktSelectionDecision = "SELECTED" | "NOT_SELECTED";
+/** Cac cot dang "Lua chon (KT hoac GS hoac de trong)" cua FS - null = de trong. */
+export type AuditKhktSelectionChoice = "KT" | "GS";
+/** "Trang thai" cua Phan 2 (BP2/TH2) - null o Phan 1. */
+export type AuditKhktApprovalStatus = "PENDING" | "APPROVED";
 
 export interface AuditKhktBpRowItem {
   id: string;
@@ -20,6 +24,15 @@ export interface AuditKhktBpRowItem {
   fundingSource: number | null;
   reviewResult: string | null;
   selectionDecision: AuditKhktSelectionDecision | null;
+  proposalBasis: string | null;
+  approvedSelection: AuditKhktSelectionChoice | null;
+  expectedSelection: AuditKhktSelectionChoice | null;
+  auditScope: string | null;
+  adhocAuditOrSupervision: AuditKhktSelectionChoice | null;
+  planAdjustment: AuditKhktSelectionChoice | null;
+  adjustmentReason: string | null;
+  khktgsAfterAdjustment: AuditKhktSelectionChoice | null;
+  approvalStatus: AuditKhktApprovalStatus | null;
   businessSegmentCodes: string[];
   /** 30 khoa dang "{LOAI}_T{1..5}" (vd "TTCP_T5") -> co/khong co lich su thanh tra/giam sat/kiem
    * toan nam tuong ung - xem AuditKhktBpService.buildInspectionHistory o BE. */
@@ -41,6 +54,14 @@ export interface AuditKhktBpCandidateRequest {
 export interface AuditKhktBpCandidateUpdateRequest {
   reviewResult: string | null;
   selectionDecision: AuditKhktSelectionDecision | null;
+  proposalBasis: string | null;
+  approvedSelection: AuditKhktSelectionChoice | null;
+  expectedSelection: AuditKhktSelectionChoice | null;
+  auditScope: string | null;
+  adhocAuditOrSupervision: AuditKhktSelectionChoice | null;
+  planAdjustment: AuditKhktSelectionChoice | null;
+  adjustmentReason: string | null;
+  khktgsAfterAdjustment: AuditKhktSelectionChoice | null;
   businessSegmentIds: string[];
 }
 
@@ -73,6 +94,13 @@ export async function deleteAuditKhktBp(id: string): Promise<void> {
 
 export async function confirmAuditKhktBp(departmentId: string, year: number): Promise<void> {
   await httpClient.post(`${BASE}/confirm`, null, { params: { departmentId, year } });
+}
+
+export async function setAuditKhktBpApprovalStatus(id: string, approved: boolean): Promise<AuditKhktBpRowItem> {
+  const res = await httpClient.patch<ApiResponse<AuditKhktBpRowItem>>(`${CONFIRMED_BASE}/${id}/approval-status`, null, {
+    params: { approved },
+  });
+  return res.data.data;
 }
 
 export async function exportAuditKhktBpReport(year: number): Promise<void> {

@@ -966,6 +966,8 @@
     "confirmListTitle": "Confirm the proposal list?",
     "confirmListContent": "This will overwrite all {{count}} previously confirmed objects (Part 2) for this department and year with the current Part 1 list.",
     "deleteConfirmTitle": "Delete this proposed object?",
+    "approveButton": "Approve",
+    "unapproveButton": "Unapprove",
     "columns": {
       "sourceType": "Object Type",
       "auditObjectCode": "Object Code",
@@ -977,7 +979,16 @@
       "fundingSource": "Funding Source",
       "businessSegments": "Proposed Audit Areas",
       "reviewResult": "Review Result",
-      "selectionDecision": "Decision"
+      "proposalBasis": "Proposal Basis",
+      "selectionDecision": "Decision",
+      "approvedSelection": "Approved Selection",
+      "expectedSelection": "Expected Selection",
+      "auditScope": "Audit Scope",
+      "adhocAuditOrSupervision": "Ad-hoc Audit/Supervision",
+      "planAdjustment": "Plan Adjustment",
+      "adjustmentReason": "Adjustment Reason",
+      "khktgsAfterAdjustment": "Plan After Adjustment",
+      "approvalStatus": "Status"
     },
     "sourceType": {
       "BRANCH": "Branch",
@@ -986,6 +997,10 @@
     "selectionDecision": {
       "SELECTED": "Selected",
       "NOT_SELECTED": "Not Selected"
+    },
+    "approvalStatus": {
+      "PENDING": "Pending",
+      "APPROVED": "Approved"
     },
     "inspectionType": {
       "TTCP": "TTCP",
@@ -1009,7 +1024,9 @@
       "deleteSuccess": "Deleted",
       "deleteError": "Failed to delete",
       "saveError": "Failed to save",
-      "confirmSuccess": "List confirmed"
+      "confirmSuccess": "List confirmed",
+      "approveSuccess": "Approved",
+      "unapproveSuccess": "Unapproved"
     }
   },
   "auditKhktTh": {
@@ -1023,12 +1040,17 @@
     "confirmListTitle": "Confirm the list?",
     "confirmListContent": "This will overwrite all {{count}} previously confirmed objects (Part 2) for this year with the current Part 1 list.",
     "deleteConfirmTitle": "Remove this object from the list?",
+    "approveButton": "Approve",
+    "unapproveButton": "Unapprove",
     "columns": {
       "sourceType": "Object Type",
       "auditObjectCode": "Object Code",
       "auditObjectName": "Object Name",
+      "auditObjectCategoryCode": "Category",
       "riskScore": "Risk Score",
       "rankLabel": "Rank",
+      "onBalanceSheetLoan": "On-balance-sheet Loan",
+      "fundingSource": "Funding Source",
       "proposingDepartments": "Proposing Depts.",
       "bpProposedSegments": "BP Proposed Areas",
       "thBusinessSegments": "TH Proposed Areas",
@@ -1037,7 +1059,13 @@
       "expertOpinion": "Expert Opinion",
       "selection1": "Selection 1",
       "selection2": "Selection 2",
-      "selection3": "Selection 3"
+      "selection3": "Selection 3",
+      "auditScope": "Audit Scope",
+      "adhocAuditOrSupervision": "Ad-hoc Audit/Supervision",
+      "planAdjustment": "Plan Adjustment",
+      "adjustmentReason": "Adjustment Reason",
+      "khktgsAfterAdjustment": "Plan After Adjustment",
+      "approvalStatus": "Status"
     },
     "form": {
       "editTitle": "Edit"
@@ -1049,7 +1077,9 @@
       "deleteError": "Failed to delete",
       "saveError": "Failed to save",
       "syncSuccess": "Aggregated from BP2",
-      "confirmSuccess": "List confirmed"
+      "confirmSuccess": "List confirmed",
+      "approveSuccess": "Approved",
+      "unapproveSuccess": "Unapproved"
     }
   },
   "auditKhktThang": {

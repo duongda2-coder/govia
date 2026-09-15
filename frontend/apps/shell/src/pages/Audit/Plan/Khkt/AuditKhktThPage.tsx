@@ -9,13 +9,16 @@ import {
   exportAuditKhktThReport,
   listAuditKhktTh,
   listAuditKhktThConfirmed,
+  setAuditKhktThApprovalStatus,
   syncAuditKhktTh,
   updateAuditKhktTh,
   type AuditKhktThRowItem,
 } from "../../../../api/auditKhktTh";
-import type { AuditKhktSourceType } from "../../../../api/auditKhktBp";
+import type { AuditKhktApprovalStatus, AuditKhktSelectionChoice, AuditKhktSourceType } from "../../../../api/auditKhktBp";
 import { listMasterDataItems, type MasterDataItem } from "../../../../api/auditMasterData";
 import { useAuth } from "../../../../auth/AuthContext";
+
+const SELECTION_CHOICES: AuditKhktSelectionChoice[] = ["KT", "GS"];
 
 interface EditFormValues {
   proposalBasisTh?: string;
@@ -23,6 +26,11 @@ interface EditFormValues {
   selection1: boolean;
   selection2: boolean;
   selection3: boolean;
+  auditScope?: string;
+  adhocAuditOrSupervision?: AuditKhktSelectionChoice;
+  planAdjustment?: AuditKhktSelectionChoice;
+  adjustmentReason?: string;
+  khktgsAfterAdjustment?: AuditKhktSelectionChoice;
   thBusinessSegmentIds: string[];
 }
 
@@ -47,11 +55,13 @@ export function AuditKhktThPage() {
   const [confirmed, setConfirmed] = useState<AuditKhktThRowItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedConfirmedIds, setSelectedConfirmedIds] = useState<string[]>([]);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editing, setEditing] = useState<AuditKhktThRowItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [approving, setApproving] = useState(false);
   const [form] = Form.useForm<EditFormValues>();
 
   useEffect(() => {
@@ -83,6 +93,7 @@ export function AuditKhktThPage() {
 
   useEffect(() => {
     setSelectedIds([]);
+    setSelectedConfirmedIds([]);
   }, [activeTab, year]);
 
   const segmentIdByCode = useMemo(() => new Map(businessSegments.map((s) => [s.code, s.id])), [businessSegments]);
@@ -112,6 +123,11 @@ export function AuditKhktThPage() {
       selection1: target.selection1,
       selection2: target.selection2,
       selection3: target.selection3,
+      auditScope: target.auditScope ?? undefined,
+      adhocAuditOrSupervision: target.adhocAuditOrSupervision ?? undefined,
+      planAdjustment: target.planAdjustment ?? undefined,
+      adjustmentReason: target.adjustmentReason ?? undefined,
+      khktgsAfterAdjustment: target.khktgsAfterAdjustment ?? undefined,
       thBusinessSegmentIds: target.thBusinessSegmentCodes.map((c) => segmentIdByCode.get(c)).filter((v): v is string => !!v),
     });
     setEditModalOpen(true);
@@ -133,6 +149,11 @@ export function AuditKhktThPage() {
         selection1: values.selection1 ?? false,
         selection2: values.selection2 ?? false,
         selection3: values.selection3 ?? false,
+        auditScope: values.auditScope ?? null,
+        adhocAuditOrSupervision: values.adhocAuditOrSupervision ?? null,
+        planAdjustment: values.planAdjustment ?? null,
+        adjustmentReason: values.adjustmentReason ?? null,
+        khktgsAfterAdjustment: values.khktgsAfterAdjustment ?? null,
         thBusinessSegmentIds: values.thBusinessSegmentIds ?? [],
       });
       message.success(t("auditKhktTh.messages.updateSuccess"));
@@ -191,6 +212,21 @@ export function AuditKhktThPage() {
     });
   };
 
+  const handleSetApprovalStatus = async (approved: boolean) => {
+    if (selectedConfirmedIds.length === 0) return;
+    setApproving(true);
+    try {
+      await Promise.all(selectedConfirmedIds.map((id) => setAuditKhktThApprovalStatus(id, approved)));
+      message.success(t(approved ? "auditKhktTh.messages.approveSuccess" : "auditKhktTh.messages.unapproveSuccess"));
+      setSelectedConfirmedIds([]);
+      await load();
+    } catch {
+      message.error(t("auditKhktTh.messages.saveError"));
+    } finally {
+      setApproving(false);
+    }
+  };
+
   const columns: TableProps<AuditKhktThRowItem>["columns"] = [
     {
       title: t("auditKhktTh.columns.sourceType"),
@@ -201,8 +237,11 @@ export function AuditKhktThPage() {
     },
     { title: t("auditKhktTh.columns.auditObjectCode"), dataIndex: "auditObjectCode", width: 100, fixed: "left" },
     { title: t("auditKhktTh.columns.auditObjectName"), dataIndex: "auditObjectName", width: 180, fixed: "left" },
+    { title: t("auditKhktTh.columns.auditObjectCategoryCode"), dataIndex: "auditObjectCategoryCode", width: 110, render: (v: string | null) => v ?? "-" },
     { title: t("auditKhktTh.columns.riskScore"), dataIndex: "riskScore", width: 100, render: (v: number | null) => v ?? "-" },
     { title: t("auditKhktTh.columns.rankLabel"), dataIndex: "rankLabel", width: 100, render: (v: string | null) => v ?? "-" },
+    { title: t("auditKhktTh.columns.onBalanceSheetLoan"), dataIndex: "onBalanceSheetLoan", width: 130, render: (v: number | null) => v ?? "-" },
+    { title: t("auditKhktTh.columns.fundingSource"), dataIndex: "fundingSource", width: 130, render: (v: number | null) => v ?? "-" },
     {
       title: t("auditKhktTh.columns.proposingDepartments"),
       dataIndex: "proposingDepartmentCodes",
@@ -244,6 +283,34 @@ export function AuditKhktThPage() {
       width: 90,
       align: "center",
       render: (v: boolean) => (v ? "X" : ""),
+    },
+    { title: t("auditKhktTh.columns.auditScope"), dataIndex: "auditScope", width: 140, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("auditKhktTh.columns.adhocAuditOrSupervision"),
+      dataIndex: "adhocAuditOrSupervision",
+      width: 110,
+      render: (v: AuditKhktSelectionChoice | null) => v ?? "-",
+    },
+    {
+      title: t("auditKhktTh.columns.planAdjustment"),
+      dataIndex: "planAdjustment",
+      width: 110,
+      render: (v: AuditKhktSelectionChoice | null) => v ?? "-",
+    },
+    { title: t("auditKhktTh.columns.adjustmentReason"), dataIndex: "adjustmentReason", width: 200, render: (v: string | null) => v ?? "-" },
+    {
+      title: t("auditKhktTh.columns.khktgsAfterAdjustment"),
+      dataIndex: "khktgsAfterAdjustment",
+      width: 130,
+      render: (v: AuditKhktSelectionChoice | null) => v ?? "-",
+    },
+    {
+      title: t("auditKhktTh.columns.approvalStatus"),
+      dataIndex: "approvalStatus",
+      width: 130,
+      fixed: "right",
+      render: (v: AuditKhktApprovalStatus | null) =>
+        v ? <Tag color={v === "APPROVED" ? "green" : "gold"}>{t(`auditKhktBp.approvalStatus.${v}`)}</Tag> : "-",
     },
   ];
 
@@ -320,15 +387,40 @@ export function AuditKhktThPage() {
               key: "confirmed",
               label: t("auditKhktTh.tabConfirmed"),
               children: (
-                <Table<AuditKhktThRowItem>
-                  size="small"
-                  columns={columns}
-                  dataSource={confirmed}
-                  rowKey="id"
-                  loading={loading}
-                  pagination={false}
-                  scroll={{ x: "max-content" }}
-                />
+                <>
+                  {canEdit && (
+                    <Space style={{ marginBottom: 12 }}>
+                      <Button
+                        disabled={selectedConfirmedIds.length === 0}
+                        loading={approving}
+                        onClick={() => handleSetApprovalStatus(true)}
+                      >
+                        {t("auditKhktTh.approveButton")}
+                      </Button>
+                      <Button
+                        disabled={selectedConfirmedIds.length === 0}
+                        loading={approving}
+                        onClick={() => handleSetApprovalStatus(false)}
+                      >
+                        {t("auditKhktTh.unapproveButton")}
+                      </Button>
+                    </Space>
+                  )}
+                  <Table<AuditKhktThRowItem>
+                    size="small"
+                    columns={columns}
+                    dataSource={confirmed}
+                    rowKey="id"
+                    loading={loading}
+                    pagination={false}
+                    scroll={{ x: "max-content" }}
+                    rowSelection={
+                      canEdit
+                        ? { selectedRowKeys: selectedConfirmedIds, onChange: (keys) => setSelectedConfirmedIds(keys as string[]) }
+                        : undefined
+                    }
+                  />
+                </>
               ),
             },
           ]}
@@ -365,6 +457,23 @@ export function AuditKhktThPage() {
               <Switch />
             </Form.Item>
           </Space>
+          <Form.Item name="auditScope" label={t("auditKhktTh.columns.auditScope")}>
+            <Input maxLength={100} />
+          </Form.Item>
+          <Form.Item name="adhocAuditOrSupervision" label={t("auditKhktTh.columns.adhocAuditOrSupervision")}>
+            <Select allowClear options={SELECTION_CHOICES.map((v) => ({ value: v, label: v }))} />
+          </Form.Item>
+          <Space size="large" style={{ display: "flex" }}>
+            <Form.Item name="planAdjustment" label={t("auditKhktTh.columns.planAdjustment")} style={{ flex: 1 }}>
+              <Select allowClear options={SELECTION_CHOICES.map((v) => ({ value: v, label: v }))} />
+            </Form.Item>
+            <Form.Item name="khktgsAfterAdjustment" label={t("auditKhktTh.columns.khktgsAfterAdjustment")} style={{ flex: 1 }}>
+              <Select allowClear options={SELECTION_CHOICES.map((v) => ({ value: v, label: v }))} />
+            </Form.Item>
+          </Space>
+          <Form.Item name="adjustmentReason" label={t("auditKhktTh.columns.adjustmentReason")}>
+            <Input.TextArea rows={2} maxLength={255} />
+          </Form.Item>
         </Form>
       </Modal>
     </div>

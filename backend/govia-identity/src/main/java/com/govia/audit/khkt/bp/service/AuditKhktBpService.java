@@ -11,6 +11,8 @@ import com.govia.audit.khkt.bp.repository.AuditKhktBpCandidateRepository;
 import com.govia.audit.khkt.bp.repository.AuditKhktBpCandidateSegmentRepository;
 import com.govia.audit.khkt.bp.repository.AuditKhktBpConfirmedRepository;
 import com.govia.audit.khkt.bp.repository.AuditKhktBpConfirmedSegmentRepository;
+import com.govia.audit.khkt.common.entity.AuditKhktApprovalStatus;
+import com.govia.audit.khkt.common.entity.AuditKhktSelectionChoice;
 import com.govia.audit.khkt.common.entity.AuditKhktSelectionDecision;
 import com.govia.audit.khkt.common.entity.AuditKhktSourceType;
 import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
@@ -88,7 +90,9 @@ public class AuditKhktBpService {
         return rows.stream().map(row -> toResponse(row.getId(), row.getDepartmentId(), row.getYear(), row.getSourceType(),
                 row.getAuditObjectCode(), row.getAuditObjectName(), row.getAuditObjectCategoryCode(), row.getRiskScore(),
                 row.getRankLabel(), row.getOnBalanceSheetLoan(), row.getFundingSource(), row.getReviewResult(),
-                row.getSelectionDecision(), row.getId(), ctx)).toList();
+                row.getSelectionDecision(), row.getProposalBasis(), row.getApprovedSelection(), row.getExpectedSelection(),
+                row.getAuditScope(), row.getAdhocAuditOrSupervision(), row.getPlanAdjustment(), row.getAdjustmentReason(),
+                row.getKhktgsAfterAdjustment(), null, row.getId(), ctx)).toList();
     }
 
     @Transactional(readOnly = true)
@@ -101,7 +105,9 @@ public class AuditKhktBpService {
         return rows.stream().map(row -> toResponse(row.getId(), row.getDepartmentId(), row.getYear(), row.getSourceType(),
                 row.getAuditObjectCode(), row.getAuditObjectName(), row.getAuditObjectCategoryCode(), row.getRiskScore(),
                 row.getRankLabel(), row.getOnBalanceSheetLoan(), row.getFundingSource(), row.getReviewResult(),
-                row.getSelectionDecision(), row.getId(), ctx)).toList();
+                row.getSelectionDecision(), row.getProposalBasis(), row.getApprovedSelection(), row.getExpectedSelection(),
+                row.getAuditScope(), row.getAdhocAuditOrSupervision(), row.getPlanAdjustment(), row.getAdjustmentReason(),
+                row.getKhktgsAfterAdjustment(), row.getApprovalStatus(), row.getId(), ctx)).toList();
     }
 
     @Transactional
@@ -140,6 +146,14 @@ public class AuditKhktBpService {
         AuditKhktBpCandidate item = getOwnedCandidateOrThrow(tenantId, id);
         item.setReviewResult(request.reviewResult());
         item.setSelectionDecision(request.selectionDecision());
+        item.setProposalBasis(request.proposalBasis());
+        item.setApprovedSelection(request.approvedSelection());
+        item.setExpectedSelection(request.expectedSelection());
+        item.setAuditScope(request.auditScope());
+        item.setAdhocAuditOrSupervision(request.adhocAuditOrSupervision());
+        item.setPlanAdjustment(request.planAdjustment());
+        item.setAdjustmentReason(request.adjustmentReason());
+        item.setKhktgsAfterAdjustment(request.khktgsAfterAdjustment());
         item = candidateRepository.save(item);
         replaceCandidateSegments(tenantId, item.getId(), request.businessSegmentIds());
 
@@ -188,6 +202,15 @@ public class AuditKhktBpService {
             confirmed.setFundingSource(candidate.getFundingSource());
             confirmed.setReviewResult(candidate.getReviewResult());
             confirmed.setSelectionDecision(candidate.getSelectionDecision());
+            confirmed.setProposalBasis(candidate.getProposalBasis());
+            confirmed.setApprovedSelection(candidate.getApprovedSelection());
+            confirmed.setExpectedSelection(candidate.getExpectedSelection());
+            confirmed.setAuditScope(candidate.getAuditScope());
+            confirmed.setAdhocAuditOrSupervision(candidate.getAdhocAuditOrSupervision());
+            confirmed.setPlanAdjustment(candidate.getPlanAdjustment());
+            confirmed.setAdjustmentReason(candidate.getAdjustmentReason());
+            confirmed.setKhktgsAfterAdjustment(candidate.getKhktgsAfterAdjustment());
+            confirmed.setApprovalStatus(AuditKhktApprovalStatus.PENDING);
             confirmed = confirmedRepository.save(confirmed);
 
             for (UUID segmentId : segmentsByRow.getOrDefault(candidate.getId(), List.of())) {
@@ -201,6 +224,22 @@ public class AuditKhktBpService {
 
         auditLogService.record("AuditKhktBpConfirmed", null, AuditAction.CREATE,
                 "Xac nhan danh sach DTKT nam KHKT (BP) phong " + departmentId + " nam " + year + ": " + candidates.size() + " doi tuong");
+    }
+
+    /** Nut "Phe duyet"/"Chua phe duyet" o Phan 2 (BJ - "Trang thai") - CHI doi trang thai, khong
+     * dung de sua du lieu khac cua dong da xac nhan. */
+    @Transactional
+    public AuditKhktBpRowResponse setApprovalStatus(UUID id, boolean approved) {
+        UUID tenantId = TenantContext.getTenantId();
+        AuditKhktBpConfirmed item = confirmedRepository.findById(id)
+                .filter(row -> row.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("AUDIT_KHKT_BP_CONFIRMED_NOT_FOUND", "Khong tim thay dong da xac nhan", HttpStatus.NOT_FOUND));
+        item.setApprovalStatus(approved ? AuditKhktApprovalStatus.APPROVED : AuditKhktApprovalStatus.PENDING);
+        item = confirmedRepository.save(item);
+
+        auditLogService.record("AuditKhktBpConfirmed", item.getId(), AuditAction.UPDATE,
+                (approved ? "Phe duyet" : "Bo phe duyet") + " DTKT nam KHKT (BP2): " + item.getAuditObjectCode());
+        return listConfirmed(item.getDepartmentId(), item.getYear()).stream().filter(r -> r.id().equals(id)).findFirst().orElseThrow();
     }
 
     private AuditKhktBpRowResponse findResponse(UUID departmentId, Integer year, UUID rowId) {
@@ -319,7 +358,11 @@ public class AuditKhktBpService {
                                                String auditObjectCode, String auditObjectName, String auditObjectCategoryCode,
                                                BigDecimal riskScore, String rankLabel, BigDecimal onBalanceSheetLoan,
                                                BigDecimal fundingSource, String reviewResult, AuditKhktSelectionDecision selectionDecision,
-                                               UUID rowId, RowContext ctx) {
+                                               String proposalBasis, AuditKhktSelectionChoice approvedSelection,
+                                               AuditKhktSelectionChoice expectedSelection, String auditScope,
+                                               AuditKhktSelectionChoice adhocAuditOrSupervision, AuditKhktSelectionChoice planAdjustment,
+                                               String adjustmentReason, AuditKhktSelectionChoice khktgsAfterAdjustment,
+                                               AuditKhktApprovalStatus approvalStatus, UUID rowId, RowContext ctx) {
         AuditMasterDataItem department = ctx.departmentsById().get(departmentId);
         List<String> segmentCodes = ctx.segmentsByRowId().getOrDefault(rowId, List.of()).stream()
                 .map(ctx.segmentsById()::get).filter(Objects::nonNull).map(AuditMasterDataItem::getCode).toList();
@@ -327,6 +370,8 @@ public class AuditKhktBpService {
         return new AuditKhktBpRowResponse(id, departmentId, department == null ? null : department.getCode(),
                 department == null ? null : department.getName(), year, sourceType, auditObjectCode, auditObjectName,
                 auditObjectCategoryCode, riskScore, rankLabel, onBalanceSheetLoan, fundingSource, reviewResult,
-                selectionDecision, segmentCodes, history);
+                selectionDecision, proposalBasis, approvedSelection, expectedSelection, auditScope,
+                adhocAuditOrSupervision, planAdjustment, adjustmentReason, khktgsAfterAdjustment, approvalStatus,
+                segmentCodes, history);
     }
 }

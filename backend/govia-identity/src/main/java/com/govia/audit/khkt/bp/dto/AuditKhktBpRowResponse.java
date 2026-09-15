@@ -1,5 +1,7 @@
 package com.govia.audit.khkt.bp.dto;
 
+import com.govia.audit.khkt.common.entity.AuditKhktApprovalStatus;
+import com.govia.audit.khkt.common.entity.AuditKhktSelectionChoice;
 import com.govia.audit.khkt.common.entity.AuditKhktSelectionDecision;
 import com.govia.audit.khkt.common.entity.AuditKhktSourceType;
 
@@ -9,6 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /** Dung chung cho ca danh sach Phan 1 (De xuat) va Phan 2 (Da xac nhan) - cung 1 hinh dang du lieu.
+ * "approvalStatus" luon null o Phan 1 (chi ton tai tren AuditKhktBpConfirmed).
  * "inspectionHistory": map 30 khoa dang "{LOAI}_T{1..5}" (vd "TTCP_T5") -> co/khong co lich su
  * thanh tra/giam sat/kiem toan nam tuong ung, tinh dong tu AuditObjectInspectionHistory theo
  * auditObjectUnitId + (year - offset) - xem AuditKhktBpService.buildInspectionHistory. */
@@ -28,6 +31,15 @@ public record AuditKhktBpRowResponse(
         BigDecimal fundingSource,
         String reviewResult,
         AuditKhktSelectionDecision selectionDecision,
+        String proposalBasis,
+        AuditKhktSelectionChoice approvedSelection,
+        AuditKhktSelectionChoice expectedSelection,
+        String auditScope,
+        AuditKhktSelectionChoice adhocAuditOrSupervision,
+        AuditKhktSelectionChoice planAdjustment,
+        String adjustmentReason,
+        AuditKhktSelectionChoice khktgsAfterAdjustment,
+        AuditKhktApprovalStatus approvalStatus,
         List<String> businessSegmentCodes,
         Map<String, Boolean> inspectionHistory
 ) {

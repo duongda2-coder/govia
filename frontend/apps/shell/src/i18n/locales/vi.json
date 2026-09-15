@@ -966,6 +966,8 @@
     "confirmListTitle": "Xác nhận danh sách đề xuất?",
     "confirmListContent": "Sẽ ghi đè toàn bộ {{count}} đối tượng đã xác nhận trước đó (Phần 2) của phòng và năm này bằng danh sách hiện tại ở Phần 1.",
     "deleteConfirmTitle": "Xóa đối tượng đề xuất này?",
+    "approveButton": "Phê duyệt",
+    "unapproveButton": "Bỏ phê duyệt",
     "columns": {
       "sourceType": "Loại ĐTKT",
       "auditObjectCode": "Mã ĐTKT",
@@ -977,7 +979,16 @@
       "fundingSource": "Nguồn vốn",
       "businessSegments": "Lĩnh vực đề xuất KT",
       "reviewResult": "Kết quả rà soát",
-      "selectionDecision": "Lựa chọn"
+      "proposalBasis": "Căn cứ đề xuất",
+      "selectionDecision": "Lựa chọn",
+      "approvedSelection": "Lựa chọn khi đã ký ban hành",
+      "expectedSelection": "Lựa chọn dự kiến",
+      "auditScope": "Lĩnh vực kiểm toán",
+      "adhocAuditOrSupervision": "Kiểm toán/giám sát đột xuất",
+      "planAdjustment": "Điều chỉnh kế hoạch",
+      "adjustmentReason": "Lý do điều chỉnh",
+      "khktgsAfterAdjustment": "KHKTGS sau điều chỉnh",
+      "approvalStatus": "Trạng thái"
     },
     "sourceType": {
       "BRANCH": "Chi nhánh",
@@ -986,6 +997,10 @@
     "selectionDecision": {
       "SELECTED": "Chọn",
       "NOT_SELECTED": "Không chọn"
+    },
+    "approvalStatus": {
+      "PENDING": "Chờ phê duyệt",
+      "APPROVED": "Đã phê duyệt"
     },
     "inspectionType": {
       "TTCP": "TTCP",
@@ -1009,7 +1024,9 @@
       "deleteSuccess": "Đã xóa",
       "deleteError": "Xóa thất bại",
       "saveError": "Lưu thất bại",
-      "confirmSuccess": "Đã xác nhận danh sách"
+      "confirmSuccess": "Đã xác nhận danh sách",
+      "approveSuccess": "Đã phê duyệt",
+      "unapproveSuccess": "Đã bỏ phê duyệt"
     }
   },
   "auditKhktTh": {
@@ -1023,12 +1040,17 @@
     "confirmListTitle": "Xác nhận danh sách?",
     "confirmListContent": "Sẽ ghi đè toàn bộ {{count}} đối tượng đã xác nhận trước đó (Phần 2) của năm này bằng danh sách hiện tại ở Phần 1.",
     "deleteConfirmTitle": "Xóa đối tượng này khỏi danh sách?",
+    "approveButton": "Phê duyệt",
+    "unapproveButton": "Bỏ phê duyệt",
     "columns": {
       "sourceType": "Loại ĐTKT",
       "auditObjectCode": "Mã ĐTKT",
       "auditObjectName": "Tên ĐTKT",
+      "auditObjectCategoryCode": "Loại đối tượng",
       "riskScore": "Điểm rủi ro",
       "rankLabel": "Xếp hạng",
+      "onBalanceSheetLoan": "Dư nợ nội bảng",
+      "fundingSource": "Nguồn vốn",
       "proposingDepartments": "Phòng đề xuất",
       "bpProposedSegments": "BP đề xuất LVKT",
       "thBusinessSegments": "TH đề xuất LVKT",
@@ -1037,7 +1059,13 @@
       "expertOpinion": "Ý kiến của chuyên gia",
       "selection1": "Lựa chọn 1",
       "selection2": "Lựa chọn 2",
-      "selection3": "Lựa chọn 3"
+      "selection3": "Lựa chọn 3",
+      "auditScope": "Lĩnh vực kiểm toán",
+      "adhocAuditOrSupervision": "Kiểm toán/giám sát đột xuất",
+      "planAdjustment": "Điều chỉnh kế hoạch",
+      "adjustmentReason": "Lý do điều chỉnh",
+      "khktgsAfterAdjustment": "KHKTGS sau điều chỉnh",
+      "approvalStatus": "Trạng thái"
     },
     "form": {
       "editTitle": "Sửa"
@@ -1049,7 +1077,9 @@
       "deleteError": "Xóa thất bại",
       "saveError": "Lưu thất bại",
       "syncSuccess": "Đã tổng hợp từ BP2",
-      "confirmSuccess": "Đã xác nhận danh sách"
+      "confirmSuccess": "Đã xác nhận danh sách",
+      "approveSuccess": "Đã phê duyệt",
+      "unapproveSuccess": "Đã bỏ phê duyệt"
     }
   },
   "auditKhktThang": {

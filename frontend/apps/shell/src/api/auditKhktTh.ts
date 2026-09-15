@@ -1,6 +1,6 @@
 import type { ApiResponse } from "@govia/ui-kit";
 import { httpClient } from "./client";
-import type { AuditKhktSourceType } from "./auditKhktBp";
+import type { AuditKhktApprovalStatus, AuditKhktSelectionChoice, AuditKhktSourceType } from "./auditKhktBp";
 
 export interface AuditKhktThRowItem {
   id: string;
@@ -19,6 +19,12 @@ export interface AuditKhktThRowItem {
   selection1: boolean;
   selection2: boolean;
   selection3: boolean;
+  auditScope: string | null;
+  adhocAuditOrSupervision: AuditKhktSelectionChoice | null;
+  planAdjustment: AuditKhktSelectionChoice | null;
+  adjustmentReason: string | null;
+  khktgsAfterAdjustment: AuditKhktSelectionChoice | null;
+  approvalStatus: AuditKhktApprovalStatus | null;
   /** Danh sach ma phong da de xuat doi tuong nay (tinh dong tu BP2, chi de tham khao). */
   proposingDepartmentCodes: string[];
   /** Hop cac ma linh vuc CAC PHONG da de xuat cho doi tuong nay (tinh dong tu BP2, chi de tham khao). */
@@ -33,6 +39,11 @@ export interface AuditKhktThCandidateUpdateRequest {
   selection1: boolean;
   selection2: boolean;
   selection3: boolean;
+  auditScope: string | null;
+  adhocAuditOrSupervision: AuditKhktSelectionChoice | null;
+  planAdjustment: AuditKhktSelectionChoice | null;
+  adjustmentReason: string | null;
+  khktgsAfterAdjustment: AuditKhktSelectionChoice | null;
   thBusinessSegmentIds: string[];
 }
 
@@ -64,6 +75,13 @@ export async function deleteAuditKhktTh(id: string): Promise<void> {
 
 export async function confirmAuditKhktTh(year: number): Promise<void> {
   await httpClient.post(`${BASE}/confirm`, null, { params: { year } });
+}
+
+export async function setAuditKhktThApprovalStatus(id: string, approved: boolean): Promise<AuditKhktThRowItem> {
+  const res = await httpClient.patch<ApiResponse<AuditKhktThRowItem>>(`${CONFIRMED_BASE}/${id}/approval-status`, null, {
+    params: { approved },
+  });
+  return res.data.data;
 }
 
 export async function exportAuditKhktThReport(year: number): Promise<void> {

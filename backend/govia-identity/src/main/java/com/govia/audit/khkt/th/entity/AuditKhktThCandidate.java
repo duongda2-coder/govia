@@ -1,5 +1,6 @@
 package com.govia.audit.khkt.th.entity;
 
+import com.govia.audit.khkt.common.entity.AuditKhktSelectionChoice;
 import com.govia.audit.khkt.common.entity.AuditKhktSourceType;
 import com.govia.core.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -76,4 +77,23 @@ public class AuditKhktThCandidate extends BaseEntity {
 
     @Column(name = "selection3", nullable = false)
     private boolean selection3 = false;
+
+    /** "Linh vuc kiem toan" - TH tu nhap, khong bi ghi de khi sync() lai. */
+    @Column(name = "audit_scope", length = 100)
+    private String auditScope;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "adhoc_audit_or_supervision", length = 10)
+    private AuditKhktSelectionChoice adhocAuditOrSupervision;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "plan_adjustment", length = 10)
+    private AuditKhktSelectionChoice planAdjustment;
+
+    @Column(name = "adjustment_reason", length = 255)
+    private String adjustmentReason;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "khktgs_after_adjustment", length = 10)
+    private AuditKhktSelectionChoice khktgsAfterAdjustment;
 }

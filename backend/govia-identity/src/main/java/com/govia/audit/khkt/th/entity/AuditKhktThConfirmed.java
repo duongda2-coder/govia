@@ -1,5 +1,7 @@
 package com.govia.audit.khkt.th.entity;
 
+import com.govia.audit.khkt.common.entity.AuditKhktApprovalStatus;
+import com.govia.audit.khkt.common.entity.AuditKhktSelectionChoice;
 import com.govia.audit.khkt.common.entity.AuditKhktSourceType;
 import com.govia.core.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -70,4 +72,28 @@ public class AuditKhktThConfirmed extends BaseEntity {
 
     @Column(name = "selection3", nullable = false)
     private boolean selection3 = false;
+
+    @Column(name = "audit_scope", length = 100)
+    private String auditScope;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "adhoc_audit_or_supervision", length = 10)
+    private AuditKhktSelectionChoice adhocAuditOrSupervision;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "plan_adjustment", length = 10)
+    private AuditKhktSelectionChoice planAdjustment;
+
+    @Column(name = "adjustment_reason", length = 255)
+    private String adjustmentReason;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "khktgs_after_adjustment", length = 10)
+    private AuditKhktSelectionChoice khktgsAfterAdjustment;
+
+    /** "Trang thai" - chi co o Phan 2 (TH2). Reset ve PENDING moi lan "Xac nhan danh sach" ghi de
+     * (xoa+tao lai dong), chuyen APPROVED qua nut phe duyet rieng o Phan 2. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "approval_status", nullable = false, length = 20)
+    private AuditKhktApprovalStatus approvalStatus = AuditKhktApprovalStatus.PENDING;
 }
