@@ -242,24 +242,22 @@ export function AuditKhktThPage() {
     { title: t("auditKhktTh.columns.rankLabel"), dataIndex: "rankLabel", width: 100, render: (v: string | null) => v ?? "-" },
     { title: t("auditKhktTh.columns.onBalanceSheetLoan"), dataIndex: "onBalanceSheetLoan", width: 130, render: (v: number | null) => v ?? "-" },
     { title: t("auditKhktTh.columns.fundingSource"), dataIndex: "fundingSource", width: 130, render: (v: number | null) => v ?? "-" },
-    {
-      title: t("auditKhktTh.columns.proposingDepartments"),
-      dataIndex: "proposingDepartmentCodes",
-      width: 160,
-      render: (codes: string[]) => (codes.length === 0 ? "-" : codes.join(", ")),
-    },
-    {
-      title: t("auditKhktTh.columns.bpProposedSegments"),
-      dataIndex: "bpProposedSegmentCodes",
-      width: 180,
-      render: (codes: string[]) => (codes.length === 0 ? "-" : codes.map((c) => <Tag key={c}>{c}</Tag>)),
-    },
-    {
-      title: t("auditKhktTh.columns.thBusinessSegments"),
-      dataIndex: "thBusinessSegmentCodes",
-      width: 180,
-      render: (codes: string[]) => (codes.length === 0 ? "-" : codes.map((c) => <Tag key={c} color="green">{c}</Tag>)),
-    },
+    ...businessSegments.flatMap((segment) => [
+      {
+        title: t("auditKhktTh.columns.bpSegmentProposal", { segment: segment.code }),
+        key: `bp_segment_${segment.code}`,
+        width: 90,
+        align: "center" as const,
+        render: (_: unknown, row: AuditKhktThRowItem) => (row.bpProposedSegmentCodes.includes(segment.code) ? "X" : ""),
+      },
+      {
+        title: t("auditKhktTh.columns.thSegmentProposal", { segment: segment.code }),
+        key: `th_segment_${segment.code}`,
+        width: 90,
+        align: "center" as const,
+        render: (_: unknown, row: AuditKhktThRowItem) => (row.thBusinessSegmentCodes.includes(segment.code) ? "X" : ""),
+      },
+    ]),
     { title: t("auditKhktTh.columns.bpReviewResult"), dataIndex: "bpReviewResult", width: 200, render: (v: string | null) => v ?? "-" },
     { title: t("auditKhktTh.columns.proposalBasisTh"), dataIndex: "proposalBasisTh", width: 160, render: (v: string | null) => v ?? "-" },
     { title: t("auditKhktTh.columns.expertOpinion"), dataIndex: "expertOpinion", width: 200, render: (v: string | null) => v ?? "-" },
@@ -304,6 +302,10 @@ export function AuditKhktThPage() {
       width: 130,
       render: (v: AuditKhktSelectionChoice | null) => v ?? "-",
     },
+  ];
+
+  const confirmedColumns: TableProps<AuditKhktThRowItem>["columns"] = [
+    ...columns,
     {
       title: t("auditKhktTh.columns.approvalStatus"),
       dataIndex: "approvalStatus",
@@ -408,7 +410,7 @@ export function AuditKhktThPage() {
                   )}
                   <Table<AuditKhktThRowItem>
                     size="small"
-                    columns={columns}
+                    columns={confirmedColumns}
                     dataSource={confirmed}
                     rowKey="id"
                     loading={loading}

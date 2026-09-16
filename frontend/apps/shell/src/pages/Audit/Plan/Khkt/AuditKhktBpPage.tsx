@@ -258,12 +258,13 @@ export function AuditKhktBpPage() {
     { title: t("auditKhktBp.columns.rankLabel"), dataIndex: "rankLabel", width: 100, render: (v: string | null) => v ?? "-" },
     { title: t("auditKhktBp.columns.onBalanceSheetLoan"), dataIndex: "onBalanceSheetLoan", width: 130, render: (v: number | null) => v ?? "-" },
     { title: t("auditKhktBp.columns.fundingSource"), dataIndex: "fundingSource", width: 130, render: (v: number | null) => v ?? "-" },
-    {
-      title: t("auditKhktBp.columns.businessSegments"),
-      dataIndex: "businessSegmentCodes",
-      width: 200,
-      render: (codes: string[]) => (codes.length === 0 ? "-" : codes.map((c) => <Tag key={c}>{c}</Tag>)),
-    },
+    ...businessSegments.map((segment) => ({
+      title: t("auditKhktBp.columns.segmentProposal", { segment: segment.name }),
+      key: `segment_${segment.code}`,
+      width: 130,
+      align: "center" as const,
+      render: (_: unknown, row: AuditKhktBpRowItem) => (row.businessSegmentCodes.includes(segment.code) ? "X" : ""),
+    })),
     { title: t("auditKhktBp.columns.reviewResult"), dataIndex: "reviewResult", width: 220, render: (v: string | null) => v ?? "-" },
     { title: t("auditKhktBp.columns.proposalBasis"), dataIndex: "proposalBasis", width: 220, render: (v: string | null) => v ?? "-" },
     {
@@ -315,6 +316,10 @@ export function AuditKhktBpPage() {
       width: 130,
       render: (v: AuditKhktSelectionChoice | null) => v ?? "-",
     },
+  ];
+
+  const confirmedColumns: TableProps<AuditKhktBpRowItem>["columns"] = [
+    ...columns,
     {
       title: t("auditKhktBp.columns.approvalStatus"),
       dataIndex: "approvalStatus",
@@ -428,7 +433,7 @@ export function AuditKhktBpPage() {
                   )}
                   <Table<AuditKhktBpRowItem>
                     size="small"
-                    columns={columns}
+                    columns={confirmedColumns}
                     dataSource={confirmed}
                     rowKey="id"
                     loading={loading}
