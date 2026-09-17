@@ -491,3 +491,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/169-audit-khkt-bp-th-fs-columns.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/170-audit-khkt-bp-th-object-name-length.yaml
+      relativeToChangelogFile: false

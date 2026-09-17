@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { App, Button, Checkbox, Form, Input, Modal, Result, Select, Space, Table, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
+import { ReloadOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import { listAuditKhktThang, updateAuditKhktThang, type AuditKhktThangRowItem } from "../../../../api/auditKhktThang";
 import { listMasterDataItems, type MasterDataItem } from "../../../../api/auditMasterData";
@@ -14,7 +15,10 @@ interface EditFormValues {
 }
 
 /** "Khai bao so thang kiem toan trong nam" (sheet ZTC_KHKT_THANG) - doc song danh sach doi tuong da
- * xac nhan (TH2), chi cho sua phan thang 1-12 + ghi chu (xem AuditKhktThangService). */
+ * xac nhan (TH2) va da "Chon 3"/co "KHKTGS sau dieu chinh", chi cho sua phan thang 1-12 + ghi chu
+ * (xem AuditKhktThangService). Nut "Cap nhat danh sach" de nguoi dung tu lam moi khi Phong Ke hoach
+ * thay doi danh sach DTKT nam o man hinh KHKT TH (Phan 2) - danh sach o day khong tu dong day lai
+ * cho toi khi ban lam moi trang hoac bam nut nay. */
 export function AuditKhktThangPage() {
   const { t } = useTranslation();
   const { message } = App.useApp();
@@ -159,6 +163,9 @@ export function AuditKhktThangPage() {
           onChange={setYear}
           options={years.map((y) => ({ value: Number(y.code), label: y.code }))}
         />
+        <Button icon={<ReloadOutlined />} disabled={!year} loading={loading} onClick={load}>
+          {t("common.refresh")}
+        </Button>
         {canEdit && (
           <Button disabled={!selectedRow} onClick={openEdit}>
             {t("common.edit")}

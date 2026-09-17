@@ -189,6 +189,7 @@
     "downloadTemplate": "Tải mẫu",
     "search": "Tìm kiếm",
     "reset": "Đặt lại",
+    "refresh": "Cập nhật danh sách",
     "confirm": "Đồng ý",
     "yes": "Có",
     "no": "Không",
@@ -1183,6 +1184,12 @@
     "selectYearHint": "Chọn Năm để xem danh sách.",
     "editNoteButton": "Sửa ghi chú",
     "exportReportButton": "Xuất báo cáo theo đợt",
+    "assignButton": "Phân bổ nhân sự",
+    "assignModalTitle": "Phân bổ nhân sự đi kiểm toán",
+    "assignObjectLabel": "Đối tượng kiểm toán",
+    "assignObjectPlaceholder": "Chọn đối tượng kiểm toán",
+    "assignMonthLabel": "Tháng",
+    "assignEmployeesHint": "Chọn cán bộ được phân bổ đi kiểm toán đối tượng này trong tháng đã chọn. Bỏ chọn cán bộ đang được phân bổ sẽ hủy phân bổ của họ.",
     "columns": {
       "employeeCode": "Mã cán bộ",
       "employeeName": "Tên cán bộ",
@@ -1192,12 +1199,16 @@
       "businessSegmentCode": "Lĩnh vực dự kiến",
       "otherDuties": "Công việc khác đang đảm nhận",
       "totalTeamsCount": "Tổng số đoàn",
-      "note": "Ghi chú"
+      "note": "Ghi chú",
+      "currentAssignment": "Đang phân bổ tháng đã chọn"
     },
     "messages": {
       "loadError": "Không tải được dữ liệu",
       "updateSuccess": "Đã cập nhật",
-      "saveError": "Lưu thất bại"
+      "saveError": "Lưu thất bại",
+      "assignObjectRequired": "Vui lòng chọn đối tượng kiểm toán",
+      "assignSuccess": "Đã phân bổ nhân sự",
+      "assignError": "Phân bổ nhân sự thất bại"
     }
   },
   "auditKhktTransfer": {

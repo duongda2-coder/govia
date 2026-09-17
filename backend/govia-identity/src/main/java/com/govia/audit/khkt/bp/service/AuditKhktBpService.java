@@ -84,9 +84,11 @@ public class AuditKhktBpService {
     public List<AuditKhktBpRowResponse> list(UUID departmentId, Integer year) {
         UUID tenantId = TenantContext.getTenantId();
         List<AuditKhktBpCandidate> rows = candidateRepository.findByTenantIdAndDepartmentIdAndYearOrderByAuditObjectCodeAsc(tenantId, departmentId, year);
+        Map<UUID, UUID> unitIdByRowId = new HashMap<>();
+        rows.forEach(row -> unitIdByRowId.put(row.getId(), row.getAuditObjectUnitId()));
         RowContext ctx = buildContext(tenantId, year,
                 candidateSegmentsByRow(tenantId, rows.stream().map(AuditKhktBpCandidate::getId).toList()),
-                rows.stream().collect(Collectors.toMap(AuditKhktBpCandidate::getId, AuditKhktBpCandidate::getAuditObjectUnitId)));
+                unitIdByRowId);
         return rows.stream().map(row -> toResponse(row.getId(), row.getDepartmentId(), row.getYear(), row.getSourceType(),
                 row.getAuditObjectCode(), row.getAuditObjectName(), row.getAuditObjectCategoryCode(), row.getRiskScore(),
                 row.getRankLabel(), row.getOnBalanceSheetLoan(), row.getFundingSource(), row.getReviewResult(),
@@ -99,9 +101,11 @@ public class AuditKhktBpService {
     public List<AuditKhktBpRowResponse> listConfirmed(UUID departmentId, Integer year) {
         UUID tenantId = TenantContext.getTenantId();
         List<AuditKhktBpConfirmed> rows = confirmedRepository.findByTenantIdAndDepartmentIdAndYearOrderByAuditObjectCodeAsc(tenantId, departmentId, year);
+        Map<UUID, UUID> unitIdByRowId = new HashMap<>();
+        rows.forEach(row -> unitIdByRowId.put(row.getId(), row.getAuditObjectUnitId()));
         RowContext ctx = buildContext(tenantId, year,
                 confirmedSegmentsByRow(tenantId, rows.stream().map(AuditKhktBpConfirmed::getId).toList()),
-                rows.stream().collect(Collectors.toMap(AuditKhktBpConfirmed::getId, AuditKhktBpConfirmed::getAuditObjectUnitId)));
+                unitIdByRowId);
         return rows.stream().map(row -> toResponse(row.getId(), row.getDepartmentId(), row.getYear(), row.getSourceType(),
                 row.getAuditObjectCode(), row.getAuditObjectName(), row.getAuditObjectCategoryCode(), row.getRiskScore(),
                 row.getRankLabel(), row.getOnBalanceSheetLoan(), row.getFundingSource(), row.getReviewResult(),

@@ -30,11 +30,15 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/** "Khai bao so thang kiem toan trong nam" (sheet ZTC_KHKT_THANG). Nguon dong: TAT CA doi tuong da
- * co trong TH2 (AuditKhktThConfirmed) cua nam duoc chon - moi doi tuong ung 1 dong, khong can them/
- * xoa dong o day. Cac cot doc (ten, phan loai, xep hang, du no, nguon von, linh vuc kiem toan) lay
- * nguyen tu TH2; khu vuc dia ly lay tu AuditObjectUnit; quy mo tin dung/huy dong von tinh dong qua
- * AuditKhktScaleService. Chi phan thang 1-12 + ghi chu la du lieu rieng, luu trong AuditKhktThang. */
+/** "Khai bao so thang kiem toan trong nam" (sheet ZTC_KHKT_THANG). Nguon dong: doi tuong trong TH2
+ * (AuditKhktThConfirmed) cua nam duoc chon MA da duoc "Chon 3" HOAC co dien "KHKTGS sau dieu chinh"
+ * (xem eligibleConfirmedRows) - dung theo FS "cot Chon 3 hoac cot KHKTGS sau dieu chinh co dien thi moi
+ * sang phan Khai bao so thang kiem toan trong nam", khong phai TAT CA doi tuong cua TH2. Moi doi
+ * tuong hop le ung 1 dong, khong can them/xoa dong o day - danh sach tu dong khop lai voi TH2 moi
+ * lan tai (xem nut "Cap nhat" o FE de nguoi dung chu dong lam moi khi TH2 thay doi). Cac cot doc
+ * (ten, phan loai, xep hang, du no, nguon von, linh vuc kiem toan) lay nguyen tu TH2; khu vuc dia ly
+ * lay tu AuditObjectUnit; quy mo tin dung/huy dong von tinh dong qua AuditKhktScaleService. Chi
+ * phan thang 1-12 + ghi chu la du lieu rieng, luu trong AuditKhktThang. */
 @Service
 public class AuditKhktThangService {
 
@@ -62,7 +66,7 @@ public class AuditKhktThangService {
     @Transactional(readOnly = true)
     public List<AuditKhktThangRowResponse> list(Integer year) {
         UUID tenantId = TenantContext.getTenantId();
-        List<AuditKhktThConfirmed> confirmedRows = confirmedRepository.findByTenantIdAndYearOrderByAuditObjectCodeAsc(tenantId, year);
+        List<AuditKhktThConfirmed> confirmedRows = eligibleConfirmedRows(tenantId, year);
         if (confirmedRows.isEmpty()) {
             return List.of();
         }
@@ -93,10 +97,10 @@ public class AuditKhktThangService {
     @Transactional
     public AuditKhktThangRowResponse update(Integer year, String auditObjectCode, AuditKhktThangUpdateRequest request) {
         UUID tenantId = TenantContext.getTenantId();
-        AuditKhktThConfirmed confirmed = confirmedRepository.findByTenantIdAndYearOrderByAuditObjectCodeAsc(tenantId, year).stream()
+        AuditKhktThConfirmed confirmed = eligibleConfirmedRows(tenantId, year).stream()
                 .filter(row -> row.getAuditObjectCode().equals(auditObjectCode)).findFirst()
                 .orElseThrow(() -> new BusinessException("AUDIT_KHKT_THANG_OBJECT_NOT_FOUND",
-                        "Doi tuong khong thuoc danh sach da xac nhan (TH2) cua nam " + year, HttpStatus.NOT_FOUND));
+                        "Doi tuong khong thuoc danh sach da 'Chon 3'/co 'KHKTGS sau dieu chinh' cua TH2 nam " + year, HttpStatus.NOT_FOUND));
 
         AuditKhktThang thang = thangRepository.findByTenantIdAndYearAndAuditObjectCode(tenantId, year, auditObjectCode)
                 .orElseGet(() -> {
@@ -135,6 +139,14 @@ public class AuditKhktThangService {
         Integer creditScale = scaleService.resolveCreditScale(confirmed.getOnBalanceSheetLoan());
         Integer fundingScale = scaleService.resolveFundingScale(confirmed.getFundingSource());
         return toResponse(confirmed, segmentCodes, geographicArea, creditScale, fundingScale, thang);
+    }
+
+    /** FS: chi doi tuong da "Chon 3" HOAC co dien "KHKTGS sau dieu chinh" (khac null - xem
+     * AuditKhktSelectionChoice) moi sang phan Khai bao so thang kiem toan trong nam. */
+    private List<AuditKhktThConfirmed> eligibleConfirmedRows(UUID tenantId, Integer year) {
+        return confirmedRepository.findByTenantIdAndYearOrderByAuditObjectCodeAsc(tenantId, year).stream()
+                .filter(row -> row.isSelection3() || row.getKhktgsAfterAdjustment() != null)
+                .toList();
     }
 
     private Map<UUID, List<UUID>> segmentIdsByConfirmedId(UUID tenantId, List<UUID> confirmedIds) {

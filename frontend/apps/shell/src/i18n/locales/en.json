@@ -189,6 +189,7 @@
     "downloadTemplate": "Download template",
     "search": "Search",
     "reset": "Reset",
+    "refresh": "Refresh",
     "confirm": "OK",
     "yes": "Yes",
     "no": "No",
@@ -1183,6 +1184,12 @@
     "selectYearHint": "Select a Year to view the list.",
     "editNoteButton": "Edit note",
     "exportReportButton": "Export batch report",
+    "assignButton": "Assign personnel",
+    "assignModalTitle": "Assign personnel to go on audit",
+    "assignObjectLabel": "Audit object",
+    "assignObjectPlaceholder": "Select audit object",
+    "assignMonthLabel": "Month",
+    "assignEmployeesHint": "Pick the employees assigned to this audit object for the selected month. Unchecking a currently assigned employee removes their assignment.",
     "columns": {
       "employeeCode": "Employee code",
       "employeeName": "Employee name",
@@ -1192,12 +1199,16 @@
       "businessSegmentCode": "Assigned segment",
       "otherDuties": "Other duties",
       "totalTeamsCount": "Total teams",
-      "note": "Note"
+      "note": "Note",
+      "currentAssignment": "Current assignment for selected month"
     },
     "messages": {
       "loadError": "Failed to load data",
       "updateSuccess": "Updated",
-      "saveError": "Save failed"
+      "saveError": "Save failed",
+      "assignObjectRequired": "Please select an audit object",
+      "assignSuccess": "Personnel assigned",
+      "assignError": "Failed to assign personnel"
     }
   },
   "auditKhktTransfer": {

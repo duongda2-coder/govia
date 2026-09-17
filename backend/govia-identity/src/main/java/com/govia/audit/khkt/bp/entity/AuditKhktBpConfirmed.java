@@ -38,7 +38,7 @@ public class AuditKhktBpConfirmed extends BaseEntity {
     @Column(name = "audit_object_code", nullable = false, length = 20)
     private String auditObjectCode;
 
-    @Column(name = "audit_object_name", nullable = false, length = 255)
+    @Column(name = "audit_object_name", nullable = false, length = 500)
     private String auditObjectName;
 
     @Column(name = "audit_object_category_code", length = 20)

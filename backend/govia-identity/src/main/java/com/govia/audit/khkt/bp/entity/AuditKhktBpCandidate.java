@@ -39,7 +39,7 @@ public class AuditKhktBpCandidate extends BaseEntity {
     @Column(name = "audit_object_code", nullable = false, length = 20)
     private String auditObjectCode;
 
-    @Column(name = "audit_object_name", nullable = false, length = 255)
+    @Column(name = "audit_object_name", nullable = false, length = 500)
     private String auditObjectName;
 
     /** Chi co gia tri khi sourceType = OTHER - "ma loai doi tuong kiem toan" cua ztc_xhrr_khac_cg. */

@@ -1,0 +1,45 @@
+databaseChangeLog:
+
+  # ===================== "Chon doi tuong kiem toan" bi luu that bai khi chon doi tuong loai "Quy
+  # trinh" (AuditObjectProcess.name dai toi 500 ky tu) vi audit_object_name o day chi la VARCHAR(255)
+  # - noi rong len 500 cho khop voi nguon du lieu Process =====
+
+  - changeSet:
+      id: 170-1-audit-khkt-bp-candidate-object-name-length
+      author: govia
+      comment: "Noi rong audit_khkt_bp_candidate.audit_object_name len VARCHAR(500)"
+      changes:
+        - modifyDataType:
+            tableName: audit_khkt_bp_candidate
+            columnName: audit_object_name
+            newDataType: VARCHAR(500)
+
+  - changeSet:
+      id: 170-2-audit-khkt-bp-confirmed-object-name-length
+      author: govia
+      comment: "Noi rong audit_khkt_bp_confirmed.audit_object_name len VARCHAR(500)"
+      changes:
+        - modifyDataType:
+            tableName: audit_khkt_bp_confirmed
+            columnName: audit_object_name
+            newDataType: VARCHAR(500)
+
+  - changeSet:
+      id: 170-3-audit-khkt-th-candidate-object-name-length
+      author: govia
+      comment: "Noi rong audit_khkt_th_candidate.audit_object_name len VARCHAR(500)"
+      changes:
+        - modifyDataType:
+            tableName: audit_khkt_th_candidate
+            columnName: audit_object_name
+            newDataType: VARCHAR(500)
+
+  - changeSet:
+      id: 170-4-audit-khkt-th-confirmed-object-name-length
+      author: govia
+      comment: "Noi rong audit_khkt_th_confirmed.audit_object_name len VARCHAR(500)"
+      changes:
+        - modifyDataType:
+            tableName: audit_khkt_th_confirmed
+            columnName: audit_object_name
+            newDataType: VARCHAR(500)
