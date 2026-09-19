@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { App, Button, Checkbox, Form, Modal, Result, Select, Space, Table, Tag, Typography } from "antd";
+import { App, Button, Checkbox, Dropdown, Form, Modal, Result, Select, Space, Table, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
 import { EditOutlined, FileExcelOutlined, PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import { isAxiosError } from "axios";
@@ -53,7 +53,6 @@ export function AuditKhnsPbPage() {
 
   const [years, setYears] = useState<MasterDataItem[]>([]);
   const [year, setYear] = useState<number | undefined>(undefined);
-  const [month, setMonth] = useState<number>(1);
   const [pbRows, setPbRows] = useState<AuditKhnsPbRowItem[]>([]);
   const [khnsRows, setKhnsRows] = useState<AuditKhnsNamRowItem[]>([]);
   const [thangRows, setThangRows] = useState<AuditKhktThangRowItem[]>([]);
@@ -354,10 +353,18 @@ export function AuditKhnsPbPage() {
             {t("auditKhnsPb.assignButton")}
           </Button>
         )}
-        <Select style={{ width: 140 }} value={month} onChange={setMonth} options={MONTHS.map((m) => ({ value: m, label: t("auditKhktThang.columns.month", { month: m }) }))} />
-        <Button icon={<FileExcelOutlined />} disabled={!year} onClick={() => year && exportAuditKhnsNamMonthlyReport(year, month)}>
-          {t("auditKhnsPb.exportReportButton")}
-        </Button>
+        <Dropdown
+          disabled={!year}
+          trigger={["click"]}
+          menu={{
+            items: MONTHS.map((m) => ({ key: String(m), label: t("auditKhktThang.columns.month", { month: m }) })),
+            onClick: ({ key }) => year && exportAuditKhnsNamMonthlyReport(year, Number(key)),
+          }}
+        >
+          <Button icon={<FileExcelOutlined />} disabled={!year}>
+            {t("auditKhnsPb.exportReportButton")}
+          </Button>
+        </Dropdown>
       </Space>
 
       {!year ? (
