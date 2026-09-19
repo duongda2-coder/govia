@@ -27,12 +27,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -156,7 +161,7 @@ public class AuditKhktThService {
         item.setSelection1(request.selection1());
         item.setSelection2(request.selection2());
         item.setSelection3(request.selection3());
-        item.setAuditScope(request.auditScope());
+        item.setAuditScope(scopeOf(request.thBusinessSegmentIds(), masterDataItemsByCategory(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT)));
         item.setAdhocAuditOrSupervision(request.adhocAuditOrSupervision());
         item.setPlanAdjustment(request.planAdjustment());
         item.setAdjustmentReason(request.adjustmentReason());
@@ -293,7 +298,7 @@ public class AuditKhktThService {
         return result;
     }
 
-    private record BpAggregate(Set<String> departmentCodes, Set<String> segmentCodes) {
+    private record BpAggregate(Set<String> departmentCodes, Set<String> segmentCodes, Map<String, Set<String>> departmentsBySegment) {
     }
 
     /** Gom TAT CA dong AuditKhktBpConfirmed (moi phong) theo audit_object_code cho 1 nam - tra ve
@@ -311,9 +316,17 @@ public class AuditKhktThService {
             segmentsByBpRow.computeIfAbsent(s.getConfirmedId(), k -> new ArrayList<>()).add(s.getBusinessSegmentId());
         }
 
+        // Thu tu phong = thu tu danh muc (sortOrder), de ket qua "PGS,PKH,KTNB1" on dinh giua cac lan tai
+        List<String> deptCodesInOrder = departments.values().stream().map(AuditMasterDataItem::getCode).toList();
+        Comparator<String> deptOrder = Comparator.<String>comparingInt(code -> {
+            int index = deptCodesInOrder.indexOf(code);
+            return index < 0 ? Integer.MAX_VALUE : index;
+        }).thenComparing(Comparator.naturalOrder());
+
         Map<String, BpAggregate> result = new HashMap<>();
         for (AuditKhktBpConfirmed bp : bpRows) {
-            BpAggregate agg = result.computeIfAbsent(bp.getAuditObjectCode(), k -> new BpAggregate(new LinkedHashSet<>(), new LinkedHashSet<>()));
+            BpAggregate agg = result.computeIfAbsent(bp.getAuditObjectCode(),
+                    k -> new BpAggregate(new TreeSet<>(deptOrder), new LinkedHashSet<>(), new LinkedHashMap<>()));
             AuditMasterDataItem dept = departments.get(bp.getDepartmentId());
             if (dept != null) {
                 agg.departmentCodes().add(dept.getCode());
@@ -322,6 +335,9 @@ public class AuditKhktThService {
                 AuditMasterDataItem seg = segments.get(segId);
                 if (seg != null) {
                     agg.segmentCodes().add(seg.getCode());
+                    if (dept != null) {
+                        agg.departmentsBySegment().computeIfAbsent(seg.getCode(), k -> new TreeSet<>(deptOrder)).add(dept.getCode());
+                    }
                 }
             }
         }
@@ -329,8 +345,23 @@ public class AuditKhktThService {
     }
 
     private Map<UUID, AuditMasterDataItem> masterDataItemsByCategory(UUID tenantId, AuditMasterDataCategory category) {
+        // LinkedHashMap: giu thu tu danh muc (sortOrder) - dung de sap xep linh vuc/phong hien thi
         return masterDataItemRepository.findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, category).stream()
-                .collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i));
+                .collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i, (a, b) -> a, LinkedHashMap::new));
+    }
+
+    /** Ma linh vuc TH da tich, theo thu tu danh muc, noi bang dau phay (vd "AM,CE"); null neu khong tich linh vuc nao. */
+    private String scopeOf(Collection<UUID> thSegmentIds, Map<UUID, AuditMasterDataItem> segments) {
+        String scope = orderedSegmentCodes(thSegmentIds, segments).stream().collect(Collectors.joining(","));
+        return scope.isEmpty() ? null : scope;
+    }
+
+    private List<String> orderedSegmentCodes(Collection<UUID> thSegmentIds, Map<UUID, AuditMasterDataItem> segments) {
+        if (thSegmentIds == null || thSegmentIds.isEmpty()) {
+            return List.of();
+        }
+        Set<UUID> wanted = new HashSet<>(thSegmentIds);
+        return segments.entrySet().stream().filter(e -> wanted.contains(e.getKey())).map(e -> e.getValue().getCode()).toList();
     }
 
     private AuditKhktThRowResponse toResponse(UUID id, Integer year, com.govia.audit.khkt.common.entity.AuditKhktSourceType sourceType,
@@ -343,13 +374,18 @@ public class AuditKhktThService {
                                                com.govia.audit.khkt.common.entity.AuditKhktSelectionChoice khktgsAfterAdjustment,
                                                AuditKhktApprovalStatus approvalStatus,
                                                List<UUID> thSegmentIds, BpAggregate bpAggregate, Map<UUID, AuditMasterDataItem> segments) {
-        List<String> thSegmentCodes = thSegmentIds.stream().map(segments::get).filter(Objects::nonNull)
-                .map(AuditMasterDataItem::getCode).toList();
+        List<String> thSegmentCodes = orderedSegmentCodes(thSegmentIds, segments);
+        String derivedScope = scopeOf(thSegmentIds, segments);
+        Map<String, List<String>> bpDepartmentsBySegment = new LinkedHashMap<>();
+        if (bpAggregate != null) {
+            bpAggregate.departmentsBySegment().forEach((segmentCode, deptCodes) -> bpDepartmentsBySegment.put(segmentCode, List.copyOf(deptCodes)));
+        }
         List<String> proposingDepartmentCodes = bpAggregate == null ? List.of() : List.copyOf(bpAggregate.departmentCodes());
         List<String> bpProposedSegmentCodes = bpAggregate == null ? List.of() : List.copyOf(bpAggregate.segmentCodes());
         return new AuditKhktThRowResponse(id, year, sourceType, auditObjectCode, auditObjectName, auditObjectCategoryCode,
                 riskScore, rankLabel, onBalanceSheetLoan, fundingSource, bpReviewResult, proposalBasisTh, expertOpinion,
-                selection1, selection2, selection3, auditScope, adhocAuditOrSupervision, planAdjustment, adjustmentReason,
-                khktgsAfterAdjustment, approvalStatus, proposingDepartmentCodes, bpProposedSegmentCodes, thSegmentCodes);
+                selection1, selection2, selection3, derivedScope, adhocAuditOrSupervision, planAdjustment, adjustmentReason,
+                khktgsAfterAdjustment, approvalStatus, proposingDepartmentCodes, bpProposedSegmentCodes, thSegmentCodes,
+                bpDepartmentsBySegment);
     }
 }

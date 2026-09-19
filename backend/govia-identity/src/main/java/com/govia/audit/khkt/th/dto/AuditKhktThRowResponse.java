@@ -6,13 +6,17 @@ import com.govia.audit.khkt.common.entity.AuditKhktSourceType;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** Dung chung cho ca danh sach Phan 1 (TH) va Phan 2 (TH2 - da xac nhan). "approvalStatus" luon
  * null o Phan 1 (chi ton tai tren AuditKhktThConfirmed). "proposingDepartmentCodes" va
  * "bpProposedSegmentCodes" tinh dong tu AuditKhktBpConfirmed (BP2) - danh sach phong da de xuat
  * doi tuong nay va hop cac linh vuc ho da de xuat, CHI DE THAM KHAO (khong phai TH de xuat that su -
- * xem thBusinessSegmentCodes). */
+ * xem thBusinessSegmentCodes). "bpProposedSegmentDepartments": voi moi ma linh vuc, danh sach ma phong
+ * (theo thu tu danh muc) da tich "De xuat LVKT" linh vuc do o BP2 - hien thanh chu "PGS,PKH,KTNB1" o cot
+ * "BP de xuat LVKT: <linh vuc>". "auditScope" (cot "Linh vuc kiem toan") KHONG nhap tay: la cac ma linh vuc
+ * TH da tich (thBusinessSegmentCodes) noi bang dau phay theo thu tu danh muc, vd "AM,CE". */
 public record AuditKhktThRowResponse(
         UUID id,
         Integer year,
@@ -38,6 +42,7 @@ public record AuditKhktThRowResponse(
         AuditKhktApprovalStatus approvalStatus,
         List<String> proposingDepartmentCodes,
         List<String> bpProposedSegmentCodes,
-        List<String> thBusinessSegmentCodes
+        List<String> thBusinessSegmentCodes,
+        Map<String, List<String>> bpProposedSegmentDepartments
 ) {
 }

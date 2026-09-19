@@ -26,7 +26,6 @@ interface EditFormValues {
   selection1: boolean;
   selection2: boolean;
   selection3: boolean;
-  auditScope?: string;
   adhocAuditOrSupervision?: AuditKhktSelectionChoice;
   planAdjustment?: AuditKhktSelectionChoice;
   adjustmentReason?: string;
@@ -123,7 +122,6 @@ export function AuditKhktThPage() {
       selection1: target.selection1,
       selection2: target.selection2,
       selection3: target.selection3,
-      auditScope: target.auditScope ?? undefined,
       adhocAuditOrSupervision: target.adhocAuditOrSupervision ?? undefined,
       planAdjustment: target.planAdjustment ?? undefined,
       adjustmentReason: target.adjustmentReason ?? undefined,
@@ -149,7 +147,7 @@ export function AuditKhktThPage() {
         selection1: values.selection1 ?? false,
         selection2: values.selection2 ?? false,
         selection3: values.selection3 ?? false,
-        auditScope: values.auditScope ?? null,
+        auditScope: null, // "Linh vuc kiem toan" do he thong tu tinh tu cac linh vuc TH da tich - BE bo qua gia tri nhap tay
         adhocAuditOrSupervision: values.adhocAuditOrSupervision ?? null,
         planAdjustment: values.planAdjustment ?? null,
         adjustmentReason: values.adjustmentReason ?? null,
@@ -246,9 +244,8 @@ export function AuditKhktThPage() {
       {
         title: t("auditKhktTh.columns.bpSegmentProposal", { segment: segment.code }),
         key: `bp_segment_${segment.code}`,
-        width: 90,
-        align: "center" as const,
-        render: (_: unknown, row: AuditKhktThRowItem) => (row.bpProposedSegmentCodes.includes(segment.code) ? "X" : ""),
+        width: 150,
+        render: (_: unknown, row: AuditKhktThRowItem) => (row.bpProposedSegmentDepartments?.[segment.code] ?? []).join(","),
       },
       {
         title: t("auditKhktTh.columns.thSegmentProposal", { segment: segment.code }),
@@ -282,7 +279,7 @@ export function AuditKhktThPage() {
       align: "center",
       render: (v: boolean) => (v ? "X" : ""),
     },
-    { title: t("auditKhktTh.columns.auditScope"), dataIndex: "auditScope", width: 140, render: (v: string | null) => v ?? "-" },
+    { title: t("auditKhktTh.columns.auditScope"), dataIndex: "auditScope", width: 160, render: (v: string | null) => v ?? "-" },
     {
       title: t("auditKhktTh.columns.adhocAuditOrSupervision"),
       dataIndex: "adhocAuditOrSupervision",
@@ -459,9 +456,6 @@ export function AuditKhktThPage() {
               <Switch />
             </Form.Item>
           </Space>
-          <Form.Item name="auditScope" label={t("auditKhktTh.columns.auditScope")}>
-            <Input maxLength={100} />
-          </Form.Item>
           <Form.Item name="adhocAuditOrSupervision" label={t("auditKhktTh.columns.adhocAuditOrSupervision")}>
             <Select allowClear options={SELECTION_CHOICES.map((v) => ({ value: v, label: v }))} />
           </Form.Item>

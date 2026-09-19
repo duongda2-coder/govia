@@ -31,6 +31,8 @@ export interface AuditKhktThRowItem {
   bpProposedSegmentCodes: string[];
   /** Linh vuc Phong Ke hoach THUC SU quyet dinh theo doi (TH tu chon, luu rieng). */
   thBusinessSegmentCodes: string[];
+  /** Voi moi ma linh vuc: cac phong (theo thu tu danh muc) da tich "De xuat LVKT" linh vuc do o BP2 - hien thanh "PGS,PKH,KTNB1". */
+  bpProposedSegmentDepartments: Record<string, string[]>;
 }
 
 export interface AuditKhktThCandidateUpdateRequest {
