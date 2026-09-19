@@ -3,6 +3,7 @@ package com.govia.audit.khkt.khnsnam.service;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamInfoRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamUpdateRequest;
+import com.govia.audit.khkt.khnsnam.dto.AuditKhnsPbRowResponse;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsNam;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsNamObject;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsPosition;
@@ -325,6 +326,8 @@ public class AuditKhnsNamService {
         Map<UUID, AuditMasterDataItem> departments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.DEPARTMENT);
         Map<UUID, AuditMasterDataItem> segments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT);
         ThObjectLookup thLookup = buildThLookup(tenantId, year, segments);
+        Map<UUID, List<AuditKhnsPbRowResponse>> pbRowsByEmployee = pbService.listRows(year).stream()
+                .collect(Collectors.groupingBy(r -> UUID.fromString(r.employeeId())));
 
         List<ExportColumn> columns = List.of(
                 new ExportColumn("stt", "STT"),
@@ -350,11 +353,25 @@ public class AuditKhnsNamService {
             row.put("departmentCode", department == null ? null : department.getCode());
             row.put("auditObjectName", monthCode == null ? null : thLookup.nameByCode().get(monthCode));
             row.put("businessSegments", monthCode == null ? null : String.join(", ", thLookup.segmentCodesByCode().getOrDefault(monthCode, List.of())));
-            row.put("roleInTeam", plan == null || plan.getRoleInTeam() == null ? null : plan.getRoleInTeam().name());
+            row.put("roleInTeam", positionText(plan, monthCode, pbRowsByEmployee.getOrDefault(employee.getId(), List.of())));
             rows.add(row);
         }
 
         return excelExportService.export("audit_khns_nam_thang_" + month, columns, rows);
+    }
+
+    /** Cot "Chuc vu" cua bao cao - giong y nguyen cot "Chuc vu" o KHNS_PB: can bo di kiem toan trong thang thi lay chuc vu tai don vi
+     * cua thang do; can bo khong di thi lay chuc vu cua cac don vi khac nhau trong nam (cach nhau dau ;), khong co thi chuc vu chung. */
+    private String positionText(AuditKhnsNam plan, String monthCode, List<AuditKhnsPbRowResponse> pbRows) {
+        AuditKhnsRoleInTeam role = plan == null ? null : plan.getRoleInTeam();
+        List<String> texts = pbRows.stream()
+                .filter(r -> monthCode == null || r.auditObjectCode().equals(monthCode))
+                .map(r -> AuditKhnsPositionLabel.format(r.positions(), r.segmentNames(), role))
+                .filter(Objects::nonNull).distinct().toList();
+        if (!texts.isEmpty()) {
+            return String.join("; ", texts);
+        }
+        return role == null ? null : AuditKhnsPositionLabel.role(role);
     }
 
     private String monthAuditObjectCode(AuditKhnsNam plan, int month) {

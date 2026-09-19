@@ -306,6 +306,49 @@ class AuditKhnsPbAllocationTest {
         assertThat(lead.getId()).isNotNull();
     }
 
+    @Test
+    void monthlyReportChucVuColumnMatchesKhnsPbPositionText() throws Exception {
+        object("OBJ-A", AuditKhktApprovalStatus.APPROVED, true, "12000", Set.of(3), lnId, gaId);
+        employee("E1", EmployeeAuditorClassification.TYPE_3, true, false, "LN");
+        employee("E2", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
+        employee("E3", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
+        employee("E6", EmployeeAuditorClassification.TYPE_3, false, false, "LN");
+        employee("E5", EmployeeAuditorClassification.TYPE_1, false, false, "GA");
+        employee("E8-UNUSED", EmployeeAuditorClassification.TYPE_1, false, false);
+        pbService.allocate(YEAR);
+        List<AuditKhnsPbRowResponse> pbRows = pbService.listRows(YEAR);
+
+        byte[] xlsx = khnsNamService.exportMonthlyReport(YEAR, 3);
+
+        java.util.Map<String, String> chucVuByCode = new java.util.HashMap<>();
+        try (org.apache.poi.ss.usermodel.Workbook workbook = new org.apache.poi.xssf.usermodel.XSSFWorkbook(new java.io.ByteArrayInputStream(xlsx))) {
+            org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
+            org.apache.poi.ss.usermodel.Row header = sheet.getRow(0);
+            int codeCol = -1;
+            int roleCol = -1;
+            for (int c = 0; c < header.getLastCellNum(); c++) {
+                String title = header.getCell(c).getStringCellValue();
+                if ("Mã cán bộ".equals(title)) codeCol = c;
+                if ("Chức vụ".equals(title)) roleCol = c;
+            }
+            for (int r = 1; r <= sheet.getLastRowNum(); r++) {
+                org.apache.poi.ss.usermodel.Cell role = sheet.getRow(r).getCell(roleCol);
+                chucVuByCode.put(sheet.getRow(r).getCell(codeCol).getStringCellValue(), role == null ? null : role.getStringCellValue());
+            }
+        }
+
+        // moi can bo di kiem toan thang 3: cot Chuc vu cua file = chuoi hien thi o man KHNS_PB (Truong doan / Truong nhom / Thanh vien ...)
+        assertThat(pbRows).isNotEmpty();
+        for (AuditKhnsPbRowResponse pb : pbRows) {
+            String expected = com.govia.audit.khkt.khnsnam.service.AuditKhnsPositionLabel.format(pb.positions(), pb.segmentNames(), pb.roleInTeam());
+            assertThat(chucVuByCode.get(pb.employeeCode())).isEqualTo(expected);
+        }
+        assertThat(chucVuByCode.values().stream().filter(v -> v != null)).noneMatch(v -> v.matches(".*(TEAM_LEAD|MEMBER|GROUP_LEAD).*"));
+        assertThat(chucVuByCode.values()).contains("Trưởng đoàn, Trưởng nhóm QTĐH, Thành viên QTĐH");
+        assertThat(chucVuByCode.values().stream().filter(v -> v != null && v.contains("Tín dụng"))).hasSize(3);
+        assertThat(chucVuByCode.get("PB-E8-UNUSED")).isNullOrEmpty();
+    }
+
     private AuditKhnsNamUpdateRequest updateRequest(String objectCode, List<String> positions, List<String> segments) {
         return new AuditKhnsNamUpdateRequest(null, null, List.of(objectCode), null, null, null, null, null, null, objectCode, null, null,
                 null, null, null, null, null, null, null, List.of(new AuditKhnsNamUpdateRequest.ObjectAssignment(objectCode, positions, segments)));
