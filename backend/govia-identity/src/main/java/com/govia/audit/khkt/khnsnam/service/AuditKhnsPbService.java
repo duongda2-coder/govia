@@ -32,7 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -103,6 +105,14 @@ public class AuditKhnsPbService {
                 .collect(Collectors.toMap(UserAccount::getEmployeeId, UserAccount::getUsername, (a, b) -> a));
         Map<String, AuditKhktThangRowResponse> objectsByCode = thangService.list(year).stream()
                 .collect(Collectors.toMap(AuditKhktThangRowResponse::auditObjectCode, r -> r, (a, b) -> a));
+        Map<UUID, Set<String>> capableByEmployee = capabilityRepository.findByTenantId(tenantId).stream()
+                .collect(Collectors.toMap(AuditEmployeeCapability::getEmployeeId,
+                        c -> new HashSet<>(AuditEngagementService.capableSegmentCodes(c)), (a, b) -> a));
+        Map<String, String> segmentNameByCode = new HashMap<>();
+        for (AuditMasterDataItem item : masterDataItemRepository
+                .findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT)) {
+            segmentNameByCode.putIfAbsent(normalizeSegmentCode(item.getCode()), item.getName());
+        }
 
         List<AuditKhnsPbRowResponse> rows = new ArrayList<>();
         for (AuditKhnsNam plan : plans) {
@@ -122,13 +132,34 @@ public class AuditKhnsPbService {
                 rows.add(new AuditKhnsPbRowResponse(employee.getId().toString(), code, object == null ? code : object.auditObjectName(),
                         object == null ? List.of() : object.businessSegmentCodes(), object == null ? null : object.creditScale(),
                         object == null ? null : object.fundingScale(), employee.getEmployeeCode(), employee.getFullName(),
-                        usernames.get(employee.getId()), plan.getRoleInTeam(), months));
+                        usernames.get(employee.getId()), plan.getRoleInTeam(),
+                        segmentNamesOf(object, capableByEmployee.getOrDefault(employee.getId(), Set.of()), segmentNameByCode), months));
             });
         }
         rows.sort(Comparator.comparing(AuditKhnsPbRowResponse::auditObjectCode)
                 .thenComparingInt(r -> r.roleInTeam() == null ? Integer.MAX_VALUE : r.roleInTeam().ordinal())
                 .thenComparing(AuditKhnsPbRowResponse::employeeName));
         return rows;
+    }
+
+    /** Nghiep vu cua don vi ma can bo dam nhan duoc (theo thu tu nghiep vu cua don vi). Phan bo khong luu
+     * san nghiep vu nao cua don vi giao cho can bo nao, nen lay giao "nghiep vu don vi" x "kha nang dam nhan". */
+    private List<String> segmentNamesOf(AuditKhktThangRowResponse object, Set<String> capable, Map<String, String> segmentNameByCode) {
+        if (object == null) {
+            return List.of();
+        }
+        Set<String> names = new LinkedHashSet<>();
+        for (String code : object.businessSegmentCodes()) {
+            String normalized = normalizeSegmentCode(code);
+            if (capable.contains(normalized)) {
+                names.add(segmentNameByCode.getOrDefault(normalized, code));
+            }
+        }
+        return List.copyOf(names);
+    }
+
+    private String normalizeSegmentCode(String code) {
+        return "TD".equals(code) ? AuditKhnsPbAllocator.CREDIT : code;
     }
 
     private String monthObject(AuditKhnsNam plan, int month) {
@@ -216,7 +247,7 @@ public class AuditKhnsPbService {
 
     private String ownSegmentCode(Employee e, Map<UUID, String> segmentCodeById) {
         String code = e.getBusinessSegmentId() == null ? null : segmentCodeById.get(e.getBusinessSegmentId());
-        return "TD".equals(code) ? AuditKhnsPbAllocator.CREDIT : code;
+        return code == null ? null : normalizeSegmentCode(code);
     }
 
     private void persist(UUID tenantId, Integer year, Map<UUID, AuditKhnsPbAllocator.StaffAssignment> assignments) {
@@ -282,7 +313,7 @@ public class AuditKhnsPbService {
     private Set<String> normalizeSegmentCodes(List<String> codes) {
         Set<String> result = new HashSet<>();
         for (String code : codes) {
-            result.add("TD".equals(code) ? AuditKhnsPbAllocator.CREDIT : code);
+            result.add(normalizeSegmentCode(code));
         }
         return result;
     }

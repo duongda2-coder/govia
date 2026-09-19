@@ -186,6 +186,11 @@ class AuditKhnsPbAllocationTest {
         assertThat(a.creditScale()).isEqualTo(2);
         assertThat(a.months()).containsExactly(3);
 
+        // nghiep vu moi can bo dam nhan tai don vi: thanh vien TCKT -> "GA"; thanh vien tin dung -> "LN"
+        assertThat(rows.subList(0, 4)).filteredOn(r -> r.roleInTeam() == AuditKhnsRoleInTeam.MEMBER)
+                .extracting(AuditKhnsPbRowResponse::segmentNames)
+                .containsExactlyInAnyOrder(List.of("LN"), List.of("LN"), List.of("GA"));
+
         AuditKhnsPbRowResponse d = rows.get(4);
         assertThat(d.employeeName()).isEqualTo("Nhan vien E4");
         assertThat(d.roleInTeam()).isEqualTo(AuditKhnsRoleInTeam.TEAM_LEAD);

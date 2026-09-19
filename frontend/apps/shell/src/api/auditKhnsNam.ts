@@ -103,6 +103,8 @@ export interface AuditKhnsPbRowItem {
   employeeName: string;
   username: string | null;
   roleInTeam: AuditKhnsRoleInTeam | null;
+  /** Tên các nghiệp vụ của đơn vị mà cán bộ đảm nhận được - hiện kèm "Chức vụ" của thành viên. */
+  segmentNames: string[];
   months: number[];
 }
 

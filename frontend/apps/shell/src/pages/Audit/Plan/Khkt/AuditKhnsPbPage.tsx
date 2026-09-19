@@ -248,8 +248,13 @@ export function AuditKhnsPbPage() {
     {
       title: t("auditKhnsPb.columns.position"),
       dataIndex: "roleInTeam",
-      width: 130,
-      render: (v: AuditKhnsRoleInTeam | null) => (v ? t(`auditKhnsNam.role.${v}`) : "-"),
+      width: 220,
+      render: (_: unknown, row) => {
+        if (!row.roleInTeam) return "-";
+        const role = t(`auditKhnsNam.role.${row.roleInTeam}`);
+        // Trưởng đoàn giữ nguyên; các vai trò còn lại ghi rõ đang làm nghiệp vụ nào (1 hoặc nhiều)
+        return row.roleInTeam === "TEAM_LEAD" || row.segmentNames.length === 0 ? role : `${role} ${row.segmentNames.join(", ")}`;
+      },
     },
     { title: t("auditKhnsPb.columns.months"), dataIndex: "months", width: 100, render: (months: number[]) => months.join(", ") },
   ];
