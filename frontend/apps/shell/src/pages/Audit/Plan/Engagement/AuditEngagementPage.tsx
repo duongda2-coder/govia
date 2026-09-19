@@ -151,6 +151,7 @@ export function AuditEngagementPage() {
     { title: t("auditEngagement.columns.status"), dataIndex: "status", width: 140, render: (v: AuditEngagementItem["status"]) => t(`auditEngagement.status.${v}`) },
     { title: t("auditEngagement.columns.decisionDate"), dataIndex: "decisionDate", width: 120 },
     { title: t("auditEngagement.columns.teamLeadEmployee"), dataIndex: "teamLeadEmployeeName", render: (v: string | null) => v ?? "-" },
+    { title: t("auditEngagement.columns.createdBy"), dataIndex: "createdBy", width: 130, render: (v: string | null) => v ?? "-" },
   ];
 
   if (!canView) {

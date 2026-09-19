@@ -245,12 +245,12 @@ public class AuditEngagementService {
 
     @Transactional(readOnly = true)
     public byte[] exportExcel() {
-        return excelExportService.export("audit_engagement", exportColumns(), exportRows());
+        return excelExportService.export("audit_engagement", exportOnlyColumns(), exportRows());
     }
 
     @Transactional(readOnly = true)
     public byte[] exportWord() {
-        return wordExportService.export("Cuộc kiểm toán", exportColumns(), exportRows());
+        return wordExportService.export("Cuộc kiểm toán", exportOnlyColumns(), exportRows());
     }
 
     @Transactional
@@ -408,6 +408,13 @@ public class AuditEngagementService {
                 new ExportColumn("reportEndDate", "Báo cáo sau KT - kết thúc"));
     }
 
+    /** Cot dung rieng cho file xuat (Excel/Word): cot cua Import + cot chi-doc "User tao CKT" (khong nhap lai qua Import). */
+    private List<ExportColumn> exportOnlyColumns() {
+        List<ExportColumn> columns = new ArrayList<>(exportColumns());
+        columns.add(new ExportColumn("createdBy", "User tạo CKT"));
+        return columns;
+    }
+
     private List<Map<String, Object>> exportRows() {
         UUID tenantId = TenantContext.getTenantId();
         List<AuditEngagement> items = repository.findByTenantIdOrderByCreatedAtDesc(tenantId);
@@ -438,6 +445,7 @@ public class AuditEngagementService {
             row.put("fieldworkEndDate", item.getFieldworkEndDate());
             row.put("reportStartDate", item.getReportStartDate());
             row.put("reportEndDate", item.getReportEndDate());
+            row.put("createdBy", item.getCreatedBy());
             return row;
         }).toList();
     }

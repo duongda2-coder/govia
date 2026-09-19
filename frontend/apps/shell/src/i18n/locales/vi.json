@@ -1323,6 +1323,7 @@
       "expectedMonth": "Tháng dự kiến",
       "decisionDate": "Ngày QĐKT",
       "teamLeadEmployee": "Trưởng đoàn",
+      "createdBy": "User tạo CKT",
       "decisionNumber": "Số QĐ kiểm toán",
       "status": "Trạng thái đợt kiểm toán",
       "riskRank": "Xếp loại rủi ro",

@@ -1323,6 +1323,7 @@
       "expectedMonth": "Expected Month",
       "decisionDate": "Decision Date",
       "teamLeadEmployee": "Team Lead",
+      "createdBy": "Created by",
       "decisionNumber": "Decision Number",
       "status": "Engagement Status",
       "riskRank": "Risk Rank",
