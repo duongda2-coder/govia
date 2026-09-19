@@ -248,6 +248,59 @@ class AuditKhnsPbAllocationTest {
         assertThat(pbService.listRows(YEAR).get(0).positions()).containsExactlyInAnyOrder("TD_GROUP_LEAD", "TD_MEMBER");
     }
 
+    @Test
+    void khnsNamListComesFromAllocationOnlyAfterSyncAndShowsMonthNamesPositionsAndTotalTeams() {
+        object("OBJ-A", AuditKhktApprovalStatus.APPROVED, true, "12000", Set.of(3), lnId, gaId);
+        object("OBJ-D", AuditKhktApprovalStatus.APPROVED, true, null, Set.of(4), gaId);
+        Employee lead = employee("E1", EmployeeAuditorClassification.TYPE_3, true, false, "LN");
+        employee("E2", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
+        employee("E3", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
+        employee("E6", EmployeeAuditorClassification.TYPE_3, false, false, "LN");
+        employee("E5", EmployeeAuditorClassification.TYPE_1, false, false, "GA");
+        employee("E7", EmployeeAuditorClassification.TYPE_1, true, false, "GA");
+        employee("E8-UNUSED", EmployeeAuditorClassification.TYPE_1, false, false);
+        pbService.allocate(YEAR);
+
+        // chua bam "Cap nhat danh sach can bo" -> danh sach KHNS_NAM trong
+        assertThat(khnsNamService.list(YEAR, false, true)).isEmpty();
+
+        int listed = khnsNamService.syncListFromAllocation(YEAR);
+
+        List<com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse> rows = khnsNamService.list(YEAR, false, true);
+        assertThat(rows).hasSize(listed).noneMatch(r -> r.employeeName().contains("UNUSED"));
+        assertThat(listed).isEqualTo(pbService.listRows(YEAR).stream().map(AuditKhnsPbRowResponse::employeeId).distinct().count());
+        assertThat(rows).allSatisfy(r -> assertThat(r.year()).isEqualTo(YEAR));
+
+        // Truong doan cua OBJ-D (thang 4): chuc vu lay tu KHNS_PB, thang 4 hien TEN doi tuong, tong so doan = 1
+        com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse leadRow = rows.stream()
+                .filter(r -> r.positions().contains("TEAM_LEAD")).filter(r -> r.monthAuditObjectNames().get(3) != null).findFirst().orElseThrow();
+        assertThat(leadRow.positions()).contains("QTDH_GROUP_LEAD", "QTDH_MEMBER");
+        assertThat(leadRow.monthAuditObjectNames()).hasSize(12);
+        assertThat(leadRow.monthAuditObjectNames().get(3)).isEqualTo("OBJ-D");
+        assertThat(leadRow.monthAuditObjectNames().get(0)).isNull();
+        assertThat(leadRow.totalTeamsCount()).isEqualTo(1);
+
+        // sua thong tin nhap tay khong dong vao phan bo thang/chuc vu
+        UUID leadId = UUID.fromString(leadRow.employeeId());
+        khnsNamService.updateInfo(leadId, YEAR, new com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamInfoRequest("Kiem nhiem A", "QD-01", null, null, "ghi chu"));
+        com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse after = khnsNamService.list(YEAR, false, true).stream()
+                .filter(r -> r.employeeId().equals(leadRow.employeeId())).findFirst().orElseThrow();
+        assertThat(after.otherDuties()).isEqualTo("Kiem nhiem A");
+        assertThat(after.monthAuditObjectNames()).isEqualTo(leadRow.monthAuditObjectNames());
+        assertThat(after.positions()).isEqualTo(leadRow.positions());
+
+        // phan bo lai khong con cua 1 doi tuong -> bam cap nhat lai thi can bo khong con duoc phan bo bi go khoi danh sach
+        for (AuditKhnsNam plan : khnsNamRepository.findByTenantIdAndYear(tenantId, YEAR)) {
+            plan.setMonth3AuditObjectCode(null);
+            plan.setMonth4AuditObjectCode(null);
+            khnsNamRepository.save(plan);
+            khnsNamObjectRepository.deleteByTenantIdAndKhnsNamId(tenantId, plan.getId());
+        }
+        assertThat(khnsNamService.syncListFromAllocation(YEAR)).isZero();
+        assertThat(khnsNamService.list(YEAR, false, true)).isEmpty();
+        assertThat(lead.getId()).isNotNull();
+    }
+
     private AuditKhnsNamUpdateRequest updateRequest(String objectCode, List<String> positions, List<String> segments) {
         return new AuditKhnsNamUpdateRequest(null, null, List.of(objectCode), null, null, null, null, null, null, objectCode, null, null,
                 null, null, null, null, null, null, null, List.of(new AuditKhnsNamUpdateRequest.ObjectAssignment(objectCode, positions, segments)));

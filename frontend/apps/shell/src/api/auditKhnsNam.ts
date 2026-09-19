@@ -52,6 +52,11 @@ export interface AuditKhnsNamRowItem {
   month10AuditObjectCode: string | null;
   month11AuditObjectCode: string | null;
   month12AuditObjectCode: string | null;
+  year: number;
+  /** Chức vụ của cán bộ ở màn KHNS_PB (gộp các đơn vị) - hiện ở cột "Chức vụ có thể đảm nhận trong đoàn". */
+  positions: AuditKhnsPosition[];
+  /** Tên đối tượng kiểm toán của tháng 1..12 (lấy từ KHNS_PB), null nếu tháng đó không đi kiểm toán. */
+  monthAuditObjectNames: (string | null)[];
 }
 
 export interface AuditKhnsNamUpdateRequest {
@@ -80,9 +85,10 @@ export interface AuditKhnsNamUpdateRequest {
 
 const BASE = "/api/audit/plan/khns-nam";
 
-/** allocatedOnly=true: chỉ cán bộ đã được phân bổ đi kiểm toán (dùng cho KHNS_PB). */
-export async function listAuditKhnsNam(year: number, allocatedOnly = false): Promise<AuditKhnsNamRowItem[]> {
-  const res = await httpClient.get<ApiResponse<AuditKhnsNamRowItem[]>>(BASE, { params: { year, allocatedOnly } });
+/** allocatedOnly=true: chỉ cán bộ đã được phân bổ đi kiểm toán (dùng cho KHNS_PB).
+ * listedOnly=true: chỉ cán bộ đã được đưa vào danh sách KHNS_NAM qua nút "Cập nhật danh sách cán bộ". */
+export async function listAuditKhnsNam(year: number, allocatedOnly = false, listedOnly = false): Promise<AuditKhnsNamRowItem[]> {
+  const res = await httpClient.get<ApiResponse<AuditKhnsNamRowItem[]>>(BASE, { params: { year, allocatedOnly, listedOnly } });
   return res.data.data;
 }
 
@@ -92,6 +98,26 @@ export async function updateAuditKhnsNam(
   request: AuditKhnsNamUpdateRequest,
 ): Promise<AuditKhnsNamRowItem> {
   const res = await httpClient.put<ApiResponse<AuditKhnsNamRowItem>>(`${BASE}/${employeeId}`, request, { params: { year } });
+  return res.data.data;
+}
+
+/** Nút "Cập nhật danh sách cán bộ" ở KHNS_NAM - lấy danh sách cán bộ đã phân bổ ở KHNS_PB; trả về số cán bộ trong danh sách. */
+export async function syncAuditKhnsNamList(year: number): Promise<number> {
+  const res = await httpClient.post<ApiResponse<number>>(`${BASE}/sync-list`, null, { params: { year } });
+  return res.data.data;
+}
+
+export interface AuditKhnsNamInfoRequest {
+  otherDuties: string | null;
+  decisionNumber: string | null;
+  decisionDate: string | null;
+  expectedBatch: string | null;
+  note: string | null;
+}
+
+/** Sửa các trường nhập tay của KHNS_NAM (không đụng tới phân bổ tháng/chức vụ lấy từ KHNS_PB). */
+export async function updateAuditKhnsNamInfo(employeeId: string, year: number, request: AuditKhnsNamInfoRequest): Promise<AuditKhnsNamRowItem> {
+  const res = await httpClient.put<ApiResponse<AuditKhnsNamRowItem>>(`${BASE}/${employeeId}/info`, request, { params: { year } });
   return res.data.data;
 }
 

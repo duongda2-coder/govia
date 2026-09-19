@@ -1142,6 +1142,8 @@
   "auditKhnsNam": {
     "title": "Dự kiến nhân sự thực hiện kiểm toán năm, đợt",
     "selectYearHint": "Chọn Năm để xem danh sách.",
+    "syncButton": "Cập nhật danh sách cán bộ",
+    "emptyHint": "Chưa có cán bộ trong danh sách. Bấm \"Cập nhật danh sách cán bộ\" để lấy danh sách từ màn hình Phân bổ cán bộ cho chi nhánh theo tháng.",
     "classification": {
       "TYPE_1": "Loại 1",
       "TYPE_2": "Loại 2",
@@ -1154,29 +1156,34 @@
       "SUPPORT": "Cán bộ hỗ trợ"
     },
     "columns": {
+      "year": "Năm kiểm toán",
       "employeeCode": "Mã cán bộ",
       "employeeName": "Tên cán bộ",
+      "positions": "Chức vụ có thể đảm nhận trong đoàn",
       "positionName": "Chức danh",
       "departmentCode": "Phòng công tác",
       "auditorClassification": "Phân loại năng lực KTV",
-      "businessSegmentCode": "Lĩnh vực dự kiến",
+      "businessSegmentCode": "Lĩnh vực dự kiến được phân công",
       "roleInTeam": "Chức vụ trong đoàn",
-      "otherDuties": "Công việc khác đang đảm nhận",
+      "otherDuties": "Các công việc khác đang đảm nhận",
       "auditObjectCodes": "Mã đối tượng KT",
       "decisionNumber": "Số quyết định",
       "decisionDate": "Ngày quyết định",
       "expectedBatch": "Dự kiến thời gian",
-      "totalTeamsCount": "Tổng số đoàn",
+      "totalTeamsCount": "Tổng số đoàn dự kiến tham gia trong năm",
       "note": "Ghi chú"
     },
     "form": {
       "editTitle": "Sửa",
-      "monthDetail": "Chi tiết đợt (theo tháng)"
+      "decisionHint": "Thông tin quyết định (cần cho màn hình Chuyển thông tin KHTH):"
     },
     "messages": {
       "loadError": "Không tải được dữ liệu",
       "updateSuccess": "Đã cập nhật",
-      "saveError": "Lưu thất bại"
+      "saveError": "Lưu thất bại",
+      "syncSuccess": "Đã cập nhật danh sách: {{count}} cán bộ từ màn hình Phân bổ cán bộ cho chi nhánh theo tháng",
+      "syncEmpty": "Chưa có cán bộ nào được phân bổ ở màn hình Phân bổ cán bộ cho chi nhánh theo tháng",
+      "syncError": "Cập nhật danh sách cán bộ thất bại"
     }
   },
   "auditKhnsPb": {

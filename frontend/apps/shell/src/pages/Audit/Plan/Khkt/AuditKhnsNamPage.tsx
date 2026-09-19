@@ -1,36 +1,32 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { App, Button, DatePicker, Form, Input, Modal, Result, Select, Space, Table, Tag, Typography } from "antd";
+import { App, Button, DatePicker, Form, Input, Modal, Result, Select, Space, Table, Typography } from "antd";
 import type { TableProps } from "antd";
+import { SyncOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import {
-  updateAuditKhnsNam,
   listAuditKhnsNam,
+  syncAuditKhnsNamList,
+  updateAuditKhnsNamInfo,
   type AuditKhnsNamRowItem,
-  type AuditKhnsNamUpdateRequest,
-  type AuditKhnsRoleInTeam,
 } from "../../../../api/auditKhnsNam";
-import { listAuditKhktThConfirmed } from "../../../../api/auditKhktTh";
 import { listMasterDataItems, type MasterDataItem } from "../../../../api/auditMasterData";
 import { useAuth } from "../../../../auth/AuthContext";
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const ROLES: AuditKhnsRoleInTeam[] = ["TEAM_LEAD", "GROUP_LEAD", "MEMBER", "SUPPORT"];
 
 interface EditFormValues {
-  roleInTeam?: AuditKhnsRoleInTeam;
   otherDuties?: string;
-  auditObjectCodes: string[];
   decisionNumber?: string;
   decisionDate?: dayjs.Dayjs;
   expectedBatch?: string;
   note?: string;
-  months: Record<number, string | undefined>;
 }
 
-/** "Dự kiến nhân sự thực hiện kiểm toán năm, đợt" (sheet ZTC_KHNS_NAM) - liet ke TOAN BO nhan vien
- * cua nam, cho sua truc tiep (khong them/xoa dong - xem AuditKhnsNamService o BE). "Chi tiet dot"
- * (12 thang, moi thang chon 1 doi tuong KT) gop vao chung modal Sua thay vi man hinh rieng. */
+/** "Dự kiến nhân sự thực hiện kiểm toán năm, đợt" (sheet ZTC_KHNS_NAM) - danh sach can bo LAY TU man hinh "Phan bo can bo cho chi
+ * nhanh theo thang" (KHNS_PB) qua nut "Cap nhat danh sach can bo": Chuc vu, Thang 1..12 (ten doi tuong KT), Tong so doan deu doc
+ * tu phan bo do; chi "Cac cong viec khac dang dam nhan" la NSD tu nhap. So/ngay quyet dinh, dot du kien, ghi chu khong phai
+ * cot theo dac ta nhung "Chuyen thong tin KHTH" van can nen giu o form Sua. */
 export function AuditKhnsNamPage() {
   const { t } = useTranslation();
   const { message } = App.useApp();
@@ -41,8 +37,8 @@ export function AuditKhnsNamPage() {
   const [years, setYears] = useState<MasterDataItem[]>([]);
   const [year, setYear] = useState<number | undefined>(undefined);
   const [rows, setRows] = useState<AuditKhnsNamRowItem[]>([]);
-  const [thObjects, setThObjects] = useState<{ value: string; label: string }[]>([]);
   const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -58,9 +54,7 @@ export function AuditKhnsNamPage() {
     if (!year) return;
     setLoading(true);
     try {
-      const [namRows, thRows] = await Promise.all([listAuditKhnsNam(year), listAuditKhktThConfirmed(year)]);
-      setRows(namRows);
-      setThObjects(thRows.map((r) => ({ value: r.auditObjectCode, label: `${r.auditObjectCode} - ${r.auditObjectName}` })));
+      setRows(await listAuditKhnsNam(year, false, true));
     } catch {
       message.error(t("auditKhnsNam.messages.loadError"));
     } finally {
@@ -78,21 +72,33 @@ export function AuditKhnsNamPage() {
 
   const selectedRow = useMemo(() => rows.find((r) => r.employeeId === selectedId) ?? null, [rows, selectedId]);
 
+  const handleSync = async () => {
+    if (!year) return;
+    setSyncing(true);
+    try {
+      const count = await syncAuditKhnsNamList(year);
+      setSelectedId(null);
+      await load();
+      if (count === 0) {
+        message.warning(t("auditKhnsNam.messages.syncEmpty"));
+      } else {
+        message.success(t("auditKhnsNam.messages.syncSuccess", { count }));
+      }
+    } catch {
+      message.error(t("auditKhnsNam.messages.syncError"));
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const openEdit = () => {
     if (!selectedRow) return;
-    const months: Record<number, string | undefined> = {};
-    MONTHS.forEach((m) => {
-      months[m] = (selectedRow[`month${m}AuditObjectCode` as keyof AuditKhnsNamRowItem] as string | null) ?? undefined;
-    });
     form.setFieldsValue({
-      roleInTeam: selectedRow.roleInTeam ?? undefined,
       otherDuties: selectedRow.otherDuties ?? undefined,
-      auditObjectCodes: selectedRow.auditObjectCodes,
       decisionNumber: selectedRow.decisionNumber ?? undefined,
       decisionDate: selectedRow.decisionDate ? dayjs(selectedRow.decisionDate) : undefined,
       expectedBatch: selectedRow.expectedBatch ?? undefined,
       note: selectedRow.note ?? undefined,
-      months,
     });
     setEditModalOpen(true);
   };
@@ -107,28 +113,13 @@ export function AuditKhnsNamPage() {
     }
     setSubmitting(true);
     try {
-      const request: AuditKhnsNamUpdateRequest = {
-        roleInTeam: values.roleInTeam ?? null,
+      await updateAuditKhnsNamInfo(selectedRow.employeeId, year, {
         otherDuties: values.otherDuties ?? null,
-        auditObjectCodes: values.auditObjectCodes ?? [],
         decisionNumber: values.decisionNumber ?? null,
         decisionDate: values.decisionDate ? values.decisionDate.format("YYYY-MM-DD") : null,
         expectedBatch: values.expectedBatch ?? null,
         note: values.note ?? null,
-        month1AuditObjectCode: values.months?.[1] ?? null,
-        month2AuditObjectCode: values.months?.[2] ?? null,
-        month3AuditObjectCode: values.months?.[3] ?? null,
-        month4AuditObjectCode: values.months?.[4] ?? null,
-        month5AuditObjectCode: values.months?.[5] ?? null,
-        month6AuditObjectCode: values.months?.[6] ?? null,
-        month7AuditObjectCode: values.months?.[7] ?? null,
-        month8AuditObjectCode: values.months?.[8] ?? null,
-        month9AuditObjectCode: values.months?.[9] ?? null,
-        month10AuditObjectCode: values.months?.[10] ?? null,
-        month11AuditObjectCode: values.months?.[11] ?? null,
-        month12AuditObjectCode: values.months?.[12] ?? null,
-      };
-      await updateAuditKhnsNam(selectedRow.employeeId, year, request);
+      });
       message.success(t("auditKhnsNam.messages.updateSuccess"));
       setEditModalOpen(false);
       await load();
@@ -140,39 +131,32 @@ export function AuditKhnsNamPage() {
   };
 
   const columns: TableProps<AuditKhnsNamRowItem>["columns"] = [
-    { title: t("auditKhnsNam.columns.employeeCode"), dataIndex: "employeeCode", width: 100, fixed: "left" },
-    { title: t("auditKhnsNam.columns.employeeName"), dataIndex: "employeeName", width: 180, fixed: "left" },
-    { title: t("auditKhnsNam.columns.positionName"), dataIndex: "positionName", width: 140, render: (v: string | null) => v ?? "-" },
-    { title: t("auditKhnsNam.columns.departmentCode"), dataIndex: "departmentCode", width: 100, render: (v: string | null) => v ?? "-" },
+    { title: t("auditKhnsNam.columns.year"), dataIndex: "year", width: 90, align: "center" },
+    { title: t("auditKhnsNam.columns.employeeCode"), dataIndex: "employeeCode", width: 110 },
+    { title: t("auditKhnsNam.columns.employeeName"), dataIndex: "employeeName", width: 200 },
+    { title: t("auditKhnsNam.columns.positionName"), dataIndex: "positionName", width: 150, render: (v: string | null) => v ?? "-" },
+    { title: t("auditKhnsNam.columns.departmentCode"), dataIndex: "departmentCode", width: 120, render: (v: string | null) => v ?? "-" },
     {
       title: t("auditKhnsNam.columns.auditorClassification"),
       dataIndex: "auditorClassification",
-      width: 110,
+      width: 130,
       render: (v: string | null) => (v ? t(`auditKhnsNam.classification.${v}`) : "-"),
     },
-    { title: t("auditKhnsNam.columns.businessSegmentCode"), dataIndex: "businessSegmentCode", width: 100, render: (v: string | null) => v ?? "-" },
+    { title: t("auditKhnsNam.columns.businessSegmentCode"), dataIndex: "businessSegmentCode", width: 150, render: (v: string | null) => v ?? "-" },
     {
-      title: t("auditKhnsNam.columns.roleInTeam"),
-      dataIndex: "roleInTeam",
-      width: 120,
-      render: (v: AuditKhnsRoleInTeam | null) => (v ? t(`auditKhnsNam.role.${v}`) : "-"),
+      title: t("auditKhnsNam.columns.positions"),
+      dataIndex: "positions",
+      width: 300,
+      render: (positions: string[]) => (positions.length === 0 ? "-" : positions.map((p) => t(`auditKhnsPb.position.${p}`)).join(", ")),
     },
-    {
-      title: t("auditKhnsNam.columns.auditObjectCodes"),
-      dataIndex: "auditObjectCodes",
-      width: 200,
-      render: (codes: string[]) => (codes.length === 0 ? "-" : codes.map((c) => <Tag key={c}>{c}</Tag>)),
-    },
-    { title: t("auditKhnsNam.columns.decisionNumber"), dataIndex: "decisionNumber", width: 120, render: (v: string | null) => v ?? "-" },
-    {
-      title: t("auditKhnsNam.columns.decisionDate"),
-      dataIndex: "decisionDate",
-      width: 120,
-      render: (v: string | null) => (v ? dayjs(v).format("DD.MM.YYYY") : "-"),
-    },
-    { title: t("auditKhnsNam.columns.expectedBatch"), dataIndex: "expectedBatch", width: 130, render: (v: string | null) => v ?? "-" },
-    { title: t("auditKhnsNam.columns.totalTeamsCount"), dataIndex: "totalTeamsCount", width: 90, align: "center" },
-    { title: t("auditKhnsNam.columns.note"), dataIndex: "note", render: (v: string | null) => v ?? "-" },
+    { title: t("auditKhnsNam.columns.otherDuties"), dataIndex: "otherDuties", width: 200, render: (v: string | null) => v ?? "-" },
+    { title: t("auditKhnsNam.columns.totalTeamsCount"), dataIndex: "totalTeamsCount", width: 140, align: "center" },
+    ...MONTHS.map((m) => ({
+      title: t("auditKhktThang.columns.month", { month: m }),
+      key: `month${m}`,
+      width: 170,
+      render: (_: unknown, row: AuditKhnsNamRowItem) => row.monthAuditObjectNames?.[m - 1] ?? "-",
+    })),
   ];
 
   if (!canView) {
@@ -184,7 +168,7 @@ export function AuditKhnsNamPage() {
       <Typography.Title level={4} style={{ margin: 0, marginBottom: 16 }}>
         {t("auditKhnsNam.title")}
       </Typography.Title>
-      <Space style={{ marginBottom: 16 }}>
+      <Space style={{ marginBottom: 16 }} wrap>
         <Select
           placeholder={t("common.selectYear")}
           style={{ width: 120 }}
@@ -192,6 +176,11 @@ export function AuditKhnsNamPage() {
           onChange={setYear}
           options={years.map((y) => ({ value: Number(y.code), label: y.code }))}
         />
+        {canEdit && (
+          <Button icon={<SyncOutlined />} disabled={!year} loading={syncing} onClick={handleSync}>
+            {t("auditKhnsNam.syncButton")}
+          </Button>
+        )}
         {canEdit && (
           <Button disabled={!selectedRow} onClick={openEdit}>
             {t("common.edit")}
@@ -208,6 +197,7 @@ export function AuditKhnsNamPage() {
           dataSource={rows}
           rowKey="employeeId"
           loading={loading}
+          locale={{ emptyText: t("auditKhnsNam.emptyHint") }}
           pagination={{ pageSize: 50 }}
           scroll={{ x: "max-content" }}
           rowSelection={{
@@ -225,18 +215,13 @@ export function AuditKhnsNamPage() {
         onOk={handleSubmit}
         confirmLoading={submitting}
         destroyOnClose
-        width={720}
+        width={560}
       >
         <Form<EditFormValues> form={form} layout="vertical">
-          <Form.Item name="roleInTeam" label={t("auditKhnsNam.columns.roleInTeam")}>
-            <Select allowClear options={ROLES.map((r) => ({ value: r, label: t(`auditKhnsNam.role.${r}`) }))} />
-          </Form.Item>
           <Form.Item name="otherDuties" label={t("auditKhnsNam.columns.otherDuties")}>
             <Input maxLength={120} />
           </Form.Item>
-          <Form.Item name="auditObjectCodes" label={t("auditKhnsNam.columns.auditObjectCodes")}>
-            <Select mode="multiple" options={thObjects} showSearch optionFilterProp="label" />
-          </Form.Item>
+          <Typography.Paragraph type="secondary">{t("auditKhnsNam.form.decisionHint")}</Typography.Paragraph>
           <Form.Item name="decisionNumber" label={t("auditKhnsNam.columns.decisionNumber")}>
             <Input maxLength={25} />
           </Form.Item>
@@ -249,14 +234,6 @@ export function AuditKhnsNamPage() {
           <Form.Item name="note" label={t("auditKhnsNam.columns.note")}>
             <Input.TextArea rows={2} maxLength={120} />
           </Form.Item>
-          <Typography.Title level={5}>{t("auditKhnsNam.form.monthDetail")}</Typography.Title>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 8 }}>
-            {MONTHS.map((m) => (
-              <Form.Item key={m} name={["months", m]} label={t("auditKhktThang.columns.month", { month: m })} style={{ marginBottom: 8 }}>
-                <Select allowClear showSearch optionFilterProp="label" options={thObjects} />
-              </Form.Item>
-            ))}
-          </div>
         </Form>
       </Modal>
     </div>

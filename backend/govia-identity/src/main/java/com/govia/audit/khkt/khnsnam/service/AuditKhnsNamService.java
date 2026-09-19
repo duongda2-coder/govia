@@ -1,5 +1,6 @@
 package com.govia.audit.khkt.khnsnam.service;
 
+import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamInfoRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamUpdateRequest;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsNam;
@@ -51,12 +52,13 @@ public class AuditKhnsNamService {
     private final AuditKhktThConfirmedSegmentRepository thConfirmedSegmentRepository;
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
+    private final AuditKhnsPbService pbService;
 
     public AuditKhnsNamService(AuditKhnsNamRepository repository, AuditKhnsNamObjectRepository objectRepository,
                                 EmployeeRepository employeeRepository, AuditMasterDataItemRepository masterDataItemRepository,
                                 AuditKhktThConfirmedRepository thConfirmedRepository,
                                 AuditKhktThConfirmedSegmentRepository thConfirmedSegmentRepository, AuditLogService auditLogService,
-                                ExcelExportService excelExportService) {
+                                ExcelExportService excelExportService, AuditKhnsPbService pbService) {
         this.repository = repository;
         this.objectRepository = objectRepository;
         this.employeeRepository = employeeRepository;
@@ -65,6 +67,7 @@ public class AuditKhnsNamService {
         this.thConfirmedSegmentRepository = thConfirmedSegmentRepository;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
+        this.pbService = pbService;
     }
 
     @Transactional(readOnly = true)
@@ -72,9 +75,15 @@ public class AuditKhnsNamService {
         return list(year, false);
     }
 
-    /** allocatedOnly=true (man hinh KHNS_PB): chi tra can bo da duoc phan bo di kiem toan (co it nhat 1 thang/doi tuong). */
     @Transactional(readOnly = true)
     public List<AuditKhnsNamRowResponse> list(Integer year, boolean allocatedOnly) {
+        return list(year, allocatedOnly, false);
+    }
+
+    /** allocatedOnly=true (man hinh KHNS_PB): chi tra can bo da duoc phan bo di kiem toan (co it nhat 1 thang/doi tuong).
+     * listedOnly=true (man hinh KHNS_NAM): chi tra can bo da duoc dua vao danh sach qua nut "Cap nhat danh sach can bo". */
+    @Transactional(readOnly = true)
+    public List<AuditKhnsNamRowResponse> list(Integer year, boolean allocatedOnly, boolean listedOnly) {
         UUID tenantId = TenantContext.getTenantId();
         List<Employee> employees = employeeRepository.findByTenantIdOrderByFullNameAsc(tenantId);
         Map<UUID, AuditKhnsNam> plansByEmployee = repository.findByTenantIdAndYear(tenantId, year).stream()
@@ -84,12 +93,84 @@ public class AuditKhnsNamService {
         Map<UUID, AuditMasterDataItem> departments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.DEPARTMENT);
         Map<UUID, AuditMasterDataItem> segments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT);
         ThObjectLookup thLookup = buildThLookup(tenantId, year, segments);
+        Map<String, Set<AuditKhnsPosition>> pbPositionsByEmployee = new HashMap<>();
+        Map<String, List<String>> pbMonthNamesByEmployee = new HashMap<>();
+        if (listedOnly) {
+            // chuc vu va ten doi tuong theo thang lay dung tu KHNS_PB (cung nguon voi man hinh do)
+            pbService.listRows(year).forEach(r -> {
+                pbPositionsByEmployee.computeIfAbsent(r.employeeId(), k -> new HashSet<>())
+                        .addAll(r.positions().stream().map(AuditKhnsPosition::valueOf).toList());
+                List<String> names = pbMonthNamesByEmployee.computeIfAbsent(r.employeeId(), k -> new ArrayList<>(java.util.Collections.nCopies(12, (String) null)));
+                r.months().forEach(m -> names.set(m - 1, r.auditObjectName()));
+            });
+        }
 
-        return employees.stream().map(employee -> {
+        return employees.stream().filter(employee -> {
+            if (!listedOnly) {
+                return true;
+            }
+            AuditKhnsNam plan = plansByEmployee.get(employee.getId());
+            return plan != null && plan.isListed();
+        }).map(employee -> {
             AuditKhnsNam plan = plansByEmployee.get(employee.getId());
             List<String> objectCodes = plan == null ? List.of() : objectCodesByPlan.getOrDefault(plan.getId(), List.of());
-            return toResponse(employee, plan, objectCodes, positions, departments, segments, thLookup);
+            List<String> pbPositions = pbPositionsByEmployee.getOrDefault(employee.getId().toString(), Set.of()).stream()
+                    .sorted().map(Enum::name).toList();
+            return toResponse(employee, plan, objectCodes, positions, departments, segments, thLookup, year, pbPositions,
+                    pbMonthNamesByEmployee.get(employee.getId().toString()));
         }).filter(row -> !allocatedOnly || isAllocated(row)).toList();
+    }
+
+    /** Nut "Cap nhat danh sach can bo" o KHNS_NAM: lay danh sach can bo da phan bo o KHNS_PB (co it nhat 1 thang/doi tuong) dua vao
+     * danh sach KHNS_NAM cua nam; can bo khong con duoc phan bo bi go khoi danh sach. Giu nguyen cac truong nhap tay. */
+    @Transactional
+    public int syncListFromAllocation(Integer year) {
+        UUID tenantId = TenantContext.getTenantId();
+        List<AuditKhnsNam> plans = repository.findByTenantIdAndYear(tenantId, year);
+        Map<UUID, List<String>> objectCodesByPlan = objectCodesByPlan(tenantId, plans);
+        int listed = 0;
+        for (AuditKhnsNam plan : plans) {
+            boolean allocated = !objectCodesByPlan.getOrDefault(plan.getId(), List.of()).isEmpty()
+                    || monthCodesOf(plan).stream().anyMatch(code -> code != null && !code.isBlank());
+            if (plan.isListed() != allocated) {
+                plan.setListed(allocated);
+                repository.save(plan);
+            }
+            if (allocated) {
+                listed++;
+            }
+        }
+        auditLogService.record("AuditKhnsNam", null, AuditAction.UPDATE,
+                "Cap nhat danh sach can bo KHNS_NAM nam " + year + " tu KHNS_PB: " + listed + " can bo");
+        return listed;
+    }
+
+    /** Sua cac truong nhap tay cua 1 dong KHNS_NAM (cong viec khac, so/ngay quyet dinh, dot du kien, ghi chu) - khong dong vao
+     * phan bo thang/chuc vu (lay tu KHNS_PB). */
+    @Transactional
+    public AuditKhnsNamRowResponse updateInfo(UUID employeeId, Integer year, AuditKhnsNamInfoRequest request) {
+        UUID tenantId = TenantContext.getTenantId();
+        Employee employee = employeeRepository.findById(employeeId)
+                .filter(e -> e.getTenantId().equals(tenantId))
+                .orElseThrow(() -> new BusinessException("EMPLOYEE_NOT_FOUND", "Khong tim thay nhan vien", HttpStatus.NOT_FOUND));
+        AuditKhnsNam plan = repository.findByTenantIdAndYearAndEmployeeId(tenantId, year, employeeId)
+                .orElseThrow(() -> new BusinessException("AUDIT_KHNS_NAM_NOT_LISTED", "Can bo chua co trong danh sach du kien nhan su nam", HttpStatus.NOT_FOUND));
+        plan.setOtherDuties(request.otherDuties());
+        plan.setDecisionNumber(request.decisionNumber());
+        plan.setDecisionDate(request.decisionDate());
+        plan.setExpectedBatch(request.expectedBatch());
+        plan.setNote(request.note());
+        plan = repository.save(plan);
+
+        auditLogService.record("AuditKhnsNam", plan.getId(), AuditAction.UPDATE,
+                "Cap nhat thong tin du kien nhan su KHKT nam " + year + ": " + employee.getFullName());
+
+        List<String> objectCodes = objectCodesByPlan(tenantId, List.of(plan)).getOrDefault(plan.getId(), List.of());
+        Map<UUID, AuditMasterDataItem> positions = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.POSITION);
+        Map<UUID, AuditMasterDataItem> departments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.DEPARTMENT);
+        Map<UUID, AuditMasterDataItem> segments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT);
+        ThObjectLookup thLookup = buildThLookup(tenantId, year, segments);
+        return toResponse(employee, plan, objectCodes, positions, departments, segments, thLookup, year, List.of(), null);
     }
 
     private boolean isAllocated(AuditKhnsNamRowResponse row) {
@@ -199,7 +280,7 @@ public class AuditKhnsNamService {
         Map<UUID, AuditMasterDataItem> departments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.DEPARTMENT);
         Map<UUID, AuditMasterDataItem> segments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT);
         ThObjectLookup thLookup = buildThLookup(tenantId, year, segments);
-        return toResponse(employee, plan, newObjectCodes, positions, departments, segments, thLookup);
+        return toResponse(employee, plan, newObjectCodes, positions, departments, segments, thLookup, year, List.of(), null);
     }
 
     /** Dung rieng cho man hinh KHNS_PB (bao cao tong hop tu du lieu nay) - man hinh do CHI cho sua
@@ -228,7 +309,7 @@ public class AuditKhnsNamService {
         Map<UUID, AuditMasterDataItem> departments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.DEPARTMENT);
         Map<UUID, AuditMasterDataItem> segments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT);
         ThObjectLookup thLookup = buildThLookup(tenantId, year, segments);
-        return toResponse(employee, plan, objectCodes, positions, departments, segments, thLookup);
+        return toResponse(employee, plan, objectCodes, positions, departments, segments, thLookup, year, List.of(), null);
     }
 
     /** "Báo cáo theo đợt" (sheet Báo cáo theo đợt) - "DỰ KIẾN NHÂN SỰ CÁC ĐOÀN KIỂM TOÁN NỘI BỘ
@@ -375,7 +456,8 @@ public class AuditKhnsNamService {
 
     private AuditKhnsNamRowResponse toResponse(Employee employee, AuditKhnsNam plan, List<String> objectCodes,
                                                 Map<UUID, AuditMasterDataItem> positions, Map<UUID, AuditMasterDataItem> departments,
-                                                Map<UUID, AuditMasterDataItem> segments, ThObjectLookup thLookup) {
+                                                Map<UUID, AuditMasterDataItem> segments, ThObjectLookup thLookup, Integer year,
+                                                List<String> pbPositions, List<String> pbMonthNames) {
         AuditMasterDataItem position = employee.getPositionId() == null ? null : positions.get(employee.getPositionId());
         AuditMasterDataItem department = employee.getDepartmentId() == null ? null : departments.get(employee.getDepartmentId());
         AuditMasterDataItem segment = employee.getBusinessSegmentId() == null ? null : segments.get(employee.getBusinessSegmentId());
@@ -389,12 +471,42 @@ public class AuditKhnsNamService {
                 plan == null ? null : plan.getRoleInTeam(), plan == null ? null : plan.getOtherDuties(), objectCodes, objectNames,
                 objectSegmentCodes, plan == null ? null : plan.getDecisionNumber(), plan == null ? null : plan.getDecisionDate(),
                 plan == null ? null : plan.getExpectedBatch(),
-                objectCodes.size(), plan == null ? null : plan.getNote(),
+                totalTeams(plan, objectCodes), plan == null ? null : plan.getNote(),
                 plan == null ? null : plan.getMonth1AuditObjectCode(), plan == null ? null : plan.getMonth2AuditObjectCode(),
                 plan == null ? null : plan.getMonth3AuditObjectCode(), plan == null ? null : plan.getMonth4AuditObjectCode(),
                 plan == null ? null : plan.getMonth5AuditObjectCode(), plan == null ? null : plan.getMonth6AuditObjectCode(),
                 plan == null ? null : plan.getMonth7AuditObjectCode(), plan == null ? null : plan.getMonth8AuditObjectCode(),
                 plan == null ? null : plan.getMonth9AuditObjectCode(), plan == null ? null : plan.getMonth10AuditObjectCode(),
-                plan == null ? null : plan.getMonth11AuditObjectCode(), plan == null ? null : plan.getMonth12AuditObjectCode());
+                plan == null ? null : plan.getMonth11AuditObjectCode(), plan == null ? null : plan.getMonth12AuditObjectCode(),
+                year, pbPositions, pbMonthNames != null ? pbMonthNames : monthNames(plan, thLookup));
+    }
+
+    /** "Tong so doan du kien tham gia trong nam" = so doi tuong kiem toan khac nhau can bo di trong nam (tu cac thang KHNS_PB + doi tuong da chon). */
+    private int totalTeams(AuditKhnsNam plan, List<String> objectCodes) {
+        Set<String> codes = new HashSet<>(objectCodes);
+        if (plan != null) {
+            monthCodesOf(plan).stream().filter(c -> c != null && !c.isBlank()).forEach(codes::add);
+        }
+        return codes.size();
+    }
+
+    private List<String> monthNames(AuditKhnsNam plan, ThObjectLookup thLookup) {
+        List<String> names = new ArrayList<>();
+        if (plan != null) {
+            for (String code : monthCodesOf(plan)) {
+                names.add(code == null || code.isBlank() ? null : thLookup.nameByCode().getOrDefault(code, code));
+            }
+        }
+        while (names.size() < 12) {
+            names.add(null);
+        }
+        return names;
+    }
+
+    private List<String> monthCodesOf(AuditKhnsNam plan) {
+        return java.util.Arrays.asList(plan.getMonth1AuditObjectCode(), plan.getMonth2AuditObjectCode(), plan.getMonth3AuditObjectCode(),
+                plan.getMonth4AuditObjectCode(), plan.getMonth5AuditObjectCode(), plan.getMonth6AuditObjectCode(), plan.getMonth7AuditObjectCode(),
+                plan.getMonth8AuditObjectCode(), plan.getMonth9AuditObjectCode(), plan.getMonth10AuditObjectCode(), plan.getMonth11AuditObjectCode(),
+                plan.getMonth12AuditObjectCode());
     }
 }

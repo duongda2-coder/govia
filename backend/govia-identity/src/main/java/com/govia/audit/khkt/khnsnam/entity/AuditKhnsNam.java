@@ -52,6 +52,11 @@ public class AuditKhnsNam extends BaseEntity {
     @Column(name = "note", length = 120)
     private String note;
 
+    /** true = can bo da duoc dua vao man hinh KHNS_NAM qua nut "Cap nhat danh sach can bo" (lay tu KHNS_PB). Phan bo thang/chuc vu
+     * van doc truc tiep tu du lieu KHNS_PB; co nay chi quyet dinh can bo co nam trong danh sach KHNS_NAM hay khong. */
+    @Column(name = "khns_listed", nullable = false)
+    private boolean listed;
+
     @Column(name = "month1_audit_object_code", length = 20)
     private String month1AuditObjectCode;
 

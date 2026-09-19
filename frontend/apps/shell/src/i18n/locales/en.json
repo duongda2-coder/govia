@@ -1142,6 +1142,8 @@
   "auditKhnsNam": {
     "title": "Annual/batch audit staffing plan",
     "selectYearHint": "Select a Year to view the list.",
+    "syncButton": "Update staff list",
+    "emptyHint": "No staff in the list yet. Click \"Update staff list\" to pull the list from the Monthly staff allocation to branches screen.",
     "classification": {
       "TYPE_1": "Type 1",
       "TYPE_2": "Type 2",
@@ -1154,29 +1156,34 @@
       "SUPPORT": "Support Staff"
     },
     "columns": {
+      "year": "Audit year",
       "employeeCode": "Employee code",
       "employeeName": "Employee name",
+      "positions": "Positions available in the team",
       "positionName": "Position",
       "departmentCode": "Department",
       "auditorClassification": "Auditor classification",
-      "businessSegmentCode": "Assigned segment",
+      "businessSegmentCode": "Expected assigned segment",
       "roleInTeam": "Team role",
-      "otherDuties": "Other duties",
+      "otherDuties": "Other duties currently held",
       "auditObjectCodes": "Audit object codes",
       "decisionNumber": "Decision number",
       "decisionDate": "Decision date",
       "expectedBatch": "Expected batch",
-      "totalTeamsCount": "Total teams",
+      "totalTeamsCount": "Total teams expected this year",
       "note": "Note"
     },
     "form": {
       "editTitle": "Edit",
-      "monthDetail": "Batch detail (by month)"
+      "decisionHint": "Decision information (needed by the Transfer KHTH information screen):"
     },
     "messages": {
       "loadError": "Failed to load data",
       "updateSuccess": "Updated",
-      "saveError": "Save failed"
+      "saveError": "Save failed",
+      "syncSuccess": "List updated: {{count}} staff from the Monthly staff allocation to branches screen",
+      "syncEmpty": "No staff has been allocated in the Monthly staff allocation to branches screen yet",
+      "syncError": "Failed to update the staff list"
     }
   },
   "auditKhnsPb": {

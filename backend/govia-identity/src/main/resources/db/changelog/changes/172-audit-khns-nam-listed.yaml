@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 172-1-audit-khns-nam-listed
+      author: govia
+      comment: "KHNS_NAM: danh sach can bo lay tu KHNS_PB qua nut 'Cap nhat danh sach can bo' - danh dau can bo da duoc dua vao danh sach"
+      changes:
+        - addColumn:
+            tableName: audit_khns_nam
+            columns:
+              - column: { name: khns_listed, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }

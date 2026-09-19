@@ -1,5 +1,6 @@
 package com.govia.audit.khkt.khnsnam.controller;
 
+import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamInfoRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamUpdateRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsPbAllocationResult;
@@ -46,8 +47,24 @@ public class AuditKhnsNamController {
     @GetMapping
     @PreAuthorize("hasAuthority('PERM_AUDIT.KHNS_NAM.VIEW')")
     public ApiResponse<List<AuditKhnsNamRowResponse>> list(@RequestParam Integer year,
-                                                            @RequestParam(defaultValue = "false") boolean allocatedOnly) {
-        return ApiResponse.ok(service.list(year, allocatedOnly));
+                                                            @RequestParam(defaultValue = "false") boolean allocatedOnly,
+                                                            @RequestParam(defaultValue = "false") boolean listedOnly) {
+        return ApiResponse.ok(service.list(year, allocatedOnly, listedOnly));
+    }
+
+    /** Nut "Cap nhat danh sach can bo" o KHNS_NAM - lay danh sach can bo da phan bo o KHNS_PB. Tra ve so can bo trong danh sach. */
+    @PostMapping("/sync-list")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.KHNS_NAM.EDIT')")
+    public ApiResponse<Integer> syncList(@RequestParam Integer year) {
+        return ApiResponse.ok(service.syncListFromAllocation(year));
+    }
+
+    /** Sua cac truong nhap tay cua man hinh KHNS_NAM (khong dong vao phan bo thang/chuc vu). */
+    @PutMapping("/{employeeId}/info")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.KHNS_NAM.EDIT')")
+    public ApiResponse<AuditKhnsNamRowResponse> updateInfo(@PathVariable UUID employeeId, @RequestParam Integer year,
+                                                            @Valid @RequestBody AuditKhnsNamInfoRequest request) {
+        return ApiResponse.ok(service.updateInfo(employeeId, year, request));
     }
 
     @PutMapping("/{employeeId}")
