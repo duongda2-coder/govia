@@ -91,6 +91,26 @@ export async function exportAuditKhnsNamMonthlyReport(year: number, month: numbe
   window.URL.revokeObjectURL(blobUrl);
 }
 
+/** 1 dòng màn KHNS_PB = 1 cán bộ được phân bổ vào 1 đơn vị (months = các tháng cán bộ đi kiểm toán đơn vị đó). */
+export interface AuditKhnsPbRowItem {
+  employeeId: string;
+  auditObjectCode: string;
+  auditObjectName: string;
+  businessSegmentCodes: string[];
+  creditScale: number | null;
+  fundingScale: number | null;
+  employeeCode: string;
+  employeeName: string;
+  username: string | null;
+  roleInTeam: AuditKhnsRoleInTeam | null;
+  months: number[];
+}
+
+export async function listAuditKhnsPbRows(year: number): Promise<AuditKhnsPbRowItem[]> {
+  const res = await httpClient.get<ApiResponse<AuditKhnsPbRowItem[]>>(`${BASE}/allocation`, { params: { year } });
+  return res.data.data;
+}
+
 export interface AuditKhnsPbAllocationResult {
   objectCount: number;
   fullyStaffedCount: number;

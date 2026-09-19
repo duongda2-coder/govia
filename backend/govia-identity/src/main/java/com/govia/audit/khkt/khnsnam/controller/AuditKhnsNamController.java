@@ -3,6 +3,7 @@ package com.govia.audit.khkt.khnsnam.controller;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamUpdateRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsPbAllocationResult;
+import com.govia.audit.khkt.khnsnam.dto.AuditKhnsPbRowResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsTransferCandidateResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsTransferRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsTransferResultItem;
@@ -65,6 +66,13 @@ public class AuditKhnsNamController {
     }
 
     public record NoteRequest(String note) {
+    }
+
+    /** Cac dong man hinh KHNS_PB (sheet ZTC_KHNS_PB): moi can bo duoc phan bo vao moi don vi 1 dong - xem AuditKhnsPbService. */
+    @GetMapping("/allocation")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.KHNS_NAM.VIEW')")
+    public ApiResponse<List<AuditKhnsPbRowResponse>> allocationRows(@RequestParam Integer year) {
+        return ApiResponse.ok(pbService.listRows(year));
     }
 
     /** Nut "Phan bo nhan su" o KHNS_PB - tu dong phan bo can bo cho ca nam, xem AuditKhnsPbService. */

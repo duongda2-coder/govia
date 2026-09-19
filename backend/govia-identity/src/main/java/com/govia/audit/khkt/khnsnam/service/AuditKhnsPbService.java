@@ -5,6 +5,7 @@ import com.govia.audit.employeecapability.repository.AuditEmployeeCapabilityRepo
 import com.govia.audit.khkt.khnsnam.allocation.AuditKhnsPbAllocator;
 import com.govia.audit.khkt.khnsnam.allocation.AuditKhnsPbAllocator.ScaleLevel;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsPbAllocationResult;
+import com.govia.audit.khkt.khnsnam.dto.AuditKhnsPbRowResponse;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsNam;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsNamObject;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsRoleInTeam;
@@ -23,11 +24,15 @@ import com.govia.core.audit.AuditLogService;
 import com.govia.core.tenant.TenantContext;
 import com.govia.identity.entity.Employee;
 import com.govia.identity.entity.EmployeeStatus;
+import com.govia.identity.entity.UserAccount;
 import com.govia.identity.repository.EmployeeRepository;
+import com.govia.identity.repository.UserAccountRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -66,11 +71,12 @@ public class AuditKhnsPbService {
     private final AuditKhnsNamRepository khnsNamRepository;
     private final AuditKhnsNamObjectRepository khnsNamObjectRepository;
     private final AuditLogService auditLogService;
+    private final UserAccountRepository userAccountRepository;
 
     public AuditKhnsPbService(AuditKhktThangService thangService, AuditKhktScaleService scaleService, EmployeeRepository employeeRepository,
                                AuditEmployeeCapabilityRepository capabilityRepository, AuditMasterDataItemRepository masterDataItemRepository,
                                AuditKhnsNamRepository khnsNamRepository, AuditKhnsNamObjectRepository khnsNamObjectRepository,
-                               AuditLogService auditLogService) {
+                               AuditLogService auditLogService, UserAccountRepository userAccountRepository) {
         this.thangService = thangService;
         this.scaleService = scaleService;
         this.employeeRepository = employeeRepository;
@@ -79,6 +85,67 @@ public class AuditKhnsPbService {
         this.khnsNamRepository = khnsNamRepository;
         this.khnsNamObjectRepository = khnsNamObjectRepository;
         this.auditLogService = auditLogService;
+        this.userAccountRepository = userAccountRepository;
+    }
+
+    /** Cac dong cua man hinh KHNS_PB: moi (can bo, don vi) da duoc phan bo 1 dong, gom cac thang can bo do di
+     * kiem toan don vi. Chi gom can bo da duoc phan bo; sap xep theo don vi, roi chuc vu (Truong doan truoc). */
+    @Transactional(readOnly = true)
+    public List<AuditKhnsPbRowResponse> listRows(Integer year) {
+        UUID tenantId = TenantContext.getTenantId();
+        List<AuditKhnsNam> plans = khnsNamRepository.findByTenantIdAndYear(tenantId, year);
+        if (plans.isEmpty()) {
+            return List.of();
+        }
+        Map<UUID, Employee> employees = employeeRepository.findAllById(plans.stream().map(AuditKhnsNam::getEmployeeId).toList()).stream()
+                .collect(Collectors.toMap(Employee::getId, e -> e));
+        Map<UUID, String> usernames = userAccountRepository.findByEmployeeIdIn(employees.keySet()).stream()
+                .collect(Collectors.toMap(UserAccount::getEmployeeId, UserAccount::getUsername, (a, b) -> a));
+        Map<String, AuditKhktThangRowResponse> objectsByCode = thangService.list(year).stream()
+                .collect(Collectors.toMap(AuditKhktThangRowResponse::auditObjectCode, r -> r, (a, b) -> a));
+
+        List<AuditKhnsPbRowResponse> rows = new ArrayList<>();
+        for (AuditKhnsNam plan : plans) {
+            Employee employee = employees.get(plan.getEmployeeId());
+            if (employee == null) {
+                continue;
+            }
+            Map<String, List<Integer>> monthsByObject = new LinkedHashMap<>();
+            for (int month = 1; month <= 12; month++) {
+                String code = monthObject(plan, month);
+                if (code != null && !code.isBlank()) {
+                    monthsByObject.computeIfAbsent(code, k -> new ArrayList<>()).add(month);
+                }
+            }
+            monthsByObject.forEach((code, months) -> {
+                AuditKhktThangRowResponse object = objectsByCode.get(code);
+                rows.add(new AuditKhnsPbRowResponse(employee.getId().toString(), code, object == null ? code : object.auditObjectName(),
+                        object == null ? List.of() : object.businessSegmentCodes(), object == null ? null : object.creditScale(),
+                        object == null ? null : object.fundingScale(), employee.getEmployeeCode(), employee.getFullName(),
+                        usernames.get(employee.getId()), plan.getRoleInTeam(), months));
+            });
+        }
+        rows.sort(Comparator.comparing(AuditKhnsPbRowResponse::auditObjectCode)
+                .thenComparingInt(r -> r.roleInTeam() == null ? Integer.MAX_VALUE : r.roleInTeam().ordinal())
+                .thenComparing(AuditKhnsPbRowResponse::employeeName));
+        return rows;
+    }
+
+    private String monthObject(AuditKhnsNam plan, int month) {
+        return switch (month) {
+            case 1 -> plan.getMonth1AuditObjectCode();
+            case 2 -> plan.getMonth2AuditObjectCode();
+            case 3 -> plan.getMonth3AuditObjectCode();
+            case 4 -> plan.getMonth4AuditObjectCode();
+            case 5 -> plan.getMonth5AuditObjectCode();
+            case 6 -> plan.getMonth6AuditObjectCode();
+            case 7 -> plan.getMonth7AuditObjectCode();
+            case 8 -> plan.getMonth8AuditObjectCode();
+            case 9 -> plan.getMonth9AuditObjectCode();
+            case 10 -> plan.getMonth10AuditObjectCode();
+            case 11 -> plan.getMonth11AuditObjectCode();
+            default -> plan.getMonth12AuditObjectCode();
+        };
     }
 
     @Transactional

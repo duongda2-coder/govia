@@ -1196,15 +1196,15 @@
     "assignConfirmTitle": "Phân bổ nhân sự cả năm?",
     "assignConfirmContent": "Hệ thống sẽ tự động phân bổ cán bộ cho tất cả đối tượng đã khai báo số tháng kiểm toán trong năm {{year}} theo nguyên tắc bố trí nhân sự đoàn kiểm toán, và ghi đè toàn bộ phân bổ theo tháng hiện có của năm này.",
     "columns": {
-      "employeeCode": "Mã cán bộ",
+      "auditObjectCode": "Mã đơn vị",
+      "auditObjectName": "Tên đơn vị",
+      "businessSegments": "Lĩnh vực kiểm toán",
+      "creditScale": "Quy mô tín dụng",
+      "fundingScale": "Quy mô huy động vốn",
       "employeeName": "Tên cán bộ",
-      "positionName": "Chức danh",
-      "departmentCode": "Phòng công tác",
-      "auditorClassification": "Phân loại năng lực KTV",
-      "businessSegmentCode": "Lĩnh vực dự kiến",
-      "otherDuties": "Công việc khác đang đảm nhận",
-      "totalTeamsCount": "Tổng số đoàn",
-      "note": "Ghi chú"
+      "username": "Username",
+      "position": "Chức vụ",
+      "months": "Tháng"
     },
     "messages": {
       "loadError": "Không tải được dữ liệu",

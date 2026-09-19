@@ -6,6 +6,7 @@ import com.govia.audit.khkt.common.entity.AuditKhktApprovalStatus;
 import com.govia.audit.khkt.common.entity.AuditKhktSelectionChoice;
 import com.govia.audit.khkt.common.entity.AuditKhktSourceType;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsPbAllocationResult;
+import com.govia.audit.khkt.khnsnam.dto.AuditKhnsPbRowResponse;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsNam;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsNamObject;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsRoleInTeam;
@@ -156,6 +157,49 @@ class AuditKhnsPbAllocationTest {
         AuditKhnsPbAllocationResult again = pbService.allocate(YEAR);
         assertThat(again.warnings()).isEmpty();
         assertThat(teamOf("OBJ-A", 3)).containsExactlyInAnyOrder(e1.getId(), e2.getId(), e3.getId(), e5.getId());
+    }
+
+    @Test
+    void listRowsReturnsOneRowPerAllocatedEmployeeAndUnitWithMonthsAndUnitInfo() {
+        object("OBJ-A", AuditKhktApprovalStatus.APPROVED, true, "12000", Set.of(3), lnId, gaId);
+        object("OBJ-D", AuditKhktApprovalStatus.APPROVED, true, null, Set.of(3, 4), gaId);
+        employee("E1", EmployeeAuditorClassification.TYPE_3, true, false, "LN");
+        employee("E2", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
+        employee("E3", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
+        employee("E4", EmployeeAuditorClassification.TYPE_1, true, false, "GA");
+        employee("E5", EmployeeAuditorClassification.TYPE_1, false, false, "GA");
+        employee("E6-UNUSED", EmployeeAuditorClassification.TYPE_1, false, false);
+        pbService.allocate(YEAR);
+
+        List<AuditKhnsPbRowResponse> rows = pbService.listRows(YEAR);
+
+        // OBJ-A: 3 tin dung (gom Truong doan) + 1 TCKT = 4 dong; OBJ-D: 1 dong (1 nguoi, 2 thang) -> 5 dong
+        assertThat(rows).hasSize(5);
+        // sap xep theo don vi, Truong doan truoc
+        assertThat(rows).extracting(AuditKhnsPbRowResponse::auditObjectCode).containsExactly("OBJ-A", "OBJ-A", "OBJ-A", "OBJ-A", "OBJ-D");
+        assertThat(rows.get(0).roleInTeam()).isEqualTo(AuditKhnsRoleInTeam.TEAM_LEAD);
+        assertThat(rows.get(0).employeeName()).isEqualTo("Nhan vien E1");
+
+        AuditKhnsPbRowResponse a = rows.get(0);
+        assertThat(a.auditObjectName()).isEqualTo("OBJ-A");
+        assertThat(a.businessSegmentCodes()).containsExactlyInAnyOrder("LN", "GA");
+        assertThat(a.creditScale()).isEqualTo(2);
+        assertThat(a.months()).containsExactly(3);
+
+        AuditKhnsPbRowResponse d = rows.get(4);
+        assertThat(d.employeeName()).isEqualTo("Nhan vien E4");
+        assertThat(d.roleInTeam()).isEqualTo(AuditKhnsRoleInTeam.TEAM_LEAD);
+        assertThat(d.months()).containsExactly(3, 4);
+        // can bo khong duoc phan bo khong xuat hien
+        assertThat(rows).noneMatch(r -> r.employeeName().contains("UNUSED"));
+    }
+
+    @Test
+    void listRowsIsEmptyWhenNobodyIsAllocated() {
+        object("OBJ-A", AuditKhktApprovalStatus.APPROVED, true, null, Set.of(3), gaId);
+        employee("E1", EmployeeAuditorClassification.TYPE_1, true, false, "GA");
+
+        assertThat(pbService.listRows(YEAR)).isEmpty();
     }
 
     @Test

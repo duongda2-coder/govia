@@ -1196,15 +1196,15 @@
     "assignConfirmTitle": "Assign personnel for the whole year?",
     "assignConfirmContent": "The system will automatically assign staff to every audit object with declared audit months in {{year}}, following the audit team staffing rules, and overwrite all existing month assignments of this year.",
     "columns": {
-      "employeeCode": "Employee code",
+      "auditObjectCode": "Unit code",
+      "auditObjectName": "Unit name",
+      "businessSegments": "Audit segments",
+      "creditScale": "Credit scale",
+      "fundingScale": "Funding scale",
       "employeeName": "Employee name",
-      "positionName": "Position",
-      "departmentCode": "Department",
-      "auditorClassification": "Auditor classification",
-      "businessSegmentCode": "Assigned segment",
-      "otherDuties": "Other duties",
-      "totalTeamsCount": "Total teams",
-      "note": "Note"
+      "username": "Username",
+      "position": "Position",
+      "months": "Month"
     },
     "messages": {
       "loadError": "Failed to load data",
