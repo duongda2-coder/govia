@@ -22,6 +22,25 @@ interface FormValues {
   businessSegment3Id?: string;
 }
 
+/** Ma nghiep vu (BUSINESS_SEGMENT) cua QTDH va Tin dung - xem AuditEngagementService.capableSegmentCodes. */
+const SEGMENT_QTDH = "CE";
+const SEGMENT_CREDIT = "LN";
+
+/** Nghiep vu duoc chon cho thanh vien cua nhom co dinh cua CKT thuong: nhom QTDH (DIEUHANH) chi mang CE,
+ * nhom Tin dung (TINDUNG) chi mang LN, nhom ngoai tin dung (NTINDUNG) la cac nghiep vu con lai. */
+function segmentAllowedForGroup(segmentCode: string, groupCode: string | undefined): boolean {
+  switch (groupCode) {
+    case "DIEUHANH":
+      return segmentCode === SEGMENT_QTDH;
+    case "TINDUNG":
+      return segmentCode === SEGMENT_CREDIT;
+    case "NTINDUNG":
+      return segmentCode !== SEGMENT_QTDH && segmentCode !== SEGMENT_CREDIT;
+    default:
+      return true;
+  }
+}
+
 export interface AuditEngagementGroupMembersDrawerProps {
   open: boolean;
   engagementId: string;
@@ -152,7 +171,7 @@ export function AuditEngagementGroupMembersDrawer(props: AuditEngagementGroupMem
     const capableCodes = new Set(employee?.capableSegmentCodes ?? []);
     return businessSegments
       .filter((s) => capableCodes.has(s.code) && !excludeIds.includes(s.id))
-      .filter((s) => !processScoped || s.code === group?.groupCode)
+      .filter((s) => (processScoped ? s.code === group?.groupCode : segmentAllowedForGroup(s.code, group?.groupCode)))
       .map((s) => ({ value: s.id, label: `${s.code} - ${s.name}` }));
   };
 
@@ -216,11 +235,16 @@ export function AuditEngagementGroupMembersDrawer(props: AuditEngagementGroupMem
             />
           </Form.Item>
           <Form.Item noStyle shouldUpdate={(prev, cur) => prev.employeeId !== cur.employeeId}>
-            {() =>
-              form.getFieldValue("employeeId") && segmentOptions(form.getFieldValue("employeeId"), []).length === 0 ? (
-                <Typography.Paragraph type="warning">{t("auditEngagement.form.noCapableSegments")}</Typography.Paragraph>
-              ) : null
-            }
+            {() => {
+              const employeeId = form.getFieldValue("employeeId");
+              if (!employeeId || segmentOptions(employeeId, []).length > 0) return null;
+              const hasAnyCapability = (employees.find((e) => e.id === employeeId)?.capableSegmentCodes ?? []).length > 0;
+              return (
+                <Typography.Paragraph type="warning">
+                  {hasAnyCapability ? t("auditEngagement.form.noSegmentsForGroup") : t("auditEngagement.form.noCapableSegments")}
+                </Typography.Paragraph>
+              );
+            }}
           </Form.Item>
           <Row gutter={16}>
             <Col span={8}>

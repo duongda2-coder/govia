@@ -1396,6 +1396,7 @@
       "segment2": "Business Segment 2",
       "segment3": "Business Segment 3",
       "noCapableSegments": "This employee has no declared business-segment capability (see Employee Capability screen)",
+      "noSegmentsForGroup": "This employee has no business segment that fits this group (the QTDH group takes only CE, the Credit group only LN, the non-credit group takes the remaining segments)",
       "assignmentTitle": "Work Item Assignment - {{code}}",
       "notTeamLeadWarning": "Only the team lead ({{name}}) is allowed to assign work items for this engagement.",
       "readOnlyWarning": "View only - opened from Engagement Monitoring, not for assigning work items.",

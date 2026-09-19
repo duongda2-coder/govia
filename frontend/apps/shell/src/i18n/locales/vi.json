@@ -1396,6 +1396,7 @@
       "segment2": "Nghiệp vụ 2",
       "segment3": "Nghiệp vụ 3",
       "noCapableSegments": "Cán bộ này chưa được khai báo khả năng đảm nhiệm nghiệp vụ nào (xem màn hình Khả năng đảm nhiệm)",
+      "noSegmentsForGroup": "Cán bộ này không có nghiệp vụ nào phù hợp với nhóm này (nhóm QTĐH chỉ nhận CE, nhóm Tín dụng chỉ nhận LN, nhóm ngoài tín dụng nhận các nghiệp vụ còn lại)",
       "assignmentTitle": "Phân công nghiệp vụ cho thành viên - {{code}}",
       "notTeamLeadWarning": "Chỉ trưởng đoàn ({{name}}) mới được phép phân công công việc cho cuộc kiểm toán này.",
       "readOnlyWarning": "Màn hình chỉ xem - vào từ Quản lý đợt kiểm toán, không dùng để phân công công việc.",
