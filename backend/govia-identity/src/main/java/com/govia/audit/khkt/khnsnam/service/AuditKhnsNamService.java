@@ -36,6 +36,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /** "Dự kiến nhân sự thực hiện kiểm toán năm, đợt" (sheet ZTC_KHNS_NAM) - xem AuditKhnsNam. */
 @Service
@@ -67,6 +68,12 @@ public class AuditKhnsNamService {
 
     @Transactional(readOnly = true)
     public List<AuditKhnsNamRowResponse> list(Integer year) {
+        return list(year, false);
+    }
+
+    /** allocatedOnly=true (man hinh KHNS_PB): chi tra can bo da duoc phan bo di kiem toan (co it nhat 1 thang/doi tuong). */
+    @Transactional(readOnly = true)
+    public List<AuditKhnsNamRowResponse> list(Integer year, boolean allocatedOnly) {
         UUID tenantId = TenantContext.getTenantId();
         List<Employee> employees = employeeRepository.findByTenantIdOrderByFullNameAsc(tenantId);
         Map<UUID, AuditKhnsNam> plansByEmployee = repository.findByTenantIdAndYear(tenantId, year).stream()
@@ -81,7 +88,14 @@ public class AuditKhnsNamService {
             AuditKhnsNam plan = plansByEmployee.get(employee.getId());
             List<String> objectCodes = plan == null ? List.of() : objectCodesByPlan.getOrDefault(plan.getId(), List.of());
             return toResponse(employee, plan, objectCodes, positions, departments, segments, thLookup);
-        }).toList();
+        }).filter(row -> !allocatedOnly || isAllocated(row)).toList();
+    }
+
+    private boolean isAllocated(AuditKhnsNamRowResponse row) {
+        return !row.auditObjectCodes().isEmpty() || Stream.of(row.month1AuditObjectCode(), row.month2AuditObjectCode(),
+                row.month3AuditObjectCode(), row.month4AuditObjectCode(), row.month5AuditObjectCode(), row.month6AuditObjectCode(),
+                row.month7AuditObjectCode(), row.month8AuditObjectCode(), row.month9AuditObjectCode(), row.month10AuditObjectCode(),
+                row.month11AuditObjectCode(), row.month12AuditObjectCode()).anyMatch(code -> code != null && !code.isBlank());
     }
 
     @Transactional

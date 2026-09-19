@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -24,6 +25,8 @@ import java.util.UUID;
  *   <li>Khong bo tri KTV tai don vi minh tung lam viec / don vi co nguoi lien quan (loai cung).</li>
  *   <li>Can bang do phuc tap giua cac doan: xu ly doan phuc tap truoc, uu tien can bo it doan nhat,
  *       KTV bac cao chi dung khi can (tranh don het vao 1 doan).</li>
+ *   <li>Trong so cac can bo dap ung duoc (cung diem) thi chon NGAU NHIEN - moi lan phan bo cho ra 1 phuong an
+ *       khac, nguoi dung xem roi tu chinh lai neu can.</li>
  * </ul>
  * Rang buoc cua mo hinh du lieu KHNS_NAM: moi can bo chi co 1 doi tuong / thang, va 1 "Chuc vu" cho
  * ca nam - nen 1 can bo da lam Truong doan thi chi lam Truong doan o moi doan (khong tron vai tro).
@@ -72,6 +75,17 @@ public final class AuditKhnsPbAllocator {
     }
 
     public record Result(Map<UUID, StaffAssignment> assignments, List<String> warnings, int objectCount, int objectsFullyStaffed) {
+    }
+
+    private final Random random;
+
+    public AuditKhnsPbAllocator() {
+        this(new Random());
+    }
+
+    /** Truyen Random co seed co dinh de kiem thu lap lai duoc. */
+    public AuditKhnsPbAllocator(Random random) {
+        this.random = random;
     }
 
     private record Slot(String label, Set<String> segments, int minGrade) {
@@ -150,6 +164,7 @@ public final class AuditKhnsPbAllocator {
         Staff lead = null;
         Slot leadSlot = null;
         double bestScore = Double.NEGATIVE_INFINITY;
+        int leadTies = 0;
         for (Staff s : staff) {
             StaffAssignment current = assignments.get(s.id());
             if (!s.leadCapable() || (current != null && current.member) || !available(s, plan.object(), current)) {
@@ -157,8 +172,12 @@ public final class AuditKhnsPbAllocator {
             }
             Slot slot = bestSlotFor(s, open);
             double score = (slot != null ? 100 : 0) + score(s, plan, current, slot, false);
-            if (score > bestScore || (score == bestScore && lead != null && s.code().compareTo(lead.code()) < 0)) {
+            if (score > bestScore) {
                 bestScore = score;
+                lead = s;
+                leadSlot = slot;
+                leadTies = 1;
+            } else if (score == bestScore && random.nextInt(++leadTies) == 0) {
                 lead = s;
                 leadSlot = slot;
             }
@@ -193,11 +212,15 @@ public final class AuditKhnsPbAllocator {
             open.remove(target);
             Staff picked = null;
             double pickedScore = Double.NEGATIVE_INFINITY;
+            int pickedTies = 0;
             for (Staff s : targetCandidates) {
                 double score = score(s, plan, assignments.get(s.id()), target, true);
-                if (score > pickedScore || (score == pickedScore && s.code().compareTo(picked.code()) < 0)) {
+                if (score > pickedScore) {
                     picked = s;
                     pickedScore = score;
+                    pickedTies = 1;
+                } else if (score == pickedScore && random.nextInt(++pickedTies) == 0) {
+                    picked = s;
                 }
             }
             if (picked == null) {

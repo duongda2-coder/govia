@@ -9,7 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -118,5 +120,20 @@ class AuditKhnsPbAllocatorTest {
 
         assertThat(result.assignments()).hasSize(1);
         assertThat(result.assignments().containsKey(UUID.nameUUIDFromBytes("L1".getBytes()))).isFalse();
+    }
+
+    @Test
+    void equallySuitableStaffArePickedRandomlyButRulesStillHold() {
+        List<Staff> staff = List.of(
+                staff("L1", 1, true, "GA"), staff("L2", 1, true, "GA"), staff("L3", 1, true, "GA"), staff("L4", 1, true, "GA"));
+        Set<Set<String>> distinctTeams = new HashSet<>();
+        for (long seed = 0; seed < 30; seed++) {
+            var result = new AuditKhnsPbAllocator(new Random(seed)).allocate(List.of(object("CN1", Set.of(1), ScaleLevel.LOW, "GA")), staff);
+            assertThat(result.warnings()).isEmpty();
+            assertThat(result.assignments()).hasSize(1);
+            distinctTeams.add(Set.copyOf(teamOf(result, "CN1")));
+        }
+        // 4 ung vien cung diem -> qua nhieu lan phan bo phai ra it nhat 2 phuong an khac nhau (khong con co dinh theo ma)
+        assertThat(distinctTeams.size()).isGreaterThan(1);
     }
 }

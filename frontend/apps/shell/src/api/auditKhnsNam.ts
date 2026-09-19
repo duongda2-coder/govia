@@ -61,8 +61,9 @@ export interface AuditKhnsNamUpdateRequest {
 
 const BASE = "/api/audit/plan/khns-nam";
 
-export async function listAuditKhnsNam(year: number): Promise<AuditKhnsNamRowItem[]> {
-  const res = await httpClient.get<ApiResponse<AuditKhnsNamRowItem[]>>(BASE, { params: { year } });
+/** allocatedOnly=true: chỉ cán bộ đã được phân bổ đi kiểm toán (dùng cho KHNS_PB). */
+export async function listAuditKhnsNam(year: number, allocatedOnly = false): Promise<AuditKhnsNamRowItem[]> {
+  const res = await httpClient.get<ApiResponse<AuditKhnsNamRowItem[]>>(BASE, { params: { year, allocatedOnly } });
   return res.data.data;
 }
 

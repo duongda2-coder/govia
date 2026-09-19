@@ -1183,6 +1183,14 @@
     "title": "Monthly staff allocation to branches",
     "selectYearHint": "Select a Year to view the list.",
     "editNoteButton": "Edit note",
+    "editAllocationButton": "Edit allocation",
+    "addEmployeeButton": "Add employee",
+    "editAllocationTitle": "Edit staff allocation",
+    "addEmployeeTitle": "Add employee to allocation",
+    "employeeField": "Employee",
+    "roleField": "Role in team",
+    "monthsHint": "Pick the audit object for each month (leave empty if the employee is not auditing that month).",
+    "emptyHint": "No staff allocated for this year yet. Click \"Assign personnel\" to allocate automatically, then adjust as needed.",
     "exportReportButton": "Export batch report",
     "assignButton": "Assign personnel",
     "assignConfirmTitle": "Assign personnel for the whole year?",
@@ -1205,7 +1213,8 @@
       "assignSuccess": "Personnel assigned: {{staffed}}/{{total}} teams fully staffed, {{employees}} employees assigned",
       "assignPartialTitle": "{{employees}} employees assigned - {{staffed}}/{{total}} teams fully staffed",
       "assignPartialHint": "The teams below could not be fully staffed under the rules. Add staff / business-segment capabilities and assign again, or adjust manually in the personnel plan screen.",
-      "assignError": "Failed to assign personnel"
+      "assignError": "Failed to assign personnel",
+      "teamLeadConflict": "This object already has another team lead; this employee cannot be set as team lead"
     }
   },
   "auditKhktTransfer": {

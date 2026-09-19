@@ -1183,6 +1183,14 @@
     "title": "Phân bổ cán bộ cho chi nhánh theo tháng",
     "selectYearHint": "Chọn Năm để xem danh sách.",
     "editNoteButton": "Sửa ghi chú",
+    "editAllocationButton": "Sửa phân bổ",
+    "addEmployeeButton": "Thêm cán bộ",
+    "editAllocationTitle": "Chỉnh sửa phân bổ cán bộ",
+    "addEmployeeTitle": "Thêm cán bộ vào phân bổ",
+    "employeeField": "Cán bộ",
+    "roleField": "Vai trò trong đoàn",
+    "monthsHint": "Chọn đối tượng kiểm toán cho từng tháng (để trống nếu tháng đó cán bộ không đi kiểm toán).",
+    "emptyHint": "Chưa có cán bộ nào được phân bổ trong năm này. Bấm \"Phân bổ nhân sự\" để hệ thống tự động phân bổ, sau đó có thể chỉnh sửa lại.",
     "exportReportButton": "Xuất báo cáo theo đợt",
     "assignButton": "Phân bổ nhân sự",
     "assignConfirmTitle": "Phân bổ nhân sự cả năm?",
@@ -1205,7 +1213,8 @@
       "assignSuccess": "Đã phân bổ nhân sự: {{staffed}}/{{total}} đoàn đủ định biên, {{employees}} cán bộ được phân bổ",
       "assignPartialTitle": "Đã phân bổ {{employees}} cán bộ - {{staffed}}/{{total}} đoàn đủ định biên",
       "assignPartialHint": "Các đoàn dưới đây chưa bố trí đủ cán bộ theo nguyên tắc. Vui lòng bổ sung nhân sự / khả năng đảm nhận lĩnh vực rồi phân bổ lại, hoặc điều chỉnh thủ công ở màn hình Dự kiến nhân sự.",
-      "assignError": "Phân bổ nhân sự thất bại"
+      "assignError": "Phân bổ nhân sự thất bại",
+      "teamLeadConflict": "Đối tượng đã có Trưởng đoàn khác, không thể đặt cán bộ này làm Trưởng đoàn"
     }
   },
   "auditKhktTransfer": {

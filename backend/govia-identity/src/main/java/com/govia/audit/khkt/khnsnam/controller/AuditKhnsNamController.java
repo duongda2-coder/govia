@@ -44,8 +44,9 @@ public class AuditKhnsNamController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('PERM_AUDIT.KHNS_NAM.VIEW')")
-    public ApiResponse<List<AuditKhnsNamRowResponse>> list(@RequestParam Integer year) {
-        return ApiResponse.ok(service.list(year));
+    public ApiResponse<List<AuditKhnsNamRowResponse>> list(@RequestParam Integer year,
+                                                            @RequestParam(defaultValue = "false") boolean allocatedOnly) {
+        return ApiResponse.ok(service.list(year, allocatedOnly));
     }
 
     @PutMapping("/{employeeId}")
