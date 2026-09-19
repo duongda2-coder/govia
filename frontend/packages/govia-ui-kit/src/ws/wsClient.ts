@@ -39,7 +39,7 @@ function resubscribeAll(): void {
  *
  * QUAN TRONG: neu da co 1 ket noi tu TRUOC (vd tab nay tung mang token cua 1 phien khac da bi da,
  * hoac nguoi dung vao thang /login trong khi tab van con dang nhap) thi PHAI reconnect lai bang
- * token MOI NHAT trong localStorage, khong duoc no-op som - neu khong, socket cu se tiep tuc gan
+ * token MOI NHAT trong sessionStorage cua tab, khong duoc no-op som - neu khong, socket cu se tiep tuc gan
  * voi jti CU (co the vua bi thu hoi boi chinh lan dang nhap nay qua KICK_OTHERS), roi nhan nham
  * tin "session-kicked" cua phien cu va vo tinh dang xuat luon phien MOI vua tao.
  */

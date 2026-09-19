@@ -35,18 +35,32 @@ export interface AuthTokens {
 
 const TOKEN_STORAGE_KEY = "govia.tokens";
 
+/* Token luu o sessionStorage (RIENG TUNG TAB), khong phai localStorage (dung chung moi tab cua trinh
+ * duyet): neu dung localStorage thi dang nhap user2 o tab 2 se ghi de token cua user1 o tab 1, khien
+ * moi thao tac o tab 1 bi ghi nhan la user2. Doi lai, mo tab moi phai dang nhap lai. */
 export function getStoredTokens(): AuthTokens | null {
-  const raw = localStorage.getItem(TOKEN_STORAGE_KEY);
+  const raw = sessionStorage.getItem(TOKEN_STORAGE_KEY);
   return raw ? (JSON.parse(raw) as AuthTokens) : null;
 }
 
 export function storeTokens(tokens: AuthTokens): void {
-  localStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify(tokens));
+  sessionStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify(tokens));
 }
 
 export function clearTokens(): void {
-  localStorage.removeItem(TOKEN_STORAGE_KEY);
+  sessionStorage.removeItem(TOKEN_STORAGE_KEY);
 }
+
+/* Don token cu con sot lai o localStorage tu ban truoc - neu khong se ton tai mai, va (tren may dung
+ * chung) la 1 token dang nhap nam ngoai tam kiem soat cua nut Dang xuat. */
+export function clearLegacySharedSession(...keys: string[]): void {
+  try {
+    [TOKEN_STORAGE_KEY, ...keys].forEach((key) => localStorage.removeItem(key));
+  } catch {
+    // localStorage bi chan - khong co gi de don
+  }
+}
+clearLegacySharedSession();
 
 /**
  * DLL goi API dung chung cho TOAN BO man hinh cua moi module GOVIA:

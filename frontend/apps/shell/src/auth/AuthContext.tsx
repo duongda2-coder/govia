@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import { getStoredTokens, clearTokens, initSocket, disconnectSocket, subscribeTopic } from "@govia/ui-kit";
+import { getStoredTokens, clearTokens, clearLegacySharedSession, initSocket, disconnectSocket, subscribeTopic } from "@govia/ui-kit";
 import { httpClient, API_BASE_URL } from "../api/client";
 
 interface CurrentUser {
@@ -23,9 +23,11 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 const USER_STORAGE_KEY = "govia.user";
+// Cung sessionStorage (rieng tung tab) nhu token - xem ghi chu o httpClient.ts.
+clearLegacySharedSession(USER_STORAGE_KEY);
 
 function readStoredUser(): CurrentUser | null {
-  const raw = localStorage.getItem(USER_STORAGE_KEY);
+  const raw = sessionStorage.getItem(USER_STORAGE_KEY);
   return raw ? (JSON.parse(raw) as CurrentUser) : null;
 }
 
@@ -33,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUserState] = useState<CurrentUser | null>(() => (getStoredTokens() ? readStoredUser() : null));
 
   const setUser = (newUser: CurrentUser) => {
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
+    sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(newUser));
     setUserState(newUser);
   };
 
@@ -43,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     disconnectSocket();
     clearTokens();
-    localStorage.removeItem(USER_STORAGE_KEY);
+    sessionStorage.removeItem(USER_STORAGE_KEY);
     setUserState(null);
   };
 
@@ -58,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = subscribeTopic("/user/queue/session-kicked", () => {
       disconnectSocket();
       clearTokens();
-      localStorage.removeItem(USER_STORAGE_KEY);
+      sessionStorage.removeItem(USER_STORAGE_KEY);
       setUserState(null);
       window.location.href = "/login?reason=kicked";
     });
