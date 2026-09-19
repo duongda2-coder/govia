@@ -1142,6 +1142,7 @@
   "auditKhnsNam": {
     "title": "Annual/batch audit staffing plan",
     "selectYearHint": "Select a Year to view the list.",
+    "exportReportButton": "Export batch report",
     "syncButton": "Update staff list",
     "emptyHint": "No staff in the list yet. Click \"Update staff list\" to pull the list from the Monthly staff allocation to branches screen.",
     "classification": {
@@ -1210,7 +1211,6 @@
     },
     "monthsHint": "Pick the audit object for each month (leave empty if the employee is not auditing that month).",
     "emptyHint": "No staff allocated for this year yet. Click \"Assign personnel\" to allocate automatically, then adjust as needed.",
-    "exportReportButton": "Export batch report",
     "assignButton": "Assign personnel",
     "assignConfirmTitle": "Assign personnel for the whole year?",
     "assignConfirmContent": "The system will automatically assign staff to every audit object with declared audit months in {{year}}, following the audit team staffing rules, and overwrite all existing month assignments of this year.",

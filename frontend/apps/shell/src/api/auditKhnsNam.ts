@@ -53,8 +53,8 @@ export interface AuditKhnsNamRowItem {
   month11AuditObjectCode: string | null;
   month12AuditObjectCode: string | null;
   year: number;
-  /** Chức vụ của cán bộ ở màn KHNS_PB (gộp các đơn vị) - hiện ở cột "Chức vụ có thể đảm nhận trong đoàn". */
-  positions: AuditKhnsPosition[];
+  /** Chức vụ + nghiệp vụ của cán bộ ở màn KHNS_PB, mỗi đơn vị khác nhau 1 phần tử - hiện y nguyên cột "Chức vụ" của màn đó. */
+  positionDetails: { positions: AuditKhnsPosition[]; segmentNames: string[] }[];
   /** Tên đối tượng kiểm toán của tháng 1..12 (lấy từ KHNS_PB), null nếu tháng đó không đi kiểm toán. */
   monthAuditObjectNames: (string | null)[];
 }

@@ -10,7 +10,8 @@ import java.util.List;
  * vien, khong can them/xoa dong - xem AuditKhnsNamService). Cac truong employeeCode..businessSegmentCode
  * doc song tu Employee; auditObjectCodes la NSD tu chon (K); auditObjectNames/objectBusinessSegmentCodes
  * tinh dong theo K, tra cuu tu TH2 cua nam nay. year/positions/monthAuditObjectNames phuc vu man hinh KHNS_NAM theo dac ta:
- * positions = cac chuc vu (AuditKhnsPosition) cua can bo o KHNS_PB (gop cac don vi), monthAuditObjectNames = ten doi tuong KT
+ * positionDetails = chuc vu (AuditKhnsPosition) + nghiep vu cua can bo o KHNS_PB, moi don vi khac nhau 1 phan tu (de hien y nguyen
+ * cot "Chuc vu" cua man hinh do), monthAuditObjectNames = ten doi tuong KT
  * cua tung thang (12 phan tu, null neu thang khong di kiem toan). */
 public record AuditKhnsNamRowResponse(
         String employeeId,
@@ -44,7 +45,10 @@ public record AuditKhnsNamRowResponse(
         String month11AuditObjectCode,
         String month12AuditObjectCode,
         Integer year,
-        List<String> positions,
+        List<PositionDetail> positionDetails,
         List<String> monthAuditObjectNames
 ) {
+    /** Chuc vu + nghiep vu cua can bo tai 1 don vi o KHNS_PB - cung noi dung cot "Chuc vu" cua man hinh do. */
+    public record PositionDetail(List<String> positions, List<String> segmentNames) {
+    }
 }

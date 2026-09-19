@@ -273,8 +273,13 @@ class AuditKhnsPbAllocationTest {
 
         // Truong doan cua OBJ-D (thang 4): chuc vu lay tu KHNS_PB, thang 4 hien TEN doi tuong, tong so doan = 1
         com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse leadRow = rows.stream()
-                .filter(r -> r.positions().contains("TEAM_LEAD")).filter(r -> r.monthAuditObjectNames().get(3) != null).findFirst().orElseThrow();
-        assertThat(leadRow.positions()).contains("QTDH_GROUP_LEAD", "QTDH_MEMBER");
+                .filter(r -> r.positionDetails().stream().anyMatch(d -> d.positions().contains("TEAM_LEAD")))
+                .filter(r -> r.monthAuditObjectNames().get(3) != null).findFirst().orElseThrow();
+        // cot "Chuc vu" giong y nguyen dong tuong ung o man hinh KHNS_PB (chuc vu + nghiep vu)
+        AuditKhnsPbRowResponse pbRow = pbService.listRows(YEAR).stream().filter(r -> r.employeeId().equals(leadRow.employeeId())).findFirst().orElseThrow();
+        assertThat(leadRow.positionDetails()).containsExactly(
+                new com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse.PositionDetail(pbRow.positions(), pbRow.segmentNames()));
+        assertThat(leadRow.positionDetails().get(0).positions()).contains("QTDH_GROUP_LEAD", "QTDH_MEMBER");
         assertThat(leadRow.monthAuditObjectNames()).hasSize(12);
         assertThat(leadRow.monthAuditObjectNames().get(3)).isEqualTo("OBJ-D");
         assertThat(leadRow.monthAuditObjectNames().get(0)).isNull();
@@ -287,7 +292,7 @@ class AuditKhnsPbAllocationTest {
                 .filter(r -> r.employeeId().equals(leadRow.employeeId())).findFirst().orElseThrow();
         assertThat(after.otherDuties()).isEqualTo("Kiem nhiem A");
         assertThat(after.monthAuditObjectNames()).isEqualTo(leadRow.monthAuditObjectNames());
-        assertThat(after.positions()).isEqualTo(leadRow.positions());
+        assertThat(after.positionDetails()).isEqualTo(leadRow.positionDetails());
 
         // phan bo lai khong con cua 1 doi tuong -> bam cap nhat lai thi can bo khong con duoc phan bo bi go khoi danh sach
         for (AuditKhnsNam plan : khnsNamRepository.findByTenantIdAndYear(tenantId, YEAR)) {

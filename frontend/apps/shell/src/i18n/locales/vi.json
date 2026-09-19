@@ -1142,6 +1142,7 @@
   "auditKhnsNam": {
     "title": "Dự kiến nhân sự thực hiện kiểm toán năm, đợt",
     "selectYearHint": "Chọn Năm để xem danh sách.",
+    "exportReportButton": "Xuất báo cáo theo đợt",
     "syncButton": "Cập nhật danh sách cán bộ",
     "emptyHint": "Chưa có cán bộ trong danh sách. Bấm \"Cập nhật danh sách cán bộ\" để lấy danh sách từ màn hình Phân bổ cán bộ cho chi nhánh theo tháng.",
     "classification": {
@@ -1210,7 +1211,6 @@
     },
     "monthsHint": "Chọn đối tượng kiểm toán cho từng tháng (để trống nếu tháng đó cán bộ không đi kiểm toán).",
     "emptyHint": "Chưa có cán bộ nào được phân bổ trong năm này. Bấm \"Phân bổ nhân sự\" để hệ thống tự động phân bổ, sau đó có thể chỉnh sửa lại.",
-    "exportReportButton": "Xuất báo cáo theo đợt",
     "assignButton": "Phân bổ nhân sự",
     "assignConfirmTitle": "Phân bổ nhân sự cả năm?",
     "assignConfirmContent": "Hệ thống sẽ tự động phân bổ cán bộ cho tất cả đối tượng đã khai báo số tháng kiểm toán trong năm {{year}} theo nguyên tắc bố trí nhân sự đoàn kiểm toán, và ghi đè toàn bộ phân bổ theo tháng hiện có của năm này.",

@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { App, Button, Checkbox, Dropdown, Form, Modal, Result, Select, Space, Table, Tag, Typography } from "antd";
+import { App, Button, Checkbox, Form, Modal, Result, Select, Space, Table, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
-import { EditOutlined, FileExcelOutlined, PlusOutlined, TeamOutlined } from "@ant-design/icons";
+import { EditOutlined, PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import { isAxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import {
   allocateAuditKhnsPb,
-  exportAuditKhnsNamMonthlyReport,
   listAuditKhnsNam,
   listAuditKhnsPbRows,
   updateAuditKhnsNam,
@@ -19,6 +18,7 @@ import {
 import { listAuditKhktThang, type AuditKhktThangRowItem } from "../../../../api/auditKhktThang";
 import { listMasterDataItems, type MasterDataItem } from "../../../../api/auditMasterData";
 import { useAuth } from "../../../../auth/AuthContext";
+import { formatKhnsPositions } from "./khnsPositionLabel";
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 const POSITIONS: AuditKhnsPosition[] = ["TEAM_LEAD", "QTDH_GROUP_LEAD", "QTDH_MEMBER", "TD_GROUP_LEAD", "TD_MEMBER", "NTD_GROUP_LEAD", "NTD_MEMBER"];
@@ -310,13 +310,7 @@ export function AuditKhnsPbPage() {
       title: t("auditKhnsPb.columns.position"),
       dataIndex: "roleInTeam",
       width: 320,
-      render: (_: unknown, row) => {
-        if (row.positions.length === 0) return row.roleInTeam ? t(`auditKhnsNam.role.${row.roleInTeam}`) : "-";
-        const labels = row.positions.map((p) => t(`auditKhnsPb.position.${p}`)).join(", ");
-        // Chức vụ NTD ghi kèm các nghiệp vụ cụ thể cán bộ làm (tối đa 3)
-        const ntd = row.positions.some((p) => p.startsWith("NTD_")) && row.segmentNames.length > 0;
-        return ntd ? `${labels} (${row.segmentNames.join(", ")})` : labels;
-      },
+      render: (_: unknown, row) => formatKhnsPositions(t, row.positions, row.segmentNames, row.roleInTeam),
     },
     { title: t("auditKhnsPb.columns.months"), dataIndex: "months", width: 100, render: (months: number[]) => months.join(", ") },
   ];
@@ -353,18 +347,6 @@ export function AuditKhnsPbPage() {
             {t("auditKhnsPb.assignButton")}
           </Button>
         )}
-        <Dropdown
-          disabled={!year}
-          trigger={["click"]}
-          menu={{
-            items: MONTHS.map((m) => ({ key: String(m), label: t("auditKhktThang.columns.month", { month: m }) })),
-            onClick: ({ key }) => year && exportAuditKhnsNamMonthlyReport(year, Number(key)),
-          }}
-        >
-          <Button icon={<FileExcelOutlined />} disabled={!year}>
-            {t("auditKhnsPb.exportReportButton")}
-          </Button>
-        </Dropdown>
       </Space>
 
       {!year ? (

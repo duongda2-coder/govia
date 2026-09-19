@@ -93,13 +93,13 @@ public class AuditKhnsNamService {
         Map<UUID, AuditMasterDataItem> departments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.DEPARTMENT);
         Map<UUID, AuditMasterDataItem> segments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT);
         ThObjectLookup thLookup = buildThLookup(tenantId, year, segments);
-        Map<String, Set<AuditKhnsPosition>> pbPositionsByEmployee = new HashMap<>();
+        Map<String, Set<AuditKhnsNamRowResponse.PositionDetail>> pbPositionsByEmployee = new HashMap<>();
         Map<String, List<String>> pbMonthNamesByEmployee = new HashMap<>();
         if (listedOnly) {
             // chuc vu va ten doi tuong theo thang lay dung tu KHNS_PB (cung nguon voi man hinh do)
             pbService.listRows(year).forEach(r -> {
-                pbPositionsByEmployee.computeIfAbsent(r.employeeId(), k -> new HashSet<>())
-                        .addAll(r.positions().stream().map(AuditKhnsPosition::valueOf).toList());
+                pbPositionsByEmployee.computeIfAbsent(r.employeeId(), k -> new java.util.LinkedHashSet<>())
+                        .add(new AuditKhnsNamRowResponse.PositionDetail(r.positions(), r.segmentNames()));
                 List<String> names = pbMonthNamesByEmployee.computeIfAbsent(r.employeeId(), k -> new ArrayList<>(java.util.Collections.nCopies(12, (String) null)));
                 r.months().forEach(m -> names.set(m - 1, r.auditObjectName()));
             });
@@ -114,8 +114,8 @@ public class AuditKhnsNamService {
         }).map(employee -> {
             AuditKhnsNam plan = plansByEmployee.get(employee.getId());
             List<String> objectCodes = plan == null ? List.of() : objectCodesByPlan.getOrDefault(plan.getId(), List.of());
-            List<String> pbPositions = pbPositionsByEmployee.getOrDefault(employee.getId().toString(), Set.of()).stream()
-                    .sorted().map(Enum::name).toList();
+            List<AuditKhnsNamRowResponse.PositionDetail> pbPositions = List.copyOf(
+                    pbPositionsByEmployee.getOrDefault(employee.getId().toString(), Set.of()));
             return toResponse(employee, plan, objectCodes, positions, departments, segments, thLookup, year, pbPositions,
                     pbMonthNamesByEmployee.get(employee.getId().toString()));
         }).filter(row -> !allocatedOnly || isAllocated(row)).toList();
@@ -457,7 +457,7 @@ public class AuditKhnsNamService {
     private AuditKhnsNamRowResponse toResponse(Employee employee, AuditKhnsNam plan, List<String> objectCodes,
                                                 Map<UUID, AuditMasterDataItem> positions, Map<UUID, AuditMasterDataItem> departments,
                                                 Map<UUID, AuditMasterDataItem> segments, ThObjectLookup thLookup, Integer year,
-                                                List<String> pbPositions, List<String> pbMonthNames) {
+                                                List<AuditKhnsNamRowResponse.PositionDetail> pbPositions, List<String> pbMonthNames) {
         AuditMasterDataItem position = employee.getPositionId() == null ? null : positions.get(employee.getPositionId());
         AuditMasterDataItem department = employee.getDepartmentId() == null ? null : departments.get(employee.getDepartmentId());
         AuditMasterDataItem segment = employee.getBusinessSegmentId() == null ? null : segments.get(employee.getBusinessSegmentId());

@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { App, Button, DatePicker, Form, Input, Modal, Result, Select, Space, Table, Typography } from "antd";
+import { App, Button, DatePicker, Dropdown, Form, Input, Modal, Result, Select, Space, Table, Typography } from "antd";
 import type { TableProps } from "antd";
-import { SyncOutlined } from "@ant-design/icons";
+import { FileExcelOutlined, SyncOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import {
+  exportAuditKhnsNamMonthlyReport,
   listAuditKhnsNam,
   syncAuditKhnsNamList,
   updateAuditKhnsNamInfo,
@@ -12,6 +13,7 @@ import {
 } from "../../../../api/auditKhnsNam";
 import { listMasterDataItems, type MasterDataItem } from "../../../../api/auditMasterData";
 import { useAuth } from "../../../../auth/AuthContext";
+import { formatKhnsPositions } from "./khnsPositionLabel";
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 
@@ -145,9 +147,14 @@ export function AuditKhnsNamPage() {
     { title: t("auditKhnsNam.columns.businessSegmentCode"), dataIndex: "businessSegmentCode", width: 150, render: (v: string | null) => v ?? "-" },
     {
       title: t("auditKhnsNam.columns.positions"),
-      dataIndex: "positions",
-      width: 300,
-      render: (positions: string[]) => (positions.length === 0 ? "-" : positions.map((p) => t(`auditKhnsPb.position.${p}`)).join(", ")),
+      key: "positions",
+      width: 320,
+      // y nguyên cột "Chức vụ" của màn Phân bổ cán bộ cho chi nhánh theo tháng; cán bộ đi nhiều đơn vị có chức vụ khác nhau thì mỗi dòng 1 kiểu
+      render: (_: unknown, row: AuditKhnsNamRowItem) => {
+        const texts = Array.from(new Set(row.positionDetails.map((d) => formatKhnsPositions(t, d.positions, d.segmentNames, row.roleInTeam))));
+        if (texts.length === 0) return formatKhnsPositions(t, [], [], row.roleInTeam);
+        return texts.map((text) => <div key={text}>{text}</div>);
+      },
     },
     { title: t("auditKhnsNam.columns.otherDuties"), dataIndex: "otherDuties", width: 200, render: (v: string | null) => v ?? "-" },
     { title: t("auditKhnsNam.columns.totalTeamsCount"), dataIndex: "totalTeamsCount", width: 140, align: "center" },
@@ -186,6 +193,18 @@ export function AuditKhnsNamPage() {
             {t("common.edit")}
           </Button>
         )}
+        <Dropdown
+          disabled={!year}
+          trigger={["click"]}
+          menu={{
+            items: MONTHS.map((m) => ({ key: String(m), label: t("auditKhktThang.columns.month", { month: m }) })),
+            onClick: ({ key }) => year && exportAuditKhnsNamMonthlyReport(year, Number(key)),
+          }}
+        >
+          <Button icon={<FileExcelOutlined />} disabled={!year}>
+            {t("auditKhnsNam.exportReportButton")}
+          </Button>
+        </Dropdown>
       </Space>
 
       {!year ? (
