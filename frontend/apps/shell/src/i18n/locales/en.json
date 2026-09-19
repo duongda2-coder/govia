@@ -1185,11 +1185,8 @@
     "editNoteButton": "Edit note",
     "exportReportButton": "Export batch report",
     "assignButton": "Assign personnel",
-    "assignModalTitle": "Assign personnel to go on audit",
-    "assignObjectLabel": "Audit object",
-    "assignObjectPlaceholder": "Select audit object",
-    "assignMonthLabel": "Month",
-    "assignEmployeesHint": "Pick the employees assigned to this audit object for the selected month. Unchecking a currently assigned employee removes their assignment.",
+    "assignConfirmTitle": "Assign personnel for the whole year?",
+    "assignConfirmContent": "The system will automatically assign staff to every audit object with declared audit months in {{year}}, following the audit team staffing rules, and overwrite all existing month assignments of this year.",
     "columns": {
       "employeeCode": "Employee code",
       "employeeName": "Employee name",
@@ -1199,15 +1196,15 @@
       "businessSegmentCode": "Assigned segment",
       "otherDuties": "Other duties",
       "totalTeamsCount": "Total teams",
-      "note": "Note",
-      "currentAssignment": "Current assignment for selected month"
+      "note": "Note"
     },
     "messages": {
       "loadError": "Failed to load data",
       "updateSuccess": "Updated",
       "saveError": "Save failed",
-      "assignObjectRequired": "Please select an audit object",
-      "assignSuccess": "Personnel assigned",
+      "assignSuccess": "Personnel assigned: {{staffed}}/{{total}} teams fully staffed, {{employees}} employees assigned",
+      "assignPartialTitle": "{{employees}} employees assigned - {{staffed}}/{{total}} teams fully staffed",
+      "assignPartialHint": "The teams below could not be fully staffed under the rules. Add staff / business-segment capabilities and assign again, or adjust manually in the personnel plan screen.",
       "assignError": "Failed to assign personnel"
     }
   },

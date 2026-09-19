@@ -89,3 +89,16 @@ export async function exportAuditKhnsNamMonthlyReport(year: number, month: numbe
   link.click();
   window.URL.revokeObjectURL(blobUrl);
 }
+
+export interface AuditKhnsPbAllocationResult {
+  objectCount: number;
+  fullyStaffedCount: number;
+  employeesAssigned: number;
+  warnings: string[];
+}
+
+/** Nut "Phân bổ nhân sự" ở KHNS_PB - tự động phân bổ cán bộ cho cả năm theo số tháng kiểm toán đã khai báo. */
+export async function allocateAuditKhnsPb(year: number): Promise<AuditKhnsPbAllocationResult> {
+  const res = await httpClient.post<ApiResponse<AuditKhnsPbAllocationResult>>(`${BASE}/allocate`, null, { params: { year } });
+  return res.data.data;
+}

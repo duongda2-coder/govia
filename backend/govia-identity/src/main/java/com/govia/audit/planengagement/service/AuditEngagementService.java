@@ -122,7 +122,7 @@ public class AuditEngagementService {
      * chuan cua ngan hang (Comment: The->CD, QTDH->CE, HDV->DP, TCKT->GA, CNTT->IT, TTKQ->MF,
      * PCRT->AM, TTQT->TF, XDCB->FA, TD->LN).
      */
-    private List<String> capableSegmentCodes(AuditEmployeeCapability capability) {
+    public static List<String> capableSegmentCodes(AuditEmployeeCapability capability) {
         if (capability == null) {
             return List.of();
         }

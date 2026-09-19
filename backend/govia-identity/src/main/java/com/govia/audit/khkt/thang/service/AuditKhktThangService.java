@@ -1,5 +1,6 @@
 package com.govia.audit.khkt.thang.service;
 
+import com.govia.audit.khkt.common.entity.AuditKhktApprovalStatus;
 import com.govia.audit.khkt.scale.service.AuditKhktScaleService;
 import com.govia.audit.khkt.thang.dto.AuditKhktThangRowResponse;
 import com.govia.audit.khkt.thang.dto.AuditKhktThangUpdateRequest;
@@ -100,7 +101,7 @@ public class AuditKhktThangService {
         AuditKhktThConfirmed confirmed = eligibleConfirmedRows(tenantId, year).stream()
                 .filter(row -> row.getAuditObjectCode().equals(auditObjectCode)).findFirst()
                 .orElseThrow(() -> new BusinessException("AUDIT_KHKT_THANG_OBJECT_NOT_FOUND",
-                        "Doi tuong khong thuoc danh sach da 'Chon 3'/co 'KHKTGS sau dieu chinh' cua TH2 nam " + year, HttpStatus.NOT_FOUND));
+                        "Doi tuong khong thuoc danh sach da phe duyet + 'Chon 3'/co 'KHKTGS sau dieu chinh' cua TH2 nam " + year, HttpStatus.NOT_FOUND));
 
         AuditKhktThang thang = thangRepository.findByTenantIdAndYearAndAuditObjectCode(tenantId, year, auditObjectCode)
                 .orElseGet(() -> {
@@ -142,9 +143,11 @@ public class AuditKhktThangService {
     }
 
     /** FS: chi doi tuong da "Chon 3" HOAC co dien "KHKTGS sau dieu chinh" (khac null - xem
-     * AuditKhktSelectionChoice) moi sang phan Khai bao so thang kiem toan trong nam. */
+     * AuditKhktSelectionChoice) moi sang phan Khai bao so thang kiem toan trong nam; dong thoi phai
+     * da duoc PHE DUYET o Phan 2 ("Danh sach DTKT nam cua Phong ke hoach") - yeu cau test18.9. */
     private List<AuditKhktThConfirmed> eligibleConfirmedRows(UUID tenantId, Integer year) {
         return confirmedRepository.findByTenantIdAndYearOrderByAuditObjectCodeAsc(tenantId, year).stream()
+                .filter(row -> row.getApprovalStatus() == AuditKhktApprovalStatus.APPROVED)
                 .filter(row -> row.isSelection3() || row.getKhktgsAfterAdjustment() != null)
                 .toList();
     }

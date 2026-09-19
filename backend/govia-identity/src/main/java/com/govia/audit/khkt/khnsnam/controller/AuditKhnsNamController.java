@@ -2,11 +2,13 @@ package com.govia.audit.khkt.khnsnam.controller;
 
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamUpdateRequest;
+import com.govia.audit.khkt.khnsnam.dto.AuditKhnsPbAllocationResult;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsTransferCandidateResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsTransferRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsTransferResultItem;
 import com.govia.audit.khkt.khnsnam.service.AuditKhktTransferService;
 import com.govia.audit.khkt.khnsnam.service.AuditKhnsNamService;
+import com.govia.audit.khkt.khnsnam.service.AuditKhnsPbService;
 import com.govia.core.web.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -32,10 +34,12 @@ public class AuditKhnsNamController {
 
     private final AuditKhnsNamService service;
     private final AuditKhktTransferService transferService;
+    private final AuditKhnsPbService pbService;
 
-    public AuditKhnsNamController(AuditKhnsNamService service, AuditKhktTransferService transferService) {
+    public AuditKhnsNamController(AuditKhnsNamService service, AuditKhktTransferService transferService, AuditKhnsPbService pbService) {
         this.service = service;
         this.transferService = transferService;
+        this.pbService = pbService;
     }
 
     @GetMapping
@@ -60,6 +64,13 @@ public class AuditKhnsNamController {
     }
 
     public record NoteRequest(String note) {
+    }
+
+    /** Nut "Phan bo nhan su" o KHNS_PB - tu dong phan bo can bo cho ca nam, xem AuditKhnsPbService. */
+    @PostMapping("/allocate")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.KHNS_NAM.EDIT')")
+    public ApiResponse<AuditKhnsPbAllocationResult> allocate(@RequestParam Integer year) {
+        return ApiResponse.ok(pbService.allocate(year));
     }
 
     @GetMapping("/export")
