@@ -50,8 +50,10 @@ public class AuditWorkAssignmentController {
         return ApiResponse.ok(service.updateStatus(engagementId, assignmentId, request, principal.employeeCode()));
     }
 
+    /** Quyen APPROVE hoac EDIT (Truong doan cap nhat cong viec) - "chi Truong doan cua CKT" duoc kiem tra
+     * o service (requireTeamLead), khong dua vao vai tro/quyen. */
     @PostMapping("/approve")
-    @PreAuthorize("hasAuthority('PERM_AUDIT.WORK_MANAGEMENT.APPROVE')")
+    @PreAuthorize("hasAnyAuthority('PERM_AUDIT.WORK_MANAGEMENT.APPROVE', 'PERM_AUDIT.WORK_MANAGEMENT.EDIT')")
     public ApiResponse<List<UUID>> approve(@PathVariable UUID engagementId, @Valid @RequestBody AuditWorkAssignmentApproveRequest request,
                                             @AuthenticationPrincipal CurrentUserPrincipal principal) {
         return ApiResponse.ok(service.approve(engagementId, request, principal));

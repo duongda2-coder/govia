@@ -118,6 +118,9 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
 
   const currentEngagement = engagements.find((e) => e.id === engagementId);
   const isTeamLead = !!user?.employeeCode && !!currentEngagement && user.employeeCode === currentEngagement.teamLeadEmployeeCode;
+  // Nut "Phe duyet" hien voi Truong doan cua CKT dang chon (co quyen cap nhat cong viec) - khong bat
+  // buoc admin phai gan them quyen APPROVE cho tung vai tro; BE van chi cho dung Truong doan duyet.
+  const showApprove = canApprove || (isTeamLead && canEdit);
 
   // Chi prefill status/note khi dung 1 dong duoc chon - chon nhieu dong thi de trong, tranh de mot
   // gia tri cua rieng 1 dong bi ap dung nham cho ca cac dong khac khi bam luu.
@@ -281,7 +284,7 @@ export function WorkManagementGridPage({ phase, tableId, title, showProgressRepo
         loading={loading}
         onSelectionChange={(_keys, rows) => setSelected(rows)}
         onOtherReports={engagementId ? () => setReportFilesOpen(true) : undefined}
-        onApprove={canApprove && engagementId ? handleApprove : undefined}
+        onApprove={showApprove && engagementId ? handleApprove : undefined}
         approveDisabled={approveDisabled}
       />
 
