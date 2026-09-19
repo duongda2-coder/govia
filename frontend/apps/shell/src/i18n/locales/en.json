@@ -1189,6 +1189,18 @@
     "addEmployeeTitle": "Add employee to allocation",
     "employeeField": "Employee",
     "roleField": "Role in team",
+    "positionsField": "Position at the unit",
+    "segmentsField": "Business segments (max 3, Credit or non-credit only)",
+    "unitAssignmentsHint": "Tick the employee's positions and business segments at each unit selected above. One person can hold several positions; they work either Credit or non-credit (NTD), never both, and at most 3 segments.",
+    "position": {
+      "TEAM_LEAD": "Team lead",
+      "QTDH_GROUP_LEAD": "QTĐH group lead",
+      "QTDH_MEMBER": "QTĐH member",
+      "TD_GROUP_LEAD": "Credit group lead",
+      "TD_MEMBER": "Credit member",
+      "NTD_GROUP_LEAD": "NTD group lead",
+      "NTD_MEMBER": "NTD member"
+    },
     "monthsHint": "Pick the audit object for each month (leave empty if the employee is not auditing that month).",
     "emptyHint": "No staff allocated for this year yet. Click \"Assign personnel\" to allocate automatically, then adjust as needed.",
     "exportReportButton": "Export batch report",
@@ -1214,7 +1226,9 @@
       "assignPartialTitle": "{{employees}} employees assigned - {{staffed}}/{{total}} teams fully staffed",
       "assignPartialHint": "The teams below could not be fully staffed under the rules. Add staff / business-segment capabilities and assign again, or adjust manually in the personnel plan screen.",
       "assignError": "Failed to assign personnel",
-      "teamLeadConflict": "This object already has another team lead; this employee cannot be set as team lead"
+      "teamLeadConflict": "This object already has another team lead; this employee cannot be set as team lead",
+      "tooManySegments": "An employee can work at most 3 business segments at a unit",
+      "creditAndNtd": "An employee works either Credit or non-credit (NTD), not both"
     }
   },
   "auditKhktTransfer": {

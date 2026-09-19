@@ -1189,6 +1189,18 @@
     "addEmployeeTitle": "Thêm cán bộ vào phân bổ",
     "employeeField": "Cán bộ",
     "roleField": "Vai trò trong đoàn",
+    "positionsField": "Chức vụ tại đơn vị",
+    "segmentsField": "Nghiệp vụ (tối đa 3, chỉ Tín dụng hoặc NTD)",
+    "unitAssignmentsHint": "Tích chọn chức vụ và nghiệp vụ của cán bộ tại từng đơn vị đã chọn ở trên. Một người giữ được nhiều chức vụ; chỉ làm Tín dụng hoặc NTD, không làm cả hai, và tối đa 3 nghiệp vụ.",
+    "position": {
+      "TEAM_LEAD": "Trưởng đoàn",
+      "QTDH_GROUP_LEAD": "Trưởng nhóm QTĐH",
+      "QTDH_MEMBER": "Thành viên QTĐH",
+      "TD_GROUP_LEAD": "Trưởng nhóm Tín dụng",
+      "TD_MEMBER": "Thành viên Tín dụng",
+      "NTD_GROUP_LEAD": "Trưởng nhóm NTD",
+      "NTD_MEMBER": "Thành viên NTD"
+    },
     "monthsHint": "Chọn đối tượng kiểm toán cho từng tháng (để trống nếu tháng đó cán bộ không đi kiểm toán).",
     "emptyHint": "Chưa có cán bộ nào được phân bổ trong năm này. Bấm \"Phân bổ nhân sự\" để hệ thống tự động phân bổ, sau đó có thể chỉnh sửa lại.",
     "exportReportButton": "Xuất báo cáo theo đợt",
@@ -1214,7 +1226,9 @@
       "assignPartialTitle": "Đã phân bổ {{employees}} cán bộ - {{staffed}}/{{total}} đoàn đủ định biên",
       "assignPartialHint": "Các đoàn dưới đây chưa bố trí đủ cán bộ theo nguyên tắc. Vui lòng bổ sung nhân sự / khả năng đảm nhận lĩnh vực rồi phân bổ lại, hoặc điều chỉnh thủ công ở màn hình Dự kiến nhân sự.",
       "assignError": "Phân bổ nhân sự thất bại",
-      "teamLeadConflict": "Đối tượng đã có Trưởng đoàn khác, không thể đặt cán bộ này làm Trưởng đoàn"
+      "teamLeadConflict": "Đối tượng đã có Trưởng đoàn khác, không thể đặt cán bộ này làm Trưởng đoàn",
+      "tooManySegments": "Một cán bộ chỉ làm tối đa 3 nghiệp vụ tại một đơn vị",
+      "creditAndNtd": "Một cán bộ chỉ làm Tín dụng hoặc NTD, không làm cả hai"
     }
   },
   "auditKhktTransfer": {

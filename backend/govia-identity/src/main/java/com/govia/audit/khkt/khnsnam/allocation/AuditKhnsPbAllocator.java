@@ -1,15 +1,20 @@
 package com.govia.audit.khkt.khnsnam.allocation;
 
+import com.govia.audit.khkt.khnsnam.entity.AuditKhnsPosition;
+
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Random;
+import java.util.TreeSet;
 import java.util.UUID;
 
 /**
@@ -17,7 +22,7 @@ import java.util.UUID;
  * thuan logic, khong phu thuoc Spring/DB de de kiem thu. Theo "Nguyen tac bo tri nhan su 1 doan
  * kiem toan" (yeu cau test18.9):
  * <ul>
- *   <li>Toi da 9 can bo / doan; doi tuong khong co linh vuc Tin dung (LN) chi bo tri toi da 4.</li>
+ *   <li>Toi da 9 can bo / doan (gom Truong doan); doi tuong khong co linh vuc Tin dung (LN) chi bo tri toi da 4.</li>
  *   <li>Tin dung (LN): toi thieu 02 KTV, tu trung binh tro len toi thieu 03 can bo.</li>
  *   <li>HDV-PCRT (DP/AM), TCKT (GA), XDCB (FA), TTQT (TF): moi nghiep vu 01 KTV. CNTT/The/TTKQ
  *       (IT/CD/MF): co tu 2 trong 3 nghiep vu thi bo tri them 01 KTV.</li>
@@ -28,12 +33,16 @@ import java.util.UUID;
  *   <li>Trong so cac can bo dap ung duoc (cung diem) thi chon NGAU NHIEN - moi lan phan bo cho ra 1 phuong an
  *       khac, nguoi dung xem roi tu chinh lai neu can.</li>
  * </ul>
- * Rang buoc cua mo hinh du lieu KHNS_NAM: moi can bo chi co 1 doi tuong / thang, va 1 "Chuc vu" cho
+ * Chuc vu trong doan (yeu cau test19.9): Truong doan giu them Truong nhom QTDH + Thanh vien QTDH (khong chiem vi tri
+ * Tin dung/NTD); moi nhom Tin dung / NTD co 1 Truong nhom (uu tien nguoi co kha nang Truong nhom, roi bac cao) - Truong
+ * nhom cung la thanh vien cua nhom; 1 can bo chi lam Tin dung HOAC NTD va toi da 3 nghiep vu tai 1 don vi.
+ * Rang buoc cua mo hinh du lieu KHNS_NAM: moi can bo chi co 1 doi tuong / thang, va 1 "Chuc vu" (roleInTeam) cho
  * ca nam - nen 1 can bo da lam Truong doan thi chi lam Truong doan o moi doan (khong tron vai tro).
  */
 public final class AuditKhnsPbAllocator {
 
-    public static final String CREDIT = "LN";
+    public static final String CREDIT = AuditKhnsPosition.CREDIT_SEGMENT;
+    public static final String QTDH = AuditKhnsPosition.QTDH_SEGMENT;
     private static final Set<String> HDV_PCRT = Set.of("DP", "AM");
     private static final String TCKT = "GA";
     private static final String XDCB = "FA";
@@ -50,9 +59,24 @@ public final class AuditKhnsPbAllocator {
                               ScaleLevel creditLevel, ScaleLevel fundingLevel) {
     }
 
-    /** grade: bac KTV (1..3); capableSegments: ma nghiep vu (BUSINESS_SEGMENT) can bo dam nhan duoc. */
+    /** grade: bac KTV (1..3); capableSegments: ma nghiep vu (BUSINESS_SEGMENT) can bo dam nhan duoc;
+     * groupLeadCapable: co the lam Truong nhom (kha nang dam nhan "Truong nhom"). */
     public record Staff(UUID id, String code, String name, int grade, Set<String> capableSegments, boolean leadCapable,
-                         String ownSegmentCode, Set<String> blockedObjectCodes, Set<String> rotatedObjectCodes) {
+                         boolean groupLeadCapable, String ownSegmentCode, Set<String> blockedObjectCodes, Set<String> rotatedObjectCodes) {
+    }
+
+    /** Chuc vu + nghiep vu cua 1 can bo tai 1 don vi. */
+    public static final class ObjectRole {
+        private final Set<AuditKhnsPosition> positions = EnumSet.noneOf(AuditKhnsPosition.class);
+        private final Set<String> segments = new TreeSet<>();
+
+        public Set<AuditKhnsPosition> getPositions() {
+            return positions;
+        }
+
+        public Set<String> getSegments() {
+            return segments;
+        }
     }
 
     public static final class StaffAssignment {
@@ -60,6 +84,7 @@ public final class AuditKhnsPbAllocator {
         private boolean member;
         private final Map<Integer, String> monthToObject = new TreeMap<>();
         private final Set<String> objectCodes = new LinkedHashSet<>();
+        private final Map<String, ObjectRole> objectRoles = new LinkedHashMap<>();
 
         public boolean isLead() {
             return lead;
@@ -71,6 +96,10 @@ public final class AuditKhnsPbAllocator {
 
         public Set<String> getObjectCodes() {
             return objectCodes;
+        }
+
+        public Map<String, ObjectRole> getObjectRoles() {
+            return objectRoles;
         }
     }
 
@@ -88,10 +117,14 @@ public final class AuditKhnsPbAllocator {
         this.random = random;
     }
 
-    private record Slot(String label, Set<String> segments, int minGrade) {
+    private record Slot(String label, Set<String> segments, int minGrade, boolean credit) {
     }
 
     private record TeamPlan(TeamObject object, List<Slot> slots, Set<String> bonusSegments, int maxSize) {
+    }
+
+    /** 1 can bo da chon cho 1 vi tri cua doan. */
+    private record Pick(Staff staff, Slot slot) {
     }
 
     public Result allocate(List<TeamObject> objects, List<Staff> staff) {
@@ -121,30 +154,31 @@ public final class AuditKhnsPbAllocator {
             int count = object.creditLevel() == ScaleLevel.LOW ? 2 : 3;
             int minGrade = object.creditLevel() == ScaleLevel.LARGE ? 2 : 1;
             for (int i = 0; i < count; i++) {
-                slots.add(new Slot("Tín dụng", Set.of(CREDIT), minGrade));
+                slots.add(new Slot("Tín dụng", Set.of(CREDIT), minGrade, true));
             }
         }
         Set<String> hdvPcrt = intersection(segments, HDV_PCRT);
         if (!hdvPcrt.isEmpty()) {
             int minGrade = segments.contains("DP") && object.fundingLevel() == ScaleLevel.LARGE ? 2 : 1;
-            slots.add(new Slot("HĐV-PCRT", hdvPcrt, minGrade));
+            slots.add(new Slot("HĐV-PCRT", hdvPcrt, minGrade, false));
         }
         if (segments.contains(TCKT)) {
-            slots.add(new Slot("TCKT", Set.of(TCKT), 1));
+            slots.add(new Slot("TCKT", Set.of(TCKT), 1, false));
         }
         if (segments.contains(XDCB)) {
-            slots.add(new Slot("XDCB", Set.of(XDCB), 1));
+            slots.add(new Slot("XDCB", Set.of(XDCB), 1, false));
         }
         if (segments.contains(TTQT)) {
-            slots.add(new Slot("TTQT", Set.of(TTQT), 1));
+            slots.add(new Slot("TTQT", Set.of(TTQT), 1, false));
         }
         Set<String> itCardTreasury = intersection(segments, IT_CARD_TREASURY);
         if (itCardTreasury.size() >= 2) {
-            slots.add(new Slot("CNTT/Thẻ/TTKQ", itCardTreasury, 1));
+            slots.add(new Slot("CNTT/Thẻ/TTKQ", itCardTreasury, 1, false));
         }
 
+        // Truong doan la 1 can bo rieng (lam QTDH), khong chiem vi tri Tin dung/NTD
         int maxSize = hasCredit ? MAX_TEAM_SIZE : MAX_TEAM_SIZE_NON_CREDIT;
-        while (slots.size() > maxSize) {
+        while (slots.size() > maxSize - 1) {
             slots.remove(slots.size() - 1);
         }
 
@@ -152,17 +186,19 @@ public final class AuditKhnsPbAllocator {
         slots.forEach(s -> covered.addAll(s.segments()));
         Set<String> bonus = new HashSet<>(segments);
         bonus.removeAll(covered);
+        bonus.remove(CREDIT);
+        bonus.remove(QTDH);
         return new TeamPlan(object, slots, bonus, maxSize);
     }
 
     /** @return true neu doan du dinh bien (du Truong doan va du cac vi tri). */
     private boolean staffTeam(TeamPlan plan, List<Staff> staff, Map<UUID, StaffAssignment> assignments, List<String> warnings) {
         List<Slot> open = new ArrayList<>(plan.slots());
+        List<Pick> picks = new ArrayList<>();
         boolean complete = true;
 
-        // 1. Truong doan - uu tien nguoi vua lam Truong doan vua dam nhan duoc 1 vi tri (khong ton them cho)
+        // 1. Truong doan (giu them Truong nhom + Thanh vien QTDH) - tranh dung nguoi la ung vien duy nhat cua 1 vi tri
         Staff lead = null;
-        Slot leadSlot = null;
         double bestScore = Double.NEGATIVE_INFINITY;
         int leadTies = 0;
         for (Staff s : staff) {
@@ -170,31 +206,25 @@ public final class AuditKhnsPbAllocator {
             if (!s.leadCapable() || (current != null && current.member) || !available(s, plan.object(), current)) {
                 continue;
             }
-            Slot slot = bestSlotFor(s, open);
-            double score = (slot != null ? 100 : 0) + score(s, plan, current, slot, false);
+            long slotsItFits = open.stream().filter(slot -> fits(s, slot)).count();
+            double score = score(s, plan, current, null, false) - slotsItFits + (s.capableSegments().contains(QTDH) ? 3 : 0);
             if (score > bestScore) {
                 bestScore = score;
                 lead = s;
-                leadSlot = slot;
                 leadTies = 1;
             } else if (score == bestScore && random.nextInt(++leadTies) == 0) {
                 lead = s;
-                leadSlot = slot;
             }
         }
         if (lead == null) {
             warnings.add(describe(plan.object()) + ": chưa tìm được Trưởng đoàn phù hợp (còn trống trong các tháng kiểm toán).");
             complete = false;
-        } else if (leadSlot == null && plan.slots().size() + 1 > plan.maxSize()) {
-            warnings.add(describe(plan.object()) + ": không bố trí thêm Trưởng đoàn vì đoàn đã đủ số lượng tối đa (" + plan.maxSize() + " cán bộ).");
-            complete = false;
-            lead = null;
-        }
-        if (lead != null) {
-            assign(assignments, lead, plan.object(), true);
-            if (leadSlot != null) {
-                open.remove(leadSlot);
-            }
+        } else {
+            ObjectRole role = assign(assignments, lead, plan.object(), true);
+            role.positions.add(AuditKhnsPosition.TEAM_LEAD);
+            role.positions.add(AuditKhnsPosition.QTDH_GROUP_LEAD);
+            role.positions.add(AuditKhnsPosition.QTDH_MEMBER);
+            role.segments.add(QTDH);
         }
 
         // 2. Cac vi tri con lai - vi tri it nguoi dap ung nhat xu ly truoc
@@ -228,10 +258,64 @@ public final class AuditKhnsPbAllocator {
                         + (target.minGrade() > 1 ? " (yêu cầu KTV từ bậc " + target.minGrade() + ")" : "") + ".");
                 complete = false;
             } else {
-                assign(assignments, picked, plan.object(), false);
+                ObjectRole role = assign(assignments, picked, plan.object(), false);
+                role.positions.add(target.credit() ? AuditKhnsPosition.TD_MEMBER : AuditKhnsPosition.NTD_MEMBER);
+                role.segments.addAll(intersection(picked.capableSegments(), target.segments()));
+                picks.add(new Pick(picked, target));
             }
         }
+
+        // 3. Nghiep vu NTD chua co vi tri rieng (vd chi co 1 trong 3 nghiep vu CNTT/The/TTKQ) giao them cho thanh vien NTD
+        // dam nhan duoc, moi nguoi toi da 3 nghiep vu
+        for (String segment : new TreeSet<>(plan.bonusSegments())) {
+            Pick best = null;
+            int fewest = Integer.MAX_VALUE;
+            for (Pick pick : picks) {
+                if (pick.slot().credit() || !pick.staff().capableSegments().contains(segment)) {
+                    continue;
+                }
+                ObjectRole role = assignments.get(pick.staff().id()).objectRoles.get(plan.object().code());
+                if (role.segments.contains(segment)) {
+                    best = null;
+                    break;
+                }
+                if (role.segments.size() < AuditKhnsPosition.MAX_SEGMENTS && role.segments.size() < fewest) {
+                    best = pick;
+                    fewest = role.segments.size();
+                }
+            }
+            if (best != null) {
+                assignments.get(best.staff().id()).objectRoles.get(plan.object().code()).segments.add(segment);
+            }
+        }
+
+        // 4. Truong nhom Tin dung / NTD: 1 nguoi moi nhom (Truong nhom cung la thanh vien nhom)
+        assignGroupLead(picks, true, AuditKhnsPosition.TD_GROUP_LEAD, plan.object(), assignments);
+        assignGroupLead(picks, false, AuditKhnsPosition.NTD_GROUP_LEAD, plan.object(), assignments);
         return complete;
+    }
+
+    /** Uu tien can bo co kha nang Truong nhom, roi KTV bac cao hon, cuoi cung ngau nhien. */
+    private void assignGroupLead(List<Pick> picks, boolean credit, AuditKhnsPosition position, TeamObject object,
+                                 Map<UUID, StaffAssignment> assignments) {
+        Staff best = null;
+        int ties = 0;
+        for (Pick pick : picks) {
+            if (pick.slot().credit() != credit) {
+                continue;
+            }
+            Staff s = pick.staff();
+            int cmp = best == null ? 1 : Comparator.comparing(Staff::groupLeadCapable).thenComparingInt(Staff::grade).compare(s, best);
+            if (cmp > 0) {
+                best = s;
+                ties = 1;
+            } else if (cmp == 0 && random.nextInt(++ties) == 0) {
+                best = s;
+            }
+        }
+        if (best != null) {
+            assignments.get(best.id()).objectRoles.get(object.code()).positions.add(position);
+        }
     }
 
     private List<Staff> candidatesFor(Slot slot, TeamObject object, List<Staff> staff, Map<UUID, StaffAssignment> assignments) {
@@ -248,17 +332,6 @@ public final class AuditKhnsPbAllocator {
 
     private boolean fits(Staff s, Slot slot) {
         return s.grade() >= slot.minGrade() && !intersection(s.capableSegments(), slot.segments()).isEmpty();
-    }
-
-    /** Vi tri kho nhat (bac yeu cau cao nhat) ma can bo dam nhan duoc, hoac null. */
-    private Slot bestSlotFor(Staff s, List<Slot> open) {
-        Slot best = null;
-        for (Slot slot : open) {
-            if (fits(s, slot) && (best == null || slot.minGrade() > best.minGrade())) {
-                best = slot;
-            }
-        }
-        return best;
     }
 
     private boolean available(Staff s, TeamObject object, StaffAssignment current) {
@@ -297,7 +370,7 @@ public final class AuditKhnsPbAllocator {
         return score;
     }
 
-    private void assign(Map<UUID, StaffAssignment> assignments, Staff s, TeamObject object, boolean asLead) {
+    private ObjectRole assign(Map<UUID, StaffAssignment> assignments, Staff s, TeamObject object, boolean asLead) {
         StaffAssignment a = assignments.computeIfAbsent(s.id(), k -> new StaffAssignment());
         if (asLead) {
             a.lead = true;
@@ -308,6 +381,7 @@ public final class AuditKhnsPbAllocator {
             a.monthToObject.put(month, object.code());
         }
         a.objectCodes.add(object.code());
+        return a.objectRoles.computeIfAbsent(object.code(), k -> new ObjectRole());
     }
 
     private String describe(TeamObject object) {

@@ -5,6 +5,7 @@ import com.govia.audit.khkt.khnsnam.entity.AuditKhnsRoleInTeam;
 import java.time.LocalDate;
 import java.util.List;
 
+/** objectAssignments (tuy chon, chi KHNS_PB gui): chuc vu + nghiep vu chi tiet tai tung doi tuong; null = giu nguyen. */
 public record AuditKhnsNamUpdateRequest(
         AuditKhnsRoleInTeam roleInTeam,
         String otherDuties,
@@ -24,6 +25,9 @@ public record AuditKhnsNamUpdateRequest(
         String month9AuditObjectCode,
         String month10AuditObjectCode,
         String month11AuditObjectCode,
-        String month12AuditObjectCode
+        String month12AuditObjectCode,
+        List<ObjectAssignment> objectAssignments
 ) {
+    public record ObjectAssignment(String auditObjectCode, List<String> positions, List<String> segmentCodes) {
+    }
 }

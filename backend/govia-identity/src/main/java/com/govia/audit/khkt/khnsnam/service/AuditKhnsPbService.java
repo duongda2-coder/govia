@@ -8,6 +8,7 @@ import com.govia.audit.khkt.khnsnam.dto.AuditKhnsPbAllocationResult;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsPbRowResponse;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsNam;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsNamObject;
+import com.govia.audit.khkt.khnsnam.entity.AuditKhnsPosition;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsRoleInTeam;
 import com.govia.audit.khkt.khnsnam.repository.AuditKhnsNamObjectRepository;
 import com.govia.audit.khkt.khnsnam.repository.AuditKhnsNamRepository;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -113,6 +115,10 @@ public class AuditKhnsPbService {
                 .findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT)) {
             segmentNameByCode.putIfAbsent(normalizeSegmentCode(item.getCode()), item.getName());
         }
+        Map<UUID, Map<String, AuditKhnsNamObject>> storedByPlan = new HashMap<>();
+        for (AuditKhnsNamObject stored : khnsNamObjectRepository.findByTenantIdAndKhnsNamIdIn(tenantId, plans.stream().map(AuditKhnsNam::getId).toList())) {
+            storedByPlan.computeIfAbsent(stored.getKhnsNamId(), k -> new HashMap<>()).put(stored.getAuditObjectCode(), stored);
+        }
 
         List<AuditKhnsPbRowResponse> rows = new ArrayList<>();
         for (AuditKhnsNam plan : plans) {
@@ -129,33 +135,67 @@ public class AuditKhnsPbService {
             }
             monthsByObject.forEach((code, months) -> {
                 AuditKhktThangRowResponse object = objectsByCode.get(code);
+                AuditKhnsNamObject stored = storedByPlan.getOrDefault(plan.getId(), Map.of()).get(code);
+                Set<AuditKhnsPosition> positions;
+                List<String> segmentCodes;
+                if (stored != null && stored.getPositions() != null && !stored.getPositions().isBlank()) {
+                    positions = AuditKhnsPosition.parse(stored.getPositions());
+                    segmentCodes = AuditKhnsPosition.parseSegments(stored.getSegmentCodes());
+                } else {
+                    // du lieu nhap tu KHNS_NAM / phan bo cu: suy ra tu chuc vu chung + nghiep vu don vi x kha nang dam nhan
+                    positions = EnumSet.noneOf(AuditKhnsPosition.class);
+                    segmentCodes = new ArrayList<>();
+                    deriveLegacy(plan.getRoleInTeam(), object, capableByEmployee.getOrDefault(employee.getId(), Set.of()), positions, segmentCodes);
+                }
+                // danh muc Nghiep vu cua 1 so moi truong khong co muc CE -> van hien "QTĐH" thay vi ma
+                List<String> segmentNames = segmentCodes.stream()
+                        .map(c -> segmentNameByCode.getOrDefault(c, AuditKhnsPosition.QTDH_SEGMENT.equals(c) ? "QTĐH" : c)).toList();
                 rows.add(new AuditKhnsPbRowResponse(employee.getId().toString(), code, object == null ? code : object.auditObjectName(),
                         object == null ? List.of() : object.businessSegmentCodes(), object == null ? null : object.creditScale(),
                         object == null ? null : object.fundingScale(), employee.getEmployeeCode(), employee.getFullName(),
                         usernames.get(employee.getId()), plan.getRoleInTeam(),
-                        segmentNamesOf(object, capableByEmployee.getOrDefault(employee.getId(), Set.of()), segmentNameByCode), months));
+                        positions.stream().sorted().map(Enum::name).toList(), segmentCodes, segmentNames, months));
             });
         }
         rows.sort(Comparator.comparing(AuditKhnsPbRowResponse::auditObjectCode)
-                .thenComparingInt(r -> r.roleInTeam() == null ? Integer.MAX_VALUE : r.roleInTeam().ordinal())
+                .thenComparingInt(r -> r.positions().stream().map(AuditKhnsPosition::valueOf).mapToInt(Enum::ordinal).min().orElse(Integer.MAX_VALUE))
                 .thenComparing(AuditKhnsPbRowResponse::employeeName));
         return rows;
     }
 
-    /** Nghiep vu cua don vi ma can bo dam nhan duoc (theo thu tu nghiep vu cua don vi). Phan bo khong luu
-     * san nghiep vu nao cua don vi giao cho can bo nao, nen lay giao "nghiep vu don vi" x "kha nang dam nhan". */
-    private List<String> segmentNamesOf(AuditKhktThangRowResponse object, Set<String> capable, Map<String, String> segmentNameByCode) {
-        if (object == null) {
-            return List.of();
+    /** Chuc vu/nghiep vu cho dong chua co chuc vu chi tiet: Truong doan = Truong doan + Truong nhom/Thanh vien QTDH; con lai
+     * lay giao "nghiep vu don vi" x "kha nang dam nhan", chi Tin dung HOAC NTD va toi da 3 nghiep vu. */
+    private void deriveLegacy(AuditKhnsRoleInTeam role, AuditKhktThangRowResponse object, Set<String> capable,
+                              Set<AuditKhnsPosition> positions, List<String> segmentCodes) {
+        if (role == AuditKhnsRoleInTeam.TEAM_LEAD) {
+            positions.addAll(List.of(AuditKhnsPosition.TEAM_LEAD, AuditKhnsPosition.QTDH_GROUP_LEAD, AuditKhnsPosition.QTDH_MEMBER));
+            segmentCodes.add(AuditKhnsPosition.QTDH_SEGMENT);
+            return;
         }
-        Set<String> names = new LinkedHashSet<>();
+        if (object == null) {
+            return;
+        }
+        Set<String> covered = new LinkedHashSet<>();
         for (String code : object.businessSegmentCodes()) {
             String normalized = normalizeSegmentCode(code);
-            if (capable.contains(normalized)) {
-                names.add(segmentNameByCode.getOrDefault(normalized, code));
+            if (capable.contains(normalized) && !AuditKhnsPosition.QTDH_SEGMENT.equals(normalized)) {
+                covered.add(normalized);
             }
         }
-        return List.copyOf(names);
+        boolean groupLead = role == AuditKhnsRoleInTeam.GROUP_LEAD;
+        if (covered.contains(AuditKhnsPbAllocator.CREDIT)) {
+            segmentCodes.add(AuditKhnsPbAllocator.CREDIT);
+            positions.add(AuditKhnsPosition.TD_MEMBER);
+            if (groupLead) {
+                positions.add(AuditKhnsPosition.TD_GROUP_LEAD);
+            }
+        } else if (!covered.isEmpty()) {
+            covered.stream().limit(AuditKhnsPosition.MAX_SEGMENTS).forEach(segmentCodes::add);
+            positions.add(AuditKhnsPosition.NTD_MEMBER);
+            if (groupLead) {
+                positions.add(AuditKhnsPosition.NTD_GROUP_LEAD);
+            }
+        }
     }
 
     private String normalizeSegmentCode(String code) {
@@ -239,8 +279,9 @@ public class AuditKhnsPbService {
                 }
             }
             int grade = e.getAuditorClassification() == null ? 1 : e.getAuditorClassification().ordinal() + 1;
+            boolean groupLeadCapable = capability != null && capability.isTruongNhomCapable();
             staff.add(new AuditKhnsPbAllocator.Staff(e.getId(), e.getEmployeeCode(), e.getFullName(), grade, capable, leadCapable,
-                    ownSegmentCode(e, segmentCodeById), blocked, rotated));
+                    groupLeadCapable, ownSegmentCode(e, segmentCodeById), blocked, rotated));
         }
         return staff;
     }
@@ -270,11 +311,10 @@ public class AuditKhnsPbService {
                 setMonth(plan, month, assignment == null ? null : assignment.getMonthToObject().get(month));
             }
             if (assignment != null) {
-                if (assignment.isLead()) {
-                    plan.setRoleInTeam(AuditKhnsRoleInTeam.TEAM_LEAD);
-                } else if (plan.getRoleInTeam() == null || plan.getRoleInTeam() == AuditKhnsRoleInTeam.TEAM_LEAD) {
-                    plan.setRoleInTeam(AuditKhnsRoleInTeam.MEMBER);
-                }
+                boolean groupLead = assignment.getObjectRoles().values().stream()
+                        .anyMatch(r -> r.getPositions().stream().anyMatch(p -> p.name().endsWith("_GROUP_LEAD")));
+                plan.setRoleInTeam(assignment.isLead() ? AuditKhnsRoleInTeam.TEAM_LEAD
+                        : groupLead ? AuditKhnsRoleInTeam.GROUP_LEAD : AuditKhnsRoleInTeam.MEMBER);
             }
             plan = khnsNamRepository.save(plan);
 
@@ -285,6 +325,11 @@ public class AuditKhnsPbService {
                     obj.setTenantId(tenantId);
                     obj.setKhnsNamId(plan.getId());
                     obj.setAuditObjectCode(code);
+                    AuditKhnsPbAllocator.ObjectRole role = assignment.getObjectRoles().get(code);
+                    if (role != null) {
+                        obj.setPositions(AuditKhnsPosition.join(role.getPositions()));
+                        obj.setSegmentCodes(String.join(",", role.getSegments()));
+                    }
                     khnsNamObjectRepository.save(obj);
                 }
             }

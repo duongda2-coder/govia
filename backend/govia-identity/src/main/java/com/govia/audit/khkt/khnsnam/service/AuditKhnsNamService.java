@@ -4,6 +4,7 @@ import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamUpdateRequest;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsNam;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsNamObject;
+import com.govia.audit.khkt.khnsnam.entity.AuditKhnsPosition;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsRoleInTeam;
 import com.govia.audit.khkt.khnsnam.repository.AuditKhnsNamObjectRepository;
 import com.govia.audit.khkt.khnsnam.repository.AuditKhnsNamRepository;
@@ -119,11 +120,40 @@ public class AuditKhnsNamService {
                 request.month5AuditObjectCode(), request.month6AuditObjectCode(), request.month7AuditObjectCode(),
                 request.month8AuditObjectCode(), request.month9AuditObjectCode(), request.month10AuditObjectCode(),
                 request.month11AuditObjectCode(), request.month12AuditObjectCode());
-        if (request.roleInTeam() == AuditKhnsRoleInTeam.TEAM_LEAD) {
-            validateNoTeamLeadConflict(tenantId, year, plan.getId(), newReferencedCodes);
+        Map<String, AuditKhnsNamObject> existingObjects = new HashMap<>();
+        if (plan.getId() != null) {
+            objectRepository.findByTenantIdAndKhnsNamIdIn(tenantId, List.of(plan.getId()))
+                    .forEach(o -> existingObjects.put(o.getAuditObjectCode(), o));
+        }
+        Map<String, AuditKhnsNamUpdateRequest.ObjectAssignment> requestedAssignments = new HashMap<>();
+        if (request.objectAssignments() != null) {
+            request.objectAssignments().forEach(a -> requestedAssignments.put(a.auditObjectCode(), a));
+            requestedAssignments.values().forEach(a -> AuditKhnsPosition.validate(
+                    AuditKhnsPosition.parse(String.join(",", a.positions() == null ? List.of() : a.positions())),
+                    a.segmentCodes() == null ? List.of() : a.segmentCodes()));
         }
 
-        plan.setRoleInTeam(request.roleInTeam());
+        // Chuc vu suy ra tu cac chuc vu chi tiet (KHNS_PB): Truong doan > Truong nhom > Thanh vien; khong co thi dung roleInTeam gui len
+        AuditKhnsRoleInTeam newRole = request.roleInTeam();
+        if (!requestedAssignments.isEmpty()) {
+            Set<AuditKhnsPosition> all = requestedAssignments.values().stream()
+                    .flatMap(a -> AuditKhnsPosition.parse(String.join(",", a.positions() == null ? List.of() : a.positions())).stream())
+                    .collect(Collectors.toSet());
+            if (all.contains(AuditKhnsPosition.TEAM_LEAD)) {
+                newRole = AuditKhnsRoleInTeam.TEAM_LEAD;
+            } else if (all.stream().anyMatch(p -> p.name().endsWith("_GROUP_LEAD"))) {
+                newRole = AuditKhnsRoleInTeam.GROUP_LEAD;
+            } else if (!all.isEmpty()) {
+                newRole = AuditKhnsRoleInTeam.MEMBER;
+            }
+        }
+        if (newRole == AuditKhnsRoleInTeam.TEAM_LEAD) {
+            validateNoTeamLeadConflict(tenantId, year, plan.getId(), newReferencedCodes);
+        }
+        // KHNS_NAM doi chuc vu (khong gui chuc vu chi tiet) -> chuc vu chi tiet cu khong con dung, de KHNS_PB suy lai tu chuc vu moi
+        boolean keepDetail = request.objectAssignments() != null || newRole == plan.getRoleInTeam();
+
+        plan.setRoleInTeam(newRole);
         plan.setOtherDuties(request.otherDuties());
         plan.setDecisionNumber(request.decisionNumber());
         plan.setDecisionDate(request.decisionDate());
@@ -149,6 +179,16 @@ public class AuditKhnsNamService {
             obj.setTenantId(tenantId);
             obj.setKhnsNamId(plan.getId());
             obj.setAuditObjectCode(code);
+            AuditKhnsNamUpdateRequest.ObjectAssignment requested = requestedAssignments.get(code);
+            if (requested != null) {
+                obj.setPositions(requested.positions() == null || requested.positions().isEmpty() ? null
+                        : AuditKhnsPosition.join(AuditKhnsPosition.parse(String.join(",", requested.positions()))));
+                obj.setSegmentCodes(requested.segmentCodes() == null || requested.segmentCodes().isEmpty() ? null
+                        : String.join(",", requested.segmentCodes()));
+            } else if (keepDetail && existingObjects.containsKey(code)) {
+                obj.setPositions(existingObjects.get(code).getPositions());
+                obj.setSegmentCodes(existingObjects.get(code).getSegmentCodes());
+            }
             objectRepository.save(obj);
         }
 

@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 171-1-audit-khns-nam-object-positions
+      author: govia
+      comment: "KHNS_PB: chuc vu (nhieu gia tri) va nghiep vu can bo dam nhan tai tung don vi - luu tren dong (nhan vien, doi tuong) cua audit_khns_nam_object"
+      changes:
+        - addColumn:
+            tableName: audit_khns_nam_object
+            columns:
+              - column: { name: positions, type: VARCHAR(200) }
+              - column: { name: segment_codes, type: VARCHAR(100) }

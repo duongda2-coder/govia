@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { App, Button, Form, Modal, Result, Select, Space, Table, Tag, Typography } from "antd";
+import { App, Button, Checkbox, Form, Modal, Result, Select, Space, Table, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
 import { EditOutlined, FileExcelOutlined, PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import { isAxiosError } from "axios";
@@ -12,20 +12,28 @@ import {
   updateAuditKhnsNam,
   type AuditKhnsNamRowItem,
   type AuditKhnsNamUpdateRequest,
+  type AuditKhnsObjectAssignment,
   type AuditKhnsPbRowItem,
-  type AuditKhnsRoleInTeam,
+  type AuditKhnsPosition,
 } from "../../../../api/auditKhnsNam";
 import { listAuditKhktThang, type AuditKhktThangRowItem } from "../../../../api/auditKhktThang";
 import { listMasterDataItems, type MasterDataItem } from "../../../../api/auditMasterData";
 import { useAuth } from "../../../../auth/AuthContext";
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const ROLES: AuditKhnsRoleInTeam[] = ["TEAM_LEAD", "GROUP_LEAD", "MEMBER", "SUPPORT"];
+const POSITIONS: AuditKhnsPosition[] = ["TEAM_LEAD", "QTDH_GROUP_LEAD", "QTDH_MEMBER", "TD_GROUP_LEAD", "TD_MEMBER", "NTD_GROUP_LEAD", "NTD_MEMBER"];
+const QTDH_SEGMENT = "CE";
+const CREDIT_SEGMENT = "LN";
+const MAX_SEGMENTS = 3;
+
+/** Danh mục Nghiệp vụ chuẩn dùng mã "LN" cho Tín dụng, một số môi trường demo đặt "TD" - coi "TD" là "LN". */
+const normalizeSegment = (code: string) => (code === "TD" ? CREDIT_SEGMENT : code);
 
 interface AllocationFormValues {
   employeeId?: string;
-  roleInTeam?: AuditKhnsRoleInTeam;
   months: Record<number, string | undefined>;
+  /** Chức vụ + nghiệp vụ theo từng đơn vị (khóa = mã đơn vị đã chọn ở các tháng). */
+  assignments?: Record<string, { positions?: AuditKhnsPosition[]; segments?: string[] }>;
 }
 
 const rowKeyOf = (row: AuditKhnsPbRowItem) => `${row.employeeId}|${row.auditObjectCode}`;
@@ -49,6 +57,7 @@ export function AuditKhnsPbPage() {
   const [pbRows, setPbRows] = useState<AuditKhnsPbRowItem[]>([]);
   const [khnsRows, setKhnsRows] = useState<AuditKhnsNamRowItem[]>([]);
   const [thangRows, setThangRows] = useState<AuditKhktThangRowItem[]>([]);
+  const [segmentItems, setSegmentItems] = useState<MasterDataItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -58,10 +67,14 @@ export function AuditKhnsPbPage() {
   const [unallocatedRows, setUnallocatedRows] = useState<AuditKhnsNamRowItem[]>([]);
   const [currentMonthCodes, setCurrentMonthCodes] = useState<Record<number, string | undefined>>({});
   const [allocForm] = Form.useForm<AllocationFormValues>();
+  const watchedMonths = Form.useWatch("months", allocForm);
 
   useEffect(() => {
-    listMasterDataItems("YEAR")
-      .then(setYears)
+    Promise.all([listMasterDataItems("YEAR"), listMasterDataItems("BUSINESS_SEGMENT")])
+      .then(([yearItems, segments]) => {
+        setYears(yearItems);
+        setSegmentItems(segments);
+      })
       .catch(() => message.error(t("auditKhnsPb.messages.loadError")));
   }, [message, t]);
 
@@ -113,11 +126,32 @@ export function AuditKhnsPbPage() {
     return months;
   };
 
+  const segmentNameOf = (code: string) => segmentItems.find((i) => normalizeSegment(i.code) === code)?.name ?? (code === QTDH_SEGMENT ? "QTĐH" : code);
+
+  /** Đơn vị đang chọn ở các tháng trong form (mỗi đơn vị 1 khối chọn chức vụ/nghiệp vụ). */
+  const selectedUnitCodes = useMemo(
+    () => Array.from(new Set(Object.values(watchedMonths ?? {}).filter((c): c is string => !!c))),
+    [watchedMonths],
+  );
+
+  /** Nghiệp vụ chọn được tại đơn vị = nghiệp vụ đã khai báo của đơn vị + QTĐH (Trưởng đoàn làm QTĐH). */
+  const segmentOptionsForUnit = (code: string) => {
+    const declared = thangRows.find((r) => r.auditObjectCode === code)?.businessSegmentCodes ?? [];
+    const codes = Array.from(new Set([...declared.map(normalizeSegment), QTDH_SEGMENT]));
+    return codes.map((c) => ({ value: c, label: segmentNameOf(c) }));
+  };
+
   const openEditAllocation = () => {
     if (!selectedPlan) return;
     const months = monthsOf(selectedPlan);
     setCurrentMonthCodes(months);
-    allocForm.setFieldsValue({ employeeId: selectedPlan.employeeId, roleInTeam: selectedPlan.roleInTeam ?? undefined, months });
+    const assignments: NonNullable<AllocationFormValues["assignments"]> = {};
+    pbRows
+      .filter((r) => r.employeeId === selectedPlan.employeeId)
+      .forEach((r) => {
+        assignments[r.auditObjectCode] = { positions: r.positions, segments: r.segmentCodes };
+      });
+    allocForm.setFieldsValue({ employeeId: selectedPlan.employeeId, months, assignments });
     setAllocAddMode(false);
     setAllocModalOpen(true);
   };
@@ -149,10 +183,30 @@ export function AuditKhnsPbPage() {
     const target = allocAddMode ? unallocatedRows.find((r) => r.employeeId === values.employeeId) : selectedPlan;
     if (!target) return;
     const monthCode = (m: number) => values.months?.[m] ?? null;
+    const unitCodes = Array.from(new Set(MONTHS.map(monthCode).filter((c): c is string => !!c)));
+    const objectAssignments: AuditKhnsObjectAssignment[] = unitCodes.map((code) => ({
+      auditObjectCode: code,
+      positions: values.assignments?.[code]?.positions ?? [],
+      segmentCodes: values.assignments?.[code]?.segments ?? [],
+    }));
+    for (const a of objectAssignments) {
+      if (a.segmentCodes.length > MAX_SEGMENTS) {
+        message.error(t("auditKhnsPb.messages.tooManySegments"));
+        return;
+      }
+      const credit = a.positions.some((p) => p.startsWith("TD_")) || a.segmentCodes.includes(CREDIT_SEGMENT);
+      const nonCredit =
+        a.positions.some((p) => p.startsWith("NTD_")) || a.segmentCodes.some((c) => c !== CREDIT_SEGMENT && c !== QTDH_SEGMENT);
+      if (credit && nonCredit) {
+        message.error(t("auditKhnsPb.messages.creditAndNtd"));
+        return;
+      }
+    }
     const request: AuditKhnsNamUpdateRequest = {
-      roleInTeam: values.roleInTeam ?? null,
+      roleInTeam: allocAddMode ? null : (selectedPlan?.roleInTeam ?? null),
+      objectAssignments,
       otherDuties: target.otherDuties,
-      auditObjectCodes: Array.from(new Set(MONTHS.map(monthCode).filter((c): c is string => !!c))),
+      auditObjectCodes: unitCodes,
       decisionNumber: target.decisionNumber,
       decisionDate: target.decisionDate,
       expectedBatch: target.expectedBatch,
@@ -179,7 +233,15 @@ export function AuditKhnsPbPage() {
       await load();
     } catch (err) {
       const code = isAxiosError<{ errorCode?: string }>(err) ? err.response?.data?.errorCode : undefined;
-      message.error(code === "AUDIT_KHNS_NAM_TEAM_LEAD_CONFLICT" ? t("auditKhnsPb.messages.teamLeadConflict") : t("auditKhnsPb.messages.saveError"));
+      message.error(
+        code === "AUDIT_KHNS_NAM_TEAM_LEAD_CONFLICT"
+          ? t("auditKhnsPb.messages.teamLeadConflict")
+          : code === "AUDIT_KHNS_PB_TOO_MANY_SEGMENTS"
+            ? t("auditKhnsPb.messages.tooManySegments")
+            : code === "AUDIT_KHNS_PB_CREDIT_AND_NTD"
+              ? t("auditKhnsPb.messages.creditAndNtd")
+              : t("auditKhnsPb.messages.saveError"),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -248,12 +310,13 @@ export function AuditKhnsPbPage() {
     {
       title: t("auditKhnsPb.columns.position"),
       dataIndex: "roleInTeam",
-      width: 220,
+      width: 320,
       render: (_: unknown, row) => {
-        if (!row.roleInTeam) return "-";
-        const role = t(`auditKhnsNam.role.${row.roleInTeam}`);
-        // Trưởng đoàn giữ nguyên; các vai trò còn lại ghi rõ đang làm nghiệp vụ nào (1 hoặc nhiều)
-        return row.roleInTeam === "TEAM_LEAD" || row.segmentNames.length === 0 ? role : `${role} ${row.segmentNames.join(", ")}`;
+        if (row.positions.length === 0) return row.roleInTeam ? t(`auditKhnsNam.role.${row.roleInTeam}`) : "-";
+        const labels = row.positions.map((p) => t(`auditKhnsPb.position.${p}`)).join(", ");
+        // Chức vụ NTD ghi kèm các nghiệp vụ cụ thể cán bộ làm (tối đa 3)
+        const ntd = row.positions.some((p) => p.startsWith("NTD_")) && row.segmentNames.length > 0;
+        return ntd ? `${labels} (${row.segmentNames.join(", ")})` : labels;
       },
     },
     { title: t("auditKhnsPb.columns.months"), dataIndex: "months", width: 100, render: (months: number[]) => months.join(", ") },
@@ -340,9 +403,6 @@ export function AuditKhnsPbPage() {
               {selectedPlan?.employeeCode} - {selectedPlan?.employeeName}
             </Typography.Paragraph>
           )}
-          <Form.Item name="roleInTeam" label={t("auditKhnsPb.roleField")}>
-            <Select allowClear options={ROLES.map((r) => ({ value: r, label: t(`auditKhnsNam.role.${r}`) }))} />
-          </Form.Item>
           <Typography.Paragraph type="secondary">{t("auditKhnsPb.monthsHint")}</Typography.Paragraph>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 8 }}>
             {MONTHS.map((m) => (
@@ -351,6 +411,27 @@ export function AuditKhnsPbPage() {
               </Form.Item>
             ))}
           </div>
+          {selectedUnitCodes.length > 0 && (
+            <>
+              <Typography.Paragraph type="secondary" style={{ marginTop: 8 }}>
+                {t("auditKhnsPb.unitAssignmentsHint")}
+              </Typography.Paragraph>
+              {selectedUnitCodes.map((code) => {
+                const unit = thangRows.find((r) => r.auditObjectCode === code);
+                return (
+                  <div key={code} style={{ border: "1px solid #f0f0f0", borderRadius: 6, padding: 12, marginBottom: 8 }}>
+                    <Typography.Text strong>{unit ? `${code} - ${unit.auditObjectName}` : code}</Typography.Text>
+                    <Form.Item name={["assignments", code, "positions"]} label={t("auditKhnsPb.positionsField")} style={{ marginTop: 8, marginBottom: 8 }}>
+                      <Checkbox.Group options={POSITIONS.map((p) => ({ value: p, label: t(`auditKhnsPb.position.${p}`) }))} />
+                    </Form.Item>
+                    <Form.Item name={["assignments", code, "segments"]} label={t("auditKhnsPb.segmentsField")} style={{ marginBottom: 0 }}>
+                      <Checkbox.Group options={segmentOptionsForUnit(code)} />
+                    </Form.Item>
+                  </div>
+                );
+              })}
+            </>
+          )}
         </Form>
       </Modal>
     </div>

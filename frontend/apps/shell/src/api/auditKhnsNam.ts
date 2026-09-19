@@ -2,6 +2,23 @@ import type { ApiResponse } from "@govia/ui-kit";
 import { httpClient } from "./client";
 
 export type AuditKhnsRoleInTeam = "TEAM_LEAD" | "GROUP_LEAD" | "MEMBER" | "SUPPORT";
+
+/** Chức vụ chi tiết của cán bộ tại 1 đơn vị (màn KHNS_PB) - 1 cán bộ giữ được nhiều chức vụ cùng lúc. */
+export type AuditKhnsPosition =
+  | "TEAM_LEAD"
+  | "QTDH_GROUP_LEAD"
+  | "QTDH_MEMBER"
+  | "TD_GROUP_LEAD"
+  | "TD_MEMBER"
+  | "NTD_GROUP_LEAD"
+  | "NTD_MEMBER";
+
+export interface AuditKhnsObjectAssignment {
+  auditObjectCode: string;
+  positions: AuditKhnsPosition[];
+  segmentCodes: string[];
+}
+
 export type EmployeeAuditorClassification = "TYPE_1" | "TYPE_2" | "TYPE_3";
 
 export interface AuditKhnsNamRowItem {
@@ -57,6 +74,8 @@ export interface AuditKhnsNamUpdateRequest {
   month10AuditObjectCode: string | null;
   month11AuditObjectCode: string | null;
   month12AuditObjectCode: string | null;
+  /** Chỉ KHNS_PB gửi: chức vụ + nghiệp vụ chi tiết theo từng đơn vị; bỏ trống = giữ nguyên. */
+  objectAssignments?: AuditKhnsObjectAssignment[];
 }
 
 const BASE = "/api/audit/plan/khns-nam";
@@ -103,7 +122,9 @@ export interface AuditKhnsPbRowItem {
   employeeName: string;
   username: string | null;
   roleInTeam: AuditKhnsRoleInTeam | null;
-  /** Tên các nghiệp vụ của đơn vị mà cán bộ đảm nhận được - hiện kèm "Chức vụ" của thành viên. */
+  positions: AuditKhnsPosition[];
+  /** Nghiệp vụ cán bộ làm tại đơn vị này (tối đa 3, không trộn Tín dụng với NTD). */
+  segmentCodes: string[];
   segmentNames: string[];
   months: number[];
 }
