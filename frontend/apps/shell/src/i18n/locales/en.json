@@ -1143,6 +1143,17 @@
     "title": "Annual/batch audit staffing plan",
     "selectYearHint": "Select a Year to view the list.",
     "exportReportButton": "Export batch report",
+    "exportDialog": {
+      "title": "Export batch report - {{month}}/{{year}}",
+      "decisionNumber": "Decision number",
+      "decisionDate": "Decision date",
+      "hint": "All fields below are optional; anything left empty stays blank in the file.",
+      "units": "Audit period of each unit",
+      "noUnits": "No unit has staff allocated in this month.",
+      "periodPlaceholder": "e.g. 05/03 - 20/03",
+      "submit": "Export",
+      "error": "Export failed"
+    },
     "syncButton": "Update staff list",
     "emptyHint": "No staff in the list yet. Click \"Update staff list\" to pull the list from the Monthly staff allocation to branches screen.",
     "classification": {

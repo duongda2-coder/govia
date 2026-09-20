@@ -44,4 +44,45 @@ public final class AuditKhnsPositionLabel {
         boolean ntd = parsed.stream().anyMatch(AuditKhnsPosition::isNonCredit) && !segmentNames.isEmpty();
         return ntd ? labels + " (" + String.join(", ", segmentNames) + ")" : labels;
     }
+
+    /** Vai tro cao nhat trong doan tu cac chuc vu chi tiet: Truong doan > Truong nhom (bat ky nhom nao) > Thanh vien; khong co chuc vu
+     * chi tiet thi dung chuc vu chung. null neu khong xac dinh. Dung cho cot "Chuc vu" cua bao cao theo dot (ZTC_BC_DOT). */
+    public static AuditKhnsRoleInTeam batchRoleKind(List<String> positions, AuditKhnsRoleInTeam roleInTeam) {
+        if (positions.isEmpty()) {
+            return roleInTeam;
+        }
+        List<AuditKhnsPosition> parsed = positions.stream().map(AuditKhnsPosition::valueOf).toList();
+        if (parsed.contains(AuditKhnsPosition.TEAM_LEAD)) {
+            return AuditKhnsRoleInTeam.TEAM_LEAD;
+        }
+        if (parsed.stream().anyMatch(p -> p.name().endsWith("_GROUP_LEAD"))) {
+            return AuditKhnsRoleInTeam.GROUP_LEAD;
+        }
+        return AuditKhnsRoleInTeam.MEMBER;
+    }
+
+    public static String batchRole(List<String> positions, AuditKhnsRoleInTeam roleInTeam) {
+        AuditKhnsRoleInTeam kind = batchRoleKind(positions, roleInTeam);
+        return kind == null ? null : role(kind);
+    }
+
+    /** "Linh vuc duoc phan cong kiem toan" cua bao cao theo dot: nghiep vu du kien cua can bo CE -> QTĐH, LN -> TD, cac nghiep vu con
+     * lai -> NTD; can bo chua co nghiep vu thi suy tu nhom chuc vu (QTĐH / Tin dung / NTD). */
+    public static String group(String employeeSegmentCode, List<String> positions) {
+        if (employeeSegmentCode != null && !employeeSegmentCode.isBlank()) {
+            String code = employeeSegmentCode.trim();
+            if (AuditKhnsPosition.QTDH_SEGMENT.equalsIgnoreCase(code)) {
+                return "QTĐH";
+            }
+            return AuditKhnsPosition.CREDIT_SEGMENT.equalsIgnoreCase(code) ? "TD" : "NTD";
+        }
+        List<AuditKhnsPosition> parsed = positions.stream().map(AuditKhnsPosition::valueOf).toList();
+        if (parsed.stream().anyMatch(p -> p == AuditKhnsPosition.QTDH_GROUP_LEAD || p == AuditKhnsPosition.QTDH_MEMBER)) {
+            return "QTĐH";
+        }
+        if (parsed.stream().anyMatch(AuditKhnsPosition::isCredit)) {
+            return "TD";
+        }
+        return parsed.stream().anyMatch(AuditKhnsPosition::isNonCredit) ? "NTD" : null;
+    }
 }

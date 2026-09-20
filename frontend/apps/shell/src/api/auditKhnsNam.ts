@@ -126,8 +126,16 @@ export async function updateAuditKhnsNamNote(employeeId: string, year: number, n
   return res.data.data;
 }
 
-export async function exportAuditKhnsNamMonthlyReport(year: number, month: number): Promise<void> {
-  const res = await httpClient.get(`${BASE}/export`, { params: { year, month }, responseType: "blob" });
+/** Thông tin NSD nhập khi xuất báo cáo theo đợt (file mẫu ZTC_BC_DOT) - đều tuỳ chọn, để trống thì để trống trong file. */
+export interface AuditKhnsNamBatchReportRequest {
+  decisionNumber: string | null;
+  /** yyyy-MM-dd */
+  decisionDate: string | null;
+  unitPeriods: { auditObjectCode: string; period: string }[];
+}
+
+export async function exportAuditKhnsNamMonthlyReport(year: number, month: number, request: AuditKhnsNamBatchReportRequest): Promise<void> {
+  const res = await httpClient.post(`${BASE}/export`, request, { params: { year, month }, responseType: "blob" });
   const blobUrl = window.URL.createObjectURL(res.data as Blob);
   const link = document.createElement("a");
   link.href = blobUrl;

@@ -307,46 +307,67 @@ class AuditKhnsPbAllocationTest {
     }
 
     @Test
-    void monthlyReportChucVuColumnMatchesKhnsPbPositionText() throws Exception {
+    void batchReportFollowsZtcBcDotTemplate() throws Exception {
         object("OBJ-A", AuditKhktApprovalStatus.APPROVED, true, "12000", Set.of(3), lnId, gaId);
-        employee("E1", EmployeeAuditorClassification.TYPE_3, true, false, "LN");
+        Employee e1 = employee("E1", EmployeeAuditorClassification.TYPE_3, true, false, "LN");
         employee("E2", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
         employee("E3", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
         employee("E6", EmployeeAuditorClassification.TYPE_3, false, false, "LN");
-        employee("E5", EmployeeAuditorClassification.TYPE_1, false, false, "GA");
+        Employee e5 = employee("E5", EmployeeAuditorClassification.TYPE_1, false, false, "GA");
         employee("E8-UNUSED", EmployeeAuditorClassification.TYPE_1, false, false);
+        e1.setBusinessSegmentId(lnId);
+        employeeRepository.save(e1);
+        e5.setBusinessSegmentId(gaId);
+        employeeRepository.save(e5);
         pbService.allocate(YEAR);
         List<AuditKhnsPbRowResponse> pbRows = pbService.listRows(YEAR);
 
-        byte[] xlsx = khnsNamService.exportMonthlyReport(YEAR, 3);
+        byte[] xlsx = khnsNamService.exportMonthlyReport(YEAR, 3, new com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamBatchReportRequest(
+                "12", java.time.LocalDate.of(2099, 3, 5),
+                List.of(new com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamBatchReportRequest.UnitPeriod("OBJ-A", "01/03 - 15/03"))));
 
-        java.util.Map<String, String> chucVuByCode = new java.util.HashMap<>();
         try (org.apache.poi.ss.usermodel.Workbook workbook = new org.apache.poi.xssf.usermodel.XSSFWorkbook(new java.io.ByteArrayInputStream(xlsx))) {
             org.apache.poi.ss.usermodel.Sheet sheet = workbook.getSheetAt(0);
-            org.apache.poi.ss.usermodel.Row header = sheet.getRow(0);
-            int codeCol = -1;
-            int roleCol = -1;
-            for (int c = 0; c < header.getLastCellNum(); c++) {
-                String title = header.getCell(c).getStringCellValue();
-                if ("Mã cán bộ".equals(title)) codeCol = c;
-                if ("Chức vụ".equals(title)) roleCol = c;
-            }
-            for (int r = 1; r <= sheet.getLastRowNum(); r++) {
-                org.apache.poi.ss.usermodel.Cell role = sheet.getRow(r).getCell(roleCol);
-                chucVuByCode.put(sheet.getRow(r).getCell(codeCol).getStringCellValue(), role == null ? null : role.getStringCellValue());
-            }
-        }
+            java.util.List<String> texts = new java.util.ArrayList<>();
+            sheet.forEach(row -> row.forEach(cell -> texts.add(cell.toString())));
+            assertThat(texts).contains("NHÂN SỰ CÁC ĐOÀN KIỂM TOÁN NỘI BỘ THÁNG 3 NĂM 2099",
+                    "Theo Quyết định số 12/QĐ-BKS ngày 05 tháng 03 năm 2099", "LẬP BIỂU", "TRƯỞNG PHÒNG KẾ HOẠCH", "TRƯỞNG KIỂM TOÁN NỘI BỘ");
 
-        // moi can bo di kiem toan thang 3: cot Chuc vu cua file = chuoi hien thi o man KHNS_PB (Truong doan / Truong nhom / Thanh vien ...)
-        assertThat(pbRows).isNotEmpty();
-        for (AuditKhnsPbRowResponse pb : pbRows) {
-            String expected = com.govia.audit.khkt.khnsnam.service.AuditKhnsPositionLabel.format(pb.positions(), pb.segmentNames(), pb.roleInTeam());
-            assertThat(chucVuByCode.get(pb.employeeCode())).isEqualTo(expected);
+            int headerRow = -1;
+            for (int r = 0; r <= sheet.getLastRowNum(); r++) {
+                if (sheet.getRow(r) != null && sheet.getRow(r).getCell(0) != null && "STT".equals(sheet.getRow(r).getCell(0).toString())) {
+                    headerRow = r;
+                }
+            }
+            assertThat(headerRow).isPositive();
+            org.apache.poi.ss.usermodel.Row header = sheet.getRow(headerRow);
+            assertThat(java.util.stream.IntStream.range(0, 8).mapToObj(c -> header.getCell(c).toString()).toList()).containsExactly("STT",
+                    "Đơn vị kiểm toán", "Lĩnh vực kiểm toán", "Thời gian kiểm toán", "Họ và tên", "Đơn vị công tác",
+                    "Lĩnh vực được phân công kiểm toán", "Chức vụ");
+
+            // 1 khoi don vi: STT/Don vi/Linh vuc/Thoi gian o dong dau, moi can bo 1 dong (chi can bo di kiem toan thang 3)
+            org.apache.poi.ss.usermodel.Row first = sheet.getRow(headerRow + 1);
+            assertThat(first.getCell(0).getNumericCellValue()).isEqualTo(1);
+            assertThat(first.getCell(1).getStringCellValue()).isEqualTo("OBJ-A");
+            assertThat(first.getCell(3).getStringCellValue()).isEqualTo("01/03 - 15/03");
+            java.util.Map<String, String[]> byName = new java.util.LinkedHashMap<>();
+            for (int r = headerRow + 1; r <= sheet.getLastRowNum(); r++) {
+                org.apache.poi.ss.usermodel.Row row = sheet.getRow(r);
+                if (row == null || row.getCell(4) == null || row.getCell(4).getStringCellValue().isEmpty()) {
+                    continue;
+                }
+                byName.put(row.getCell(4).getStringCellValue(), new String[]{row.getCell(6).getStringCellValue(), row.getCell(7).getStringCellValue()});
+            }
+            assertThat(byName).hasSize(pbRows.size());
+            assertThat(byName).doesNotContainKey("Nhan vien PB-E8-UNUSED").doesNotContainKey("Nhan vien E8-UNUSED");
+            // Truong doan dung dau khoi; cot Chuc vu chi con Truong doan / Truong nhom / Thanh vien
+            assertThat(sheet.getRow(headerRow + 1).getCell(7).getStringCellValue()).isEqualTo("Trưởng đoàn");
+            assertThat(byName.values()).allSatisfy(v -> assertThat(v[1]).isIn("Trưởng đoàn", "Trưởng nhóm", "Thành viên"));
+            // Linh vuc duoc phan cong theo "Linh vuc du kien": LN -> TD; nghiep vu con lai -> NTD; chua co thi suy tu chuc vu
+            assertThat(byName.get("Nhan vien E1")[0]).isEqualTo("TD");
+            assertThat(byName.get("Nhan vien E5")[0]).isEqualTo("NTD");
+            assertThat(byName.values()).allSatisfy(v -> assertThat(v[0]).isIn("QTĐH", "TD", "NTD"));
         }
-        assertThat(chucVuByCode.values().stream().filter(v -> v != null)).noneMatch(v -> v.matches(".*(TEAM_LEAD|MEMBER|GROUP_LEAD).*"));
-        assertThat(chucVuByCode.values()).contains("Trưởng đoàn, Trưởng nhóm QTĐH, Thành viên QTĐH");
-        assertThat(chucVuByCode.values().stream().filter(v -> v != null && v.contains("Tín dụng"))).hasSize(3);
-        assertThat(chucVuByCode.get("PB-E8-UNUSED")).isNullOrEmpty();
     }
 
     private AuditKhnsNamUpdateRequest updateRequest(String objectCode, List<String> positions, List<String> segments) {

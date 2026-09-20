@@ -1,5 +1,6 @@
 package com.govia.audit.khkt.khnsnam.controller;
 
+import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamBatchReportRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamInfoRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamUpdateRequest;
@@ -99,10 +100,12 @@ public class AuditKhnsNamController {
         return ApiResponse.ok(pbService.allocate(year));
     }
 
-    @GetMapping("/export")
+    /** "Xuat bao cao theo dot" (file mau ZTC_BC_DOT) - POST vi NSD nhap them so/ngay quyet dinh va thoi gian kiem toan tung don vi. */
+    @PostMapping("/export")
     @PreAuthorize("hasAuthority('PERM_AUDIT.KHNS_NAM.VIEW')")
-    public ResponseEntity<byte[]> exportMonthlyReport(@RequestParam Integer year, @RequestParam Integer month) {
-        byte[] content = service.exportMonthlyReport(year, month);
+    public ResponseEntity<byte[]> exportMonthlyReport(@RequestParam Integer year, @RequestParam Integer month,
+                                                       @RequestBody(required = false) AuditKhnsNamBatchReportRequest request) {
+        byte[] content = service.exportMonthlyReport(year, month, request);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"bao_cao_khns_thang_" + month + "_" + year + ".xlsx\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))

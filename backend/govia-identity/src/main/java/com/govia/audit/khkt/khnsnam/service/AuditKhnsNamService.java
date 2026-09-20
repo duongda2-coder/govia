@@ -1,5 +1,6 @@
 package com.govia.audit.khkt.khnsnam.service;
 
+import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamBatchReportRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamInfoRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamRowResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsNamUpdateRequest;
@@ -19,8 +20,6 @@ import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import com.govia.core.audit.AuditAction;
 import com.govia.core.audit.AuditLogService;
-import com.govia.core.export.ExcelExportService;
-import com.govia.core.export.ExportColumn;
 import com.govia.core.tenant.TenantContext;
 import com.govia.core.web.BusinessException;
 import com.govia.identity.entity.Employee;
@@ -52,14 +51,13 @@ public class AuditKhnsNamService {
     private final AuditKhktThConfirmedRepository thConfirmedRepository;
     private final AuditKhktThConfirmedSegmentRepository thConfirmedSegmentRepository;
     private final AuditLogService auditLogService;
-    private final ExcelExportService excelExportService;
     private final AuditKhnsPbService pbService;
 
     public AuditKhnsNamService(AuditKhnsNamRepository repository, AuditKhnsNamObjectRepository objectRepository,
                                 EmployeeRepository employeeRepository, AuditMasterDataItemRepository masterDataItemRepository,
                                 AuditKhktThConfirmedRepository thConfirmedRepository,
                                 AuditKhktThConfirmedSegmentRepository thConfirmedSegmentRepository, AuditLogService auditLogService,
-                                ExcelExportService excelExportService, AuditKhnsPbService pbService) {
+                                AuditKhnsPbService pbService) {
         this.repository = repository;
         this.objectRepository = objectRepository;
         this.employeeRepository = employeeRepository;
@@ -67,7 +65,6 @@ public class AuditKhnsNamService {
         this.thConfirmedRepository = thConfirmedRepository;
         this.thConfirmedSegmentRepository = thConfirmedSegmentRepository;
         this.auditLogService = auditLogService;
-        this.excelExportService = excelExportService;
         this.pbService = pbService;
     }
 
@@ -313,83 +310,57 @@ public class AuditKhnsNamService {
         return toResponse(employee, plan, objectCodes, positions, departments, segments, thLookup, year, List.of(), null);
     }
 
-    /** "Báo cáo theo đợt" (sheet Báo cáo theo đợt) - "DỰ KIẾN NHÂN SỰ CÁC ĐOÀN KIỂM TOÁN NỘI BỘ
-     * THÁNG X": 1 dong / 1 nhan vien, cho biet thang do di kiem toan doi tuong nao hay khong - gop
-     * 2 bang "di kiem toan" / "khong di kiem toan" cua sheet goc thanh 1 bang phang duy nhat co cot
-     * "Trang thai" (ExcelExportService khong ho tro 2 bang canh nhau tren cung 1 sheet). */
+    /** "Báo cáo theo đợt" (file mau ZTC_BC_DOT) - "NHÂN SỰ CÁC ĐOÀN KIỂM TOÁN NỘI BỘ THÁNG x NĂM y": moi don vi kiem toan trong thang la
+     * 1 khoi dong, moi can bo di kiem toan don vi do 1 dong. Nguon la man KHNS_PB (doi tuong + chuc vu + nghiep vu theo thang). Cac cot:
+     * Lĩnh vực kiểm toán = ma cac nghiep vu NTD (ngoai QTDH/Tin dung) trong chuc vu cua can bo tai don vi; Lĩnh vực được phân công =
+     * QTĐH (CE) / TD (LN) / NTD (con lai) theo "Lĩnh vực dự kiến được phân công" cua can bo; Chức vụ = chuc vu cao nhat trong doan;
+     * Thời gian kiểm toán do NSD nhap (request), khong luu. */
     @Transactional(readOnly = true)
-    public byte[] exportMonthlyReport(Integer year, Integer month) {
+    public byte[] exportMonthlyReport(Integer year, Integer month, AuditKhnsNamBatchReportRequest request) {
+        if (month == null || month < 1 || month > 12) {
+            throw new BusinessException("INVALID_MONTH", "Thang khong hop le: " + month);
+        }
         UUID tenantId = TenantContext.getTenantId();
-        List<Employee> employees = employeeRepository.findByTenantIdOrderByFullNameAsc(tenantId);
-        Map<UUID, AuditKhnsNam> plansByEmployee = repository.findByTenantIdAndYear(tenantId, year).stream()
-                .collect(Collectors.toMap(AuditKhnsNam::getEmployeeId, p -> p));
+        Map<UUID, Employee> employees = employeeRepository.findByTenantIdOrderByFullNameAsc(tenantId).stream()
+                .collect(Collectors.toMap(Employee::getId, e -> e));
         Map<UUID, AuditMasterDataItem> departments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.DEPARTMENT);
         Map<UUID, AuditMasterDataItem> segments = masterDataItemsByCategory(tenantId, AuditMasterDataCategory.BUSINESS_SEGMENT);
-        ThObjectLookup thLookup = buildThLookup(tenantId, year, segments);
-        Map<UUID, List<AuditKhnsPbRowResponse>> pbRowsByEmployee = pbService.listRows(year).stream()
-                .collect(Collectors.groupingBy(r -> UUID.fromString(r.employeeId())));
-
-        List<ExportColumn> columns = List.of(
-                new ExportColumn("stt", "STT"),
-                new ExportColumn("status", "Trạng thái"),
-                new ExportColumn("employeeCode", "Mã cán bộ"),
-                new ExportColumn("fullName", "Họ và tên"),
-                new ExportColumn("departmentCode", "Phòng"),
-                new ExportColumn("auditObjectName", "Đối tượng KT"),
-                new ExportColumn("businessSegments", "Lĩnh vực kiểm toán"),
-                new ExportColumn("roleInTeam", "Chức vụ"));
-
-        List<Map<String, Object>> rows = new ArrayList<>();
-        int stt = 1;
-        for (Employee employee : employees) {
-            AuditKhnsNam plan = plansByEmployee.get(employee.getId());
-            String monthCode = plan == null ? null : monthAuditObjectCode(plan, month);
-            AuditMasterDataItem department = employee.getDepartmentId() == null ? null : departments.get(employee.getDepartmentId());
-            Map<String, Object> row = new HashMap<>();
-            row.put("stt", stt++);
-            row.put("status", monthCode == null ? "Không đi kiểm toán" : "Đi kiểm toán");
-            row.put("employeeCode", employee.getEmployeeCode());
-            row.put("fullName", employee.getFullName());
-            row.put("departmentCode", department == null ? null : department.getCode());
-            row.put("auditObjectName", monthCode == null ? null : thLookup.nameByCode().get(monthCode));
-            row.put("businessSegments", monthCode == null ? null : String.join(", ", thLookup.segmentCodesByCode().getOrDefault(monthCode, List.of())));
-            row.put("roleInTeam", positionText(plan, monthCode, pbRowsByEmployee.getOrDefault(employee.getId(), List.of())));
-            rows.add(row);
+        Map<String, String> periodByObject = new HashMap<>();
+        if (request != null && request.unitPeriods() != null) {
+            request.unitPeriods().stream().filter(p -> p.auditObjectCode() != null && p.period() != null && !p.period().isBlank())
+                    .forEach(p -> periodByObject.put(p.auditObjectCode(), p.period().trim()));
         }
 
-        return excelExportService.export("audit_khns_nam_thang_" + month, columns, rows);
+        Map<String, List<AuditKhnsPbRowResponse>> rowsByObject = pbService.listRows(year).stream()
+                .filter(r -> r.months().contains(month))
+                .collect(Collectors.groupingBy(AuditKhnsPbRowResponse::auditObjectCode));
+        List<AuditKhnsNamBatchReportWriter.Unit> units = rowsByObject.entrySet().stream().map(entry -> {
+            List<AuditKhnsPbRowResponse> pbRows = entry.getValue();
+            List<AuditKhnsNamBatchReportWriter.Staff> staff = pbRows.stream()
+                    .filter(r -> employees.containsKey(UUID.fromString(r.employeeId())))
+                    .sorted(java.util.Comparator.comparingInt((AuditKhnsPbRowResponse r) -> roleRank(r.positions(), r.roleInTeam()))
+                            .thenComparing(AuditKhnsPbRowResponse::employeeName))
+                    .map(r -> {
+                        Employee employee = employees.get(UUID.fromString(r.employeeId()));
+                        AuditMasterDataItem department = employee.getDepartmentId() == null ? null : departments.get(employee.getDepartmentId());
+                        AuditMasterDataItem segment = employee.getBusinessSegmentId() == null ? null : segments.get(employee.getBusinessSegmentId());
+                        return new AuditKhnsNamBatchReportWriter.Staff(employee.getFullName(), department == null ? null : department.getCode(),
+                                AuditKhnsPositionLabel.group(segment == null ? null : segment.getCode(), r.positions()),
+                                AuditKhnsPositionLabel.batchRole(r.positions(), r.roleInTeam()));
+                    }).toList();
+            String segmentCodes = pbRows.stream().filter(r -> r.positions().stream().map(AuditKhnsPosition::valueOf).anyMatch(AuditKhnsPosition::isNonCredit))
+                    .flatMap(r -> r.segmentCodes().stream()).distinct().collect(Collectors.joining(","));
+            return new AuditKhnsNamBatchReportWriter.Unit(pbRows.get(0).auditObjectName(), segmentCodes, periodByObject.get(entry.getKey()), staff);
+        }).sorted(java.util.Comparator.comparing(AuditKhnsNamBatchReportWriter.Unit::name, java.text.Collator.getInstance(java.util.Locale.forLanguageTag("vi")))).toList();
+
+        return AuditKhnsNamBatchReportWriter.write(year, month, request == null ? null : request.decisionNumber(),
+                request == null ? null : request.decisionDate(), units);
     }
 
-    /** Cot "Chuc vu" cua bao cao - giong y nguyen cot "Chuc vu" o KHNS_PB: can bo di kiem toan trong thang thi lay chuc vu tai don vi
-     * cua thang do; can bo khong di thi lay chuc vu cua cac don vi khac nhau trong nam (cach nhau dau ;), khong co thi chuc vu chung. */
-    private String positionText(AuditKhnsNam plan, String monthCode, List<AuditKhnsPbRowResponse> pbRows) {
-        AuditKhnsRoleInTeam role = plan == null ? null : plan.getRoleInTeam();
-        List<String> texts = pbRows.stream()
-                .filter(r -> monthCode == null || r.auditObjectCode().equals(monthCode))
-                .map(r -> AuditKhnsPositionLabel.format(r.positions(), r.segmentNames(), role))
-                .filter(Objects::nonNull).distinct().toList();
-        if (!texts.isEmpty()) {
-            return String.join("; ", texts);
-        }
-        return role == null ? null : AuditKhnsPositionLabel.role(role);
-    }
-
-    private String monthAuditObjectCode(AuditKhnsNam plan, int month) {
-        return switch (month) {
-            case 1 -> plan.getMonth1AuditObjectCode();
-            case 2 -> plan.getMonth2AuditObjectCode();
-            case 3 -> plan.getMonth3AuditObjectCode();
-            case 4 -> plan.getMonth4AuditObjectCode();
-            case 5 -> plan.getMonth5AuditObjectCode();
-            case 6 -> plan.getMonth6AuditObjectCode();
-            case 7 -> plan.getMonth7AuditObjectCode();
-            case 8 -> plan.getMonth8AuditObjectCode();
-            case 9 -> plan.getMonth9AuditObjectCode();
-            case 10 -> plan.getMonth10AuditObjectCode();
-            case 11 -> plan.getMonth11AuditObjectCode();
-            case 12 -> plan.getMonth12AuditObjectCode();
-            default -> throw new BusinessException("INVALID_MONTH", "Thang khong hop le: " + month);
-        };
+    /** Thu tu trong khoi don vi: Truong doan, Truong nhom, roi thanh vien/khac. */
+    private static int roleRank(List<String> positions, AuditKhnsRoleInTeam roleInTeam) {
+        AuditKhnsRoleInTeam kind = AuditKhnsPositionLabel.batchRoleKind(positions, roleInTeam);
+        return kind == AuditKhnsRoleInTeam.TEAM_LEAD ? 0 : kind == AuditKhnsRoleInTeam.GROUP_LEAD ? 1 : 2;
     }
 
     private Set<String> referencedObjectCodes(List<String> objectCodes, String... monthCodes) {

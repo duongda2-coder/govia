@@ -1143,6 +1143,17 @@
     "title": "Dự kiến nhân sự thực hiện kiểm toán năm, đợt",
     "selectYearHint": "Chọn Năm để xem danh sách.",
     "exportReportButton": "Xuất báo cáo theo đợt",
+    "exportDialog": {
+      "title": "Xuất báo cáo theo đợt - {{month}}/{{year}}",
+      "decisionNumber": "Số quyết định",
+      "decisionDate": "Ngày quyết định",
+      "hint": "Các thông tin dưới đây có thể để trống, sẽ để trống trong file để điền tay.",
+      "units": "Thời gian kiểm toán của từng đơn vị",
+      "noUnits": "Tháng này chưa có đơn vị nào được phân bổ cán bộ.",
+      "periodPlaceholder": "VD: 05/03 - 20/03",
+      "submit": "Xuất file",
+      "error": "Xuất báo cáo thất bại"
+    },
     "syncButton": "Cập nhật danh sách cán bộ",
     "emptyHint": "Chưa có cán bộ trong danh sách. Bấm \"Cập nhật danh sách cán bộ\" để lấy danh sách từ màn hình Phân bổ cán bộ cho chi nhánh theo tháng.",
     "classification": {

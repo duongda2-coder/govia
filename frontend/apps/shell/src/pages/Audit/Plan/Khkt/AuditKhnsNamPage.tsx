@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import {
   exportAuditKhnsNamMonthlyReport,
   listAuditKhnsNam,
+  listAuditKhnsPbRows,
   syncAuditKhnsNamList,
   updateAuditKhnsNamInfo,
   type AuditKhnsNamRowItem,
@@ -16,6 +17,12 @@ import { useAuth } from "../../../../auth/AuthContext";
 import { formatKhnsPositions } from "./khnsPositionLabel";
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
+
+interface ExportFormValues {
+  decisionNumber?: string;
+  decisionDate?: dayjs.Dayjs;
+  periods?: Record<string, string>;
+}
 
 interface EditFormValues {
   otherDuties?: string;
@@ -45,6 +52,10 @@ export function AuditKhnsNamPage() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm<EditFormValues>();
+  const [exportForm] = Form.useForm<ExportFormValues>();
+  const [exportMonth, setExportMonth] = useState<number | null>(null);
+  const [exportUnits, setExportUnits] = useState<{ code: string; name: string }[]>([]);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     listMasterDataItems("YEAR")
@@ -90,6 +101,42 @@ export function AuditKhnsNamPage() {
       message.error(t("auditKhnsNam.messages.syncError"));
     } finally {
       setSyncing(false);
+    }
+  };
+
+  /** Nút "Xuất báo cáo theo đợt": chọn tháng rồi nhập số/ngày quyết định + thời gian kiểm toán từng đơn vị (NSD nhập theo file mẫu ZTC_BC_DOT). */
+  const openExport = async (month: number) => {
+    if (!year) return;
+    exportForm.resetFields();
+    setExportUnits([]);
+    setExportMonth(month);
+    try {
+      const rows = await listAuditKhnsPbRows(year);
+      const units = new Map<string, string>();
+      rows.filter((r) => r.months.includes(month)).forEach((r) => units.set(r.auditObjectCode, r.auditObjectName));
+      setExportUnits(Array.from(units, ([code, name]) => ({ code, name })).sort((a, b) => a.name.localeCompare(b.name, "vi")));
+    } catch {
+      message.error(t("auditKhnsNam.messages.loadError"));
+    }
+  };
+
+  const handleExport = async () => {
+    if (!year || !exportMonth) return;
+    const values = exportForm.getFieldsValue();
+    setExporting(true);
+    try {
+      await exportAuditKhnsNamMonthlyReport(year, exportMonth, {
+        decisionNumber: values.decisionNumber?.trim() || null,
+        decisionDate: values.decisionDate ? values.decisionDate.format("YYYY-MM-DD") : null,
+        unitPeriods: exportUnits
+          .map((u) => ({ auditObjectCode: u.code, period: values.periods?.[u.code]?.trim() ?? "" }))
+          .filter((u) => u.period),
+      });
+      setExportMonth(null);
+    } catch {
+      message.error(t("auditKhnsNam.exportDialog.error"));
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -198,7 +245,7 @@ export function AuditKhnsNamPage() {
           trigger={["click"]}
           menu={{
             items: MONTHS.map((m) => ({ key: String(m), label: t("auditKhktThang.columns.month", { month: m }) })),
-            onClick: ({ key }) => year && exportAuditKhnsNamMonthlyReport(year, Number(key)),
+            onClick: ({ key }) => openExport(Number(key)),
           }}
         >
           <Button icon={<FileExcelOutlined />} disabled={!year}>
@@ -226,6 +273,41 @@ export function AuditKhnsNamPage() {
           }}
         />
       )}
+
+      <Modal
+        title={t("auditKhnsNam.exportDialog.title", { month: exportMonth, year })}
+        open={exportMonth !== null}
+        onCancel={() => setExportMonth(null)}
+        onOk={handleExport}
+        okText={t("auditKhnsNam.exportDialog.submit")}
+        confirmLoading={exporting}
+        destroyOnClose
+        width={560}
+      >
+        <Form<ExportFormValues> form={exportForm} layout="vertical">
+          <Typography.Paragraph type="secondary">{t("auditKhnsNam.exportDialog.hint")}</Typography.Paragraph>
+          <Form.Item name="decisionNumber" label={t("auditKhnsNam.exportDialog.decisionNumber")}>
+            <Input maxLength={25} />
+          </Form.Item>
+          <Form.Item name="decisionDate" label={t("auditKhnsNam.exportDialog.decisionDate")}>
+            <DatePicker style={{ width: "100%" }} format="DD.MM.YYYY" />
+          </Form.Item>
+          <Typography.Text strong>{t("auditKhnsNam.exportDialog.units")}</Typography.Text>
+          {exportUnits.length === 0 ? (
+            <Typography.Paragraph type="secondary" style={{ marginTop: 8 }}>
+              {t("auditKhnsNam.exportDialog.noUnits")}
+            </Typography.Paragraph>
+          ) : (
+            <div style={{ marginTop: 8 }}>
+              {exportUnits.map((u) => (
+                <Form.Item key={u.code} name={["periods", u.code]} label={u.name} style={{ marginBottom: 12 }}>
+                  <Input maxLength={100} placeholder={t("auditKhnsNam.exportDialog.periodPlaceholder")} />
+                </Form.Item>
+              ))}
+            </div>
+          )}
+        </Form>
+      </Modal>
 
       <Modal
         title={t("auditKhnsNam.form.editTitle")}
