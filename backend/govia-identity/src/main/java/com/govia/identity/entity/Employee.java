@@ -70,6 +70,12 @@ public class Employee extends BaseEntity {
     @Column(name = "id_number", length = 30)
     private String idNumber;
 
+    @Column(name = "id_issue_date")
+    private LocalDate idIssueDate;
+
+    @Column(name = "id_issue_place", length = 200)
+    private String idIssuePlace;
+
     @Column(name = "manager_id", columnDefinition = "uuid")
     private UUID managerId;
 

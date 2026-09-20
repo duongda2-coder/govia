@@ -1,16 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { App, Button, DatePicker, Dropdown, Form, Input, Modal, Result, Select, Space, Table, Typography } from "antd";
 import type { TableProps } from "antd";
-import { FileExcelOutlined, SyncOutlined } from "@ant-design/icons";
+import { FileExcelOutlined, FileWordOutlined, SyncOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import {
+  exportAuditKhnsNamDecision,
   exportAuditKhnsNamMonthlyReport,
   listAuditKhnsNam,
   listAuditKhnsPbRows,
   syncAuditKhnsNamList,
   updateAuditKhnsNamInfo,
+  type AuditKhnsNamDecisionType,
   type AuditKhnsNamRowItem,
+  type AuditKhnsPbRowItem,
 } from "../../../../api/auditKhnsNam";
 import { listMasterDataItems, type MasterDataItem } from "../../../../api/auditMasterData";
 import { useAuth } from "../../../../auth/AuthContext";
@@ -56,6 +59,11 @@ export function AuditKhnsNamPage() {
   const [exportMonth, setExportMonth] = useState<number | null>(null);
   const [exportUnits, setExportUnits] = useState<{ code: string; name: string }[]>([]);
   const [exporting, setExporting] = useState(false);
+  const [decisionType, setDecisionType] = useState<AuditKhnsNamDecisionType | null>(null);
+  const [decisionRows, setDecisionRows] = useState<AuditKhnsPbRowItem[]>([]);
+  const [decisionMonth, setDecisionMonth] = useState<number | undefined>(undefined);
+  const [decisionBranch, setDecisionBranch] = useState<string | undefined>(undefined);
+  const [exportingDecision, setExportingDecision] = useState(false);
 
   useEffect(() => {
     listMasterDataItems("YEAR")
@@ -137,6 +145,41 @@ export function AuditKhnsNamPage() {
       message.error(t("auditKhnsNam.exportDialog.error"));
     } finally {
       setExporting(false);
+    }
+  };
+
+  /** Nút "Xuất QĐ thành lập đoàn" / "Xuất QĐ kiểm kê": chọn tháng (đợt) + chi nhánh đi kiểm toán; danh sách cán bộ là đoàn của chi nhánh đó ở KHNS_PB. */
+  const openDecision = async (type: AuditKhnsNamDecisionType) => {
+    if (!year) return;
+    setDecisionMonth(undefined);
+    setDecisionBranch(undefined);
+    setDecisionRows([]);
+    setDecisionType(type);
+    try {
+      setDecisionRows(await listAuditKhnsPbRows(year));
+    } catch {
+      message.error(t("auditKhnsNam.messages.loadError"));
+    }
+  };
+
+  const decisionBranches = useMemo(() => {
+    if (!decisionMonth) return [];
+    const branches = new Map<string, string>();
+    decisionRows.filter((r) => r.months.includes(decisionMonth)).forEach((r) => branches.set(r.auditObjectCode, r.auditObjectName));
+    return Array.from(branches, ([code, name]) => ({ value: code, label: name })).sort((a, b) => a.label.localeCompare(b.label, "vi"));
+  }, [decisionRows, decisionMonth]);
+
+  const handleDecisionExport = async () => {
+    if (!year || !decisionType || !decisionMonth || !decisionBranch) return;
+    setExportingDecision(true);
+    try {
+      const branchName = decisionBranches.find((b) => b.value === decisionBranch)?.label ?? decisionBranch;
+      await exportAuditKhnsNamDecision(year, decisionMonth, decisionBranch, decisionType, branchName);
+      setDecisionType(null);
+    } catch {
+      message.error(t("auditKhnsNam.decisionDialog.error"));
+    } finally {
+      setExportingDecision(false);
     }
   };
 
@@ -252,6 +295,12 @@ export function AuditKhnsNamPage() {
             {t("auditKhnsNam.exportReportButton")}
           </Button>
         </Dropdown>
+        <Button icon={<FileWordOutlined />} disabled={!year} onClick={() => openDecision("TEAM")}>
+          {t("auditKhnsNam.exportTeamDecisionButton")}
+        </Button>
+        <Button icon={<FileWordOutlined />} disabled={!year} onClick={() => openDecision("INVENTORY")}>
+          {t("auditKhnsNam.exportInventoryDecisionButton")}
+        </Button>
       </Space>
 
       {!year ? (
@@ -306,6 +355,44 @@ export function AuditKhnsNamPage() {
               ))}
             </div>
           )}
+        </Form>
+      </Modal>
+
+      <Modal
+        title={t(decisionType === "INVENTORY" ? "auditKhnsNam.decisionDialog.titleInventory" : "auditKhnsNam.decisionDialog.titleTeam", { year })}
+        open={decisionType !== null}
+        onCancel={() => setDecisionType(null)}
+        onOk={handleDecisionExport}
+        okText={t("auditKhnsNam.decisionDialog.submit")}
+        okButtonProps={{ disabled: !decisionMonth || !decisionBranch }}
+        confirmLoading={exportingDecision}
+        destroyOnClose
+        width={520}
+      >
+        <Typography.Paragraph type="secondary">{t("auditKhnsNam.decisionDialog.hint")}</Typography.Paragraph>
+        <Form layout="vertical">
+          <Form.Item label={t("auditKhnsNam.decisionDialog.month")}>
+            <Select
+              value={decisionMonth}
+              onChange={(m: number) => {
+                setDecisionMonth(m);
+                setDecisionBranch(undefined);
+              }}
+              options={MONTHS.map((m) => ({ value: m, label: t("auditKhktThang.columns.month", { month: m }) }))}
+            />
+          </Form.Item>
+          <Form.Item label={t("auditKhnsNam.decisionDialog.branch")}>
+            <Select
+              showSearch
+              optionFilterProp="label"
+              placeholder={t("auditKhnsNam.decisionDialog.branchPlaceholder")}
+              value={decisionBranch}
+              onChange={setDecisionBranch}
+              disabled={!decisionMonth}
+              options={decisionBranches}
+              notFoundContent={decisionMonth ? t("auditKhnsNam.decisionDialog.noBranches") : null}
+            />
+          </Form.Item>
         </Form>
       </Modal>
 

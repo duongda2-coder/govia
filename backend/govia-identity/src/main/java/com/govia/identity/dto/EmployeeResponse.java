@@ -29,6 +29,8 @@ public record EmployeeResponse(
         LocalDate dateOfBirth,
         Gender gender,
         String idNumber,
+        LocalDate idIssueDate,
+        String idIssuePlace,
         UUID managerId,
         String managerCode,
         String managerName,

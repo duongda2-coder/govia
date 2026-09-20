@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 173-1-employee-id-issue
+      author: govia
+      comment: "Nhan vien: ngay cap + noi cap CCCD/CMND - dung cho QD kiem ke (xuat tu man hinh KHNS_NAM)"
+      changes:
+        - addColumn:
+            tableName: employee
+            columns:
+              - column: { name: id_issue_date, type: DATE }
+              - column: { name: id_issue_place, type: VARCHAR(200) }

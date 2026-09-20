@@ -36,6 +36,8 @@ export interface Employee {
   dateOfBirth: string | null;
   gender: Gender | null;
   idNumber: string | null;
+  idIssueDate: string | null;
+  idIssuePlace: string | null;
   managerId: string | null;
   managerCode: string | null;
   managerName: string | null;
@@ -79,6 +81,8 @@ export interface EmployeeRequest {
   dateOfBirth?: string | null;
   gender?: Gender | null;
   idNumber?: string | null;
+  idIssueDate?: string | null;
+  idIssuePlace?: string | null;
   managerId?: string | null;
   rankLevel?: EmployeeRankLevel | null;
   ethnicity?: string | null;

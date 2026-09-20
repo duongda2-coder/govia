@@ -387,6 +387,8 @@
       "dateOfBirth": "Date of Birth",
       "gender": "Gender",
       "idNumber": "ID Number",
+      "idIssueDate": "ID issue date",
+      "idIssuePlace": "ID issue place",
       "manager": "Manager",
       "noManager": "No manager",
       "rankLevel": "Rank Level (N1-N6)",
@@ -1143,6 +1145,19 @@
     "title": "Annual/batch audit staffing plan",
     "selectYearHint": "Select a Year to view the list.",
     "exportReportButton": "Export batch report",
+    "exportTeamDecisionButton": "Export team formation decision",
+    "exportInventoryDecisionButton": "Export inventory decision",
+    "decisionDialog": {
+      "titleTeam": "Export team formation decision - {{year}}",
+      "titleInventory": "Export inventory decision - {{year}}",
+      "hint": "Pick the month (batch) and the branch going for audit. The staff list is the audit team of that branch from the monthly staff allocation screen.",
+      "month": "Month (batch)",
+      "branch": "Branch to audit",
+      "branchPlaceholder": "Select a branch",
+      "noBranches": "No branch has staff allocated in this month.",
+      "submit": "Export file",
+      "error": "Failed to export the decision"
+    },
     "exportDialog": {
       "title": "Export batch report - {{month}}/{{year}}",
       "decisionNumber": "Decision number",

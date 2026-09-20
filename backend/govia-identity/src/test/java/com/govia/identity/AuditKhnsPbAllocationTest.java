@@ -14,6 +14,7 @@ import com.govia.audit.khkt.khnsnam.entity.AuditKhnsPosition;
 import com.govia.audit.khkt.khnsnam.entity.AuditKhnsRoleInTeam;
 import com.govia.audit.khkt.khnsnam.repository.AuditKhnsNamObjectRepository;
 import com.govia.audit.khkt.khnsnam.repository.AuditKhnsNamRepository;
+import com.govia.audit.khkt.khnsnam.service.AuditKhnsNamDecisionService;
 import com.govia.audit.khkt.khnsnam.service.AuditKhnsNamService;
 import com.govia.audit.khkt.khnsnam.service.AuditKhnsPbService;
 import com.govia.audit.khkt.scale.entity.AuditKhktScale;
@@ -67,6 +68,7 @@ class AuditKhnsPbAllocationTest {
     @Autowired private AuditKhktThangService thangService;
     @Autowired private AuditKhnsPbService pbService;
     @Autowired private AuditKhnsNamService khnsNamService;
+    @Autowired private AuditKhnsNamDecisionService decisionService;
     @Autowired private TenantRepository tenantRepository;
     @Autowired private AuditMasterDataItemRepository masterDataItemRepository;
     @Autowired private AuditKhktScaleRepository scaleRepository;
@@ -368,6 +370,67 @@ class AuditKhnsPbAllocationTest {
             assertThat(byName.get("Nhan vien E5")[0]).isEqualTo("NTD");
             assertThat(byName.values()).allSatisfy(v -> assertThat(v[0]).isIn("QTĐH", "TD", "NTD"));
         }
+    }
+
+    /** "Xuat QD thanh lap doan" / "Xuat QD kiem ke": moi file la doan kiem toan cua 1 chi nhanh trong thang - Truong doan dung dau, kem
+     * gioi tinh (Ong/Ba), chuc danh, vai tro; QD kiem ke them ngay/noi cap CCCD/CMND lay tu danh muc nhan vien. */
+    @Test
+    void decisionExportsListTheTeamOfTheSelectedBranchAndMonth() throws Exception {
+        object("OBJ-A", AuditKhktApprovalStatus.APPROVED, true, "12000", Set.of(3), lnId, gaId);
+        object("OBJ-D", AuditKhktApprovalStatus.APPROVED, true, null, Set.of(4), gaId);
+        employee("E1", EmployeeAuditorClassification.TYPE_3, true, false, "LN");
+        employee("E2", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
+        employee("E3", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
+        employee("E6", EmployeeAuditorClassification.TYPE_3, false, false, "LN");
+        employee("E4", EmployeeAuditorClassification.TYPE_1, true, false, "GA");
+        employee("E5", EmployeeAuditorClassification.TYPE_1, false, false, "GA");
+        employee("E7", EmployeeAuditorClassification.TYPE_1, false, false, "GA");
+        pbService.allocate(YEAR);
+        List<AuditKhnsPbRowResponse> team = pbService.listRows(YEAR).stream()
+                .filter(r -> r.auditObjectCode().equals("OBJ-A") && r.months().contains(3)).toList();
+        // Truong doan (dong dau) co day du gioi tinh + thong tin cap CCCD/CMND
+        AuditKhnsPbRowResponse leadRow = team.get(0);
+        String leadName = leadRow.employeeName();
+        Employee lead = employeeRepository.findById(UUID.fromString(leadRow.employeeId())).orElseThrow();
+        lead.setGender(com.govia.identity.entity.Gender.MALE);
+        lead.setIdIssueDate(java.time.LocalDate.of(2015, 3, 9));
+        lead.setIdIssuePlace("Cục CS QLHC Hà Nội");
+        employeeRepository.save(lead);
+
+        AuditKhnsNamDecisionService.DecisionFile teamFile = decisionService.export(AuditKhnsNamDecisionService.Type.TEAM, YEAR, 3, "OBJ-A");
+        AuditKhnsNamDecisionService.DecisionFile inventoryFile = decisionService.export(AuditKhnsNamDecisionService.Type.INVENTORY, YEAR, 3, "OBJ-A");
+
+        assertThat(teamFile.fileName()).isEqualTo("QD thanh lap doan - OBJ-A - T3-" + YEAR + ".docx");
+        assertThat(inventoryFile.fileName()).isEqualTo("QD kiem ke - OBJ-A - T3-" + YEAR + ".docx");
+
+        // QD thanh lap doan: bang thanh vien = dung doan OBJ-A thang 3 (khong lan can bo cua OBJ-D), Truong doan o dong dau
+        try (org.apache.poi.xwpf.usermodel.XWPFDocument doc = new org.apache.poi.xwpf.usermodel.XWPFDocument(new java.io.ByteArrayInputStream(teamFile.content()))) {
+            org.apache.poi.xwpf.usermodel.XWPFTable members = doc.getTables().get(1);
+            assertThat(members.getRows()).hasSize(team.size());
+            List<String> firstRow = members.getRow(0).getTableCells().stream().map(org.apache.poi.xwpf.usermodel.XWPFTableCell::getText).toList();
+            assertThat(firstRow.get(0)).isEqualTo("1.");
+            assertThat(firstRow.get(1)).endsWith(leadName).startsWithIgnoringCase("Ông");
+            assertThat(firstRow.get(3)).isEqualTo("Trưởng đoàn");
+            assertThat(doc.getParagraphs().stream().map(org.apache.poi.xwpf.usermodel.XWPFParagraph::getText))
+                    .anyMatch(t -> t.contains("Thành lập Đoàn kiểm toán nội bộ tại Agribank chi nhánh OBJ-A gồm"));
+        }
+
+        // QD kiem ke: moi can bo 1 dong "Ong X, cap ngay ..., noi cap ...", CCCD/CMND lay tu danh muc nhan vien
+        try (org.apache.poi.xwpf.usermodel.XWPFDocument doc = new org.apache.poi.xwpf.usermodel.XWPFDocument(new java.io.ByteArrayInputStream(inventoryFile.content()))) {
+            List<String> lines = doc.getTables().get(1).getRow(0).getCell(0).getParagraphs().stream()
+                    .map(org.apache.poi.xwpf.usermodel.XWPFParagraph::getText).filter(t -> !t.isBlank()).toList();
+            assertThat(lines).hasSize(team.size());
+            assertThat(lines.get(0)).isEqualTo("Ông " + leadName + ", cấp ngày 09/03/2015, nơi cấp Cục CS QLHC Hà Nội;");
+            // can bo chua nhap ngay/noi cap -> de dau cham cho NSD dien tay; dong cuoi ket thuc bang dau cham
+            assertThat(lines.get(1)).contains("cấp ngày ……/……/……, nơi cấp ……………");
+            assertThat(lines.get(lines.size() - 1)).endsWith(".");
+        }
+
+        // chi nhanh khong co doan trong thang do -> bao loi ro rang, khong xuat file rong
+        assertThatThrownBy(() -> decisionService.export(AuditKhnsNamDecisionService.Type.TEAM, YEAR, 3, "OBJ-D"))
+                .isInstanceOf(BusinessException.class);
+        assertThatThrownBy(() -> decisionService.export(AuditKhnsNamDecisionService.Type.INVENTORY, YEAR, 13, "OBJ-A"))
+                .isInstanceOf(BusinessException.class);
     }
 
     private AuditKhnsNamUpdateRequest updateRequest(String objectCode, List<String> positions, List<String> segments) {

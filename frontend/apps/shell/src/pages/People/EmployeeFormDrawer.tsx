@@ -43,6 +43,8 @@ interface FormValues {
   dateOfBirth?: dayjs.Dayjs;
   gender?: "MALE" | "FEMALE" | "OTHER";
   idNumber?: string;
+  idIssueDate?: dayjs.Dayjs;
+  idIssuePlace?: string;
   managerId?: string;
   rankLevel?: EmployeeRankLevel;
   ethnicity?: string;
@@ -126,6 +128,8 @@ export function EmployeeFormDrawer({
         dateOfBirth: employee.dateOfBirth ? dayjs(employee.dateOfBirth) : undefined,
         gender: employee.gender ?? undefined,
         idNumber: employee.idNumber ?? undefined,
+        idIssueDate: employee.idIssueDate ? dayjs(employee.idIssueDate) : undefined,
+        idIssuePlace: employee.idIssuePlace ?? undefined,
         managerId: employee.managerId ?? undefined,
         rankLevel: employee.rankLevel ?? undefined,
         ethnicity: employee.ethnicity ?? undefined,
@@ -165,6 +169,8 @@ export function EmployeeFormDrawer({
       dateOfBirth: values.dateOfBirth ? values.dateOfBirth.format("YYYY-MM-DD") : null,
       gender: values.gender || null,
       idNumber: values.idNumber || null,
+      idIssueDate: values.idIssueDate ? values.idIssueDate.format("YYYY-MM-DD") : null,
+      idIssuePlace: values.idIssuePlace || null,
       managerId: values.managerId || null,
       rankLevel: values.rankLevel || null,
       ethnicity: values.ethnicity || null,
@@ -285,6 +291,19 @@ export function EmployeeFormDrawer({
           <Col span={12}>
             <Form.Item label={t("employee.form.idNumber")} name="idNumber">
               <Input />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={12}>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.idIssueDate")} name="idIssueDate">
+              <DatePicker style={{ width: "100%" }} />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item label={t("employee.form.idIssuePlace")} name="idIssuePlace">
+              <Input maxLength={200} />
             </Form.Item>
           </Col>
         </Row>

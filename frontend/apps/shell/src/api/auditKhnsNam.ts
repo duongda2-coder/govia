@@ -144,6 +144,28 @@ export async function exportAuditKhnsNamMonthlyReport(year: number, month: numbe
   window.URL.revokeObjectURL(blobUrl);
 }
 
+export type AuditKhnsNamDecisionType = "TEAM" | "INVENTORY";
+
+/** "Xuất QĐ thành lập đoàn" / "Xuất QĐ kiểm kê" (file Word mẫu của BKS) cho 1 chi nhánh đi kiểm toán trong tháng (đợt). */
+export async function exportAuditKhnsNamDecision(
+  year: number,
+  month: number,
+  auditObjectCode: string,
+  type: AuditKhnsNamDecisionType,
+  branchName: string,
+): Promise<void> {
+  const res = await httpClient.get(`${BASE}/export-decision`, { params: { year, month, auditObjectCode, type }, responseType: "blob" });
+  // tên file tự đặt ở đây: header Content-Disposition không được CORS cho phép đọc từ trình duyệt
+  const baseName = type === "TEAM" ? "QD thanh lap doan" : "QD kiem ke";
+  const fileName = `${baseName} - ${branchName.replace(/[\\/:*?"<>|]/g, " ").trim()} - T${month}-${year}.docx`;
+  const blobUrl = window.URL.createObjectURL(res.data as Blob);
+  const link = document.createElement("a");
+  link.href = blobUrl;
+  link.download = fileName;
+  link.click();
+  window.URL.revokeObjectURL(blobUrl);
+}
+
 /** 1 dòng màn KHNS_PB = 1 cán bộ được phân bổ vào 1 đơn vị (months = các tháng cán bộ đi kiểm toán đơn vị đó). */
 export interface AuditKhnsPbRowItem {
   employeeId: string;

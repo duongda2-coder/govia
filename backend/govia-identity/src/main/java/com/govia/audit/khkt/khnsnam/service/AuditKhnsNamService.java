@@ -358,7 +358,7 @@ public class AuditKhnsNamService {
     }
 
     /** Thu tu trong khoi don vi: Truong doan, Truong nhom, roi thanh vien/khac. */
-    private static int roleRank(List<String> positions, AuditKhnsRoleInTeam roleInTeam) {
+    static int roleRank(List<String> positions, AuditKhnsRoleInTeam roleInTeam) {
         AuditKhnsRoleInTeam kind = AuditKhnsPositionLabel.batchRoleKind(positions, roleInTeam);
         return kind == AuditKhnsRoleInTeam.TEAM_LEAD ? 0 : kind == AuditKhnsRoleInTeam.GROUP_LEAD ? 1 : 2;
     }

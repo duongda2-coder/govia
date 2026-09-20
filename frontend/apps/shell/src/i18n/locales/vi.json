@@ -387,6 +387,8 @@
       "dateOfBirth": "Ngày sinh",
       "gender": "Giới tính",
       "idNumber": "CCCD/CMND",
+      "idIssueDate": "Ngày cấp CCCD/CMND",
+      "idIssuePlace": "Nơi cấp CCCD/CMND",
       "manager": "Quản lý trực tiếp",
       "noManager": "Không có quản lý",
       "rankLevel": "Cấp bậc (N1-N6)",
@@ -1143,6 +1145,19 @@
     "title": "Dự kiến nhân sự thực hiện kiểm toán năm, đợt",
     "selectYearHint": "Chọn Năm để xem danh sách.",
     "exportReportButton": "Xuất báo cáo theo đợt",
+    "exportTeamDecisionButton": "Xuất QĐ thành lập đoàn",
+    "exportInventoryDecisionButton": "Xuất QĐ kiểm kê",
+    "decisionDialog": {
+      "titleTeam": "Xuất QĐ thành lập đoàn - năm {{year}}",
+      "titleInventory": "Xuất QĐ kiểm kê - năm {{year}}",
+      "hint": "Chọn tháng (đợt) và chi nhánh đi kiểm toán. Danh sách cán bộ lấy theo đoàn kiểm toán của chi nhánh đó ở màn hình Phân bổ cán bộ cho chi nhánh theo tháng.",
+      "month": "Tháng (đợt)",
+      "branch": "Chi nhánh đi kiểm toán",
+      "branchPlaceholder": "Chọn chi nhánh",
+      "noBranches": "Tháng này chưa có chi nhánh nào được phân bổ cán bộ.",
+      "submit": "Xuất file",
+      "error": "Xuất quyết định thất bại"
+    },
     "exportDialog": {
       "title": "Xuất báo cáo theo đợt - {{month}}/{{year}}",
       "decisionNumber": "Số quyết định",

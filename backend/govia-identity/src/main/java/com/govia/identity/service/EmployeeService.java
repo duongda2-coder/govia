@@ -343,6 +343,8 @@ public class EmployeeService {
                 new ExportColumn("personalEmail", "Email ca nhan"),
                 new ExportColumn("phone", "Dien thoai"),
                 new ExportColumn("idNumber", "So CCCD/CMND"),
+                new ExportColumn("idIssueDate", "Ngay cap CCCD/CMND"),
+                new ExportColumn("idIssuePlace", "Noi cap CCCD/CMND"),
                 new ExportColumn("orgUnitName", "Don vi"),
                 new ExportColumn("departmentName", "Phong"),
                 new ExportColumn("positionName", "Chuc danh"),
@@ -381,6 +383,8 @@ public class EmployeeService {
             row.put("personalEmail", e.getPersonalEmail());
             row.put("phone", e.getPhone());
             row.put("idNumber", e.getIdNumber());
+            row.put("idIssueDate", e.getIdIssueDate());
+            row.put("idIssuePlace", e.getIdIssuePlace());
             row.put("orgUnitName", e.getOrgUnitId() == null ? "" : nameOf(ctx.orgUnits.get(e.getOrgUnitId())));
             row.put("departmentName", e.getDepartmentId() == null ? "" : nameOf(ctx.departments.get(e.getDepartmentId())));
             row.put("positionName", e.getPositionId() == null ? "" : nameOf(ctx.positions.get(e.getPositionId())));
@@ -497,6 +501,8 @@ public class EmployeeService {
         employee.setDateOfBirth(request.dateOfBirth());
         employee.setGender(request.gender());
         employee.setIdNumber(request.idNumber());
+        employee.setIdIssueDate(request.idIssueDate());
+        employee.setIdIssuePlace(request.idIssuePlace());
         employee.setManagerId(request.managerId());
         employee.setRankLevel(request.rankLevel());
         employee.setEthnicity(request.ethnicity());
@@ -563,7 +569,7 @@ public class EmployeeService {
                 e.getId(), e.getEmployeeCode(), e.getFullName(), e.getEmail(), e.getPersonalEmail(), e.getPhone(),
                 e.getOrgUnitId(), orgUnit == null ? null : orgUnit.getCode(), orgUnit == null ? null : orgUnit.getName(),
                 e.getPositionId(), position == null ? null : position.getCode(), position == null ? null : position.getName(),
-                e.getHireDate(), e.getStatus(), e.getDateOfBirth(), e.getGender(), e.getIdNumber(),
+                e.getHireDate(), e.getStatus(), e.getDateOfBirth(), e.getGender(), e.getIdNumber(), e.getIdIssueDate(), e.getIdIssuePlace(),
                 e.getManagerId(), manager == null ? null : manager.getEmployeeCode(), manager == null ? null : manager.getFullName(),
                 e.getRankLevel(),
                 e.getEthnicity(), e.getHometown(), e.getPartyJoinDate(), e.getAuditDeptJoinDate(), e.getPriorWorkHistory(),

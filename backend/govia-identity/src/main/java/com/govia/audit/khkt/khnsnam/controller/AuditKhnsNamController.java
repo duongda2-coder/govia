@@ -10,10 +10,12 @@ import com.govia.audit.khkt.khnsnam.dto.AuditKhnsTransferCandidateResponse;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsTransferRequest;
 import com.govia.audit.khkt.khnsnam.dto.AuditKhnsTransferResultItem;
 import com.govia.audit.khkt.khnsnam.service.AuditKhktTransferService;
+import com.govia.audit.khkt.khnsnam.service.AuditKhnsNamDecisionService;
 import com.govia.audit.khkt.khnsnam.service.AuditKhnsNamService;
 import com.govia.audit.khkt.khnsnam.service.AuditKhnsPbService;
 import com.govia.core.web.ApiResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,11 +41,14 @@ public class AuditKhnsNamController {
     private final AuditKhnsNamService service;
     private final AuditKhktTransferService transferService;
     private final AuditKhnsPbService pbService;
+    private final AuditKhnsNamDecisionService decisionService;
 
-    public AuditKhnsNamController(AuditKhnsNamService service, AuditKhktTransferService transferService, AuditKhnsPbService pbService) {
+    public AuditKhnsNamController(AuditKhnsNamService service, AuditKhktTransferService transferService, AuditKhnsPbService pbService,
+                                  AuditKhnsNamDecisionService decisionService) {
         this.service = service;
         this.transferService = transferService;
         this.pbService = pbService;
+        this.decisionService = decisionService;
     }
 
     @GetMapping
@@ -110,6 +116,18 @@ public class AuditKhnsNamController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"bao_cao_khns_thang_" + month + "_" + year + ".xlsx\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(content);
+    }
+
+    /** "Xuat QD thanh lap doan" / "Xuat QD kiem ke" (file Word mau cua BKS) cho 1 chi nhanh di kiem toan trong thang - xem AuditKhnsNamDecisionService. */
+    @GetMapping("/export-decision")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.KHNS_NAM.VIEW')")
+    public ResponseEntity<byte[]> exportDecision(@RequestParam Integer year, @RequestParam Integer month, @RequestParam String auditObjectCode,
+                                                  @RequestParam AuditKhnsNamDecisionService.Type type) {
+        AuditKhnsNamDecisionService.DecisionFile file = decisionService.export(type, year, month, auditObjectCode);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(file.fileName(), StandardCharsets.UTF_8).build().toString())
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+                .body(file.content());
     }
 
     /** "Chuyển thông tin KHTH" (sheet ChuyenthongtinKHTH) - xem AuditKhktTransferService. */
