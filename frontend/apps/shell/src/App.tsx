@@ -30,6 +30,12 @@ import { AuditKhktDtkhFilePage } from "./pages/Audit/Plan/Khkt/AuditKhktDtkhFile
 import { AuditKhnsNamPage } from "./pages/Audit/Plan/Khkt/AuditKhnsNamPage";
 import { AuditKhnsPbPage } from "./pages/Audit/Plan/Khkt/AuditKhnsPbPage";
 import { AuditKhktTransferPage } from "./pages/Audit/Plan/Khkt/AuditKhktTransferPage";
+import { TdkpAssignmentPage } from "./pages/Audit/Tdkp/TdkpAssignmentPage";
+import { TdkpCeoPage } from "./pages/Audit/Tdkp/TdkpCeoPage";
+import { TdkpBranchPage } from "./pages/Audit/Tdkp/TdkpBranchPage";
+import { TdkpResolutionPage } from "./pages/Audit/Tdkp/TdkpResolutionPage";
+import { TdkpUnitRecommendationPage } from "./pages/Audit/Tdkp/TdkpUnitRecommendationPage";
+import { TdkpReportPage } from "./pages/Audit/Tdkp/TdkpReportPage";
 import { ProcessStepSummaryQtPage } from "./pages/Audit/Plan/ProcessQt/ProcessStepSummaryQtPage";
 import { ProcessStepDetailQtPage } from "./pages/Audit/Plan/ProcessQt/ProcessStepDetailQtPage";
 import { ExceptionMappingQtPage } from "./pages/Audit/Plan/ProcessQt/ExceptionMappingQtPage";
@@ -146,6 +152,13 @@ function App() {
           <Route path="audit/plan/khns-nam" element={<AuditKhnsNamPage />} />
           <Route path="audit/plan/khns-pb" element={<AuditKhnsPbPage />} />
           <Route path="audit/plan/khth-transfer" element={<AuditKhktTransferPage />} />
+          <Route path="audit/tdkp/assignment" element={<TdkpAssignmentPage />} />
+          <Route path="audit/tdkp/ceo-all" element={<TdkpCeoPage variant="all" />} />
+          <Route path="audit/tdkp/ceo-kh" element={<TdkpCeoPage variant="kh" />} />
+          <Route path="audit/tdkp/branch" element={<TdkpBranchPage />} />
+          <Route path="audit/tdkp/resolution" element={<TdkpResolutionPage />} />
+          <Route path="audit/tdkp/unit-recommendation" element={<TdkpUnitRecommendationPage />} />
+          <Route path="audit/tdkp/report" element={<TdkpReportPage />} />
           <Route path="audit/plan/master-data-qt/process-step-summary" element={<ProcessStepSummaryQtPage />} />
           <Route path="audit/plan/master-data-qt/process-step-detail" element={<ProcessStepDetailQtPage />} />
           <Route path="audit/plan/master-data-qt/exception-mapping" element={<ExceptionMappingQtPage />} />

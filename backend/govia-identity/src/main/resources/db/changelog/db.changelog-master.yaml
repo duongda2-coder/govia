@@ -506,3 +506,9 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/174-audit-engagement-decision-optional.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/175-audit-tdkp-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/176-audit-tdkp-permission-catalog.yaml
+      relativeToChangelogFile: false

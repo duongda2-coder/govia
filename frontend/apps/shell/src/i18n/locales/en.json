@@ -55,6 +55,14 @@
     "auditPlanKhnsNam": "Annual Staffing Plan",
     "auditPlanKhnsPb": "Monthly Staff Allocation",
     "auditPlanKhthTransfer": "Transfer to Engagements",
+    "auditTdkp": "Remediation Follow-up",
+    "auditTdkpAssignment": "Follow-up assignment",
+    "auditTdkpCeoAll": "Board / GD recommendations (business depts)",
+    "auditTdkpCeoKh": "Board / GD recommendations (Planning)",
+    "auditTdkpBranch": "Branch recommendations",
+    "auditTdkpResolution": "Board resolutions",
+    "auditTdkpUnitRecommendation": "Unit recommendations to IA",
+    "auditTdkpReport": "Follow-up reports",
     "auditPlan": "Planning",
     "auditPlanMasterData": "Master Data",
     "auditPlanMdBranchStaff": "Branch Staff Position",
@@ -1262,6 +1270,212 @@
       "teamLeadConflict": "This object already has another team lead; this employee cannot be set as team lead",
       "tooManySegments": "An employee can work at most 3 business segments at a unit",
       "creditAndNtd": "An employee works either Credit or non-credit (NTD), not both"
+    }
+  },
+  "auditTdkp": {
+    "common": {
+      "status": {
+        "DONE": "Completed",
+        "IN_PROGRESS": "In progress",
+        "NOT_STARTED": "Not started"
+      },
+      "deadline": {
+        "ON_TIME": "On time",
+        "OVERDUE": "Overdue"
+      },
+      "target": {
+        "HDTV": "Board of Members",
+        "TGD": "General Director"
+      }
+    },
+    "messages": {
+      "lookupError": "Could not load the selection lists",
+      "loadError": "Could not load data",
+      "saveError": "Save failed",
+      "deleteError": "Delete failed",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted"
+    },
+    "assignment": {
+      "title": "Remediation Follow-up Assignment",
+      "tabs": {
+        "ceo": "1. Recommendations to Board of Members / General Director",
+        "branch": "2. Recommendations to Branches"
+      },
+      "columns": {
+        "recommendationType": "Recommendation type",
+        "businessSegment": "Business segment code",
+        "targetObject": "Recommended party",
+        "auditObjectCode": "Audit object code",
+        "auditObjectCodeBranch": "Recommended party code",
+        "auditObject": "Recommended party",
+        "geographicArea": "Geographic area",
+        "employee": "Responsible officer",
+        "username": "Responsible user",
+        "department": "Business department",
+        "startDate": "Start date",
+        "endDate": "End date"
+      },
+      "form": {
+        "createTitle": "Add follow-up assignment",
+        "editTitle": "Edit follow-up assignment",
+        "endBeforeStart": "End date must not be before start date"
+      }
+    },
+    "ceo": {
+      "titleAll": "IA Recommendations to Board of Members / General Director (business departments)",
+      "titleKh": "IA Recommendations to Board of Members / General Director (Planning Department)",
+      "transferButton": "Transfer from ZTC_TDKP_CEO_ALL",
+      "transferResult": "Transferred {{transferred}} recommendations, skipped {{skipped}} already transferred",
+      "transferError": "Transfer failed",
+      "columns": {
+        "reportNumber": "Report number",
+        "reportDate": "Report date",
+        "content": "Recommendation",
+        "recommendationType": "Recommendation type",
+        "businessSegment": "Business segment code",
+        "targetObject": "Recommended party (Board / GD)",
+        "executingUnit": "Executing unit",
+        "directive": "Board / GD directive",
+        "deadline": "Completion deadline",
+        "status": "Status (Done/In progress/Not started)",
+        "evaluation": "Business department evaluation of implementation",
+        "deadlineState": "Timeliness",
+        "lastEditedDate": "Last edited on",
+        "lastEditedBy": "Edited by",
+        "note": "Note"
+      },
+      "form": {
+        "createTitle": "Add recommendation to Board / GD",
+        "editTitle": "Edit recommendation to Board / GD"
+      }
+    },
+    "branch": {
+      "title": "IA Recommendations to Branches",
+      "summaryTitle": "Recommendation follow-up summary",
+      "defectTitle": "Detailed follow-up of correcting remaining errors",
+      "selectRecommendationHint": "Select a recommendation in the summary table to view and update its related errors.",
+      "transferButton": "Transfer from Audit Execution",
+      "transferResult": "Transferred {{recommendations}} new recommendations and {{defects}} new errors, skipped {{skipped}} rows already transferred or not eligible",
+      "transferError": "Transfer failed",
+      "deleteConfirmTitle": "Delete {{count}} selected recommendation(s) together with their errors?",
+      "columns": {
+        "managementCode": "Recommendation code",
+        "branchName": "Branch",
+        "branchCode": "Branch code",
+        "auditYear": "Audit year",
+        "content": "Recommendation",
+        "recommendationType": "Recommendation type",
+        "businessSegment": "Business segment code",
+        "deadline": "Recommendation deadline",
+        "editContent": "Correction made",
+        "status": "Status",
+        "evaluation": "Evaluation of implementation",
+        "deadlineState": "Timeliness",
+        "defectCount": "Errors corrected/total",
+        "note": "Note"
+      },
+      "defectColumns": {
+        "managementCode": "Recommendation code",
+        "defectContent": "Error related to the recommendation",
+        "customerEntry": "Customer / entry",
+        "creditContract": "Related credit contract (LAV)",
+        "defectType": "Error type",
+        "recommendationDefectStatus": "Correction status of errors related to the recommendation",
+        "customerStatus": "Correction status of errors related to the customer",
+        "relatedStaff": "Related officer"
+      },
+      "form": {
+        "createTitle": "Add branch recommendation",
+        "editTitle": "Edit branch recommendation"
+      },
+      "defectForm": {
+        "createTitle": "Add error",
+        "editTitle": "Edit error"
+      }
+    },
+    "resolution": {
+      "title": "Board of Members Resolution Follow-up",
+      "columns": {
+        "code": "Resolution follow-up code",
+        "resolutionNumber": "Resolution no.",
+        "issueDate": "Issue date",
+        "content": "Resolution content",
+        "implementation": "Implementation status",
+        "status": "Evaluation (Done/In progress/Not started)",
+        "supervisor": "Supervisor",
+        "issuanceEvaluation": "Evaluation of the resolution issuance",
+        "note": "Note"
+      },
+      "form": {
+        "createTitle": "Add resolution",
+        "editTitle": "Edit resolution"
+      }
+    },
+    "unitRecommendation": {
+      "title": "Unit Recommendations to IA",
+      "columns": {
+        "code": "IA recommendation code",
+        "reportNumber": "Report number",
+        "reportDate": "Report date",
+        "unit": "Recommending unit",
+        "content": "Recommendation",
+        "deadline": "Completion deadline",
+        "implementation": "Implementation status",
+        "status": "Status (Done/In progress/Not started)",
+        "evaluation": "Evaluation of implementation",
+        "deadlineState": "Timeliness",
+        "note": "Note"
+      },
+      "form": {
+        "createTitle": "Add unit recommendation",
+        "editTitle": "Edit unit recommendation"
+      }
+    },
+    "report": {
+      "title": "Remediation Follow-up Reports",
+      "selectReport": "Select report",
+      "types": {
+        "BC01": "Summary of implementation of IA recommendations to Board of Members and General Director",
+        "BC02": "Implementation of IA recommendations at an Agribank branch",
+        "BC03": "Summary of implementation of IA recommendations at audited branches",
+        "BC04": "Summary of implementation of recommendations from units/departments to IA",
+        "BC05": "Follow-up summary of Board of Members resolutions"
+      },
+      "filters": {
+        "asOfDate": "As of date",
+        "resolutionYear": "Resolution year",
+        "auditYear": "Audit year",
+        "branch": "Branch",
+        "attachedReportNumber": "Issued with report no.",
+        "attachedReportDate": "Report date",
+        "minutesDate": "Audit minutes date",
+        "decisionNumber": "Decision no.",
+        "decisionDate": "Decision date"
+      },
+      "previewButton": "Preview",
+      "previewTitle": "Preview {{type}}",
+      "previewError": "Could not build the report",
+      "exportError": "Report export failed",
+      "archive": {
+        "title": "Exported reports - archive",
+        "createdUploadHint": "Archive entry created - now upload the exported report file",
+        "attachmentTitle": "Archived report files",
+        "columns": {
+          "reportType": "Report code",
+          "reportTypeTitle": "Report name",
+          "title": "Archive title",
+          "asOfDate": "As of date",
+          "attachmentCount": "Files",
+          "createdBy": "Saved by",
+          "note": "Note"
+        },
+        "form": {
+          "createTitle": "Archive exported report",
+          "editTitle": "Edit archived report"
+        }
+      }
     }
   },
   "auditKhktTransfer": {

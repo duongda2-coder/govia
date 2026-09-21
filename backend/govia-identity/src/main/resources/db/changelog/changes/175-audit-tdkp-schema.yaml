@@ -1,0 +1,255 @@
+databaseChangeLog:
+
+  # ===================== Theo doi khac phuc kien nghi (TDKP) - file "6.TDKP_29.5.2026.xlsx" =====================
+  - changeSet:
+      id: 175-audit_tdkp_assignment
+      author: govia
+      comment: "TDKP - Phan cong theo doi khac phuc (ZTC_TDKP_PC): scope CEO=HDTV/TGD, BRANCH=Chi nhanh"
+      changes:
+        - createTable:
+            tableName: audit_tdkp_assignment
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: scope, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: recommendation_type_id, type: UUID }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: target_object, type: VARCHAR(10) }
+              - column: { name: audit_object_unit_id, type: UUID }
+              - column: { name: geographic_area_id, type: UUID }
+              - column: { name: employee_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: start_date, type: DATE }
+              - column: { name: end_date, type: DATE }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_tdkp_assignment
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_tdkp_assignment_tenant
+
+  - changeSet:
+      id: 175-audit_tdkp_ceo_recommendation
+      author: govia
+      comment: "TDKP - Kien nghi cua KTNB doi voi HDTV/TGD (ZTC_TDKP_CEO_ALL / ZTC_TDKP_CEO_KH): scope ALL | KH"
+      changes:
+        - createTable:
+            tableName: audit_tdkp_ceo_recommendation
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: scope, type: VARCHAR(5), constraints: { nullable: false } }
+              - column: { name: source_id, type: UUID }
+              - column: { name: report_number, type: VARCHAR(50) }
+              - column: { name: report_date, type: DATE }
+              - column: { name: content, type: VARCHAR(2000), constraints: { nullable: false } }
+              - column: { name: recommendation_type_id, type: UUID }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: target_object, type: VARCHAR(10) }
+              - column: { name: executing_unit_id, type: UUID }
+              - column: { name: directive, type: VARCHAR(500) }
+              - column: { name: deadline, type: DATE }
+              - column: { name: status, type: VARCHAR(20) }
+              - column: { name: evaluation, type: VARCHAR(500) }
+              - column: { name: note, type: VARCHAR(500) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_tdkp_ceo_recommendation
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_tdkp_ceo_recommendation_tenant
+        - addUniqueConstraint:
+            tableName: audit_tdkp_ceo_recommendation
+            columnNames: tenant_id, scope, source_id
+            constraintName: uk_tdkp_ceo_rec_scope_source
+
+  - changeSet:
+      id: 175-audit_tdkp_branch_recommendation
+      author: govia
+      comment: "TDKP - Bang theo doi kien nghi tong hop cua Chi nhanh (ZTC_TDKP_CN)"
+      changes:
+        - createTable:
+            tableName: audit_tdkp_branch_recommendation
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: management_code, type: VARCHAR(30), constraints: { nullable: false } }
+              - column: { name: audit_object_unit_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: engagement_id, type: UUID }
+              - column: { name: source_recommendation_id, type: UUID }
+              - column: { name: audit_year, type: INTEGER }
+              - column: { name: content, type: VARCHAR(2000), constraints: { nullable: false } }
+              - column: { name: recommendation_type_id, type: UUID }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: deadline, type: DATE }
+              - column: { name: edit_content, type: VARCHAR(500) }
+              - column: { name: status, type: VARCHAR(20) }
+              - column: { name: evaluation, type: VARCHAR(500) }
+              - column: { name: note, type: VARCHAR(500) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_tdkp_branch_recommendation
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_tdkp_branch_recommendation_tenant
+        - addUniqueConstraint:
+            tableName: audit_tdkp_branch_recommendation
+            columnNames: tenant_id, management_code
+            constraintName: uk_tdkp_branch_rec_code
+        - addUniqueConstraint:
+            tableName: audit_tdkp_branch_recommendation
+            columnNames: tenant_id, engagement_id, source_recommendation_id
+            constraintName: uk_tdkp_branch_rec_source
+
+  - changeSet:
+      id: 175-audit_tdkp_branch_defect
+      author: govia
+      comment: "TDKP - Bang theo doi chi tiet tinh hinh chinh sua ton tai sai sot (ZTC_TDKP_CN)"
+      changes:
+        - createTable:
+            tableName: audit_tdkp_branch_defect
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: branch_recommendation_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: source_ttss_id, type: UUID }
+              - column: { name: defect_content, type: VARCHAR(2000) }
+              - column: { name: customer_entry, type: VARCHAR(500) }
+              - column: { name: credit_contract, type: VARCHAR(100) }
+              - column: { name: defect_type, type: VARCHAR(255) }
+              - column: { name: customer_status, type: VARCHAR(20) }
+              - column: { name: related_staff, type: VARCHAR(255) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_tdkp_branch_defect
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_tdkp_branch_defect_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_tdkp_branch_defect
+            baseColumnNames: branch_recommendation_id
+            referencedTableName: audit_tdkp_branch_recommendation
+            referencedColumnNames: id
+            constraintName: fk_tdkp_branch_defect_rec
+            onDelete: CASCADE
+        - addUniqueConstraint:
+            tableName: audit_tdkp_branch_defect
+            columnNames: tenant_id, source_ttss_id
+            constraintName: uk_tdkp_branch_defect_source
+
+  - changeSet:
+      id: 175-audit_tdkp_resolution
+      author: govia
+      comment: "TDKP - Theo doi thuc hien nghi quyet cua HDTV (ZTC_TDKP_NQ)"
+      changes:
+        - createTable:
+            tableName: audit_tdkp_resolution
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(30), constraints: { nullable: false } }
+              - column: { name: resolution_number, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: issue_date, type: DATE }
+              - column: { name: content, type: VARCHAR(500) }
+              - column: { name: implementation, type: VARCHAR(500) }
+              - column: { name: status, type: VARCHAR(20) }
+              - column: { name: supervisor, type: VARCHAR(50) }
+              - column: { name: issuance_evaluation, type: VARCHAR(500) }
+              - column: { name: note, type: VARCHAR(500) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_tdkp_resolution
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_tdkp_resolution_tenant
+        - addUniqueConstraint:
+            tableName: audit_tdkp_resolution
+            columnNames: tenant_id, code
+            constraintName: uk_tdkp_resolution_code
+
+  - changeSet:
+      id: 175-audit_tdkp_unit_recommendation
+      author: govia
+      comment: "TDKP - Kien nghi cua Don vi doi voi KTNB (ZTC_TDKP_KTNB)"
+      changes:
+        - createTable:
+            tableName: audit_tdkp_unit_recommendation
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: code, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: report_number, type: VARCHAR(20) }
+              - column: { name: report_date, type: DATE }
+              - column: { name: unit_id, type: UUID }
+              - column: { name: content, type: VARCHAR(2000), constraints: { nullable: false } }
+              - column: { name: deadline, type: DATE }
+              - column: { name: implementation, type: VARCHAR(500) }
+              - column: { name: status, type: VARCHAR(20) }
+              - column: { name: evaluation, type: VARCHAR(500) }
+              - column: { name: note, type: VARCHAR(500) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_tdkp_unit_recommendation
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_tdkp_unit_recommendation_tenant
+        - addUniqueConstraint:
+            tableName: audit_tdkp_unit_recommendation
+            columnNames: tenant_id, code
+            constraintName: uk_tdkp_unit_rec_code
+
+  - changeSet:
+      id: 175-audit_tdkp_report_archive
+      author: govia
+      comment: "TDKP - Bao cao TDKP da xuat, upload lai de luu tru (ZTC_TDKP_BC); file dinh kem qua bang attachment"
+      changes:
+        - createTable:
+            tableName: audit_tdkp_report_archive
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: report_type, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: title, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: as_of_date, type: DATE }
+              - column: { name: note, type: VARCHAR(500) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_tdkp_report_archive
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_tdkp_report_archive_tenant
+

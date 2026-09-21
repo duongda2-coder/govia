@@ -55,6 +55,14 @@
     "auditPlanKhnsNam": "Dự kiến nhân sự năm",
     "auditPlanKhnsPb": "Phân bổ cán bộ theo tháng",
     "auditPlanKhthTransfer": "Chuyển thông tin KHTH",
+    "auditTdkp": "Theo dõi khắc phục",
+    "auditTdkpAssignment": "Phân công theo dõi khắc phục",
+    "auditTdkpCeoAll": "Kiến nghị HĐTV/TGĐ (Phòng nghiệp vụ)",
+    "auditTdkpCeoKh": "Kiến nghị HĐTV/TGĐ (Phòng Kế hoạch)",
+    "auditTdkpBranch": "Kiến nghị đối với Chi nhánh",
+    "auditTdkpResolution": "Nghị quyết HĐTV",
+    "auditTdkpUnitRecommendation": "Kiến nghị của Đơn vị đối với KTNB",
+    "auditTdkpReport": "Báo cáo theo dõi khắc phục",
     "auditPlan": "Lập kế hoạch",
     "auditPlanMasterData": "Danh mục",
     "auditPlanMdBranchStaff": "Chức danh cán bộ chi nhánh",
@@ -1262,6 +1270,212 @@
       "teamLeadConflict": "Đối tượng đã có Trưởng đoàn khác, không thể đặt cán bộ này làm Trưởng đoàn",
       "tooManySegments": "Một cán bộ chỉ làm tối đa 3 nghiệp vụ tại một đơn vị",
       "creditAndNtd": "Một cán bộ chỉ làm Tín dụng hoặc NTD, không làm cả hai"
+    }
+  },
+  "auditTdkp": {
+    "common": {
+      "status": {
+        "DONE": "Đã thực hiện",
+        "IN_PROGRESS": "Đang thực hiện",
+        "NOT_STARTED": "Chưa thực hiện"
+      },
+      "deadline": {
+        "ON_TIME": "Trong hạn",
+        "OVERDUE": "Quá hạn"
+      },
+      "target": {
+        "HDTV": "HĐTV",
+        "TGD": "TGĐ"
+      }
+    },
+    "messages": {
+      "lookupError": "Không tải được danh sách chọn",
+      "loadError": "Không tải được dữ liệu",
+      "saveError": "Lưu thất bại",
+      "deleteError": "Xóa thất bại",
+      "createSuccess": "Đã thêm mới",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa"
+    },
+    "assignment": {
+      "title": "Phân công Theo dõi khắc phục",
+      "tabs": {
+        "ceo": "1. Kiến nghị đối với HĐTV/TGĐ",
+        "branch": "2. Kiến nghị đối với Chi nhánh"
+      },
+      "columns": {
+        "recommendationType": "Phân loại kiến nghị",
+        "businessSegment": "Mã mảng nghiệp vụ",
+        "targetObject": "Đối tượng được kiến nghị",
+        "auditObjectCode": "Mã đối tượng kiểm toán",
+        "auditObjectCodeBranch": "Mã đối tượng được kiến nghị",
+        "auditObject": "Đối tượng được kiến nghị",
+        "geographicArea": "Khu vực địa lý",
+        "employee": "Cán bộ phụ trách",
+        "username": "User phụ trách",
+        "department": "Phòng nghiệp vụ",
+        "startDate": "Ngày bắt đầu",
+        "endDate": "Ngày kết thúc"
+      },
+      "form": {
+        "createTitle": "Thêm phân công theo dõi khắc phục",
+        "editTitle": "Sửa phân công theo dõi khắc phục",
+        "endBeforeStart": "Ngày kết thúc không được trước Ngày bắt đầu"
+      }
+    },
+    "ceo": {
+      "titleAll": "Kiến nghị của KTNB đối với HĐTV, TGĐ (Phòng nghiệp vụ cập nhật)",
+      "titleKh": "Kiến nghị của KTNB đối với HĐTV, TGĐ (Phòng Kế hoạch)",
+      "transferButton": "Chuyển dữ liệu từ ZTC_TDKP_CEO_ALL",
+      "transferResult": "Đã chuyển {{transferred}} kiến nghị, bỏ qua {{skipped}} kiến nghị đã chuyển trước đó",
+      "transferError": "Chuyển dữ liệu thất bại",
+      "columns": {
+        "reportNumber": "Số báo cáo",
+        "reportDate": "Ngày báo cáo",
+        "content": "Nội dung kiến nghị",
+        "recommendationType": "Phân loại kiến nghị",
+        "businessSegment": "Mã mảng nghiệp vụ",
+        "targetObject": "Đối tượng được kiến nghị (HĐTV, TGĐ)",
+        "executingUnit": "Đơn vị thực hiện",
+        "directive": "Chỉ đạo của HĐTV, TGĐ",
+        "deadline": "Thời hạn hoàn thành",
+        "status": "Hiện trạng (Đã/đang/chưa)",
+        "evaluation": "Đánh giá tình hình thực hiện kiến nghị của Phòng nghiệp vụ",
+        "deadlineState": "Trạng thái",
+        "lastEditedDate": "Ngày thực hiện chỉnh sửa",
+        "lastEditedBy": "User chỉnh sửa",
+        "note": "Ghi chú"
+      },
+      "form": {
+        "createTitle": "Thêm kiến nghị đối với HĐTV/TGĐ",
+        "editTitle": "Sửa kiến nghị đối với HĐTV/TGĐ"
+      }
+    },
+    "branch": {
+      "title": "Kiến nghị của KTNB đối với Chi nhánh",
+      "summaryTitle": "Bảng theo dõi kiến nghị tổng hợp",
+      "defectTitle": "Bảng theo dõi chi tiết tình hình chỉnh sửa tồn tại sai sót",
+      "selectRecommendationHint": "Chọn 1 kiến nghị ở bảng tổng hợp để xem và cập nhật các tồn tại sai sót liên quan.",
+      "transferButton": "Chuyển từ Thực hiện kiểm toán",
+      "transferResult": "Đã chuyển {{recommendations}} kiến nghị và {{defects}} tồn tại sai sót mới, bỏ qua {{skipped}} dòng đã chuyển hoặc chưa đủ điều kiện",
+      "transferError": "Chuyển dữ liệu thất bại",
+      "deleteConfirmTitle": "Xóa {{count}} kiến nghị đã chọn (kèm các tồn tại sai sót liên quan)?",
+      "columns": {
+        "managementCode": "Mã quản lý kiến nghị",
+        "branchName": "Chi nhánh",
+        "branchCode": "Mã chi nhánh",
+        "auditYear": "Năm KT",
+        "content": "Nội dung kiến nghị",
+        "recommendationType": "Phân loại kiến nghị",
+        "businessSegment": "Mã mảng nghiệp vụ",
+        "deadline": "Thời hạn hoàn thành kiến nghị",
+        "editContent": "Nội dung chỉnh sửa",
+        "status": "Hiện trạng",
+        "evaluation": "Đánh giá tình hình thực hiện kiến nghị",
+        "deadlineState": "Trạng thái",
+        "defectCount": "Sai sót đã sửa/tổng",
+        "note": "Ghi chú"
+      },
+      "defectColumns": {
+        "managementCode": "Mã quản lý kiến nghị",
+        "defectContent": "Sai sót liên quan đến kiến nghị",
+        "customerEntry": "Khách hàng/Bút toán",
+        "creditContract": "Hợp đồng tín dụng liên quan (LAV)",
+        "defectType": "Loại sai sót",
+        "recommendationDefectStatus": "Hiện trạng chỉnh sửa sai sót liên quan đến kiến nghị",
+        "customerStatus": "Hiện trạng chỉnh sửa sai sót liên quan đến khách hàng",
+        "relatedStaff": "Cán bộ liên quan"
+      },
+      "form": {
+        "createTitle": "Thêm kiến nghị đối với Chi nhánh",
+        "editTitle": "Sửa kiến nghị đối với Chi nhánh"
+      },
+      "defectForm": {
+        "createTitle": "Thêm tồn tại sai sót",
+        "editTitle": "Sửa tồn tại sai sót"
+      }
+    },
+    "resolution": {
+      "title": "Theo dõi tình hình thực hiện nghị quyết của HĐTV",
+      "columns": {
+        "code": "Mã quản lý nghị quyết",
+        "resolutionNumber": "Số NQ",
+        "issueDate": "Ngày ban hành",
+        "content": "Nội dung nghị quyết",
+        "implementation": "Tình hình thực hiện",
+        "status": "Đánh giá (Đã/Đang/Chưa thực hiện)",
+        "supervisor": "Người giám sát",
+        "issuanceEvaluation": "Đánh giá về việc ban hành nghị quyết của HĐTV",
+        "note": "Ghi chú"
+      },
+      "form": {
+        "createTitle": "Thêm nghị quyết",
+        "editTitle": "Sửa nghị quyết"
+      }
+    },
+    "unitRecommendation": {
+      "title": "Kiến nghị của Đơn vị đối với KTNB",
+      "columns": {
+        "code": "Mã kiến nghị KTNB",
+        "reportNumber": "Số báo cáo",
+        "reportDate": "Ngày báo cáo",
+        "unit": "Đơn vị kiến nghị",
+        "content": "Nội dung kiến nghị",
+        "deadline": "Thời hạn hoàn thành",
+        "implementation": "Tình hình thực hiện kiến nghị",
+        "status": "Hiện trạng (đã/đang/chưa)",
+        "evaluation": "Đánh giá tình hình thực hiện kiến nghị",
+        "deadlineState": "Trạng thái",
+        "note": "Ghi chú"
+      },
+      "form": {
+        "createTitle": "Thêm kiến nghị của Đơn vị",
+        "editTitle": "Sửa kiến nghị của Đơn vị"
+      }
+    },
+    "report": {
+      "title": "Báo cáo tình hình theo dõi khắc phục",
+      "selectReport": "Chọn báo cáo",
+      "types": {
+        "BC01": "Tổng hợp tình hình thực hiện kiến nghị của KTNB đối với HĐTV và TGĐ",
+        "BC02": "Báo cáo tình hình thực hiện kiến nghị của KTNB tại Agribank CN",
+        "BC03": "Tổng hợp tình hình thực hiện KN của KTNB tại các CN được KTNB",
+        "BC04": "Tổng hợp tình hình thực hiện KN của các đơn vị, bộ phận đối với KTNB",
+        "BC05": "Bảng tổng hợp theo dõi tình hình thực hiện nghị quyết hội đồng thành viên"
+      },
+      "filters": {
+        "asOfDate": "Đến thời điểm",
+        "resolutionYear": "Năm ban hành nghị quyết",
+        "auditYear": "Năm kiểm toán",
+        "branch": "Chi nhánh",
+        "attachedReportNumber": "Ban hành kèm báo cáo số",
+        "attachedReportDate": "Ngày báo cáo",
+        "minutesDate": "Ngày biên bản kiểm toán",
+        "decisionNumber": "Quyết định số",
+        "decisionDate": "Ngày quyết định"
+      },
+      "previewButton": "Xem trước",
+      "previewTitle": "Xem trước {{type}}",
+      "previewError": "Không tạo được báo cáo",
+      "exportError": "Xuất báo cáo thất bại",
+      "archive": {
+        "title": "Báo cáo đã xuất - lưu trữ",
+        "createdUploadHint": "Đã tạo báo cáo lưu trữ - hãy tải file báo cáo đã xuất lên",
+        "attachmentTitle": "File báo cáo lưu trữ",
+        "columns": {
+          "reportType": "Mã báo cáo",
+          "reportTypeTitle": "Tên báo cáo",
+          "title": "Tiêu đề lưu trữ",
+          "asOfDate": "Đến thời điểm",
+          "attachmentCount": "Số file",
+          "createdBy": "Người lưu",
+          "note": "Ghi chú"
+        },
+        "form": {
+          "createTitle": "Lưu trữ báo cáo đã xuất",
+          "editTitle": "Sửa báo cáo lưu trữ"
+        }
+      }
     }
   },
   "auditKhktTransfer": {

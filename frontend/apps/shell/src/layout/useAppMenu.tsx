@@ -38,6 +38,13 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-plan-khns-nam": "/audit/plan/khns-nam",
   "audit-plan-khns-pb": "/audit/plan/khns-pb",
   "audit-plan-khth-transfer": "/audit/plan/khth-transfer",
+  "audit-tdkp-assignment": "/audit/tdkp/assignment",
+  "audit-tdkp-ceo-all": "/audit/tdkp/ceo-all",
+  "audit-tdkp-ceo-kh": "/audit/tdkp/ceo-kh",
+  "audit-tdkp-branch": "/audit/tdkp/branch",
+  "audit-tdkp-resolution": "/audit/tdkp/resolution",
+  "audit-tdkp-unit-recommendation": "/audit/tdkp/unit-recommendation",
+  "audit-tdkp-report": "/audit/tdkp/report",
   "audit-plan-md-branch-staff": "/audit/plan/master-data/branch-staff",
   "audit-plan-md-work-item": "/audit/plan/master-data/work-item",
   "audit-plan-md-exception-type": "/audit/plan/master-data/exception-type",
@@ -358,6 +365,17 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
     },
   ]);
 
+  const auditTdkpGroupLabel = t("menu.auditTdkp");
+  const auditTdkpChildren = dropNulls([
+    hasPermission("AUDIT.TDKP_PC.VIEW") && leaf("audit-tdkp-assignment", t("menu.auditTdkpAssignment"), auditTdkpGroupLabel),
+    hasPermission("AUDIT.TDKP_CEO_ALL.VIEW") && leaf("audit-tdkp-ceo-all", t("menu.auditTdkpCeoAll"), auditTdkpGroupLabel),
+    hasPermission("AUDIT.TDKP_CEO_KH.VIEW") && leaf("audit-tdkp-ceo-kh", t("menu.auditTdkpCeoKh"), auditTdkpGroupLabel),
+    hasPermission("AUDIT.TDKP_CN.VIEW") && leaf("audit-tdkp-branch", t("menu.auditTdkpBranch"), auditTdkpGroupLabel),
+    hasPermission("AUDIT.TDKP_NQ.VIEW") && leaf("audit-tdkp-resolution", t("menu.auditTdkpResolution"), auditTdkpGroupLabel),
+    hasPermission("AUDIT.TDKP_KTNB.VIEW") && leaf("audit-tdkp-unit-recommendation", t("menu.auditTdkpUnitRecommendation"), auditTdkpGroupLabel),
+    hasPermission("AUDIT.TDKP_BC.VIEW") && leaf("audit-tdkp-report", t("menu.auditTdkpReport"), auditTdkpGroupLabel),
+  ]);
+
   const auditChildren = dropNulls([
     auditMdChildren.length > 0 && { key: "audit-master-data", label: menuLabel(t("menu.auditMasterData")), children: auditMdChildren },
     auditRsChildren.length > 0 && { key: "audit-risk-scoring", label: menuLabel(t("menu.riskScoring")), children: auditRsChildren },
@@ -391,6 +409,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
           leaf("audit-plan-khth-transfer", t("menu.auditPlanKhthTransfer"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
       ]),
     },
+    auditTdkpChildren.length > 0 && { key: "audit-tdkp", label: menuLabel(t("menu.auditTdkp")), children: auditTdkpChildren },
   ]);
 
   const adminGroupLabel = t("menu.admin");

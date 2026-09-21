@@ -1,0 +1,335 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Theo doi khac phuc kien nghi (TDKP) =====================
+  - changeSet:
+      id: 176-1-permission-catalog-audit-tdkp
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "786d5d9e-a9d5-48ea-baae-2306bc66303d" }
+              - column: { name: code, value: "AUDIT.TDKP_PC.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem - Theo doi khac phuc - Phan cong" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Phân công" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "a21198ab-4cdc-4fb5-a706-ba0cb803d2cc" }
+              - column: { name: code, value: "AUDIT.TDKP_PC.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi - Theo doi khac phuc - Phan cong" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Phân công" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "573f3d6f-2a4b-4d67-a748-e275c348ec17" }
+              - column: { name: code, value: "AUDIT.TDKP_PC.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua - Theo doi khac phuc - Phan cong" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Phân công" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b87c5d8b-d27e-4275-a489-ea467e796900" }
+              - column: { name: code, value: "AUDIT.TDKP_PC.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa - Theo doi khac phuc - Phan cong" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Phân công" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "b72573f9-71a0-454f-a75d-8d3811b0c6a5" }
+              - column: { name: code, value: "AUDIT.TDKP_PC.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat Excel - Theo doi khac phuc - Phan cong" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Phân công" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d2f6d7af-f354-46f6-b8e7-874c06711a3a" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_ALL.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong nghiep vu)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng nghiệp vụ)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "571c1089-f38b-495c-a3ea-c4d4ef00f96c" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_ALL.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong nghiep vu)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng nghiệp vụ)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "5965630e-ebc1-4a89-b685-3903164726d4" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_ALL.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong nghiep vu)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng nghiệp vụ)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "694e3b07-2508-4154-b68d-6e9157c45b76" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_ALL.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong nghiep vu)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng nghiệp vụ)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "ba1f59f7-0336-4f56-8728-bc5782a922d1" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_ALL.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat Excel - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong nghiep vu)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng nghiệp vụ)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "fd4d499c-2f99-4255-af98-10157f11ffc3" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_ALL.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import Excel - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong nghiep vu)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng nghiệp vụ)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "afea20cd-2586-4934-8f44-f91144bc2221" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_KH.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong Ke hoach)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng Kế hoạch)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "26564330-d354-4bb4-8474-2ced7b3493a3" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_KH.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong Ke hoach)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng Kế hoạch)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "7aadd0bf-9176-4cc5-974c-8e9d57528a2e" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_KH.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong Ke hoach)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng Kế hoạch)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "80d1dad1-9ee3-4810-bd2d-ecdc3b44c468" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_KH.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong Ke hoach)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng Kế hoạch)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d87604f6-11ef-43f9-8724-ebe1a20a09bf" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_KH.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat Excel - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong Ke hoach)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng Kế hoạch)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "970a0797-3dc7-4fb6-8470-ff8641d50f91" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_KH.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import Excel - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong Ke hoach)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng Kế hoạch)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "65c2714c-0bf7-4b72-a444-57df8e1c76d2" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_KH.TRANSFER" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Chuyen du lieu nguon - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong Ke hoach)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng Kế hoạch)" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "654a9c40-fd63-4443-8d5a-818ca689ed5a" }
+              - column: { name: code, value: "AUDIT.TDKP_CN.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem - Theo doi khac phuc - Kien nghi doi voi Chi nhanh" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị đối với Chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "7c2f36a6-65b7-4e1f-88bc-5114ac23cedd" }
+              - column: { name: code, value: "AUDIT.TDKP_CN.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi - Theo doi khac phuc - Kien nghi doi voi Chi nhanh" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị đối với Chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "e63b8325-be70-4efa-a8fc-0a6af0e97d51" }
+              - column: { name: code, value: "AUDIT.TDKP_CN.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua - Theo doi khac phuc - Kien nghi doi voi Chi nhanh" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị đối với Chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d64649f4-2d66-4314-8730-d3b2c753f8eb" }
+              - column: { name: code, value: "AUDIT.TDKP_CN.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa - Theo doi khac phuc - Kien nghi doi voi Chi nhanh" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị đối với Chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c4522ae9-f944-4bda-b5ee-851115d4db4d" }
+              - column: { name: code, value: "AUDIT.TDKP_CN.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat Excel - Theo doi khac phuc - Kien nghi doi voi Chi nhanh" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị đối với Chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "807fe512-a560-4ed3-b4ef-3b221088a03e" }
+              - column: { name: code, value: "AUDIT.TDKP_CN.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import Excel - Theo doi khac phuc - Kien nghi doi voi Chi nhanh" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị đối với Chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "3d0c0177-4bf2-4ba4-b80b-50e9b4b1c773" }
+              - column: { name: code, value: "AUDIT.TDKP_CN.TRANSFER" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Chuyen du lieu nguon - Theo doi khac phuc - Kien nghi doi voi Chi nhanh" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị đối với Chi nhánh" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6b3eba99-a6c5-42bc-86c6-478cc321ad18" }
+              - column: { name: code, value: "AUDIT.TDKP_NQ.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem - Theo doi khac phuc - Nghi quyet HDTV" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Nghị quyết HĐTV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "d09bc452-495c-449c-b9a5-be7d84cdea8d" }
+              - column: { name: code, value: "AUDIT.TDKP_NQ.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi - Theo doi khac phuc - Nghi quyet HDTV" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Nghị quyết HĐTV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "bde4cb03-c57e-4f19-8f82-b9f54710856e" }
+              - column: { name: code, value: "AUDIT.TDKP_NQ.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua - Theo doi khac phuc - Nghi quyet HDTV" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Nghị quyết HĐTV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "56dd5f73-aaa3-40aa-a6a7-5f24d3545cd3" }
+              - column: { name: code, value: "AUDIT.TDKP_NQ.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa - Theo doi khac phuc - Nghi quyet HDTV" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Nghị quyết HĐTV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "8ae1813d-9ece-4866-95b4-172ef4442bae" }
+              - column: { name: code, value: "AUDIT.TDKP_NQ.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat Excel - Theo doi khac phuc - Nghi quyet HDTV" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Nghị quyết HĐTV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c6306c93-31ac-4361-b7fe-8dc2a65aba05" }
+              - column: { name: code, value: "AUDIT.TDKP_NQ.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import Excel - Theo doi khac phuc - Nghi quyet HDTV" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Nghị quyết HĐTV" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "8eb529fd-d920-47ce-adfb-9f948e8d9796" }
+              - column: { name: code, value: "AUDIT.TDKP_KTNB.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem - Theo doi khac phuc - Kien nghi cua Don vi doi voi KTNB" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị của Đơn vị đối với KTNB" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "0ea6cd7b-544d-4cf4-90bc-a6a0495ee358" }
+              - column: { name: code, value: "AUDIT.TDKP_KTNB.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi - Theo doi khac phuc - Kien nghi cua Don vi doi voi KTNB" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị của Đơn vị đối với KTNB" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "78838577-037b-410f-bee0-2ceef5b5498c" }
+              - column: { name: code, value: "AUDIT.TDKP_KTNB.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua - Theo doi khac phuc - Kien nghi cua Don vi doi voi KTNB" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị của Đơn vị đối với KTNB" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c7a8df29-505b-4fd7-854c-3333f009a6da" }
+              - column: { name: code, value: "AUDIT.TDKP_KTNB.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa - Theo doi khac phuc - Kien nghi cua Don vi doi voi KTNB" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị của Đơn vị đối với KTNB" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "7c46f66a-b410-4ccc-9086-8ba7bbe2f17f" }
+              - column: { name: code, value: "AUDIT.TDKP_KTNB.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat Excel - Theo doi khac phuc - Kien nghi cua Don vi doi voi KTNB" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị của Đơn vị đối với KTNB" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "1cdbd9c7-6e4f-4096-8456-a39fa440d50b" }
+              - column: { name: code, value: "AUDIT.TDKP_KTNB.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import Excel - Theo doi khac phuc - Kien nghi cua Don vi doi voi KTNB" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị của Đơn vị đối với KTNB" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "482339ca-7b1c-4340-bd14-ce6986e45c6d" }
+              - column: { name: code, value: "AUDIT.TDKP_BC.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem - Theo doi khac phuc - Bao cao" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Báo cáo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "5ee87dae-570c-4941-a0f9-573181b63b51" }
+              - column: { name: code, value: "AUDIT.TDKP_BC.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat Excel - Theo doi khac phuc - Bao cao" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Báo cáo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6f885c3a-a0bc-49cf-a231-5e13ad7cf50f" }
+              - column: { name: code, value: "AUDIT.TDKP_BC.UPLOAD" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Upload luu tru - Theo doi khac phuc - Bao cao" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Báo cáo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "138fa721-469c-4db4-bae7-f52eb03a19d2" }
+              - column: { name: code, value: "AUDIT.TDKP_BC.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa - Theo doi khac phuc - Bao cao" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Báo cáo" }
