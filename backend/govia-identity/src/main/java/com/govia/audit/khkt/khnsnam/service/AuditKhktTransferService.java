@@ -31,7 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 /** "Chuyển thông tin KHTH" (sheet ChuyenthongtinKHTH) - day du lieu KHNS_NAM (nhan su + doi tuong +
- * thang + so/ngay quyet dinh) sang AuditEngagement ("ztc_job", man hinh khoi tao CKT). Chon tung
+ * thang + so/ngay quyet dinh, cac gia tri nay khong bat buoc) sang AuditEngagement ("ztc_job", man hinh khoi tao CKT). Chon tung
  * doi tuong kiem toan roi bam chuyen (theo yeu cau NSD) - moi doi tuong ung 1 CKT, ghi de neu da
  * ton tai (dung dac ta "mỗi năm, một đối tượng kiểm toán chỉ có một mã cuộc kiểm toán"). */
 @Service
@@ -110,8 +110,13 @@ public class AuditKhktTransferService {
 
         Optional<AuditEngagement> existing = engagementRepository
                 .findFirstByTenantIdAndAuditObjectUnitIdAndYearOrderByCreatedAtAsc(tenantId, unit.getId(), year);
-        AuditEngagementRequest request = new AuditEngagementRequest(unit.getId(), year, candidate.expectedMonth(), candidate.decisionDate(),
-                teamLead.getId(), candidate.decisionNumber(),
+        // KHNS_NAM khong co thang/so QD/ngay QD -> giu gia tri da nhap tay o CKT hien co (neu co), khong ghi de bang null
+        AuditEngagementRequest request = new AuditEngagementRequest(unit.getId(), year,
+                candidate.expectedMonth() != null ? candidate.expectedMonth() : existing.map(AuditEngagement::getExpectedMonth).orElse(null),
+                candidate.decisionDate() != null ? candidate.decisionDate() : existing.map(AuditEngagement::getDecisionDate).orElse(null),
+                teamLead.getId(),
+                candidate.decisionNumber() != null && !candidate.decisionNumber().isBlank() ? candidate.decisionNumber()
+                        : existing.map(AuditEngagement::getDecisionNumber).orElse(null),
                 existing.map(AuditEngagement::getStatus).orElse(AuditEngagementStatus.DRAFT),
                 existing.map(AuditEngagement::getRiskRank).orElse(thRow.getRankLabel()),
                 existing.map(AuditEngagement::getName).orElse(null), existing.map(AuditEngagement::getObjective).orElse(null),
@@ -141,15 +146,7 @@ public class AuditKhktTransferService {
         if (info == null) {
             return blocked(thRow, null, "Chua co Truong doan duoc phan cong cho doi tuong nay o KHNS_NAM");
         }
-        if (info.expectedMonth() == null) {
-            return blocked(thRow, info, "Truong doan chua duoc gan thang di kiem toan cho doi tuong nay o KHNS_NAM");
-        }
-        if (info.decisionNumber() == null || info.decisionNumber().isBlank()) {
-            return blocked(thRow, info, "Thieu So quyet dinh o KHNS_NAM");
-        }
-        if (info.decisionDate() == null) {
-            return blocked(thRow, info, "Thieu Ngay quyet dinh o KHNS_NAM");
-        }
+        // Thang du kien / So QD / Ngay QD KHONG bat buoc: thieu thi van chuyen, CKT de trong cac cot do (nhap bo sung sau o man CKT)
 
         String existingEngagementCode = engagementRepository
                 .findFirstByTenantIdAndAuditObjectUnitIdAndYearOrderByCreatedAtAsc(tenantId, unit.getId(), year)

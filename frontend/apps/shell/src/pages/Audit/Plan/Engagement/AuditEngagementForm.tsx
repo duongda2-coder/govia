@@ -24,10 +24,10 @@ interface FormValues {
   unitType?: string;
   auditObjectUnitId?: string;
   year: number;
-  expectedMonth: number;
-  decisionDate: dayjs.Dayjs;
+  expectedMonth?: number;
+  decisionDate?: dayjs.Dayjs;
   teamLeadEmployeeId: string;
-  decisionNumber: string;
+  decisionNumber?: string;
   status?: AuditEngagementStatus;
   riskRank?: string;
   name?: string;
@@ -81,6 +81,8 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
   const { message } = App.useApp();
   const [form] = Form.useForm<FormValues>();
   const readOnly = mode === "view";
+  // CKT chuyen tu KHTH (KHNS_NAM) co the chua co thang/so QD/ngay QD - chi bat buoc khi tao moi bang tay, sua thi nhap bo sung duoc
+  const requiredOnCreate = mode === "create" ? [{ required: true }] : [];
 
   const [selectedUnitType, setSelectedUnitType] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
@@ -96,10 +98,10 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
         unitType: unit?.unitType ?? engagement.unitType ?? undefined,
         auditObjectUnitId: engagement.auditObjectUnitId,
         year: engagement.year,
-        expectedMonth: engagement.expectedMonth,
-        decisionDate: dayjs(engagement.decisionDate),
+        expectedMonth: engagement.expectedMonth ?? undefined,
+        decisionDate: engagement.decisionDate ? dayjs(engagement.decisionDate) : undefined,
         teamLeadEmployeeId: engagement.teamLeadEmployeeId,
-        decisionNumber: engagement.decisionNumber,
+        decisionNumber: engagement.decisionNumber ?? undefined,
         status: engagement.status,
         riskRank: engagement.riskRank ?? undefined,
         name: engagement.name ?? undefined,
@@ -152,7 +154,7 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
         auditObjectUnitId: values.auditObjectUnitId as string,
         year: values.year,
         expectedMonth: values.expectedMonth,
-        decisionDate: toDate(values.decisionDate) as string,
+        decisionDate: toDate(values.decisionDate),
         teamLeadEmployeeId: values.teamLeadEmployeeId,
         decisionNumber: values.decisionNumber,
         status: values.status ?? null,
@@ -254,7 +256,7 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item name="expectedMonth" label={t("auditEngagement.columns.expectedMonth")} rules={[{ required: true }]}>
+            <Form.Item name="expectedMonth" label={t("auditEngagement.columns.expectedMonth")} rules={requiredOnCreate}>
               <Select options={MONTHS.map((m) => ({ value: m, label: m }))} />
             </Form.Item>
           </Col>
@@ -283,7 +285,7 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
             </Form.Item>
           </Col>
           <Col span={8}>
-            <Form.Item name="decisionDate" label={t("auditEngagement.columns.decisionDate")} rules={[{ required: true }]}>
+            <Form.Item name="decisionDate" label={t("auditEngagement.columns.decisionDate")} rules={requiredOnCreate}>
               <DatePicker style={{ width: "100%" }} format="DD.MM.YYYY" />
             </Form.Item>
           </Col>
@@ -304,7 +306,7 @@ export function AuditEngagementForm(props: AuditEngagementFormProps) {
             </Form.Item>
           </Col>
           <Col span={16}>
-            <Form.Item name="decisionNumber" label={t("auditEngagement.columns.decisionNumber")} rules={[{ required: true }]}>
+            <Form.Item name="decisionNumber" label={t("auditEngagement.columns.decisionNumber")} rules={requiredOnCreate}>
               <Input maxLength={50} />
             </Form.Item>
           </Col>

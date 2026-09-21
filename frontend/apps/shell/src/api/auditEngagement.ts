@@ -11,12 +11,12 @@ export interface AuditEngagementItem {
   auditObjectUnitName: string | null;
   unitType: string | null;
   year: number;
-  expectedMonth: number;
-  decisionDate: string;
+  expectedMonth: number | null;
+  decisionDate: string | null;
   teamLeadEmployeeId: string;
   teamLeadEmployeeCode: string | null;
   teamLeadEmployeeName: string | null;
-  decisionNumber: string;
+  decisionNumber: string | null;
   status: AuditEngagementStatus;
   riskRank: string | null;
   name: string | null;
@@ -42,10 +42,10 @@ export interface AuditEngagementItem {
 export interface AuditEngagementRequest {
   auditObjectUnitId: string;
   year: number;
-  expectedMonth: number;
-  decisionDate: string;
+  expectedMonth?: number | null;
+  decisionDate?: string | null;
   teamLeadEmployeeId: string;
-  decisionNumber: string;
+  decisionNumber?: string | null;
   status?: AuditEngagementStatus | null;
   riskRank?: string | null;
   name?: string | null;

@@ -34,16 +34,17 @@ public class AuditEngagement extends BaseEntity {
     @Column(name = "engagement_year", nullable = false)
     private Integer year;
 
-    @Column(name = "expected_month", nullable = false)
+    /** Thang du kien / ngay QD / so QD co the de trong (CKT chuyen tu KHTH - nhap bo sung sau). */
+    @Column(name = "expected_month")
     private Integer expectedMonth;
 
-    @Column(name = "decision_date", nullable = false)
+    @Column(name = "decision_date")
     private LocalDate decisionDate;
 
     @Column(name = "team_lead_employee_id", nullable = false, columnDefinition = "uuid")
     private UUID teamLeadEmployeeId;
 
-    @Column(name = "decision_number", nullable = false, length = 50)
+    @Column(name = "decision_number", length = 50)
     private String decisionNumber;
 
     /** CKT quy trinh cha (AuditProcessEngagement) neu CKT nay la "CKT con" duoc tao tu nut "Tao CKT

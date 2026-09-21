@@ -12,10 +12,10 @@ import java.util.UUID;
 public record AuditEngagementRequest(
         @NotNull UUID auditObjectUnitId,
         @NotNull Integer year,
-        @NotNull Integer expectedMonth,
-        @NotNull LocalDate decisionDate,
+        Integer expectedMonth,
+        LocalDate decisionDate,
         @NotNull UUID teamLeadEmployeeId,
-        @jakarta.validation.constraints.NotBlank @Size(max = 50) String decisionNumber,
+        @Size(max = 50) String decisionNumber,
         AuditEngagementStatus status,
         @Size(max = 20) String riskRank,
         @Size(max = 255) String name,

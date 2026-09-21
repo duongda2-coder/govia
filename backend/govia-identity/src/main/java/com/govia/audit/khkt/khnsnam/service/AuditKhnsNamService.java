@@ -313,7 +313,7 @@ public class AuditKhnsNamService {
     /** "Báo cáo theo đợt" (file mau ZTC_BC_DOT) - "NHÂN SỰ CÁC ĐOÀN KIỂM TOÁN NỘI BỘ THÁNG x NĂM y": moi don vi kiem toan trong thang la
      * 1 khoi dong, moi can bo di kiem toan don vi do 1 dong. Nguon la man KHNS_PB (doi tuong + chuc vu + nghiep vu theo thang). Cac cot:
      * Lĩnh vực kiểm toán = ma cac nghiep vu NTD (ngoai QTDH/Tin dung) trong chuc vu cua can bo tai don vi; Lĩnh vực được phân công =
-     * QTĐH (CE) / TD (LN) / NTD (con lai) theo "Lĩnh vực dự kiến được phân công" cua can bo; Chức vụ = chuc vu cao nhat trong doan;
+     * QTĐH (CE) / TD (LN) / NTD (con lai) theo "Lĩnh vực dự kiến được phân công" cua can bo; Chức vụ = chuc vu cao nhat trong doan, Truong nhom/Thanh vien ghi kem linh vuc (vd "Truong nhom NTD");
      * Thời gian kiểm toán do NSD nhap (request), khong luu. */
     @Transactional(readOnly = true)
     public byte[] exportMonthlyReport(Integer year, Integer month, AuditKhnsNamBatchReportRequest request) {
@@ -344,9 +344,9 @@ public class AuditKhnsNamService {
                         Employee employee = employees.get(UUID.fromString(r.employeeId()));
                         AuditMasterDataItem department = employee.getDepartmentId() == null ? null : departments.get(employee.getDepartmentId());
                         AuditMasterDataItem segment = employee.getBusinessSegmentId() == null ? null : segments.get(employee.getBusinessSegmentId());
+                        String group = AuditKhnsPositionLabel.group(segment == null ? null : segment.getCode(), r.positions());
                         return new AuditKhnsNamBatchReportWriter.Staff(employee.getFullName(), department == null ? null : department.getCode(),
-                                AuditKhnsPositionLabel.group(segment == null ? null : segment.getCode(), r.positions()),
-                                AuditKhnsPositionLabel.batchRole(r.positions(), r.roleInTeam()));
+                                group, AuditKhnsPositionLabel.batchRole(r.positions(), r.roleInTeam(), group));
                     }).toList();
             String segmentCodes = pbRows.stream().filter(r -> r.positions().stream().map(AuditKhnsPosition::valueOf).anyMatch(AuditKhnsPosition::isNonCredit))
                     .flatMap(r -> r.segmentCodes().stream()).distinct().collect(Collectors.joining(","));

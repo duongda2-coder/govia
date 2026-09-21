@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 174-1-audit-engagement-decision-optional
+      author: govia
+      comment: "CKT chuyen tu KHTH (KHNS_NAM) khong bat buoc Thang du kien / Ngay QD / So QD - nhap bo sung sau tren man hinh CKT"
+      changes:
+        - dropNotNullConstraint:
+            tableName: audit_engagement
+            columnName: expected_month
+            columnDataType: INT
+        - dropNotNullConstraint:
+            tableName: audit_engagement
+            columnName: decision_date
+            columnDataType: DATE
+        - dropNotNullConstraint:
+            tableName: audit_engagement
+            columnName: decision_number
+            columnDataType: VARCHAR(50)

@@ -15,6 +15,8 @@ import com.govia.audit.khkt.khnsnam.entity.AuditKhnsRoleInTeam;
 import com.govia.audit.khkt.khnsnam.repository.AuditKhnsNamObjectRepository;
 import com.govia.audit.khkt.khnsnam.repository.AuditKhnsNamRepository;
 import com.govia.audit.khkt.khnsnam.service.AuditKhnsNamDecisionService;
+import com.govia.audit.khkt.khnsnam.dto.AuditKhnsTransferResultItem;
+import com.govia.audit.khkt.khnsnam.service.AuditKhktTransferService;
 import com.govia.audit.khkt.khnsnam.service.AuditKhnsNamService;
 import com.govia.audit.khkt.khnsnam.service.AuditKhnsPbService;
 import com.govia.audit.khkt.scale.entity.AuditKhktScale;
@@ -30,6 +32,10 @@ import com.govia.audit.khkt.thang.service.AuditKhktThangService;
 import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
 import com.govia.audit.masterdata.entity.AuditMasterDataItem;
 import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
+import com.govia.audit.planengagement.entity.AuditEngagement;
+import com.govia.audit.planengagement.repository.AuditEngagementRepository;
+import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
+import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
 import com.govia.core.tenant.TenantContext;
 import com.govia.core.web.BusinessException;
 import com.govia.identity.entity.Employee;
@@ -79,6 +85,9 @@ class AuditKhnsPbAllocationTest {
     @Autowired private AuditEmployeeCapabilityRepository capabilityRepository;
     @Autowired private AuditKhnsNamRepository khnsNamRepository;
     @Autowired private AuditKhnsNamObjectRepository khnsNamObjectRepository;
+    @Autowired private AuditKhktTransferService transferService;
+    @Autowired private AuditObjectUnitRepository objectUnitRepository;
+    @Autowired private AuditEngagementRepository engagementRepository;
 
     private UUID tenantId;
     private UUID lnId;
@@ -362,14 +371,66 @@ class AuditKhnsPbAllocationTest {
             }
             assertThat(byName).hasSize(pbRows.size());
             assertThat(byName).doesNotContainKey("Nhan vien PB-E8-UNUSED").doesNotContainKey("Nhan vien E8-UNUSED");
-            // Truong doan dung dau khoi; cot Chuc vu chi con Truong doan / Truong nhom / Thanh vien
+            // Truong doan dung dau khoi; Truong nhom / Thanh vien ghi ro linh vuc (QTĐH/TD/NTD) theo cot "Linh vuc duoc phan cong"
             assertThat(sheet.getRow(headerRow + 1).getCell(7).getStringCellValue()).isEqualTo("Trưởng đoàn");
-            assertThat(byName.values()).allSatisfy(v -> assertThat(v[1]).isIn("Trưởng đoàn", "Trưởng nhóm", "Thành viên"));
+            assertThat(byName.values()).allSatisfy(v -> {
+                if (!"Trưởng đoàn".equals(v[1])) {
+                    assertThat(v[1]).isIn("Trưởng nhóm " + v[0], "Thành viên " + v[0]);
+                }
+            });
+            assertThat(byName.values()).anyMatch(v -> v[1].startsWith("Thành viên "));
             // Linh vuc duoc phan cong theo "Linh vuc du kien": LN -> TD; nghiep vu con lai -> NTD; chua co thi suy tu chuc vu
             assertThat(byName.get("Nhan vien E1")[0]).isEqualTo("TD");
             assertThat(byName.get("Nhan vien E5")[0]).isEqualTo("NTD");
             assertThat(byName.values()).allSatisfy(v -> assertThat(v[0]).isIn("QTĐH", "TD", "NTD"));
         }
+    }
+
+    /** "Chuyen thong tin KHTH": KHNS_NAM khong con nhap So QD / Ngay QD -> van phai chuyen duoc, CKT de trong cac cot do; chuyen lai
+     * thi khong ghi de gia tri da nhap tay o CKT. */
+    @Test
+    void transferToKhthDoesNotRequireDecisionNumberDateOrMonth() {
+        object("OBJ-A", AuditKhktApprovalStatus.APPROVED, true, "12000", Set.of(3), lnId, gaId);
+        employee("E1", EmployeeAuditorClassification.TYPE_3, true, false, "LN");
+        employee("E2", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
+        employee("E3", EmployeeAuditorClassification.TYPE_2, false, false, "LN");
+        employee("E5", EmployeeAuditorClassification.TYPE_1, false, false, "GA");
+        pbService.allocate(YEAR);
+
+        AuditObjectUnit unit = new AuditObjectUnit();
+        unit.setTenantId(tenantId);
+        unit.setCode("OBJ-A");
+        unit.setName("OBJ-A");
+        unit.setUnitType("CN");
+        unit = objectUnitRepository.save(unit);
+        AuditKhktThConfirmed confirmed = confirmedRepository.findByTenantIdAndYearOrderByAuditObjectCodeAsc(tenantId, YEAR).get(0);
+        confirmed.setAuditObjectUnitId(unit.getId());
+        confirmedRepository.save(confirmed);
+
+        // khong co so QD / ngay QD nao duoc nhap o KHNS_NAM
+        assertThat(khnsNamRepository.findByTenantIdAndYear(tenantId, YEAR)).allSatisfy(p -> {
+            assertThat(p.getDecisionNumber()).isNull();
+            assertThat(p.getDecisionDate()).isNull();
+        });
+        assertThat(transferService.listCandidates(YEAR)).singleElement().satisfies(c -> {
+            assertThat(c.transferable()).as(c.blockReason()).isTrue();
+            assertThat(c.decisionNumber()).isNull();
+            assertThat(c.decisionDate()).isNull();
+        });
+
+        List<AuditKhnsTransferResultItem> results = transferService.transfer(YEAR, List.of("OBJ-A"));
+        assertThat(results).singleElement().satisfies(r -> assertThat(r.success()).as(r.message()).isTrue());
+        AuditEngagement engagement = engagementRepository
+                .findFirstByTenantIdAndAuditObjectUnitIdAndYearOrderByCreatedAtAsc(tenantId, unit.getId(), YEAR).orElseThrow();
+        assertThat(engagement.getDecisionNumber()).isNull();
+        assertThat(engagement.getDecisionDate()).isNull();
+        assertThat(engagement.getTeamLeadEmployeeId()).isNotNull();
+
+        // NSD nhap tay so QD o man CKT, roi chuyen lai tu KHTH -> gia tri nhap tay duoc giu
+        engagement.setDecisionNumber("QD-TAY-01");
+        engagementRepository.save(engagement);
+        assertThat(transferService.transfer(YEAR, List.of("OBJ-A"))).singleElement().satisfies(r -> assertThat(r.success()).isTrue());
+        assertThat(engagementRepository.findById(engagement.getId()).orElseThrow().getDecisionNumber()).isEqualTo("QD-TAY-01");
     }
 
     /** "Xuat QD thanh lap doan" / "Xuat QD kiem ke": moi file la doan kiem toan cua 1 chi nhanh trong thang - Truong doan dung dau, kem

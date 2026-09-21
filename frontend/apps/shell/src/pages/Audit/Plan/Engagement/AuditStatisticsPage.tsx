@@ -423,7 +423,7 @@ function UnitDetailModal({ detail, onClose }: { detail: { unitId: string; label:
 
   return (
     <Modal open={!!detail} onCancel={onClose} footer={null} width={1000} title={detail ? t("auditStatistics.form.unitDetailTitle", { unit: detail.label }) : ""} destroyOnClose>
-      <Table<UnitDetailStatRow> columns={columns} dataSource={rows} rowKey={(r) => `${r.decisionNumber}-${r.year}`} loading={loading} size="small" pagination={{ pageSize: 10 }} />
+      <Table<UnitDetailStatRow> columns={columns} dataSource={rows} rowKey={(r, index) => `${r.decisionNumber ?? "-"}-${r.year}-${index}`} loading={loading} size="small" pagination={{ pageSize: 10 }} />
     </Modal>
   );
 }

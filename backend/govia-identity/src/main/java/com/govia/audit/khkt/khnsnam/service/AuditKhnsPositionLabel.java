@@ -61,9 +61,15 @@ public final class AuditKhnsPositionLabel {
         return AuditKhnsRoleInTeam.MEMBER;
     }
 
-    public static String batchRole(List<String> positions, AuditKhnsRoleInTeam roleInTeam) {
+    /** Cot "Chuc vu" cua bao cao theo dot: Truong doan giu nguyen; Truong nhom / Thanh vien ghi kem linh vuc (QTĐH / TD / NTD) lay tu
+     * "Linh vuc du kien duoc phan cong" cua can bo (xem {@link #group}), vd "Truong nhom NTD", "Thanh vien TD". */
+    public static String batchRole(List<String> positions, AuditKhnsRoleInTeam roleInTeam, String group) {
         AuditKhnsRoleInTeam kind = batchRoleKind(positions, roleInTeam);
-        return kind == null ? null : role(kind);
+        if (kind == null) {
+            return null;
+        }
+        boolean withGroup = kind == AuditKhnsRoleInTeam.GROUP_LEAD || kind == AuditKhnsRoleInTeam.MEMBER;
+        return withGroup && group != null && !group.isBlank() ? role(kind) + " " + group : role(kind);
     }
 
     /** "Linh vuc duoc phan cong kiem toan" cua bao cao theo dot: nghiep vu du kien cua can bo CE -> QTĐH, LN -> TD, cac nghiep vu con
