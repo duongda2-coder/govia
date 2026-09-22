@@ -512,3 +512,12 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/176-audit-tdkp-permission-catalog.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/177-audit-report-issuance-schema.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/178-audit-report-issuance-permission-catalog.yaml
+      relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/179-audit-tdkp-ceo-all-transfer-permission.yaml
+      relativeToChangelogFile: false

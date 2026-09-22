@@ -2,6 +2,11 @@ package com.govia.audit.tdkp.ceo;
 
 import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
 import com.govia.audit.masterdata.entity.AuditMasterDataItem;
+import com.govia.audit.phbc.common.ReportRecommendationTarget;
+import com.govia.audit.phbc.report.AuditReportIssuance;
+import com.govia.audit.phbc.report.AuditReportIssuanceRecommendation;
+import com.govia.audit.phbc.report.AuditReportIssuanceRecommendationRepository;
+import com.govia.audit.phbc.report.AuditReportIssuanceRepository;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.tdkp.common.TdkpMasterData;
 import com.govia.audit.tdkp.common.TdkpStatus;
@@ -41,15 +46,20 @@ public class AuditTdkpCeoRecommendationService {
     private final AuditLogService auditLogService;
     private final ExcelExportService excelExportService;
     private final ExcelImportService excelImportService;
+    private final AuditReportIssuanceRepository reportIssuanceRepository;
+    private final AuditReportIssuanceRecommendationRepository reportIssuanceRecommendationRepository;
 
     public AuditTdkpCeoRecommendationService(AuditTdkpCeoRecommendationRepository repository, TdkpMasterData masterData,
                                              AuditLogService auditLogService, ExcelExportService excelExportService,
-                                             ExcelImportService excelImportService) {
+                                             ExcelImportService excelImportService, AuditReportIssuanceRepository reportIssuanceRepository,
+                                             AuditReportIssuanceRecommendationRepository reportIssuanceRecommendationRepository) {
         this.repository = repository;
         this.masterData = masterData;
         this.auditLogService = auditLogService;
         this.excelExportService = excelExportService;
         this.excelImportService = excelImportService;
+        this.reportIssuanceRepository = reportIssuanceRepository;
+        this.reportIssuanceRecommendationRepository = reportIssuanceRecommendationRepository;
     }
 
     @Transactional(readOnly = true)
@@ -126,6 +136,61 @@ public class AuditTdkpCeoRecommendationService {
         auditLogService.record("AuditTdkpCeoRecommendation", null, AuditAction.CREATE,
                 "Chuyen kien nghi tu ZTC_TDKP_CEO_ALL sang ZTC_TDKP_CEO_KH: " + transferred + " dong, bo qua " + skipped + " dong da chuyen");
         return new AuditTdkpCeoRecommendationDto.TransferResult(transferred, skipped);
+    }
+
+    /** ZTC_TDKP_CEO_ALL: "Lấy các báo cáo từ màn hình quản lý phát hành báo cáo" (PHBC) - mỗi kiến nghị của 1 báo cáo phát hành thành 1 dòng
+     * ALL, không chuyển trùng (source_id = id kiến nghị PHBC). Mảng nghiệp vụ + Đơn vị thực hiện dùng chung danh mục nên mang thẳng sang; Phân
+     * loại kiến nghị (danh mục riêng của TDKP) và Chỉ đạo/Hiện trạng/Đánh giá/Ghi chú không có nguồn tương ứng bên PHBC nên để trống, Phòng
+     * nghiệp vụ tự cập nhật sau khi chuyển. "Đối tượng kiến nghị" = ALL bên PHBC không quy đổi được 1-1 sang TdkpTarget (chỉ có HĐTV/TGĐ) nên
+     * để trống, còn lại (HĐTV/TGĐ) mang thẳng sang. */
+    @Transactional
+    public AuditTdkpCeoRecommendationDto.TransferResult transferFromReportIssuance() {
+        UUID tenantId = TenantContext.getTenantId();
+        Set<UUID> alreadyTransferred = new HashSet<>();
+        for (AuditTdkpCeoRecommendation all : repository.findByTenantIdAndScopeOrderByReportDateDescCreatedAtDesc(tenantId, TdkpCeoScope.ALL)) {
+            if (all.getSourceId() != null) {
+                alreadyTransferred.add(all.getSourceId());
+            }
+        }
+        Map<UUID, AuditReportIssuance> reports = reportIssuanceRepository.findByTenantIdOrderByReportDateDescReportNumberAsc(tenantId).stream()
+                .collect(java.util.stream.Collectors.toMap(AuditReportIssuance::getId, r -> r));
+        List<AuditReportIssuanceRecommendation> recommendations = reportIssuanceRecommendationRepository
+                .findByTenantIdAndReportIssuanceIdIn(tenantId, reports.keySet());
+        int transferred = 0;
+        int skipped = 0;
+        for (AuditReportIssuanceRecommendation source : recommendations) {
+            if (alreadyTransferred.contains(source.getId())) {
+                skipped++;
+                continue;
+            }
+            AuditReportIssuance report = reports.get(source.getReportIssuanceId());
+            AuditTdkpCeoRecommendation copy = new AuditTdkpCeoRecommendation();
+            copy.setTenantId(tenantId);
+            copy.setScope(TdkpCeoScope.ALL);
+            copy.setSourceId(source.getId());
+            copy.setReportNumber(report == null ? null : report.getReportNumber());
+            copy.setReportDate(report == null ? null : report.getReportDate());
+            copy.setContent(source.getContent());
+            copy.setBusinessSegmentId(source.getBusinessSegmentId());
+            copy.setTargetObject(toTdkpTarget(source.getTarget()));
+            copy.setExecutingUnitId(source.getExecutingUnitId());
+            copy.setDeadline(source.getDeadline());
+            repository.save(copy);
+            transferred++;
+        }
+        auditLogService.record("AuditTdkpCeoRecommendation", null, AuditAction.CREATE,
+                "Chuyen kien nghi tu Phat hanh bao cao sang ZTC_TDKP_CEO_ALL: " + transferred + " dong, bo qua " + skipped + " dong da chuyen");
+        return new AuditTdkpCeoRecommendationDto.TransferResult(transferred, skipped);
+    }
+
+    private static TdkpTarget toTdkpTarget(ReportRecommendationTarget target) {
+        if (target == ReportRecommendationTarget.HDTV) {
+            return TdkpTarget.HDTV;
+        }
+        if (target == ReportRecommendationTarget.TGD) {
+            return TdkpTarget.TGD;
+        }
+        return null;
     }
 
     @Transactional(readOnly = true)

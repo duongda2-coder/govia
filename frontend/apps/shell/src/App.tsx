@@ -36,6 +36,7 @@ import { TdkpBranchPage } from "./pages/Audit/Tdkp/TdkpBranchPage";
 import { TdkpResolutionPage } from "./pages/Audit/Tdkp/TdkpResolutionPage";
 import { TdkpUnitRecommendationPage } from "./pages/Audit/Tdkp/TdkpUnitRecommendationPage";
 import { TdkpReportPage } from "./pages/Audit/Tdkp/TdkpReportPage";
+import { PhbcReportPage } from "./pages/Audit/Phbc/PhbcReportPage";
 import { ProcessStepSummaryQtPage } from "./pages/Audit/Plan/ProcessQt/ProcessStepSummaryQtPage";
 import { ProcessStepDetailQtPage } from "./pages/Audit/Plan/ProcessQt/ProcessStepDetailQtPage";
 import { ExceptionMappingQtPage } from "./pages/Audit/Plan/ProcessQt/ExceptionMappingQtPage";
@@ -159,6 +160,7 @@ function App() {
           <Route path="audit/tdkp/resolution" element={<TdkpResolutionPage />} />
           <Route path="audit/tdkp/unit-recommendation" element={<TdkpUnitRecommendationPage />} />
           <Route path="audit/tdkp/report" element={<TdkpReportPage />} />
+          <Route path="audit/phbc" element={<PhbcReportPage />} />
           <Route path="audit/plan/master-data-qt/process-step-summary" element={<ProcessStepSummaryQtPage />} />
           <Route path="audit/plan/master-data-qt/process-step-detail" element={<ProcessStepDetailQtPage />} />
           <Route path="audit/plan/master-data-qt/exception-mapping" element={<ExceptionMappingQtPage />} />

@@ -56,6 +56,12 @@ public class AuditTdkpCeoAllController {
         return ApiResponse.ok(null);
     }
 
+    @PostMapping("/transfer-from-report-issuance")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.TDKP_CEO_ALL.TRANSFER')")
+    public ApiResponse<AuditTdkpCeoRecommendationDto.TransferResult> transferFromReportIssuance() {
+        return ApiResponse.ok(service.transferFromReportIssuance());
+    }
+
     @GetMapping("/export/excel")
     @PreAuthorize("hasAuthority('PERM_AUDIT.TDKP_CEO_ALL.EXPORT')")
     public ResponseEntity<byte[]> exportExcel() {

@@ -10,6 +10,7 @@ import {
   exportTdkpCeo,
   importTdkpCeo,
   listTdkpCeo,
+  transferTdkpCeoAllFromReportIssuance,
   transferTdkpCeoFromAll,
   updateTdkpCeo,
   type TdkpCeoItem,
@@ -60,7 +61,7 @@ export function TdkpCeoPage({ variant }: { variant: TdkpCeoVariant }) {
   const canDelete = hasPermission(`${perm}.DELETE`);
   const canExport = hasPermission(`${perm}.EXPORT`);
   const canImport = hasPermission(`${perm}.IMPORT`);
-  const canTransfer = variant === "kh" && hasPermission(`${perm}.TRANSFER`);
+  const canTransfer = hasPermission(`${perm}.TRANSFER`);
   const { getSearchColumnProps } = useClientSearchColumn<TdkpCeoItem>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
   const lookups = useTdkpLookups(() => message.error(t("auditTdkp.messages.lookupError")));
@@ -179,7 +180,7 @@ export function TdkpCeoPage({ variant }: { variant: TdkpCeoVariant }) {
   const handleTransfer = async () => {
     setTransferring(true);
     try {
-      const result = await transferTdkpCeoFromAll();
+      const result = variant === "all" ? await transferTdkpCeoAllFromReportIssuance() : await transferTdkpCeoFromAll();
       message.success(t("auditTdkp.ceo.transferResult", { transferred: result.transferred, skipped: result.skipped }));
       await load();
     } catch {
@@ -220,7 +221,7 @@ export function TdkpCeoPage({ variant }: { variant: TdkpCeoVariant }) {
       {canTransfer && (
         <Space style={{ marginBottom: 16 }} wrap>
           <Button icon={<SwapOutlined />} loading={transferring} onClick={handleTransfer}>
-            {t("auditTdkp.ceo.transferButton")}
+            {t(variant === "all" ? "auditTdkp.ceo.transferButtonAll" : "auditTdkp.ceo.transferButton")}
           </Button>
         </Space>
       )}

@@ -1,0 +1,15 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION: TDKP_CEO_ALL - chuyen du lieu tu Phat hanh bao cao (PHBC) =====================
+  - changeSet:
+      id: 179-1-permission-audit-tdkp-ceo-all-transfer
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "ac8bfd6a-c7ea-4e9c-9f7c-c1f76916c756" }
+              - column: { name: code, value: "AUDIT.TDKP_CEO_ALL.TRANSFER" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Chuyen du lieu nguon - Theo doi khac phuc - Kien nghi HDTV/TGD (Phong nghiep vu)" }
+              - column: { name: resource_label, value: "Theo dõi khắc phục - Kiến nghị HĐTV/TGĐ (Phòng nghiệp vụ)" }

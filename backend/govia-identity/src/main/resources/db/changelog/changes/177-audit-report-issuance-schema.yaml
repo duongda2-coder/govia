@@ -1,0 +1,70 @@
+databaseChangeLog:
+
+  # ===================== Phat hanh bao cao (PHBC) - file "ztc_phbc.xlsx" =====================
+  - changeSet:
+      id: 177-audit_report_issuance
+      author: govia
+      comment: "PHBC - 1. man hinh Phat hanh bao cao: danh sach bao cao kiem toan da phat hanh"
+      changes:
+        - createTable:
+            tableName: audit_report_issuance
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: report_number, type: VARCHAR(100), constraints: { nullable: false } }
+              - column: { name: report_date, type: DATE }
+              - column: { name: report_name, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: summary_content, type: VARCHAR(1000) }
+              - column: { name: issuing_unit, type: VARCHAR(10) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_report_issuance
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_report_issuance_tenant
+        - addUniqueConstraint:
+            tableName: audit_report_issuance
+            columnNames: tenant_id, report_number
+            constraintName: uk_report_issuance_number
+
+  - changeSet:
+      id: 177-audit_report_issuance_recommendation
+      author: govia
+      comment: "PHBC - 2. Nut chon ma kien nghi: kien nghi NSD them vao 1 bao cao phat hanh"
+      changes:
+        - createTable:
+            tableName: audit_report_issuance_recommendation
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: report_issuance_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: recommendation_code, type: VARCHAR(5), constraints: { nullable: false } }
+              - column: { name: content, type: VARCHAR(1000), constraints: { nullable: false } }
+              - column: { name: business_segment_id, type: UUID }
+              - column: { name: target, type: VARCHAR(10) }
+              - column: { name: executing_unit_id, type: UUID }
+              - column: { name: executing_unit_name, type: VARCHAR(100) }
+              - column: { name: deadline, type: DATE }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_report_issuance_recommendation
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_report_issuance_rec_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_report_issuance_recommendation
+            baseColumnNames: report_issuance_id
+            referencedTableName: audit_report_issuance
+            referencedColumnNames: id
+            constraintName: fk_report_issuance_rec_report
+            onDelete: CASCADE

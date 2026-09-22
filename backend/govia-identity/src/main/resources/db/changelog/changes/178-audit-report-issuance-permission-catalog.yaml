@@ -1,0 +1,55 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Phat hanh bao cao (PHBC) =====================
+  - changeSet:
+      id: 178-1-permission-catalog-audit-phbc
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6cb7a796-0528-438e-8f0f-b50100ad121e" }
+              - column: { name: code, value: "AUDIT.PHBC.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem - Phat hanh bao cao" }
+              - column: { name: resource_label, value: "Phát hành báo cáo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "f393afd2-1927-4f53-b5af-1846b474da61" }
+              - column: { name: code, value: "AUDIT.PHBC.CREATE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Them moi - Phat hanh bao cao" }
+              - column: { name: resource_label, value: "Phát hành báo cáo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "4201dbb7-17e4-463b-aa61-700251cfa444" }
+              - column: { name: code, value: "AUDIT.PHBC.EDIT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Sua - Phat hanh bao cao" }
+              - column: { name: resource_label, value: "Phát hành báo cáo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "339fb925-2c7c-4769-ba5b-3d127eba0d05" }
+              - column: { name: code, value: "AUDIT.PHBC.DELETE" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xoa - Phat hanh bao cao" }
+              - column: { name: resource_label, value: "Phát hành báo cáo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "c4f48811-5c1b-4b65-9d57-3cc833624feb" }
+              - column: { name: code, value: "AUDIT.PHBC.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat Excel - Phat hanh bao cao" }
+              - column: { name: resource_label, value: "Phát hành báo cáo" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "8fc0f92a-b09c-464d-8b0d-36791f281f32" }
+              - column: { name: code, value: "AUDIT.PHBC.IMPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Import Excel - Phat hanh bao cao" }
+              - column: { name: resource_label, value: "Phát hành báo cáo" }

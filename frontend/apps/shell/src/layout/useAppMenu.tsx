@@ -45,6 +45,7 @@ export const MENU_ROUTES: Record<string, string> = {
   "audit-tdkp-resolution": "/audit/tdkp/resolution",
   "audit-tdkp-unit-recommendation": "/audit/tdkp/unit-recommendation",
   "audit-tdkp-report": "/audit/tdkp/report",
+  "audit-phbc": "/audit/phbc",
   "audit-plan-md-branch-staff": "/audit/plan/master-data/branch-staff",
   "audit-plan-md-work-item": "/audit/plan/master-data/work-item",
   "audit-plan-md-exception-type": "/audit/plan/master-data/exception-type",
@@ -410,6 +411,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
       ]),
     },
     auditTdkpChildren.length > 0 && { key: "audit-tdkp", label: menuLabel(t("menu.auditTdkp")), children: auditTdkpChildren },
+    hasPermission("AUDIT.PHBC.VIEW") && leaf("audit-phbc", t("menu.auditPhbc"), auditGroupLabel),
   ]);
 
   const adminGroupLabel = t("menu.admin");

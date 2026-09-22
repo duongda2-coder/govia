@@ -63,6 +63,7 @@
     "auditTdkpResolution": "Nghị quyết HĐTV",
     "auditTdkpUnitRecommendation": "Kiến nghị của Đơn vị đối với KTNB",
     "auditTdkpReport": "Báo cáo theo dõi khắc phục",
+    "auditPhbc": "Phát hành báo cáo",
     "auditPlan": "Lập kế hoạch",
     "auditPlanMasterData": "Danh mục",
     "auditPlanMdBranchStaff": "Chức danh cán bộ chi nhánh",
@@ -1326,6 +1327,7 @@
     "ceo": {
       "titleAll": "Kiến nghị của KTNB đối với HĐTV, TGĐ (Phòng nghiệp vụ cập nhật)",
       "titleKh": "Kiến nghị của KTNB đối với HĐTV, TGĐ (Phòng Kế hoạch)",
+      "transferButtonAll": "Chuyển dữ liệu từ Phát hành báo cáo",
       "transferButton": "Chuyển dữ liệu từ ZTC_TDKP_CEO_ALL",
       "transferResult": "Đã chuyển {{transferred}} kiến nghị, bỏ qua {{skipped}} kiến nghị đã chuyển trước đó",
       "transferError": "Chuyển dữ liệu thất bại",
@@ -1475,6 +1477,66 @@
           "createTitle": "Lưu trữ báo cáo đã xuất",
           "editTitle": "Sửa báo cáo lưu trữ"
         }
+      }
+    }
+  },
+  "auditPhbc": {
+    "common": {
+      "issuingUnit": {
+        "KTNB": "Kiểm toán nội bộ",
+        "BKS": "Ban kiểm soát"
+      },
+      "recommendationCode": {
+        "M01": "Nhóm cơ chế, chính sách",
+        "M02": "Nhóm kiến nghị về giám sát an toàn hoạt động",
+        "M03": "Nhóm kiến nghị về hướng dẫn thực hiện cơ chế, quy chế",
+        "M04": "Các chỉ đạo khác"
+      },
+      "target": {
+        "HDTV": "HĐTV",
+        "TGD": "TGĐ",
+        "ALL": "ALL"
+      }
+    },
+    "messages": {
+      "lookupError": "Không tải được danh sách chọn",
+      "loadError": "Không tải được dữ liệu",
+      "saveError": "Lưu thất bại",
+      "deleteError": "Xóa thất bại",
+      "createSuccess": "Đã thêm mới",
+      "updateSuccess": "Đã cập nhật",
+      "deleteSuccess": "Đã xóa"
+    },
+    "report": {
+      "title": "Phát hành báo cáo",
+      "recommendationTitle": "Danh sách kiến nghị trong báo cáo",
+      "selectReportHint": "Chọn 1 báo cáo ở bảng trên để xem và thêm kiến nghị vào báo cáo.",
+      "deleteConfirmTitle": "Xóa {{count}} báo cáo đã chọn (kèm các kiến nghị liên quan)?",
+      "columns": {
+        "reportNumber": "Số báo cáo",
+        "reportDate": "Ngày báo cáo",
+        "reportName": "Tên báo cáo",
+        "summaryContent": "Nội dung trích yếu",
+        "issuingUnit": "Đơn vị phát hành",
+        "recommendationCount": "Số kiến nghị"
+      },
+      "recommendationColumns": {
+        "recommendationCode": "Mã kiến nghị",
+        "recommendationName": "Tên KN",
+        "content": "Nội dung Kiến nghị",
+        "businessSegment": "Mảng nghiệp vụ",
+        "target": "Đối tượng kiến nghị",
+        "executingUnit": "Đơn vị thực hiện",
+        "executingUnitName": "Tên đơn vị thực hiện",
+        "deadline": "Thời hạn hoàn thành"
+      },
+      "form": {
+        "createTitle": "Thêm báo cáo phát hành",
+        "editTitle": "Sửa báo cáo phát hành"
+      },
+      "recommendationForm": {
+        "createTitle": "Thêm kiến nghị vào báo cáo",
+        "editTitle": "Sửa kiến nghị"
       }
     }
   },

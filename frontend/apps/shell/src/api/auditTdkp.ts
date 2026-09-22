@@ -179,6 +179,8 @@ export const deleteTdkpCeo = (variant: TdkpCeoVariant, id: string) => remove(`${
 export const exportTdkpCeo = (variant: TdkpCeoVariant) => download(`${ceoPath(variant)}/export/excel`, `tdkp_ceo_${variant}.xlsx`);
 export const importTdkpCeo = (variant: TdkpCeoVariant, file: File) => importFile(`${ceoPath(variant)}/import`, file);
 export const transferTdkpCeoFromAll = () => send<{ transferred: number; skipped: number }>("post", "/ceo-kh/transfer-from-all");
+export const transferTdkpCeoAllFromReportIssuance = () =>
+  send<{ transferred: number; skipped: number }>("post", "/ceo-all/transfer-from-report-issuance");
 
 // ===================== sheet 4: chi nhánh =====================
 

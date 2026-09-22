@@ -63,6 +63,7 @@
     "auditTdkpResolution": "Board resolutions",
     "auditTdkpUnitRecommendation": "Unit recommendations to IA",
     "auditTdkpReport": "Follow-up reports",
+    "auditPhbc": "Report Issuance",
     "auditPlan": "Planning",
     "auditPlanMasterData": "Master Data",
     "auditPlanMdBranchStaff": "Branch Staff Position",
@@ -1326,6 +1327,7 @@
     "ceo": {
       "titleAll": "IA Recommendations to Board of Members / General Director (business departments)",
       "titleKh": "IA Recommendations to Board of Members / General Director (Planning Department)",
+      "transferButtonAll": "Transfer from Report Issuance",
       "transferButton": "Transfer from ZTC_TDKP_CEO_ALL",
       "transferResult": "Transferred {{transferred}} recommendations, skipped {{skipped}} already transferred",
       "transferError": "Transfer failed",
@@ -1475,6 +1477,66 @@
           "createTitle": "Archive exported report",
           "editTitle": "Edit archived report"
         }
+      }
+    }
+  },
+  "auditPhbc": {
+    "common": {
+      "issuingUnit": {
+        "KTNB": "Internal Audit",
+        "BKS": "Supervisory Board"
+      },
+      "recommendationCode": {
+        "M01": "Mechanism / policy group",
+        "M02": "Operational safety supervision group",
+        "M03": "Mechanism / regulation implementation guidance group",
+        "M04": "Other directives"
+      },
+      "target": {
+        "HDTV": "Board of Members",
+        "TGD": "CEO",
+        "ALL": "ALL"
+      }
+    },
+    "messages": {
+      "lookupError": "Could not load lookup lists",
+      "loadError": "Could not load data",
+      "saveError": "Save failed",
+      "deleteError": "Delete failed",
+      "createSuccess": "Created",
+      "updateSuccess": "Updated",
+      "deleteSuccess": "Deleted"
+    },
+    "report": {
+      "title": "Report Issuance",
+      "recommendationTitle": "Recommendations in report",
+      "selectReportHint": "Select a report above to view and add recommendations to it.",
+      "deleteConfirmTitle": "Delete {{count}} selected report(s) (and their recommendations)?",
+      "columns": {
+        "reportNumber": "Report No.",
+        "reportDate": "Report date",
+        "reportName": "Report name",
+        "summaryContent": "Summary",
+        "issuingUnit": "Issuing unit",
+        "recommendationCount": "Recommendations"
+      },
+      "recommendationColumns": {
+        "recommendationCode": "Recommendation code",
+        "recommendationName": "Recommendation group",
+        "content": "Recommendation content",
+        "businessSegment": "Business segment",
+        "target": "Recommendation target",
+        "executingUnit": "Executing unit",
+        "executingUnitName": "Executing unit name",
+        "deadline": "Deadline"
+      },
+      "form": {
+        "createTitle": "Add issued report",
+        "editTitle": "Edit issued report"
+      },
+      "recommendationForm": {
+        "createTitle": "Add recommendation",
+        "editTitle": "Edit recommendation"
       }
     }
   },
