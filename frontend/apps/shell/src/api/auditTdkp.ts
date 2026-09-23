@@ -1,5 +1,6 @@
 import type { ApiResponse, ImportResult } from "@govia/ui-kit";
 import { httpClient } from "./client";
+import type { AssignmentApprovalStatus } from "./auditWorkManagement";
 
 /** Nhóm màn hình "Theo dõi khắc phục" (TDKP) - file 6.TDKP_29.5.2026.xlsx: phân công, kiến nghị HĐTV/TGĐ, chi nhánh, nghị quyết, đơn vị, báo cáo. */
 const BASE = "/api/audit/tdkp";
@@ -230,6 +231,7 @@ export interface TdkpBranchDefectItem {
   defectContent: string | null;
   customerEntry: string | null;
   creditContract: string | null;
+  defectCode: string | null;
   defectType: string | null;
   recommendationDefectStatus: TdkpStatus | null;
   recommendationDefectStatusLabel: string | null;
@@ -243,6 +245,7 @@ export interface TdkpBranchDefectRequest {
   defectContent: string | null;
   customerEntry: string | null;
   creditContract: string | null;
+  defectCode: string | null;
   defectType: string | null;
   customerStatus: TdkpStatus | null;
   relatedStaff: string | null;
@@ -274,23 +277,55 @@ export interface TdkpResolutionItem {
   resolutionNumber: string;
   issueDate: string | null;
   content: string | null;
+  workDetail: string | null;
+  fieldArea: string | null;
+  unitId: string | null;
+  unitCode: string | null;
+  unitName: string | null;
+  contactPerson: string | null;
+  relatedResolution: string | null;
+  completionDeadline: string | null;
+  completionDeadlineBasis: string | null;
   implementation: string | null;
-  status: TdkpStatus | null;
-  statusLabel: string | null;
-  supervisor: string | null;
+  progressStatus: TdkpStatus | null;
+  progressStatusLabel: string | null;
+  reason: string | null;
   issuanceEvaluation: string | null;
+  completionDate: string | null;
+  resolutionState: TdkpDeadlineState | null;
+  resolutionStateLabel: string | null;
+  followUpGroup: string | null;
+  followUpGroupLabel: string | null;
+  followerName: string | null;
+  proposal: string | null;
+  proposalReason: string | null;
   note: string | null;
+  approvalStatus: AssignmentApprovalStatus | null;
+  approvalStatusLabel: string | null;
 }
 
 export interface TdkpResolutionRequest {
   resolutionNumber: string;
   issueDate: string | null;
   content: string | null;
+  workDetail: string | null;
+  fieldArea: string | null;
+  unitId: string | null;
+  contactPerson: string | null;
+  relatedResolution: string | null;
+  completionDeadline: string | null;
+  completionDeadlineBasis: string | null;
   implementation: string | null;
-  status: TdkpStatus | null;
-  supervisor: string | null;
+  progressStatus: TdkpStatus | null;
+  reason: string | null;
   issuanceEvaluation: string | null;
+  completionDate: string | null;
+  followUpGroup: string | null;
+  followerName: string | null;
+  proposal: string | null;
+  proposalReason: string | null;
   note: string | null;
+  approvalStatus: AssignmentApprovalStatus | null;
 }
 
 export const listTdkpResolutions = () => get<TdkpResolutionItem[]>("/resolution");
@@ -310,27 +345,33 @@ export interface TdkpUnitRecommendationItem {
   unitId: string | null;
   unitCode: string | null;
   unitName: string | null;
+  recommendationTarget: string | null;
   content: string;
   deadline: string | null;
   implementation: string | null;
   status: TdkpStatus | null;
   statusLabel: string | null;
   evaluation: string | null;
+  lastEditedDate: string | null;
   deadlineState: TdkpDeadlineState | null;
   deadlineStateLabel: string | null;
   note: string | null;
+  approvalStatus: AssignmentApprovalStatus | null;
+  approvalStatusLabel: string | null;
 }
 
 export interface TdkpUnitRecommendationRequest {
   reportNumber: string | null;
   reportDate: string | null;
   unitId: string | null;
+  recommendationTarget: string | null;
   content: string;
   deadline: string | null;
   implementation: string | null;
   status: TdkpStatus | null;
   evaluation: string | null;
   note: string | null;
+  approvalStatus: AssignmentApprovalStatus | null;
 }
 
 export const listTdkpUnitRecommendations = () => get<TdkpUnitRecommendationItem[]>("/unit-recommendation");

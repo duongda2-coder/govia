@@ -215,9 +215,11 @@ public class AuditTdkpReportService {
                 .filter(r -> r.issueDate() == null || !r.issueDate().isAfter(asOf))
                 .sorted(Comparator.comparing(AuditTdkpResolutionDto.Response::issueDate, Comparator.nullsLast(Comparator.naturalOrder()))
                         .thenComparing(AuditTdkpResolutionDto.Response::resolutionNumber)).toList();
+        // "NGƯỜI GIÁM SÁT" cua bao cao goc khop voi field "Nguoi theo doi" hien co (cot "Nguoi giam sat"
+        // rieng da bi bo khoi man hinh theo phan hoi nguoi dung o test23.9 - xem AuditTdkpResolution).
         List<List<String>> rows = new ArrayList<>();
         for (AuditTdkpResolutionDto.Response r : source) {
-            rows.add(List.of(s(r.resolutionNumber()), date(r.issueDate()), s(r.content()), s(r.implementation()), s(r.statusLabel()), s(r.supervisor()),
+            rows.add(List.of(s(r.resolutionNumber()), date(r.issueDate()), s(r.content()), s(r.implementation()), s(r.progressStatusLabel()), s(r.followerName()),
                     s(r.issuanceEvaluation()), s(r.note())));
         }
         return new AuditTdkpReportDto.ReportData(AuditTdkpReportType.BC05, asOf, null, request.year() == null ? String.valueOf(asOf.getYear()) : String.valueOf(request.year()),

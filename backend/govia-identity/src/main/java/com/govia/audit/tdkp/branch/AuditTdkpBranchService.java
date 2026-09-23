@@ -268,6 +268,7 @@ public class AuditTdkpBranchService {
             defect.setDefectContent(ttss.getTtssContent());
             defect.setCustomerEntry(joinNonBlank(" - ", ttss.getCustomerName(), ttss.getTransactionContent()));
             defect.setCreditContract(ttss.getReferenceNumber());
+            defect.setDefectCode(ttss.getFindingCode());
             defect.setDefectType(ttss.getFindingName() != null && !ttss.getFindingName().isBlank() ? ttss.getFindingName() : ttss.getFindingCode());
             defect.setRelatedStaff(ttss.getRelatedStaff());
             defectRepository.save(defect);
@@ -315,7 +316,8 @@ public class AuditTdkpBranchService {
     public byte[] exportDefects() {
         List<ExportColumn> columns = List.of(new ExportColumn("managementCode", "Mã quản lý kiến nghị"), new ExportColumn("defectContent", "Sai sót liên quan đến kiến nghị"),
                 new ExportColumn("customerEntry", "Khách hàng/Bút toán"), new ExportColumn("creditContract", "Hợp đồng tín dụng liên quan (LAV)"),
-                new ExportColumn("defectType", "Loại sai sót"), new ExportColumn("recommendationDefectStatus", "Hiện trạng chỉnh sửa sai sót liên quan đến kiến nghị"),
+                new ExportColumn("defectCode", "Mã tồn tại sai sót"), new ExportColumn("defectType", "Loại sai sót"),
+                new ExportColumn("recommendationDefectStatus", "Hiện trạng chỉnh sửa sai sót liên quan đến kiến nghị"),
                 new ExportColumn("customerStatus", "Hiện trạng chỉnh sửa sai sót liên quan đến khách hàng"), new ExportColumn("relatedStaff", "Cán bộ liên quan"));
         List<Map<String, Object>> rows = listDefects(null).stream().map(d -> {
             Map<String, Object> row = new HashMap<>();
@@ -323,6 +325,7 @@ public class AuditTdkpBranchService {
             row.put("defectContent", d.defectContent());
             row.put("customerEntry", d.customerEntry());
             row.put("creditContract", d.creditContract());
+            row.put("defectCode", d.defectCode());
             row.put("defectType", d.defectType());
             row.put("recommendationDefectStatus", d.recommendationDefectStatusLabel());
             row.put("customerStatus", d.customerStatusLabel());
@@ -398,6 +401,7 @@ public class AuditTdkpBranchService {
         item.setDefectContent(TdkpSupport.emptyToNull(request.defectContent()));
         item.setCustomerEntry(TdkpSupport.emptyToNull(request.customerEntry()));
         item.setCreditContract(TdkpSupport.emptyToNull(request.creditContract()));
+        item.setDefectCode(TdkpSupport.emptyToNull(request.defectCode()));
         item.setDefectType(TdkpSupport.emptyToNull(request.defectType()));
         item.setCustomerStatus(request.customerStatus());
         item.setRelatedStaff(TdkpSupport.emptyToNull(request.relatedStaff()));
@@ -459,7 +463,7 @@ public class AuditTdkpBranchService {
     private AuditTdkpBranchDto.DefectResponse toDefectResponse(AuditTdkpBranchDefect item, AuditTdkpBranchRecommendation recommendation, TdkpStatus overall) {
         return new AuditTdkpBranchDto.DefectResponse(item.getId(), item.getBranchRecommendationId(),
                 Objects.requireNonNull(recommendation).getManagementCode(), item.getDefectContent(), item.getCustomerEntry(), item.getCreditContract(),
-                item.getDefectType(), overall, TdkpStatus.labelOf(overall), item.getCustomerStatus(), TdkpStatus.labelOf(item.getCustomerStatus()),
+                item.getDefectCode(), item.getDefectType(), overall, TdkpStatus.labelOf(overall), item.getCustomerStatus(), TdkpStatus.labelOf(item.getCustomerStatus()),
                 item.getRelatedStaff());
     }
 }

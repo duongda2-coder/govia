@@ -1,5 +1,6 @@
 package com.govia.audit.tdkp.unitrec;
 
+import com.govia.audit.planengagement.entity.AssignmentApprovalStatus;
 import com.govia.audit.tdkp.common.TdkpStatus;
 import com.govia.core.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -34,6 +35,10 @@ public class AuditTdkpUnitRecommendation extends BaseEntity {
     @Column(name = "unit_id", columnDefinition = "uuid")
     private UUID unitId;
 
+    /** "Đối tượng kiến nghị" - nhập tay tự do (khac voi unitId = don vi kien nghi). */
+    @Column(name = "recommendation_target", length = 100)
+    private String recommendationTarget;
+
     @Column(name = "content", nullable = false, length = 2000)
     private String content;
 
@@ -54,4 +59,9 @@ public class AuditTdkpUnitRecommendation extends BaseEntity {
 
     @Column(name = "note", length = 500)
     private String note;
+
+    /** "Trạng thái phê duyệt" - nhap/chon tay, khong gan voi quy trinh Flowable. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "approval_status", length = 20)
+    private AssignmentApprovalStatus approvalStatus;
 }

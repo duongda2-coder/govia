@@ -39,6 +39,10 @@ public class AuditTdkpBranchDefect extends BaseEntity {
     @Column(name = "credit_contract", length = 100)
     private String creditContract;
 
+    /** "Mã tồn tại sai sót" - khop voi AuditTtssRecord.findingCode khi chuyen tu Thuc hien kiem toan. */
+    @Column(name = "defect_code", length = 50)
+    private String defectCode;
+
     /** "Loại sai sót". */
     @Column(name = "defect_type", length = 255)
     private String defectType;

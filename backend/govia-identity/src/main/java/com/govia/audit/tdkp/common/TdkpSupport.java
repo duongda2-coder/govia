@@ -1,5 +1,6 @@
 package com.govia.audit.tdkp.common;
 
+import com.govia.audit.planengagement.entity.AssignmentApprovalStatus;
 import com.govia.core.web.BusinessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -47,6 +48,33 @@ public final class TdkpSupport {
             return null;
         }
         return OVERDUE.equals(state) ? "Quá hạn" : "Trong hạn";
+    }
+
+    /** "Trạng thái phê duyệt" nhap/chon tay o cac man hinh TDKP (khong gan voi quy trinh Flowable,
+     * khac voi AuditTtssRecord.recommendationApprovalStatus). */
+    public static String approvalStatusLabel(AssignmentApprovalStatus status) {
+        if (status == null) {
+            return null;
+        }
+        return switch (status) {
+            case PENDING -> "Đang chờ duyệt";
+            case APPROVED -> "Đã duyệt";
+            case REJECTED -> "Từ chối";
+        };
+    }
+
+    /** Nhận tên enum hoặc nhãn tiếng Việt (file Excel import); rỗng -> null, khác list -> lỗi dòng import. */
+    public static AssignmentApprovalStatus parseApprovalStatus(String text) {
+        if (isBlank(text)) {
+            return null;
+        }
+        String value = text.trim();
+        for (AssignmentApprovalStatus status : AssignmentApprovalStatus.values()) {
+            if (status.name().equalsIgnoreCase(value) || approvalStatusLabel(status).equalsIgnoreCase(value)) {
+                return status;
+            }
+        }
+        throw new BusinessException("IMPORT_LIST_VALUE_NOT_FOUND", "Trang thai phe duyet khong hop le: " + value);
     }
 
     /** Ngay import: dd.MM.yyyy / dd/MM/yyyy / yyyy-MM-dd hoac so serial cua Excel (vd 44275). */

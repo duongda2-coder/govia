@@ -3,11 +3,14 @@ import { Tag } from "antd";
 import type { TFunction } from "i18next";
 import dayjs from "dayjs";
 import { getTdkpLookups, type TdkpDeadlineState, type TdkpLookups, type TdkpStatus, type TdkpTarget } from "../../../api/auditTdkp";
+import type { AssignmentApprovalStatus } from "../../../api/auditWorkManagement";
 
 export const STATUS_VALUES: TdkpStatus[] = ["DONE", "IN_PROGRESS", "NOT_STARTED"];
 export const TARGET_VALUES: TdkpTarget[] = ["HDTV", "TGD"];
+export const APPROVAL_STATUS_VALUES: AssignmentApprovalStatus[] = ["PENDING", "APPROVED", "REJECTED"];
 
 const STATUS_COLORS: Record<TdkpStatus, string> = { DONE: "green", IN_PROGRESS: "blue", NOT_STARTED: "default" };
+const APPROVAL_STATUS_COLORS: Record<AssignmentApprovalStatus, string> = { PENDING: "processing", APPROVED: "success", REJECTED: "error" };
 
 export const DATE_DISPLAY = "DD.MM.YYYY";
 export const DATE_API = "YYYY-MM-DD";
@@ -24,9 +27,13 @@ export function useTdkpLookups(onError: () => void) {
 
 export const statusOptions = (t: TFunction) => STATUS_VALUES.map((value) => ({ value, label: t(`auditTdkp.common.status.${value}`) }));
 export const targetOptions = (t: TFunction) => TARGET_VALUES.map((value) => ({ value, label: t(`auditTdkp.common.target.${value}`) }));
+export const approvalStatusOptions = (t: TFunction) => APPROVAL_STATUS_VALUES.map((value) => ({ value, label: t(`auditWorkManagement.approvalStatus.${value}`) }));
 
 export const renderStatus = (t: TFunction) => (value: TdkpStatus | null) =>
   value ? <Tag color={STATUS_COLORS[value]}>{t(`auditTdkp.common.status.${value}`)}</Tag> : "-";
+
+export const renderApprovalStatus = (t: TFunction) => (value: AssignmentApprovalStatus | null) =>
+  value ? <Tag color={APPROVAL_STATUS_COLORS[value]}>{t(`auditWorkManagement.approvalStatus.${value}`)}</Tag> : "-";
 
 export const renderDeadlineState = (t: TFunction) => (value: TdkpDeadlineState | null) =>
   value ? <Tag color={value === "OVERDUE" ? "red" : "green"}>{t(`auditTdkp.common.deadline.${value}`)}</Tag> : "-";

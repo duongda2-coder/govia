@@ -1,5 +1,6 @@
 package com.govia.audit.tdkp.unitrec;
 
+import com.govia.audit.planengagement.entity.AssignmentApprovalStatus;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.tdkp.common.TdkpMasterData;
 import com.govia.audit.tdkp.common.TdkpStatus;
@@ -19,6 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,10 +86,12 @@ public class AuditTdkpUnitRecommendationService {
 
     private List<ExportColumn> columns() {
         return List.of(new ExportColumn("code", "Mã Kiến nghị KTNB"), new ExportColumn("reportNumber", "Số báo cáo"), new ExportColumn("reportDate", "Ngày báo cáo"),
-                new ExportColumn("unit", "Đơn vị kiến nghị"), new ExportColumn("content", "Nội dung kiến nghị"), new ExportColumn("deadline", "Thời hạn hoàn thành"),
+                new ExportColumn("unit", "Đơn vị kiến nghị"), new ExportColumn("recommendationTarget", "Đối tượng kiến nghị"),
+                new ExportColumn("content", "Nội dung kiến nghị"), new ExportColumn("deadline", "Thời hạn hoàn thành"),
                 new ExportColumn("implementation", "Tình hình thực hiện kiến nghị"), new ExportColumn("status", "Hiện trạng"),
-                new ExportColumn("evaluation", "Đánh giá tình hình thực hiện kiến nghị"), new ExportColumn("deadlineState", "Trạng thái"),
-                new ExportColumn("note", "Ghi Chú"));
+                new ExportColumn("evaluation", "Đánh giá tình hình thực hiện kiến nghị"), new ExportColumn("lastEditedDate", "Thời gian chỉnh sửa"),
+                new ExportColumn("deadlineState", "Trạng thái"), new ExportColumn("note", "Ghi Chú"),
+                new ExportColumn("approvalStatus", "Trạng thái phê duyệt"));
     }
 
     @Transactional(readOnly = true)
@@ -96,13 +102,16 @@ public class AuditTdkpUnitRecommendationService {
             row.put("reportNumber", r.reportNumber());
             row.put("reportDate", r.reportDate());
             row.put("unit", r.unitName());
+            row.put("recommendationTarget", r.recommendationTarget());
             row.put("content", r.content());
             row.put("deadline", r.deadline());
             row.put("implementation", r.implementation());
             row.put("status", r.statusLabel());
             row.put("evaluation", r.evaluation());
+            row.put("lastEditedDate", r.lastEditedDate());
             row.put("deadlineState", r.deadlineStateLabel());
             row.put("note", r.note());
+            row.put("approvalStatus", r.approvalStatusLabel());
             return row;
         }).toList();
         return excelExportService.export("TDKP_KTNB", columns(), rows);
@@ -127,9 +136,11 @@ public class AuditTdkpUnitRecommendationService {
                     throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu Noi dung kien nghi");
                 }
                 AuditTdkpUnitRecommendationDto.Request request = new AuditTdkpUnitRecommendationDto.Request(TdkpSupport.emptyToNull(row.get("reportNumber")),
-                        TdkpSupport.parseDate(row.get("reportDate")), masterData.resolveUnit(row.get("unit"), "Don vi kien nghi"), row.get("content").trim(),
+                        TdkpSupport.parseDate(row.get("reportDate")), masterData.resolveUnit(row.get("unit"), "Don vi kien nghi"),
+                        TdkpSupport.emptyToNull(row.get("recommendationTarget")), row.get("content").trim(),
                         TdkpSupport.parseDate(row.get("deadline")), TdkpSupport.emptyToNull(row.get("implementation")), TdkpStatus.parse(row.get("status")),
-                        TdkpSupport.emptyToNull(row.get("evaluation")), TdkpSupport.emptyToNull(row.get("note")));
+                        TdkpSupport.emptyToNull(row.get("evaluation")), TdkpSupport.emptyToNull(row.get("note")),
+                        TdkpSupport.parseApprovalStatus(row.get("approvalStatus")));
                 String code = TdkpSupport.emptyToNull(row.get("code"));
                 AuditTdkpUnitRecommendation existing = code == null ? null : repository.findByTenantIdAndCode(tenantId, code).orElse(null);
                 if (existing != null) {
@@ -151,12 +162,14 @@ public class AuditTdkpUnitRecommendationService {
         item.setReportNumber(TdkpSupport.emptyToNull(request.reportNumber()));
         item.setReportDate(request.reportDate());
         item.setUnitId(masterData.requireUnit(request.unitId(), "Don vi kien nghi"));
+        item.setRecommendationTarget(TdkpSupport.emptyToNull(request.recommendationTarget()));
         item.setContent(request.content().trim());
         item.setDeadline(request.deadline());
         item.setImplementation(TdkpSupport.emptyToNull(request.implementation()));
         item.setStatus(request.status());
         item.setEvaluation(TdkpSupport.emptyToNull(request.evaluation()));
         item.setNote(TdkpSupport.emptyToNull(request.note()));
+        item.setApprovalStatus(request.approvalStatus());
     }
 
     private AuditTdkpUnitRecommendation getOwnedOrThrow(UUID id) {
@@ -168,8 +181,11 @@ public class AuditTdkpUnitRecommendationService {
     private AuditTdkpUnitRecommendationDto.Response toResponse(AuditTdkpUnitRecommendation item, Map<UUID, AuditObjectUnit> units) {
         AuditObjectUnit unit = item.getUnitId() == null ? null : units.get(item.getUnitId());
         String state = TdkpSupport.deadlineState(item.getDeadline());
+        Instant editedAt = item.getUpdatedAt() != null ? item.getUpdatedAt() : item.getCreatedAt();
+        LocalDate lastEditedDate = editedAt == null ? null : editedAt.atZone(ZoneId.systemDefault()).toLocalDate();
         return new AuditTdkpUnitRecommendationDto.Response(item.getId(), item.getCode(), item.getReportNumber(), item.getReportDate(), item.getUnitId(),
-                unit == null ? null : unit.getCode(), unit == null ? null : unit.getName(), item.getContent(), item.getDeadline(), item.getImplementation(),
-                item.getStatus(), TdkpStatus.labelOf(item.getStatus()), item.getEvaluation(), state, TdkpSupport.deadlineLabel(state), item.getNote());
+                unit == null ? null : unit.getCode(), unit == null ? null : unit.getName(), item.getRecommendationTarget(), item.getContent(), item.getDeadline(),
+                item.getImplementation(), item.getStatus(), TdkpStatus.labelOf(item.getStatus()), item.getEvaluation(), lastEditedDate, state,
+                TdkpSupport.deadlineLabel(state), item.getNote(), item.getApprovalStatus(), TdkpSupport.approvalStatusLabel(item.getApprovalStatus()));
     }
 }

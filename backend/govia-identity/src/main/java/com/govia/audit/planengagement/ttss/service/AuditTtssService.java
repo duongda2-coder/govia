@@ -83,6 +83,10 @@ import static com.govia.audit.masterdata.entity.AuditMasterDataCategory.BUSINESS
 public class AuditTtssService {
 
     private static final String PROCESS_KEY = "audit_recommendation_approval";
+    /** Mac dinh khi import file TTSS ma khong dien "mã KN" - khop voi dong mac dinh cua danh muc
+     * kien nghi rieng cua CKT (xem AuditRecommendationService.DEFAULT_CODE/DEFAULT_CONTENT). */
+    private static final String DEFAULT_UPLOADER_RECOMMENDATION_CODE = "KNKT000";
+    private static final String DEFAULT_UPLOADER_RECOMMENDATION_NAME = "Kiến nghị chung";
     private static final String ATTACHMENT_ENTITY_NAME = "AUDIT_PROGRESS_REPORT";
     /** Dung chung voi AuditEngagementMonitoringService - quyen "thay tat ca" bo qua scoping theo
      * truong doan/truong nhom (vd cho vai tro giam sat/QA ngoai doan kiem toan). */
@@ -493,8 +497,14 @@ public class AuditTtssService {
             record.setApproverName(emptyToNull(row.get("approverName")));
             record.setControllerName(emptyToNull(row.get("controllerName")));
             record.setRelatedStaff(emptyToNull(row.get("relatedStaff")));
-            record.setUploaderRecommendationCode(emptyToNull(row.get("uploaderRecommendationCode")));
-            record.setUploaderRecommendationName(emptyToNull(row.get("uploaderRecommendationName")));
+            String uploaderRecommendationCode = emptyToNull(row.get("uploaderRecommendationCode"));
+            String uploaderRecommendationName = emptyToNull(row.get("uploaderRecommendationName"));
+            if (uploaderRecommendationCode == null) {
+                uploaderRecommendationCode = DEFAULT_UPLOADER_RECOMMENDATION_CODE;
+                uploaderRecommendationName = DEFAULT_UPLOADER_RECOMMENDATION_NAME;
+            }
+            record.setUploaderRecommendationCode(uploaderRecommendationCode);
+            record.setUploaderRecommendationName(uploaderRecommendationName);
             record.setAppendix(emptyToNull(row.get("appendix")));
 
             AuditTtssRecord persisted = ttssRepository.save(record);

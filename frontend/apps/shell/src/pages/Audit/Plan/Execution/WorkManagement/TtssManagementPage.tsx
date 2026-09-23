@@ -185,6 +185,18 @@ export function TtssManagementPage() {
       render: (v: string | null) => v ?? "-",
     },
     {
+      title: t("auditTtss.columns.uploaderRecommendationCode"),
+      width: 130,
+      ...getSearchColumnProps("uploaderRecommendationCode", searchLabels),
+      render: (v: string | null) => v ?? "-",
+    },
+    {
+      title: t("auditTtss.columns.uploaderRecommendationName"),
+      dataIndex: "uploaderRecommendationName",
+      width: 180,
+      render: (v: string | null) => v ?? "-",
+    },
+    {
       title: t("auditTtss.columns.teamRecommendation"),
       width: 200,
       render: (_: unknown, item: AuditTtssRecordItem) =>

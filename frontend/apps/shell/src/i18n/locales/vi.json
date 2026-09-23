@@ -1378,11 +1378,14 @@
         "defectCount": "Sai sót đã sửa/tổng",
         "note": "Ghi chú"
       },
+      "yearFilter": "Năm KT",
+      "allYears": "Tất cả năm",
       "defectColumns": {
         "managementCode": "Mã quản lý kiến nghị",
         "defectContent": "Sai sót liên quan đến kiến nghị",
         "customerEntry": "Khách hàng/Bút toán",
         "creditContract": "Hợp đồng tín dụng liên quan (LAV)",
+        "defectCode": "Mã tồn tại sai sót",
         "defectType": "Loại sai sót",
         "recommendationDefectStatus": "Hiện trạng chỉnh sửa sai sót liên quan đến kiến nghị",
         "customerStatus": "Hiện trạng chỉnh sửa sai sót liên quan đến khách hàng",
@@ -1404,11 +1407,35 @@
         "resolutionNumber": "Số NQ",
         "issueDate": "Ngày ban hành",
         "content": "Nội dung nghị quyết",
+        "workDetail": "Công việc chi tiết",
+        "fieldArea": "Lĩnh vực",
+        "unit": "Đơn vị",
+        "contactPerson": "Người liên hệ",
+        "relatedResolution": "NQ liên quan có cùng ND",
+        "completionDeadline": "Thời hạn hoàn thành",
+        "completionDeadlineBasis": "Căn cứ thời hạn hoàn thành",
         "implementation": "Tình hình thực hiện",
-        "status": "Đánh giá (Đã/Đang/Chưa thực hiện)",
-        "supervisor": "Người giám sát",
-        "issuanceEvaluation": "Đánh giá về việc ban hành nghị quyết của HĐTV",
-        "note": "Ghi chú"
+        "progressStatus": "Tình trạng",
+        "reason": "Lý do",
+        "issuanceEvaluation": "Đánh giá việc ban hành NQ",
+        "completionDate": "Thời gian hoàn thành",
+        "resolutionState": "Trạng thái NQ",
+        "followUpGroup": "Nhóm theo dõi",
+        "followerName": "Người theo dõi",
+        "proposal": "Đề xuất",
+        "proposalReason": "Lý do đề xuất",
+        "note": "Ghi chú",
+        "approvalStatus": "Trạng thái phê duyệt"
+      },
+      "progressStatus": {
+        "IN_PROGRESS": "Đang thực hiện",
+        "NOT_STARTED": "Chưa thực hiện",
+        "DONE": "Hoàn thành"
+      },
+      "followUpGroup": {
+        "QTDH": "QTĐH",
+        "TD": "TD",
+        "NTD": "NTD"
       },
       "form": {
         "createTitle": "Thêm nghị quyết",
@@ -1422,13 +1449,16 @@
         "reportNumber": "Số báo cáo",
         "reportDate": "Ngày báo cáo",
         "unit": "Đơn vị kiến nghị",
+        "recommendationTarget": "Đối tượng kiến nghị",
         "content": "Nội dung kiến nghị",
         "deadline": "Thời hạn hoàn thành",
         "implementation": "Tình hình thực hiện kiến nghị",
         "status": "Hiện trạng (đã/đang/chưa)",
         "evaluation": "Đánh giá tình hình thực hiện kiến nghị",
+        "lastEditedDate": "Thời gian chỉnh sửa",
         "deadlineState": "Trạng thái",
-        "note": "Ghi chú"
+        "note": "Ghi chú",
+        "approvalStatus": "Trạng thái phê duyệt"
       },
       "form": {
         "createTitle": "Thêm kiến nghị của Đơn vị",

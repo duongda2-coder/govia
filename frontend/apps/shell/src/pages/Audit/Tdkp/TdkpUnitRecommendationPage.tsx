@@ -14,20 +14,35 @@ import {
   type TdkpUnitRecommendationItem,
   type TdkpUnitRecommendationRequest,
 } from "../../../api/auditTdkp";
+import type { AssignmentApprovalStatus } from "../../../api/auditWorkManagement";
 import { useAuth } from "../../../auth/AuthContext";
-import { filterOption, fromApiDate, renderDate, renderDeadlineState, renderStatus, renderText, statusOptions, toApiDate, useTdkpLookups } from "./tdkpShared";
+import {
+  approvalStatusOptions,
+  filterOption,
+  fromApiDate,
+  renderApprovalStatus,
+  renderDate,
+  renderDeadlineState,
+  renderStatus,
+  renderText,
+  statusOptions,
+  toApiDate,
+  useTdkpLookups,
+} from "./tdkpShared";
 import type dayjs from "dayjs";
 
 interface FormValues {
   reportNumber?: string;
   reportDate?: dayjs.Dayjs;
   unitId?: string;
+  recommendationTarget?: string;
   content: string;
   deadline?: dayjs.Dayjs;
   implementation?: string;
   status?: TdkpStatus;
   evaluation?: string;
   note?: string;
+  approvalStatus?: AssignmentApprovalStatus;
 }
 
 /** Màn hình ZTC_TDKP_KTNB: quản lý, theo dõi và cập nhật tình hình thực hiện kiến nghị của Đơn vị đối với KTNB. */
@@ -82,12 +97,14 @@ export function TdkpUnitRecommendationPage() {
       reportNumber: target.reportNumber ?? undefined,
       reportDate: fromApiDate(target.reportDate),
       unitId: target.unitId ?? undefined,
+      recommendationTarget: target.recommendationTarget ?? undefined,
       content: target.content,
       deadline: fromApiDate(target.deadline),
       implementation: target.implementation ?? undefined,
       status: target.status ?? undefined,
       evaluation: target.evaluation ?? undefined,
       note: target.note ?? undefined,
+      approvalStatus: target.approvalStatus ?? undefined,
     });
     setModalOpen(true);
   };
@@ -105,12 +122,14 @@ export function TdkpUnitRecommendationPage() {
         reportNumber: values.reportNumber ?? null,
         reportDate: toApiDate(values.reportDate),
         unitId: values.unitId ?? null,
+        recommendationTarget: values.recommendationTarget ?? null,
         content: values.content,
         deadline: toApiDate(values.deadline),
         implementation: values.implementation ?? null,
         status: values.status ?? null,
         evaluation: values.evaluation ?? null,
         note: values.note ?? null,
+        approvalStatus: values.approvalStatus ?? null,
       };
       if (editing) {
         await updateTdkpUnitRecommendation(editing.id, request);
@@ -155,13 +174,16 @@ export function TdkpUnitRecommendationPage() {
     { title: t(`${c}.reportNumber`), width: 150, ...getSearchColumnProps("reportNumber", searchLabels) },
     { title: t(`${c}.reportDate`), dataIndex: "reportDate", width: 120, sorter: (a, b) => (a.reportDate ?? "").localeCompare(b.reportDate ?? ""), render: renderDate },
     { title: t(`${c}.unit`), width: 200, ...getSearchColumnProps("unitName", searchLabels) },
+    { title: t(`${c}.recommendationTarget`), dataIndex: "recommendationTarget", width: 180, render: renderText },
     { title: t(`${c}.content`), width: 320, ...getSearchColumnProps("content", searchLabels) },
     { title: t(`${c}.deadline`), dataIndex: "deadline", width: 130, sorter: (a, b) => (a.deadline ?? "").localeCompare(b.deadline ?? ""), render: renderDate },
     { title: t(`${c}.implementation`), dataIndex: "implementation", width: 280, render: renderText },
     { title: t(`${c}.status`), dataIndex: "status", width: 140, render: renderStatus(t) },
     { title: t(`${c}.evaluation`), dataIndex: "evaluation", width: 260, render: renderText },
+    { title: t(`${c}.lastEditedDate`), dataIndex: "lastEditedDate", width: 140, sorter: (a, b) => (a.lastEditedDate ?? "").localeCompare(b.lastEditedDate ?? ""), render: renderDate },
     { title: t(`${c}.deadlineState`), dataIndex: "deadlineState", width: 120, render: renderDeadlineState(t) },
     { title: t(`${c}.note`), dataIndex: "note", width: 220, render: renderText },
+    { title: t(`${c}.approvalStatus`), dataIndex: "approvalStatus", width: 150, render: renderApprovalStatus(t) },
   ];
 
   if (!canView) {
@@ -217,15 +239,24 @@ export function TdkpUnitRecommendationPage() {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item name="unitId" label={t(`${c}.unit`)}>
-            <Select
-              allowClear
-              showSearch
-              optionFilterProp="label"
-              filterOption={filterOption}
-              options={lookups.units.map((u) => ({ value: u.id, label: `${u.code} - ${u.name}` }))}
-            />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="unitId" label={t(`${c}.unit`)}>
+                <Select
+                  allowClear
+                  showSearch
+                  optionFilterProp="label"
+                  filterOption={filterOption}
+                  options={lookups.units.map((u) => ({ value: u.id, label: `${u.code} - ${u.name}` }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="recommendationTarget" label={t(`${c}.recommendationTarget`)}>
+                <Input maxLength={100} />
+              </Form.Item>
+            </Col>
+          </Row>
           <Form.Item name="content" label={t(`${c}.content`)} rules={[{ required: true }]}>
             <Input.TextArea rows={3} maxLength={2000} showCount />
           </Form.Item>
@@ -247,9 +278,18 @@ export function TdkpUnitRecommendationPage() {
           <Form.Item name="evaluation" label={t(`${c}.evaluation`)}>
             <Input.TextArea rows={2} maxLength={500} showCount />
           </Form.Item>
-          <Form.Item name="note" label={t(`${c}.note`)}>
-            <Input.TextArea rows={2} maxLength={500} showCount />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="note" label={t(`${c}.note`)}>
+                <Input.TextArea rows={2} maxLength={500} showCount />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="approvalStatus" label={t(`${c}.approvalStatus`)}>
+                <Select allowClear options={approvalStatusOptions(t)} />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
     </div>

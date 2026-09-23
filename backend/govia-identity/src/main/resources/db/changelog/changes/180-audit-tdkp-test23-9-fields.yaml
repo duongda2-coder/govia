@@ -1,0 +1,63 @@
+databaseChangeLog:
+
+  # ===================== test23.9: bo sung/bo cot theo phan hoi nguoi dung cho cac man hinh TDKP =====================
+  - changeSet:
+      id: 180-1-audit-tdkp-branch-defect-code
+      author: govia
+      comment: "TDKP CN - them Ma ton tai sai sot (truoc cot Loai sai sot)"
+      changes:
+        - addColumn:
+            tableName: audit_tdkp_branch_defect
+            columns:
+              - column: { name: defect_code, type: VARCHAR(50) }
+
+  - changeSet:
+      id: 180-2-audit-tdkp-unit-recommendation-fields
+      author: govia
+      comment: "TDKP KTNB - them Doi tuong kien nghi, Trang thai phe duyet"
+      changes:
+        - addColumn:
+            tableName: audit_tdkp_unit_recommendation
+            columns:
+              - column: { name: recommendation_target, type: VARCHAR(100) }
+              - column: { name: approval_status, type: VARCHAR(20) }
+
+  - changeSet:
+      id: 180-3-audit-tdkp-resolution-drop-fields
+      author: govia
+      comment: "TDKP NQ - bo cot Danh gia (Da/Dang/Chua thuc hien), Nguoi giam sat theo yeu cau nguoi dung"
+      changes:
+        - dropColumn:
+            tableName: audit_tdkp_resolution
+            columnName: status
+        - dropColumn:
+            tableName: audit_tdkp_resolution
+            columnName: supervisor
+        - modifyDataType:
+            tableName: audit_tdkp_resolution
+            columnName: issuance_evaluation
+            newDataType: VARCHAR(100)
+
+  - changeSet:
+      id: 180-4-audit-tdkp-resolution-new-fields
+      author: govia
+      comment: "TDKP NQ - them cac cot con thieu (Cong viec chi tiet, linh vuc, Don vi, Nguoi lien he, NQ lien quan, Thoi han/Thoi gian hoan thanh, Tinh trang, Nhom theo doi...)"
+      changes:
+        - addColumn:
+            tableName: audit_tdkp_resolution
+            columns:
+              - column: { name: work_detail, type: VARCHAR(255) }
+              - column: { name: field_area, type: VARCHAR(100) }
+              - column: { name: unit_id, type: UUID }
+              - column: { name: contact_person, type: VARCHAR(255) }
+              - column: { name: related_resolution, type: VARCHAR(100) }
+              - column: { name: completion_deadline, type: DATE }
+              - column: { name: completion_deadline_basis, type: VARCHAR(100) }
+              - column: { name: progress_status, type: VARCHAR(20) }
+              - column: { name: reason, type: VARCHAR(100) }
+              - column: { name: completion_date, type: DATE }
+              - column: { name: follow_up_group, type: VARCHAR(10) }
+              - column: { name: follower_name, type: VARCHAR(100) }
+              - column: { name: proposal, type: VARCHAR(100) }
+              - column: { name: proposal_reason, type: VARCHAR(100) }
+              - column: { name: approval_status, type: VARCHAR(20) }

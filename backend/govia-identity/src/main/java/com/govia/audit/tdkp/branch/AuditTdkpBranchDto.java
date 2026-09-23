@@ -62,6 +62,7 @@ public final class AuditTdkpBranchDto {
             @Size(max = 2000) String defectContent,
             @Size(max = 500) String customerEntry,
             @Size(max = 100) String creditContract,
+            @Size(max = 50) String defectCode,
             @Size(max = 255) String defectType,
             TdkpStatus customerStatus,
             @Size(max = 255) String relatedStaff
@@ -75,6 +76,7 @@ public final class AuditTdkpBranchDto {
             String defectContent,
             String customerEntry,
             String creditContract,
+            String defectCode,
             String defectType,
             /** Hiện trạng chỉnh sửa sai sót liên quan đến kiến nghị - hệ thống đếm và so sánh các dòng cùng kiến nghị. */
             TdkpStatus recommendationDefectStatus,

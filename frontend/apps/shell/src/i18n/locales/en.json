@@ -1378,11 +1378,14 @@
         "defectCount": "Errors corrected/total",
         "note": "Note"
       },
+      "yearFilter": "Audit year",
+      "allYears": "All years",
       "defectColumns": {
         "managementCode": "Recommendation code",
         "defectContent": "Error related to the recommendation",
         "customerEntry": "Customer / entry",
         "creditContract": "Related credit contract (LAV)",
+        "defectCode": "Error code",
         "defectType": "Error type",
         "recommendationDefectStatus": "Correction status of errors related to the recommendation",
         "customerStatus": "Correction status of errors related to the customer",
@@ -1404,11 +1407,35 @@
         "resolutionNumber": "Resolution no.",
         "issueDate": "Issue date",
         "content": "Resolution content",
+        "workDetail": "Work detail",
+        "fieldArea": "Area",
+        "unit": "Unit",
+        "contactPerson": "Contact person",
+        "relatedResolution": "Related resolution (same content)",
+        "completionDeadline": "Completion deadline",
+        "completionDeadlineBasis": "Basis for completion deadline",
         "implementation": "Implementation status",
-        "status": "Evaluation (Done/In progress/Not started)",
-        "supervisor": "Supervisor",
+        "progressStatus": "Progress",
+        "reason": "Reason",
         "issuanceEvaluation": "Evaluation of the resolution issuance",
-        "note": "Note"
+        "completionDate": "Completion date",
+        "resolutionState": "Resolution status",
+        "followUpGroup": "Follow-up group",
+        "followerName": "Follower",
+        "proposal": "Proposal",
+        "proposalReason": "Reason for proposal",
+        "note": "Note",
+        "approvalStatus": "Approval status"
+      },
+      "progressStatus": {
+        "IN_PROGRESS": "In progress",
+        "NOT_STARTED": "Not started",
+        "DONE": "Completed"
+      },
+      "followUpGroup": {
+        "QTDH": "QTĐH",
+        "TD": "TD",
+        "NTD": "NTD"
       },
       "form": {
         "createTitle": "Add resolution",
@@ -1422,13 +1449,16 @@
         "reportNumber": "Report number",
         "reportDate": "Report date",
         "unit": "Recommending unit",
+        "recommendationTarget": "Recommendation target",
         "content": "Recommendation",
         "deadline": "Completion deadline",
         "implementation": "Implementation status",
         "status": "Status (Done/In progress/Not started)",
         "evaluation": "Evaluation of implementation",
+        "lastEditedDate": "Last edited date",
         "deadlineState": "Timeliness",
-        "note": "Note"
+        "note": "Note",
+        "approvalStatus": "Approval status"
       },
       "form": {
         "createTitle": "Add unit recommendation",

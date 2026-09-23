@@ -45,6 +45,7 @@ interface DefectFormValues {
   defectContent?: string;
   customerEntry?: string;
   creditContract?: string;
+  defectCode?: string;
   defectType?: string;
   customerStatus?: TdkpStatus;
   relatedStaff?: string;
@@ -74,6 +75,7 @@ export function TdkpBranchPage() {
   const [selected, setSelected] = useState<TdkpBranchRecommendationItem[]>([]);
   const [selectedDefects, setSelectedDefects] = useState<TdkpBranchDefectItem[]>([]);
   const [staffOptions, setStaffOptions] = useState<string[]>([]);
+  const [yearFilter, setYearFilter] = useState<number | undefined>(undefined);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<TdkpBranchRecommendationItem | null>(null);
@@ -244,6 +246,7 @@ export function TdkpBranchPage() {
       defectContent: target.defectContent ?? undefined,
       customerEntry: target.customerEntry ?? undefined,
       creditContract: target.creditContract ?? undefined,
+      defectCode: target.defectCode ?? undefined,
       defectType: target.defectType ?? undefined,
       customerStatus: target.customerStatus ?? undefined,
       relatedStaff: target.relatedStaff ?? undefined,
@@ -266,6 +269,7 @@ export function TdkpBranchPage() {
         defectContent: values.defectContent ?? null,
         customerEntry: values.customerEntry ?? null,
         creditContract: values.creditContract ?? null,
+        defectCode: values.defectCode ?? null,
         defectType: values.defectType ?? null,
         customerStatus: values.customerStatus ?? null,
         relatedStaff: values.relatedStaff ?? null,
@@ -337,6 +341,7 @@ export function TdkpBranchPage() {
     { title: t(`${d}.defectContent`), dataIndex: "defectContent", width: 320, render: renderText },
     { title: t(`${d}.customerEntry`), dataIndex: "customerEntry", width: 240, render: renderText },
     { title: t(`${d}.creditContract`), dataIndex: "creditContract", width: 180, render: renderText },
+    { title: t(`${d}.defectCode`), dataIndex: "defectCode", width: 140, render: renderText },
     { title: t(`${d}.defectType`), dataIndex: "defectType", width: 200, render: renderText },
     { title: t(`${d}.recommendationDefectStatus`), dataIndex: "recommendationDefectStatus", width: 180, render: renderStatus(t) },
     { title: t(`${d}.customerStatus`), dataIndex: "customerStatus", width: 180, render: renderStatus(t) },
@@ -352,21 +357,33 @@ export function TdkpBranchPage() {
     label: name,
   }));
 
+  const yearOptions = Array.from(new Set(items.map((item) => item.auditYear).filter((year): year is number => year != null))).sort((a, b) => b - a);
+  const filteredItems = yearFilter == null ? items : items.filter((item) => item.auditYear === yearFilter);
+
   return (
     <div>
       <Typography.Title level={4}>{t("auditTdkp.branch.title")}</Typography.Title>
-      {canTransfer && (
-        <Space style={{ marginBottom: 16 }} wrap>
+      <Space style={{ marginBottom: 16 }} wrap>
+        {canTransfer && (
           <Button icon={<SwapOutlined />} loading={transferring} onClick={handleTransfer}>
             {t("auditTdkp.branch.transferButton")}
           </Button>
-        </Space>
-      )}
+        )}
+        <Typography.Text>{t("auditTdkp.branch.yearFilter")}</Typography.Text>
+        <Select
+          style={{ width: 140 }}
+          allowClear
+          placeholder={t("auditTdkp.branch.allYears")}
+          options={yearOptions.map((year) => ({ value: year, label: year }))}
+          value={yearFilter}
+          onChange={setYearFilter}
+        />
+      </Space>
       <Typography.Title level={5}>{t("auditTdkp.branch.summaryTitle")}</Typography.Title>
       <CrudTable<TdkpBranchRecommendationItem>
         tableId="audit.tdkp.branch.summary"
         columns={columns}
-        dataSource={items}
+        dataSource={filteredItems}
         rowKey="id"
         loading={loading}
         onAdd={canCreate ? openCreate : undefined}
@@ -498,6 +515,11 @@ export function TdkpBranchPage() {
             <Col span={12}>
               <Form.Item name="creditContract" label={t(`${d}.creditContract`)}>
                 <Input maxLength={100} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="defectCode" label={t(`${d}.defectCode`)}>
+                <Input maxLength={50} />
               </Form.Item>
             </Col>
             <Col span={12}>
