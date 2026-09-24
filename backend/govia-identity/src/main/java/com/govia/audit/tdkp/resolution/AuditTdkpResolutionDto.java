@@ -17,6 +17,7 @@ public final class AuditTdkpResolutionDto {
     public record Request(
             @NotBlank @Size(max = 20) String resolutionNumber,
             LocalDate issueDate,
+            @Size(max = 255) String summary,
             @Size(max = 500) String content,
             @Size(max = 255) String workDetail,
             @Size(max = 100) String fieldArea,
@@ -44,6 +45,7 @@ public final class AuditTdkpResolutionDto {
             String code,
             String resolutionNumber,
             LocalDate issueDate,
+            String summary,
             String content,
             String workDetail,
             String fieldArea,

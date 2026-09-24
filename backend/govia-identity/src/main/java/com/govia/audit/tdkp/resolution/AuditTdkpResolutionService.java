@@ -97,7 +97,8 @@ public class AuditTdkpResolutionService {
 
     private List<ExportColumn> columns() {
         return List.of(new ExportColumn("code", "Mã quản lý kiến nghị nghị quyết"), new ExportColumn("resolutionNumber", "SỐ NQ"),
-                new ExportColumn("issueDate", "NGÀY BAN HÀNH"), new ExportColumn("content", "NỘI DUNG NGHỊ QUYẾT"),
+                new ExportColumn("issueDate", "NGÀY BAN HÀNH"), new ExportColumn("summary", "TRÍCH YẾU NGHỊ QUYẾT"),
+                new ExportColumn("content", "NỘI DUNG NGHỊ QUYẾT"),
                 new ExportColumn("workDetail", "Công việc chi tiết"), new ExportColumn("fieldArea", "Lĩnh vực"), new ExportColumn("unit", "Đơn vị"),
                 new ExportColumn("contactPerson", "Người liên hệ"), new ExportColumn("relatedResolution", "NQ liên quan có cùng ND"),
                 new ExportColumn("completionDeadline", "Thời hạn hoàn thành"), new ExportColumn("completionDeadlineBasis", "Căn cứ thời hạn hoàn thành"),
@@ -116,6 +117,7 @@ public class AuditTdkpResolutionService {
             row.put("code", r.code());
             row.put("resolutionNumber", r.resolutionNumber());
             row.put("issueDate", r.issueDate());
+            row.put("summary", r.summary());
             row.put("content", r.content());
             row.put("workDetail", r.workDetail());
             row.put("fieldArea", r.fieldArea());
@@ -160,7 +162,8 @@ public class AuditTdkpResolutionService {
                     throw new BusinessException("IMPORT_MISSING_REQUIRED", "Thieu So NQ");
                 }
                 AuditTdkpResolutionDto.Request request = new AuditTdkpResolutionDto.Request(row.get("resolutionNumber").trim(),
-                        TdkpSupport.parseDate(row.get("issueDate")), TdkpSupport.emptyToNull(row.get("content")),
+                        TdkpSupport.parseDate(row.get("issueDate")), TdkpSupport.emptyToNull(row.get("summary")),
+                        TdkpSupport.emptyToNull(row.get("content")),
                         TdkpSupport.emptyToNull(row.get("workDetail")), TdkpSupport.emptyToNull(row.get("fieldArea")),
                         masterData.resolveUnit(row.get("unit"), "Don vi"), TdkpSupport.emptyToNull(row.get("contactPerson")),
                         TdkpSupport.emptyToNull(row.get("relatedResolution")), TdkpSupport.parseDate(row.get("completionDeadline")),
@@ -189,6 +192,7 @@ public class AuditTdkpResolutionService {
     private void apply(AuditTdkpResolution item, AuditTdkpResolutionDto.Request request) {
         item.setResolutionNumber(request.resolutionNumber().trim());
         item.setIssueDate(request.issueDate());
+        item.setSummary(TdkpSupport.emptyToNull(request.summary()));
         item.setContent(TdkpSupport.emptyToNull(request.content()));
         item.setWorkDetail(TdkpSupport.emptyToNull(request.workDetail()));
         item.setFieldArea(TdkpSupport.emptyToNull(request.fieldArea()));
@@ -219,8 +223,8 @@ public class AuditTdkpResolutionService {
     private AuditTdkpResolutionDto.Response toResponse(AuditTdkpResolution item, Map<UUID, AuditObjectUnit> units) {
         AuditObjectUnit unit = item.getUnitId() == null ? null : units.get(item.getUnitId());
         String state = TdkpSupport.deadlineState(item.getCompletionDeadline());
-        return new AuditTdkpResolutionDto.Response(item.getId(), item.getCode(), item.getResolutionNumber(), item.getIssueDate(), item.getContent(),
-                item.getWorkDetail(), item.getFieldArea(), item.getUnitId(), unit == null ? null : unit.getCode(), unit == null ? null : unit.getName(),
+        return new AuditTdkpResolutionDto.Response(item.getId(), item.getCode(), item.getResolutionNumber(), item.getIssueDate(), item.getSummary(),
+                item.getContent(), item.getWorkDetail(), item.getFieldArea(), item.getUnitId(), unit == null ? null : unit.getCode(), unit == null ? null : unit.getName(),
                 item.getContactPerson(), item.getRelatedResolution(), item.getCompletionDeadline(), item.getCompletionDeadlineBasis(), item.getImplementation(),
                 item.getProgressStatus(), TdkpStatus.labelOf(item.getProgressStatus()), item.getReason(), item.getIssuanceEvaluation(), item.getCompletionDate(),
                 state, TdkpSupport.deadlineLabel(state), item.getFollowUpGroup(), followUpGroupLabel(item.getFollowUpGroup()), item.getFollowerName(),

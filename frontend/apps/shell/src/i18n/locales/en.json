@@ -1406,6 +1406,7 @@
         "code": "Resolution follow-up code",
         "resolutionNumber": "Resolution no.",
         "issueDate": "Issue date",
+        "summary": "Resolution summary",
         "content": "Resolution content",
         "workDetail": "Work detail",
         "fieldArea": "Area",

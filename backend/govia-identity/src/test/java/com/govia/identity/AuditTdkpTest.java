@@ -265,21 +265,23 @@ class AuditTdkpTest {
 
     @Test
     void resolutionAndUnitRecommendationGenerateCodesAndValidateImport() throws Exception {
-        AuditTdkpResolutionDto.Response nq1 = resolutionService.create(new AuditTdkpResolutionDto.Request("BC012021/HĐTV", LocalDate.of(2021, 3, 17), "Triển khai kế hoạch",
+        AuditTdkpResolutionDto.Response nq1 = resolutionService.create(new AuditTdkpResolutionDto.Request("BC012021/HĐTV", LocalDate.of(2021, 3, 17), null, "Triển khai kế hoạch",
                 null, null, null, null, null, null, null, "Đang đánh giá", TdkpStatus.IN_PROGRESS, null, "Đang đánh giá", null, null, "Nguyễn Thành Công", null, null, null, null));
-        AuditTdkpResolutionDto.Response nq2 = resolutionService.create(new AuditTdkpResolutionDto.Request("02/NQ", null, null, null, null, null, null, null, null, null,
+        AuditTdkpResolutionDto.Response nq2 = resolutionService.create(new AuditTdkpResolutionDto.Request("02/NQ", null, null, null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null, null, null, null));
         assertThat(nq1.code()).isEqualTo("NQ001");
         assertThat(nq2.code()).isEqualTo("NQ002");
 
-        AuditTdkpUnitRecommendationDto.Response kn = unitService.create(new AuditTdkpUnitRecommendationDto.Request("BC01", LocalDate.of(2021, 3, 17), unit.getId(), null,
+        AuditTdkpUnitRecommendationDto.Response kn = unitService.create(new AuditTdkpUnitRecommendationDto.Request("BC01", LocalDate.of(2021, 3, 17), unit.getName(), null,
                 "Xây dựng quy trình", LocalDate.of(2021, 3, 17), "Đang thực hiện", TdkpStatus.IN_PROGRESS, "Đúng hạn", null, null));
         assertThat(kn.code()).isEqualTo("KNIA001");
         assertThat(kn.deadlineState()).isEqualTo("OVERDUE");
+        // "Đơn vị kiến nghị" gio la text tu do (khong con FK toi danh muc doi tuong kiem toan) - dong
+        // BC03 thieu "Nội dung kiến nghị" (bat buoc) de van giu duoc 1 dong loi trong bai test nay.
         ImportResult result = unitService.importFromExcel(xlsx(List.of(
                 List.of("Số báo cáo", "Đơn vị kiến nghị", "Nội dung kiến nghị", "Hiện trạng"),
                 List.of("BC02", "Chi nhánh Điện Biên", "Nội dung hợp lệ", "Chưa thực hiện"),
-                List.of("BC03", "Đơn vị lạ", "Đơn vị không có trong danh mục", ""))));
+                List.of("BC03", "Đơn vị lạ", "", ""))));
         assertThat(result.successCount()).isEqualTo(1);
         assertThat(result.failureCount()).isEqualTo(1);
         assertThat(unitService.list()).extracting(AuditTdkpUnitRecommendationDto.Response::code).contains("KNIA001", "KNIA002");
@@ -297,8 +299,8 @@ class AuditTdkpTest {
                 TdkpStatus.NOT_STARTED, null, null));
         branchService.createDefect(new AuditTdkpBranchDto.DefectRequest(rec.id(), "Sai sót A", "Khách A", "LAV-1", null, "Loại 1", TdkpStatus.DONE, null));
         branchService.createDefect(new AuditTdkpBranchDto.DefectRequest(rec.id(), "Sai sót B", "Khách B", "LAV-2", null, "Loại 2", TdkpStatus.NOT_STARTED, null));
-        unitService.create(new AuditTdkpUnitRecommendationDto.Request("BC-DV", LocalDate.of(2026, 1, 5), unit.getId(), null, "Kiến nghị đơn vị", null, null, TdkpStatus.DONE, null, null, null));
-        resolutionService.create(new AuditTdkpResolutionDto.Request("11/NQ-HĐTV", LocalDate.of(2026, 1, 21), "Bổ sung phương án", null, null, null, null, null, null, null,
+        unitService.create(new AuditTdkpUnitRecommendationDto.Request("BC-DV", LocalDate.of(2026, 1, 5), unit.getName(), null, "Kiến nghị đơn vị", null, null, TdkpStatus.DONE, null, null, null));
+        resolutionService.create(new AuditTdkpResolutionDto.Request("11/NQ-HĐTV", LocalDate.of(2026, 1, 21), null, "Bổ sung phương án", null, null, null, null, null, null, null,
                 "Đang làm", TdkpStatus.IN_PROGRESS, null, "Tốt", null, null, "NTC", null, null, null, null));
 
         LocalDate asOf = LocalDate.of(2026, 2, 28);

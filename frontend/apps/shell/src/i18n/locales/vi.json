@@ -1406,6 +1406,7 @@
         "code": "Mã quản lý nghị quyết",
         "resolutionNumber": "Số NQ",
         "issueDate": "Ngày ban hành",
+        "summary": "Trích yếu nghị quyết",
         "content": "Nội dung nghị quyết",
         "workDetail": "Công việc chi tiết",
         "fieldArea": "Lĩnh vực",

@@ -8,12 +8,14 @@ import com.govia.audit.planengagement.dto.AuditObjectUnitOption;
 import com.govia.audit.planengagement.dto.EmployeeOption;
 import com.govia.audit.planengagement.service.AuditEngagementService;
 import com.govia.core.export.ImportResult;
+import com.govia.core.security.CurrentUserPrincipal;
 import com.govia.core.web.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +45,15 @@ public class AuditEngagementController {
     @PreAuthorize("hasAuthority('PERM_AUDIT.PLAN_ENGAGEMENT.VIEW')")
     public ApiResponse<List<AuditEngagementResponse>> list() {
         return ApiResponse.ok(service.list());
+    }
+
+    /** "Chỉ hiện những Cuộc kiểm toán mà được phân công" - dung cho cac man hinh chon CKT trong
+     * pham vi cong viec cua nguoi dung (vd nut "Mã cuộc kiểm toán" o "Quản lý TTSS & Kiến nghị"),
+     * khac voi list() tra ve TAT CA CKT cua tenant. */
+    @GetMapping("/assigned")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.PLAN_ENGAGEMENT.VIEW')")
+    public ApiResponse<List<AuditEngagementResponse>> listAssigned(@AuthenticationPrincipal CurrentUserPrincipal principal) {
+        return ApiResponse.ok(service.listAssignedToCurrentUser(principal));
     }
 
     @GetMapping("/{id}")

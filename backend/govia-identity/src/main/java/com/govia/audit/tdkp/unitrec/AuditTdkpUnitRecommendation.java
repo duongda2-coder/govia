@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 /** Kiến nghị của Đơn vị/Bộ phận đối với KTNB (sheet 6 ZTC_TDKP_KTNB). */
 @Getter
@@ -31,9 +30,10 @@ public class AuditTdkpUnitRecommendation extends BaseEntity {
     @Column(name = "report_date")
     private LocalDate reportDate;
 
-    /** "Đơn vị kiến nghị" - chọn trong đối tượng kiểm toán (ztc_dt_kt1, ztc_dt_kt2). */
-    @Column(name = "unit_id", columnDefinition = "uuid")
-    private UUID unitId;
+    /** "Đơn vị kiến nghị" - nhập tay tự do theo phan hoi nguoi dung (test24.9), KHONG chon tu danh
+     * muc doi tuong kiem toan nhu truoc. */
+    @Column(name = "unit_name", length = 255)
+    private String unitName;
 
     /** "Đối tượng kiến nghị" - nhập tay tự do (khac voi unitId = don vi kien nghi). */
     @Column(name = "recommendation_target", length = 100)

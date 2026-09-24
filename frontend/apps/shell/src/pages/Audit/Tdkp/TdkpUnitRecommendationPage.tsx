@@ -18,7 +18,6 @@ import type { AssignmentApprovalStatus } from "../../../api/auditWorkManagement"
 import { useAuth } from "../../../auth/AuthContext";
 import {
   approvalStatusOptions,
-  filterOption,
   fromApiDate,
   renderApprovalStatus,
   renderDate,
@@ -27,14 +26,13 @@ import {
   renderText,
   statusOptions,
   toApiDate,
-  useTdkpLookups,
 } from "./tdkpShared";
 import type dayjs from "dayjs";
 
 interface FormValues {
   reportNumber?: string;
   reportDate?: dayjs.Dayjs;
-  unitId?: string;
+  unitName?: string;
   recommendationTarget?: string;
   content: string;
   deadline?: dayjs.Dayjs;
@@ -58,7 +56,6 @@ export function TdkpUnitRecommendationPage() {
   const canImport = hasPermission("AUDIT.TDKP_KTNB.IMPORT");
   const { getSearchColumnProps } = useClientSearchColumn<TdkpUnitRecommendationItem>();
   const searchLabels = { confirmText: t("common.search"), resetText: t("common.reset") };
-  const lookups = useTdkpLookups(() => message.error(t("auditTdkp.messages.lookupError")));
 
   const [items, setItems] = useState<TdkpUnitRecommendationItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -96,7 +93,7 @@ export function TdkpUnitRecommendationPage() {
     form.setFieldsValue({
       reportNumber: target.reportNumber ?? undefined,
       reportDate: fromApiDate(target.reportDate),
-      unitId: target.unitId ?? undefined,
+      unitName: target.unitName ?? undefined,
       recommendationTarget: target.recommendationTarget ?? undefined,
       content: target.content,
       deadline: fromApiDate(target.deadline),
@@ -121,7 +118,7 @@ export function TdkpUnitRecommendationPage() {
       const request: TdkpUnitRecommendationRequest = {
         reportNumber: values.reportNumber ?? null,
         reportDate: toApiDate(values.reportDate),
-        unitId: values.unitId ?? null,
+        unitName: values.unitName ?? null,
         recommendationTarget: values.recommendationTarget ?? null,
         content: values.content,
         deadline: toApiDate(values.deadline),
@@ -241,14 +238,8 @@ export function TdkpUnitRecommendationPage() {
           </Row>
           <Row gutter={16}>
             <Col span={12}>
-              <Form.Item name="unitId" label={t(`${c}.unit`)}>
-                <Select
-                  allowClear
-                  showSearch
-                  optionFilterProp="label"
-                  filterOption={filterOption}
-                  options={lookups.units.map((u) => ({ value: u.id, label: `${u.code} - ${u.name}` }))}
-                />
+              <Form.Item name="unitName" label={t(`${c}.unit`)}>
+                <Input maxLength={255} />
               </Form.Item>
             </Col>
             <Col span={12}>

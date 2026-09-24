@@ -12,7 +12,7 @@ import {
   uploadAuditTtssFile,
   type AuditTtssRecordItem,
 } from "../../../../../api/auditTtss";
-import { listAuditEngagements, type AuditEngagementItem } from "../../../../../api/auditEngagement";
+import { listAssignedAuditEngagements, type AuditEngagementItem } from "../../../../../api/auditEngagement";
 import { useAuth } from "../../../../../auth/AuthContext";
 import { RecommendationCatalogModal } from "./RecommendationCatalogModal";
 import { LinkRecommendationModal } from "./LinkRecommendationModal";
@@ -40,7 +40,7 @@ export function TtssManagementPage() {
 
   useEffect(() => {
     if (!canView) return;
-    listAuditEngagements().then(setEngagements).catch(() => setEngagements([]));
+    listAssignedAuditEngagements().then(setEngagements).catch(() => setEngagements([]));
   }, [canView]);
 
   const load = useCallback(

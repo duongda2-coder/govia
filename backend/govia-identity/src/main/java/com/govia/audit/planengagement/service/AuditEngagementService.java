@@ -11,11 +11,14 @@ import com.govia.audit.planengagement.entity.AuditEngagementRelatedUnit;
 import com.govia.audit.planengagement.entity.AuditEngagementStatus;
 import com.govia.audit.employeecapability.entity.AuditEmployeeCapability;
 import com.govia.audit.employeecapability.repository.AuditEmployeeCapabilityRepository;
+import com.govia.audit.planengagement.entity.AuditEngagementGroupMember;
+import com.govia.audit.planengagement.repository.AuditEngagementGroupMemberRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementGroupRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRelatedUnitRepository;
 import com.govia.audit.planengagement.repository.AuditEngagementRepository;
 import com.govia.audit.planengagement.processengagement.entity.AuditProcessEngagement;
 import com.govia.audit.planengagement.processengagement.repository.AuditProcessEngagementRepository;
+import com.govia.audit.planengagement.supervisionteam.repository.AuditSupervisionTeamMemberRepository;
 import com.govia.audit.riskscoring.masterdata.entity.AuditObjectUnit;
 import com.govia.audit.riskscoring.masterdata.repository.AuditObjectUnitRepository;
 import com.govia.core.audit.AuditAction;
@@ -25,6 +28,7 @@ import com.govia.core.export.ExcelImportService;
 import com.govia.core.export.ExportColumn;
 import com.govia.core.export.ImportResult;
 import com.govia.core.export.WordExportService;
+import com.govia.core.security.CurrentUserPrincipal;
 import com.govia.core.tenant.TenantContext;
 import com.govia.core.web.BusinessException;
 import com.govia.identity.entity.Employee;
@@ -41,6 +45,7 @@ import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,10 +59,15 @@ import java.util.stream.Collectors;
 public class AuditEngagementService {
 
     private static final DateTimeFormatter IMPORT_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
+    /** Dung chung voi AuditTtssService/AuditEngagementMonitoringService - quyen "thay tat ca" bo qua
+     * scoping theo phan cong (vd cho vai tro giam sat/QA ngoai doan kiem toan). */
+    private static final String PERMISSION_VIEW_ALL = "AUDIT.PLAN_ENGAGEMENT.VIEW_ALL";
 
     private final AuditEngagementRepository repository;
     private final AuditEngagementRelatedUnitRepository relatedUnitRepository;
     private final AuditEngagementGroupRepository groupRepository;
+    private final AuditEngagementGroupMemberRepository groupMemberRepository;
+    private final AuditSupervisionTeamMemberRepository supervisionTeamMemberRepository;
     private final AuditObjectUnitRepository auditObjectUnitRepository;
     private final AuditProcessEngagementRepository processEngagementRepository;
     private final EmployeeRepository employeeRepository;
@@ -69,7 +79,9 @@ public class AuditEngagementService {
     private final ExcelImportService excelImportService;
 
     public AuditEngagementService(AuditEngagementRepository repository, AuditEngagementRelatedUnitRepository relatedUnitRepository,
-                                   AuditEngagementGroupRepository groupRepository, AuditObjectUnitRepository auditObjectUnitRepository,
+                                   AuditEngagementGroupRepository groupRepository, AuditEngagementGroupMemberRepository groupMemberRepository,
+                                   AuditSupervisionTeamMemberRepository supervisionTeamMemberRepository,
+                                   AuditObjectUnitRepository auditObjectUnitRepository,
                                    AuditProcessEngagementRepository processEngagementRepository,
                                    EmployeeRepository employeeRepository, UserAccountRepository userAccountRepository,
                                    AuditEmployeeCapabilityRepository employeeCapabilityRepository, AuditLogService auditLogService,
@@ -78,6 +90,8 @@ public class AuditEngagementService {
         this.repository = repository;
         this.relatedUnitRepository = relatedUnitRepository;
         this.groupRepository = groupRepository;
+        this.groupMemberRepository = groupMemberRepository;
+        this.supervisionTeamMemberRepository = supervisionTeamMemberRepository;
         this.auditObjectUnitRepository = auditObjectUnitRepository;
         this.processEngagementRepository = processEngagementRepository;
         this.employeeRepository = employeeRepository;
@@ -144,6 +158,43 @@ public class AuditEngagementService {
     public List<AuditEngagementResponse> list() {
         UUID tenantId = TenantContext.getTenantId();
         List<AuditEngagement> items = repository.findByTenantIdOrderByCreatedAtDesc(tenantId);
+        Map<UUID, AuditObjectUnit> units = unitsById(items.stream().map(AuditEngagement::getAuditObjectUnitId).toList());
+        Map<UUID, Employee> employees = employeesById(items.stream().map(AuditEngagement::getTeamLeadEmployeeId).toList());
+        return items.stream().map(item -> toResponse(item, units, employees)).toList();
+    }
+
+    /** "Chỉ hiện những Cuộc kiểm toán mà được phân công" (vd nut "Mã cuộc kiểm toán" o man hinh
+     * "Quản lý TTSS & Kiến nghị") - khac voi list() tra ve TAT CA CKT cua tenant (dung cho man hinh
+     * quan ly CKT). "Duoc phan cong" = truong doan, HOAC thanh vien 1 nhom cua CKT do
+     * (AuditEngagementGroupMember), HOAC thanh vien to giam sat (AuditSupervisionTeamMember); co
+     * quyen AUDIT.PLAN_ENGAGEMENT.VIEW_ALL thi thay tat ca (vd vai tro QA/giam sat toan he thong). */
+    @Transactional(readOnly = true)
+    public List<AuditEngagementResponse> listAssignedToCurrentUser(CurrentUserPrincipal principal) {
+        if (principal != null && principal.permissions() != null && principal.permissions().contains(PERMISSION_VIEW_ALL)) {
+            return list();
+        }
+        UUID tenantId = TenantContext.getTenantId();
+        UUID employeeId = principal == null || principal.employeeCode() == null ? null
+                : employeeRepository.findByTenantIdAndEmployeeCode(tenantId, principal.employeeCode()).map(Employee::getId).orElse(null);
+        if (employeeId == null) {
+            return List.of();
+        }
+        Set<UUID> engagementIds = new HashSet<>();
+        repository.findByTenantIdOrderByCreatedAtDesc(tenantId).stream()
+                .filter(e -> employeeId.equals(e.getTeamLeadEmployeeId()))
+                .forEach(e -> engagementIds.add(e.getId()));
+        List<UUID> groupIds = groupMemberRepository.findByTenantIdAndEmployeeId(tenantId, employeeId).stream()
+                .map(AuditEngagementGroupMember::getGroupId).distinct().toList();
+        groupRepository.findAllById(groupIds).forEach(g -> engagementIds.add(g.getAuditEngagementId()));
+        supervisionTeamMemberRepository.findByTenantIdAndEmployeeId(tenantId, employeeId)
+                .forEach(m -> engagementIds.add(m.getEngagementId()));
+        if (engagementIds.isEmpty()) {
+            return List.of();
+        }
+        List<AuditEngagement> items = repository.findAllById(engagementIds).stream()
+                .filter(e -> e.getTenantId().equals(tenantId))
+                .sorted(Comparator.comparing(AuditEngagement::getCreatedAt).reversed())
+                .toList();
         Map<UUID, AuditObjectUnit> units = unitsById(items.stream().map(AuditEngagement::getAuditObjectUnitId).toList());
         Map<UUID, Employee> employees = employeesById(items.stream().map(AuditEngagement::getTeamLeadEmployeeId).toList());
         return items.stream().map(item -> toResponse(item, units, employees)).toList();

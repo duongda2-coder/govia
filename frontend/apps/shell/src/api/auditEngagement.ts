@@ -101,6 +101,12 @@ export async function listAuditEngagements(): Promise<AuditEngagementItem[]> {
   return res.data.data;
 }
 
+/** Chỉ trả về các CKT mà người dùng hiện tại được phân công (trưởng đoàn/thành viên nhóm/tổ giám sát). */
+export async function listAssignedAuditEngagements(): Promise<AuditEngagementItem[]> {
+  const res = await httpClient.get<ApiResponse<AuditEngagementItem[]>>(`${BASE}/assigned`);
+  return res.data.data;
+}
+
 export async function getAuditEngagement(id: string): Promise<AuditEngagementItem> {
   const res = await httpClient.get<ApiResponse<AuditEngagementItem>>(`${BASE}/${id}`);
   return res.data.data;

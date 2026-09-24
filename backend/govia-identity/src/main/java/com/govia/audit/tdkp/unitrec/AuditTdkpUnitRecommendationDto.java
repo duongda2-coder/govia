@@ -17,7 +17,7 @@ public final class AuditTdkpUnitRecommendationDto {
     public record Request(
             @Size(max = 20) String reportNumber,
             LocalDate reportDate,
-            UUID unitId,
+            @Size(max = 255) String unitName,
             @Size(max = 100) String recommendationTarget,
             @NotBlank @Size(max = 2000) String content,
             LocalDate deadline,
@@ -34,8 +34,6 @@ public final class AuditTdkpUnitRecommendationDto {
             String code,
             String reportNumber,
             LocalDate reportDate,
-            UUID unitId,
-            String unitCode,
             String unitName,
             String recommendationTarget,
             String content,

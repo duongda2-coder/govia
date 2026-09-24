@@ -34,6 +34,10 @@ public class AuditTdkpResolution extends BaseEntity {
     @Column(name = "issue_date")
     private LocalDate issueDate;
 
+    /** "Trích yếu nghị quyết". */
+    @Column(name = "summary", length = 255)
+    private String summary;
+
     @Column(name = "content", length = 500)
     private String content;
 

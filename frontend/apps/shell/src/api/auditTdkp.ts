@@ -276,6 +276,7 @@ export interface TdkpResolutionItem {
   code: string;
   resolutionNumber: string;
   issueDate: string | null;
+  summary: string | null;
   content: string | null;
   workDetail: string | null;
   fieldArea: string | null;
@@ -307,6 +308,7 @@ export interface TdkpResolutionItem {
 export interface TdkpResolutionRequest {
   resolutionNumber: string;
   issueDate: string | null;
+  summary: string | null;
   content: string | null;
   workDetail: string | null;
   fieldArea: string | null;
@@ -342,8 +344,6 @@ export interface TdkpUnitRecommendationItem {
   code: string;
   reportNumber: string | null;
   reportDate: string | null;
-  unitId: string | null;
-  unitCode: string | null;
   unitName: string | null;
   recommendationTarget: string | null;
   content: string;
@@ -363,7 +363,7 @@ export interface TdkpUnitRecommendationItem {
 export interface TdkpUnitRecommendationRequest {
   reportNumber: string | null;
   reportDate: string | null;
-  unitId: string | null;
+  unitName: string | null;
   recommendationTarget: string | null;
   content: string;
   deadline: string | null;

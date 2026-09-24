@@ -1,0 +1,25 @@
+databaseChangeLog:
+
+  # ===================== test24.9: sua loi mo ta theo phan hoi nguoi dung cho cac man hinh TDKP/TTSS =====================
+  - changeSet:
+      id: 181-1-audit-tdkp-unit-recommendation-free-text-unit
+      author: govia
+      comment: "TDKP KTNB - Don vi kien nghi nhap tu do thay vi chon danh muc doi tuong kiem toan"
+      changes:
+        - dropColumn:
+            tableName: audit_tdkp_unit_recommendation
+            columnName: unit_id
+        - addColumn:
+            tableName: audit_tdkp_unit_recommendation
+            columns:
+              - column: { name: unit_name, type: VARCHAR(255) }
+
+  - changeSet:
+      id: 181-2-audit-tdkp-resolution-summary
+      author: govia
+      comment: "TDKP NQ - them cot Trich yeu nghi quyet (truoc Noi dung nghi quyet)"
+      changes:
+        - addColumn:
+            tableName: audit_tdkp_resolution
+            columns:
+              - column: { name: summary, type: VARCHAR(255) }

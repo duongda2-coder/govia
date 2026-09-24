@@ -257,7 +257,14 @@ public class AuditTdkpBranchService {
                 }
                 resolved.put(key, recommendation);
             }
-            if (defectRepository.existsByTenantIdAndSourceTtssId(tenantId, ttss.getId())) {
+            AuditTdkpBranchDefect existingDefect = defectRepository.findByTenantIdAndSourceTtssId(tenantId, ttss.getId()).orElse(null);
+            if (existingDefect != null) {
+                // Cac dong da chuyen TU TRUOC KHI co cot defectCode (truoc test23.9) khong duoc dien
+                // gia tri nay - backfill lai tu findingCode ("Mã TTSS") theo phan hoi nguoi dung (test24.9).
+                if (existingDefect.getDefectCode() == null || existingDefect.getDefectCode().isBlank()) {
+                    existingDefect.setDefectCode(ttss.getFindingCode());
+                    defectRepository.save(existingDefect);
+                }
                 skipped++;
                 continue;
             }

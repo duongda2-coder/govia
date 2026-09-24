@@ -40,6 +40,7 @@ const followUpGroupOptions = (t: TFunction) => FOLLOW_UP_GROUP_VALUES.map((value
 interface FormValues {
   resolutionNumber: string;
   issueDate?: dayjs.Dayjs;
+  summary?: string;
   content?: string;
   workDetail?: string;
   fieldArea?: string;
@@ -113,6 +114,7 @@ export function TdkpResolutionPage() {
     form.setFieldsValue({
       resolutionNumber: target.resolutionNumber,
       issueDate: fromApiDate(target.issueDate),
+      summary: target.summary ?? undefined,
       content: target.content ?? undefined,
       workDetail: target.workDetail ?? undefined,
       fieldArea: target.fieldArea ?? undefined,
@@ -148,6 +150,7 @@ export function TdkpResolutionPage() {
       const request: TdkpResolutionRequest = {
         resolutionNumber: values.resolutionNumber,
         issueDate: toApiDate(values.issueDate),
+        summary: values.summary ?? null,
         content: values.content ?? null,
         workDetail: values.workDetail ?? null,
         fieldArea: values.fieldArea ?? null,
@@ -207,9 +210,9 @@ export function TdkpResolutionPage() {
 
   const c = "auditTdkp.resolution.columns";
   const columns: TableProps<TdkpResolutionItem>["columns"] = [
-    { title: t(`${c}.code`), width: 130, ...getSearchColumnProps("code", searchLabels) },
     { title: t(`${c}.resolutionNumber`), width: 170, ...getSearchColumnProps("resolutionNumber", searchLabels) },
     { title: t(`${c}.issueDate`), dataIndex: "issueDate", width: 140, sorter: (a, b) => (a.issueDate ?? "").localeCompare(b.issueDate ?? ""), render: renderDate },
+    { title: t(`${c}.summary`), width: 240, ...getSearchColumnProps("summary", searchLabels) },
     { title: t(`${c}.content`), width: 320, ...getSearchColumnProps("content", searchLabels) },
     { title: t(`${c}.workDetail`), dataIndex: "workDetail", width: 240, render: renderText },
     { title: t(`${c}.fieldArea`), dataIndex: "fieldArea", width: 150, render: renderText },
@@ -290,6 +293,9 @@ export function TdkpResolutionPage() {
               </Form.Item>
             </Col>
           </Row>
+          <Form.Item name="summary" label={t(`${c}.summary`)}>
+            <Input maxLength={255} />
+          </Form.Item>
           <Form.Item name="content" label={t(`${c}.content`)}>
             <Input.TextArea rows={3} maxLength={500} showCount />
           </Form.Item>

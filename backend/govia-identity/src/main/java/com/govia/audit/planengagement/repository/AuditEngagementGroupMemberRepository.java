@@ -12,6 +12,8 @@ public interface AuditEngagementGroupMemberRepository extends JpaRepository<Audi
 
     List<AuditEngagementGroupMember> findByTenantIdAndGroupIdIn(UUID tenantId, List<UUID> groupIds);
 
+    List<AuditEngagementGroupMember> findByTenantIdAndEmployeeId(UUID tenantId, UUID employeeId);
+
     Optional<AuditEngagementGroupMember> findByTenantIdAndGroupIdAndEmployeeId(UUID tenantId, UUID groupId, UUID employeeId);
 
     long countByGroupId(UUID groupId);
