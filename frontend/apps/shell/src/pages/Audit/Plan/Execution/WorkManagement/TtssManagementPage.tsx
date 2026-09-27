@@ -119,7 +119,7 @@ export function TtssManagementPage() {
   const approveDisabled =
     selected.length === 0 ||
     !isTeamLead ||
-    selected.some((i) => !i.teamRecommendationId || i.recommendationApprovalStatus === "APPROVED");
+    selected.some((i) => i.teamRecommendations.length === 0 || i.recommendationApprovalStatus === "APPROVED");
 
   const columns: TableProps<AuditTtssRecordItem>["columns"] = [
     {
@@ -200,7 +200,7 @@ export function TtssManagementPage() {
       title: t("auditTtss.columns.teamRecommendation"),
       width: 200,
       render: (_: unknown, item: AuditTtssRecordItem) =>
-        item.teamRecommendationCode ? `${item.teamRecommendationCode} - ${item.teamRecommendationContent ?? ""}` : "-",
+        item.teamRecommendations.length > 0 ? item.teamRecommendations.map((r) => `${r.code} - ${r.content}`).join("; ") : "-",
     },
     {
       title: t("auditTtss.columns.recommendationApprovalStatus"),
@@ -247,8 +247,23 @@ export function TtssManagementPage() {
         { key: "approverName", label: t("auditTtss.columns.approverName"), children: detailItem.approverName ?? "-" },
         { key: "controllerName", label: t("auditTtss.columns.controllerName"), children: detailItem.controllerName ?? "-" },
         { key: "appendix", label: t("auditTtss.columns.appendix"), children: detailItem.appendix ?? "-" },
-        { key: "teamRecommendationCode", label: t("auditTtss.columns.teamRecommendationCode"), children: detailItem.teamRecommendationCode ?? "-" },
-        { key: "teamRecommendationContent", label: t("auditTtss.columns.teamRecommendationContent"), children: detailItem.teamRecommendationContent ?? "-" },
+        {
+          key: "teamRecommendationCode",
+          label: t("auditTtss.columns.teamRecommendationCode"),
+          children: detailItem.teamRecommendations.map((r) => r.code).join(", ") || "-",
+        },
+        {
+          key: "teamRecommendationContent",
+          label: t("auditTtss.columns.teamRecommendationContent"),
+          children:
+            detailItem.teamRecommendations.length > 0
+              ? detailItem.teamRecommendations.map((r) => (
+                  <div key={r.id}>
+                    {r.code}: {r.content}
+                  </div>
+                ))
+              : "-",
+        },
         {
           key: "recommendationApprovalStatus",
           label: t("auditTtss.columns.recommendationApprovalStatus"),
@@ -321,6 +336,7 @@ export function TtssManagementPage() {
         open={linkOpen}
         engagementId={engagementId ?? null}
         ttssRecordIds={selected.map((i) => i.id)}
+        initialRecommendationIds={selected.length === 1 ? selected[0].teamRecommendations.map((r) => r.id) : []}
         onClose={() => setLinkOpen(false)}
         onLinked={() => {
           setLinkOpen(false);

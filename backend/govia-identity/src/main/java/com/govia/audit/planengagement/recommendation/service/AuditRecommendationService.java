@@ -188,7 +188,7 @@ public class AuditRecommendationService {
     }
 
     /** Khong cho xoa dong mac dinh (KNKT000, luon phai co san - xem ensureDefaultSeeded) hoac dong
-     * dang duoc gan lam kien nghi chinh thuc cho it nhat 1 dong TTSS (AuditTtssRecord.teamRecommendationId). */
+     * dang duoc gan lam kien nghi chinh thuc cho it nhat 1 dong TTSS (AuditTtssRecord.teamRecommendationIds). */
     @Transactional
     public void delete(UUID engagementId, UUID recommendationId) {
         UUID tenantId = TenantContext.getTenantId();
@@ -201,7 +201,7 @@ public class AuditRecommendationService {
             throw new BusinessException("AUDIT_RECOMMENDATION_DEFAULT_NOT_DELETABLE",
                     "Khong the xoa kien nghi mac dinh " + DEFAULT_CODE, HttpStatus.BAD_REQUEST);
         }
-        if (ttssRecordRepository.existsByTenantIdAndTeamRecommendationId(tenantId, recommendationId)) {
+        if (ttssRecordRepository.existsLinkedToRecommendation(tenantId, recommendationId)) {
             throw new BusinessException("AUDIT_RECOMMENDATION_IN_USE",
                     "Kien nghi dang duoc gan cho it nhat 1 dong TTSS, khong the xoa", HttpStatus.BAD_REQUEST);
         }

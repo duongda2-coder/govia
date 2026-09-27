@@ -215,7 +215,7 @@ public class AuditTdkpBranchService {
             return new AuditTdkpBranchDto.TransferResult(0, 0, 0);
         }
         List<AuditTtssRecord> approved = ttssRepository.findByTenantIdAndEngagementIdIn(tenantId, List.copyOf(engagements.keySet())).stream()
-                .filter(r -> r.getTeamRecommendationId() != null && r.getRecommendationApprovalStatus() == AssignmentApprovalStatus.APPROVED)
+                .filter(r -> !r.getTeamRecommendationIds().isEmpty() && r.getRecommendationApprovalStatus() == AssignmentApprovalStatus.APPROVED)
                 .sorted(java.util.Comparator.comparing(AuditTtssRecord::getCreatedAt)).toList();
 
         Map<UUID, AuditRecommendation> auditRecommendations = auditRecommendationRepository
@@ -228,8 +228,14 @@ public class AuditTdkpBranchService {
         List<String> codes = recommendationRepository.findByTenantIdOrderByManagementCodeAsc(tenantId).stream()
                 .map(AuditTdkpBranchRecommendation::getManagementCode).collect(Collectors.toCollection(ArrayList::new));
 
+        // 1 TTSS co the gan nhieu kien nghi truong doan (test25.9) -> tao 1 dong sai sot duoi MOI kien nghi.
+        List<Map.Entry<AuditTtssRecord, UUID>> links = new ArrayList<>();
         for (AuditTtssRecord ttss : approved) {
-            AuditRecommendation source = auditRecommendations.get(ttss.getTeamRecommendationId());
+            ttss.getTeamRecommendationIds().forEach(recommendationId -> links.add(Map.entry(ttss, recommendationId)));
+        }
+        for (Map.Entry<AuditTtssRecord, UUID> link : links) {
+            AuditTtssRecord ttss = link.getKey();
+            AuditRecommendation source = auditRecommendations.get(link.getValue());
             AuditEngagement engagement = engagements.get(ttss.getEngagementId());
             if (source == null || engagement == null) {
                 skipped++;
@@ -257,7 +263,8 @@ public class AuditTdkpBranchService {
                 }
                 resolved.put(key, recommendation);
             }
-            AuditTdkpBranchDefect existingDefect = defectRepository.findByTenantIdAndSourceTtssId(tenantId, ttss.getId()).orElse(null);
+            AuditTdkpBranchDefect existingDefect = defectRepository
+                    .findByTenantIdAndBranchRecommendationIdAndSourceTtssId(tenantId, recommendation.getId(), ttss.getId()).orElse(null);
             if (existingDefect != null) {
                 // Cac dong da chuyen TU TRUOC KHI co cot defectCode (truoc test23.9) khong duoc dien
                 // gia tri nay - backfill lai tu findingCode ("Mã TTSS") theo phan hoi nguoi dung (test24.9).

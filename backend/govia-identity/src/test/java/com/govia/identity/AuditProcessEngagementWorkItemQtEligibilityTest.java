@@ -120,7 +120,7 @@ class AuditProcessEngagementWorkItemQtEligibilityTest {
         group = groupRepository.save(group);
 
         AuditEngagementGroupMemberResponse member = teamService.addMember(childEngagement.getId(), group.getId(),
-                new AuditEngagementGroupMemberRequest(worker.id(), segment.getId(), null, null));
+                new AuditEngagementGroupMemberRequest(worker.id(), segment.getId(), null, null), teamLead.employeeCode());
 
         List<AuditEngagementAssignment> assignments = assignmentRepository.findByTenantIdAndGroupMemberIdOrderByCreatedAtAsc(tenantId, member.id());
         assertThat(assignments).hasSize(1);

@@ -18,6 +18,8 @@ import type { AssignmentApprovalStatus } from "../../../api/auditWorkManagement"
 import { useAuth } from "../../../auth/AuthContext";
 import {
   approvalStatusOptions,
+  CompletionClosedFilterSelect,
+  filterByCompletionClosed,
   fromApiDate,
   renderApprovalStatus,
   renderDate,
@@ -26,6 +28,7 @@ import {
   renderText,
   statusOptions,
   toApiDate,
+  type CompletionClosedFilter,
 } from "./tdkpShared";
 import type dayjs from "dayjs";
 
@@ -63,6 +66,7 @@ export function TdkpUnitRecommendationPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<TdkpUnitRecommendationItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [completionFilter, setCompletionFilter] = useState<CompletionClosedFilter | undefined>(undefined);
   const [form] = Form.useForm<FormValues>();
 
   const load = useCallback(async () => {
@@ -190,10 +194,11 @@ export function TdkpUnitRecommendationPage() {
   return (
     <div>
       <Typography.Title level={4}>{t("auditTdkp.unitRecommendation.title")}</Typography.Title>
+      <CompletionClosedFilterSelect t={t} value={completionFilter} onChange={setCompletionFilter} />
       <CrudTable<TdkpUnitRecommendationItem>
         tableId="audit.tdkp.unitRecommendation"
         columns={columns}
-        dataSource={items}
+        dataSource={filterByCompletionClosed(items, completionFilter, (item) => item.deadline)}
         rowKey="id"
         loading={loading}
         onAdd={canCreate ? openCreate : undefined}

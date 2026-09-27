@@ -527,3 +527,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/181-audit-tdkp-test24-9-fields.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/182-audit-test25-9-ttss-multi-recommendation.yaml
+      relativeToChangelogFile: false

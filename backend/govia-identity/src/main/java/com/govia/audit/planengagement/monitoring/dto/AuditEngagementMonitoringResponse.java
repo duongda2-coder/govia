@@ -15,7 +15,7 @@ import com.govia.audit.planengagement.dto.AuditEngagementResponse;
  *   <li>totalFindings/totalMaterialFindings = "Tổng số phát hiện"/"Phát hiện trọng yếu" - dem tren
  *   AuditTtssRecord theo engagementId (moi dong TTSS = 1 "phat hien", material=true = trong yeu).
  *   CHU Y: KHONG dung AuditFinding (entity do phuc vu AI Agent, tach biet hoan toan voi CKT).</li>
- *   <li>recommendationCount = "Số kiến nghị" - dem AuditTtssRecord co teamRecommendationId != null
+ *   <li>recommendationCount = "Số kiến nghị" - tong so kien nghi truong doan da gan tren cac dong AuditTtssRecord (teamRecommendationIds, 1 TTSS co the gan nhieu KN)
  *   (kien nghi CHINH THUC da duoc gan cho phat hien), KHONG dung so dong catalog
  *   AuditRecommendation vi catalog do chi la danh sach ma kien nghi kha dung, luon co san dong mac
  *   dinh KNKT000 nen khong phan anh dung khoi luong cong viec thuc te.</li>

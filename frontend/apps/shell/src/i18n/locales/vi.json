@@ -1280,6 +1280,12 @@
         "IN_PROGRESS": "Đang thực hiện",
         "NOT_STARTED": "Chưa thực hiện"
       },
+      "completionClosed": {
+        "label": "Lọc thời hạn hoàn thành",
+        "all": "Tất cả",
+        "CLOSED": "Đóng thời hạn hoàn thành",
+        "NOT_CLOSED": "Chưa đóng thời hạn hoàn thành"
+      },
       "deadline": {
         "ON_TIME": "Trong hạn",
         "OVERDUE": "Quá hạn"
@@ -1734,6 +1740,7 @@
       "groupLeaderCode": "Mã trưởng nhóm",
       "groupLeaderName": "Trưởng nhóm",
       "groupLeaderUsername": "Username trưởng nhóm",
+      "memberTeamLeadOnly": "Chỉ trưởng đoàn mới được thêm, sửa, xóa thành viên nhóm.",
       "groupLeaderLabel": "Trưởng nhóm",
       "memberCount": "Số lượng thành viên",
       "workItemCount": "Số lượng công việc",

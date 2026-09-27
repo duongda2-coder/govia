@@ -111,7 +111,7 @@ class AuditEngagementMonitoringServiceTest {
 
         UUID recommendationId = createRecommendation(engagement.getId(), "KNKT001").getId();
         AuditTtssRecord r1 = newTtssRecord(engagement.getId(), member1.fullName(), "TT001", true);
-        r1.setTeamRecommendationId(recommendationId);
+        r1.getTeamRecommendationIds().add(recommendationId);
         AuditTtssRecord r2 = newTtssRecord(engagement.getId(), member1.fullName(), "TT001", true); // ma trung -> khong tang so LOAI phan biet
         AuditTtssRecord r3 = newTtssRecord(engagement.getId(), member1.fullName(), "TT002", false);
         AuditTtssRecord r4 = newTtssRecord(engagement.getId(), "Nguoi khong thuoc doan", "TT999", true); // khong khop ten thanh vien nao
@@ -133,7 +133,7 @@ class AuditEngagementMonitoringServiceTest {
         assertThat(memberRow.ttssTypeCount()).isEqualTo(2);
         assertThat(memberRow.totalMaterialFindings()).isEqualTo(2); // r1,r2 material=true
         assertThat(memberRow.materialTtssTypeCount()).isEqualTo(1); // chi TT001 la ma trong yeu phan biet
-        assertThat(memberRow.recommendationCount()).isEqualTo(1); // chi r1 co teamRecommendationId
+        assertThat(memberRow.recommendationCount()).isEqualTo(1); // chi r1 co teamRecommendationIds
 
         assertThat(memberRow.cbktProgress()).isEqualTo(new ProgressStat(1, 1));
         assertThat(memberRow.thktSampleProgress()).isEqualTo(new ProgressStat(0, 1));
@@ -153,7 +153,7 @@ class AuditEngagementMonitoringServiceTest {
         addMember(group, member1.id());
 
         AuditTtssRecord r1 = newTtssRecord(engagement.getId(), member1.fullName(), "TT001", true);
-        r1.setTeamRecommendationId(createRecommendation(engagement.getId(), "KNKT001").getId());
+        r1.getTeamRecommendationIds().add(createRecommendation(engagement.getId(), "KNKT001").getId());
         AuditTtssRecord r2 = newTtssRecord(engagement.getId(), "Nguoi la", "TT777", false); // khong khop thanh vien nao nhung VAN tinh vao tong CKT
         ttssRecordRepository.saveAll(List.of(r1, r2));
 

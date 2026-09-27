@@ -260,6 +260,7 @@ export function AuditEngagementPage() {
           open={!!groupsFor}
           engagementId={groupsFor.id}
           engagementCode={groupsFor.code}
+          teamLeadEmployeeCode={groupsFor.teamLeadEmployeeCode}
           employees={employees}
           businessSegments={businessSegments}
           onClose={() => setGroupsFor(null)}

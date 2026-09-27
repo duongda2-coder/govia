@@ -1,0 +1,58 @@
+databaseChangeLog:
+
+  # ===================== test25.9: 1 TTSS gan NHIEU kien nghi truong doan =====================
+  - changeSet:
+      id: 182-1-audit-ttss-record-recommendation
+      author: govia
+      comment: "Bang lien ket audit_ttss_record <-> audit_recommendation (1 TTSS gan nhieu kien nghi truong doan), chuyen du lieu tu cot team_recommendation_id"
+      changes:
+        - createTable:
+            tableName: audit_ttss_record_recommendation
+            columns:
+              - column: { name: ttss_record_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: recommendation_id, type: UUID, constraints: { nullable: false } }
+        - addPrimaryKey:
+            tableName: audit_ttss_record_recommendation
+            columnNames: ttss_record_id, recommendation_id
+            constraintName: pk_audit_ttss_record_recommendation
+        - addForeignKeyConstraint:
+            baseTableName: audit_ttss_record_recommendation
+            baseColumnNames: ttss_record_id
+            referencedTableName: audit_ttss_record
+            referencedColumnNames: id
+            constraintName: fk_audit_ttss_rec_rec_ttss
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: audit_ttss_record_recommendation
+            baseColumnNames: recommendation_id
+            referencedTableName: audit_recommendation
+            referencedColumnNames: id
+            constraintName: fk_audit_ttss_rec_rec_recommendation
+        - createIndex:
+            tableName: audit_ttss_record_recommendation
+            indexName: idx_audit_ttss_rec_rec_recommendation
+            columns:
+              - column: { name: recommendation_id }
+        - sql:
+            sql: >
+              INSERT INTO audit_ttss_record_recommendation (ttss_record_id, recommendation_id)
+              SELECT id, team_recommendation_id FROM audit_ttss_record WHERE team_recommendation_id IS NOT NULL
+        - dropForeignKeyConstraint:
+            baseTableName: audit_ttss_record
+            constraintName: fk_audit_ttss_record_team_recommendation
+        - dropColumn:
+            tableName: audit_ttss_record
+            columnName: team_recommendation_id
+
+  - changeSet:
+      id: 182-2-audit-tdkp-branch-defect-source-per-recommendation
+      author: govia
+      comment: "TDKP CN - 1 TTSS co the la sai sot duoi nhieu kien nghi chi nhanh (moi kien nghi truong doan 1 dong)"
+      changes:
+        - dropUniqueConstraint:
+            tableName: audit_tdkp_branch_defect
+            constraintName: uk_tdkp_branch_defect_source
+        - addUniqueConstraint:
+            tableName: audit_tdkp_branch_defect
+            columnNames: tenant_id, branch_recommendation_id, source_ttss_id
+            constraintName: uk_tdkp_branch_defect_source

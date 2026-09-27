@@ -2,17 +2,23 @@ package com.govia.audit.planengagement.ttss.entity;
 
 import com.govia.audit.planengagement.entity.AssignmentApprovalStatus;
 import com.govia.core.entity.BaseEntity;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -107,7 +113,7 @@ public class AuditTtssRecord extends BaseEntity {
     private String relatedStaff;
 
     /** "Mã KN"/"Tên KN" - kien nghi nguoi UPLOAD tu ghi (chi la goi y, khac voi
-     * teamRecommendationId ben duoi - kien nghi CHINH THUC do truong nhom/truong doan gan). */
+     * teamRecommendationIds ben duoi - kien nghi CHINH THUC do truong nhom/truong doan gan). */
     @Column(name = "uploader_recommendation_code", length = 30)
     private String uploaderRecommendationCode;
 
@@ -118,11 +124,15 @@ public class AuditTtssRecord extends BaseEntity {
     @Column(name = "appendix", length = 1000)
     private String appendix;
 
-    /** "Mã KN trưởng đoàn" - kien nghi CHINH THUC, set qua chuc nang "Gắn kiến nghị". Noi dung
-     * ("Nội dung KN trưởng đoàn") KHONG luu rieng - resolve dong tu day luc tra response de tranh
-     * trung lap/lech du lieu voi bang danh muc AuditRecommendation. */
-    @Column(name = "team_recommendation_id", columnDefinition = "uuid")
-    private UUID teamRecommendationId;
+    /** "Mã KN trưởng đoàn" - cac kien nghi CHINH THUC, set qua chuc nang "Gắn kiến nghị". 1 TTSS co the
+     * gan NHIEU kien nghi truong doan (test25.9) - luu o bang lien ket audit_ttss_record_recommendation.
+     * Noi dung ("Nội dung KN trưởng đoàn") KHONG luu rieng - resolve dong tu danh muc AuditRecommendation
+     * luc tra response de tranh trung lap/lech du lieu. */
+    @ElementCollection
+    @CollectionTable(name = "audit_ttss_record_recommendation", joinColumns = @JoinColumn(name = "ttss_record_id"))
+    @Column(name = "recommendation_id", columnDefinition = "uuid", nullable = false)
+    @BatchSize(size = 100)
+    private Set<UUID> teamRecommendationIds = new LinkedHashSet<>();
 
     /** "Phê duyệt KN" - null = chua nop duyet (chua gan kien nghi hoac da gan nhung chua bam duyet). */
     @Enumerated(EnumType.STRING)

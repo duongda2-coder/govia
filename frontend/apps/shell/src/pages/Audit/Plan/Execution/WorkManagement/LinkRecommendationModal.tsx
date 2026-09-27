@@ -8,16 +8,19 @@ export interface LinkRecommendationModalProps {
   open: boolean;
   engagementId: string | null;
   ttssRecordIds: string[];
+  /** Kien nghi dang gan (dien san khi chi chon 1 dong TTSS). */
+  initialRecommendationIds?: string[];
   onClose: () => void;
   onLinked: () => void;
 }
 
 interface FormValues {
-  recommendationId: string;
+  recommendationIds: string[];
 }
 
-/** "4. Gắn kiến nghị" - chon 1 kien nghi tu catalog de gan cho cac dong TTSS dang duoc chon. */
-export function LinkRecommendationModal({ open, engagementId, ttssRecordIds, onClose, onLinked }: LinkRecommendationModalProps) {
+/** "4. Gắn kiến nghị" - chon 1 hoac NHIEU kien nghi tu catalog de gan cho cac dong TTSS dang duoc chon
+ * (test25.9: 1 TTSS gan nhieu kien nghi truong doan). Danh sach chon THAY THE kien nghi da gan truoc do. */
+export function LinkRecommendationModal({ open, engagementId, ttssRecordIds, initialRecommendationIds, onClose, onLinked }: LinkRecommendationModalProps) {
   const { t } = useTranslation();
   const { message } = App.useApp();
   const [recommendations, setRecommendations] = useState<AuditRecommendationItem[]>([]);
@@ -40,7 +43,7 @@ export function LinkRecommendationModal({ open, engagementId, ttssRecordIds, onC
     }
     setSubmitting(true);
     try {
-      await linkAuditTtssRecommendation(engagementId, ttssRecordIds, values.recommendationId);
+      await linkAuditTtssRecommendation(engagementId, ttssRecordIds, values.recommendationIds);
       message.success(t("auditTtss.linkRecommendationSuccess"));
       form.resetFields();
       onLinked();
@@ -60,9 +63,10 @@ export function LinkRecommendationModal({ open, engagementId, ttssRecordIds, onC
       confirmLoading={submitting}
       destroyOnClose
     >
-      <Form<FormValues> form={form} layout="vertical">
-        <Form.Item name="recommendationId" label={t("auditRecommendation.title")} rules={[{ required: true }]}>
+      <Form<FormValues> form={form} layout="vertical" preserve={false} initialValues={{ recommendationIds: initialRecommendationIds ?? [] }}>
+        <Form.Item name="recommendationIds" label={t("auditRecommendation.title")} rules={[{ required: true }]}>
           <Select
+            mode="multiple"
             showSearch
             optionFilterProp="label"
             options={recommendations.map((r) => ({ value: r.id, label: `${r.code} - ${r.content}` }))}

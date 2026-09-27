@@ -14,9 +14,7 @@ public interface AuditTdkpBranchDefectRepository extends JpaRepository<AuditTdkp
 
     List<AuditTdkpBranchDefect> findByTenantIdAndBranchRecommendationIdIn(UUID tenantId, Collection<UUID> branchRecommendationIds);
 
-    boolean existsByTenantIdAndSourceTtssId(UUID tenantId, UUID sourceTtssId);
-
-    Optional<AuditTdkpBranchDefect> findByTenantIdAndSourceTtssId(UUID tenantId, UUID sourceTtssId);
+    Optional<AuditTdkpBranchDefect> findByTenantIdAndBranchRecommendationIdAndSourceTtssId(UUID tenantId, UUID branchRecommendationId, UUID sourceTtssId);
 
     void deleteByTenantIdAndBranchRecommendationId(UUID tenantId, UUID branchRecommendationId);
 }

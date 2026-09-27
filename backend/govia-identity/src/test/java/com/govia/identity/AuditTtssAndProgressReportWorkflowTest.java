@@ -166,8 +166,8 @@ class AuditTtssAndProgressReportWorkflowTest {
 
         AuditTtssRecord record = ttssRecordRepository.save(newTtssRecord(engagement.getId(), "TT100", true));
 
-        ttssService.linkRecommendation(engagement.getId(), new AuditTtssLinkRecommendationRequest(List.of(record.getId()), created.id()));
-        assertThat(ttssRecordRepository.findById(record.getId()).orElseThrow().getTeamRecommendationId()).isEqualTo(created.id());
+        ttssService.linkRecommendation(engagement.getId(), new AuditTtssLinkRecommendationRequest(List.of(record.getId()), List.of(created.id())));
+        assertThat(ttssRecordRepository.findById(record.getId()).orElseThrow().getTeamRecommendationIds()).containsExactly(created.id());
 
         List<UUID> approvedIds = ttssService.approveRecommendations(engagement.getId(),
                 new AuditTtssApproveRecommendationsRequest(List.of(record.getId())),
@@ -179,6 +179,27 @@ class AuditTtssAndProgressReportWorkflowTest {
         assertThat(reloaded.getRecommendationApprovedBy()).isEqualTo("ctl01");
         assertThat(notificationOutboxRepository.findAll())
                 .anySatisfy(n -> assertThat(n.getRecipientUserId()).isEqualTo(teamLeadAccountId.toString()));
+    }
+
+    /** test25.9: 1 TTSS gan nhieu kien nghi truong doan; gan lai thi thay the toan bo danh sach cu. */
+    @Test
+    void linkRecommendation_supportsMultipleRecommendationsPerTtssAndReplacesPreviousLinks() {
+        EmployeeResponse teamLead = createEmployee("NV-C-TL-04");
+        AuditEngagement engagement = createEngagement("CKT-C-04", teamLead.id());
+        AuditRecommendationResponse kn1 = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Kien nghi 1"));
+        AuditRecommendationResponse kn2 = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Kien nghi 2"));
+        AuditRecommendationResponse kn3 = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Kien nghi 3"));
+        AuditTtssRecord record = ttssRecordRepository.save(newTtssRecord(engagement.getId(), "TT400", false));
+
+        List<AuditTtssRecordResponse> linked = ttssService.linkRecommendation(engagement.getId(),
+                new AuditTtssLinkRecommendationRequest(List.of(record.getId()), List.of(kn2.id(), kn1.id())));
+        assertThat(linked.get(0).teamRecommendations()).extracting(AuditTtssRecordResponse.TeamRecommendation::code)
+                .containsExactly(kn1.code(), kn2.code());
+
+        List<AuditTtssRecordResponse> relinked = ttssService.linkRecommendation(engagement.getId(),
+                new AuditTtssLinkRecommendationRequest(List.of(record.getId()), List.of(kn3.id())));
+        assertThat(relinked.get(0).teamRecommendations()).extracting(AuditTtssRecordResponse.TeamRecommendation::id).containsExactly(kn3.id());
+        assertThat(ttssRecordRepository.findById(record.getId()).orElseThrow().getTeamRecommendationIds()).containsExactly(kn3.id());
     }
 
     @Test
@@ -193,7 +214,7 @@ class AuditTtssAndProgressReportWorkflowTest {
 
         AuditRecommendationResponse inUse = recommendationService.create(engagement.getId(), new AuditRecommendationRequest(null, "Dang duoc gan"));
         AuditTtssRecord record = ttssRecordRepository.save(newTtssRecord(engagement.getId(), "TT300", false));
-        ttssService.linkRecommendation(engagement.getId(), new AuditTtssLinkRecommendationRequest(List.of(record.getId()), inUse.id()));
+        ttssService.linkRecommendation(engagement.getId(), new AuditTtssLinkRecommendationRequest(List.of(record.getId()), List.of(inUse.id())));
         assertThatThrownBy(() -> recommendationService.delete(engagement.getId(), inUse.id()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining("dang duoc gan");

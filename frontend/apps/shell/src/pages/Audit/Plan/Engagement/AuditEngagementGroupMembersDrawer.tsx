@@ -50,19 +50,21 @@ export interface AuditEngagementGroupMembersDrawerProps {
   /** True neu CKT nay la CKT quy trinh (chi 1 nghiep vu duy nhat = group.groupCode) - khi do "Nghiep
    * vu" cua thanh vien chi duoc chon dung nghiep vu nay, xem AuditEngagementGroupsDrawer. */
   processScoped?: boolean;
+  /** True neu nguoi dang nhap la truong doan cua CKT - chi truong doan moi duoc them/sua/xoa thanh vien. */
+  canManageMembers: boolean;
   onClose: () => void;
   onChanged: () => void;
 }
 
 /** Man hinh "Danh sach thanh vien trong nhom" (nut "Xem thanh vien nhom" o Drawer nhom). */
 export function AuditEngagementGroupMembersDrawer(props: AuditEngagementGroupMembersDrawerProps) {
-  const { open, engagementId, group, employees, businessSegments, processScoped, onClose, onChanged } = props;
+  const { open, engagementId, group, employees, businessSegments, processScoped, canManageMembers, onClose, onChanged } = props;
   const { t } = useTranslation();
   const { message, modal } = App.useApp();
   const { hasPermission } = useAuth();
-  const canCreate = hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.CREATE");
-  const canEdit = hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.EDIT");
-  const canDelete = hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.DELETE");
+  const canCreate = canManageMembers && hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.CREATE");
+  const canEdit = canManageMembers && hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.EDIT");
+  const canDelete = canManageMembers && hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.DELETE");
 
   const [items, setItems] = useState<AuditEngagementGroupMemberItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -200,6 +202,7 @@ export function AuditEngagementGroupMembersDrawer(props: AuditEngagementGroupMem
             {" - "}
             {t("auditEngagement.form.groupLeaderUsername")}: {group.leaderUsername ?? "-"}
           </Typography.Paragraph>
+          {!canManageMembers && <Typography.Paragraph type="warning">{t("auditEngagement.form.memberTeamLeadOnly")}</Typography.Paragraph>}
           <CrudTable<AuditEngagementGroupMemberItem>
             tableId="audit.planEngagement.groupMembers"
             columns={columns}

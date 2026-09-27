@@ -247,7 +247,7 @@ class AuditProcessEngagementDownstreamScreensTest {
         group = groupRepository.save(group);
 
         AuditEngagementGroupMemberResponse member = teamService.addMember(childEngagement.getId(), group.getId(),
-                new AuditEngagementGroupMemberRequest(worker.id(), segment.getId(), null, null));
+                new AuditEngagementGroupMemberRequest(worker.id(), segment.getId(), null, null), teamLead.employeeCode());
 
         return new Fixture(childEngagement, teamLead, worker, segment, workItemQt, member.id());
     }

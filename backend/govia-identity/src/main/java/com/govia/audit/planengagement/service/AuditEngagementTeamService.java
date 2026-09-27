@@ -56,6 +56,8 @@ public class AuditEngagementTeamService {
 
     /** 3 nhom co dinh cho CKT thuong (khong thuoc CKT quy trinh nao) - xem validGroupCodes(). */
     private static final Set<String> DEFAULT_GROUP_CODES = Set.of("DIEUHANH", "NTINDUNG", "TINDUNG");
+    private static final String ASSIGNMENT_NOT_TEAM_LEAD_MESSAGE = "Chi truong doan moi duoc phep phan cong";
+    private static final String MEMBER_NOT_TEAM_LEAD_MESSAGE = "Chi truong doan moi duoc phep them, sua, xoa thanh vien nhom";
 
     private final AuditEngagementRepository engagementRepository;
     private final AuditEngagementGroupRepository groupRepository;
@@ -198,9 +200,10 @@ public class AuditEngagementTeamService {
     }
 
     @Transactional
-    public AuditEngagementGroupMemberResponse addMember(UUID engagementId, UUID groupId, AuditEngagementGroupMemberRequest request) {
+    public AuditEngagementGroupMemberResponse addMember(UUID engagementId, UUID groupId, AuditEngagementGroupMemberRequest request, String actorEmployeeCode) {
         UUID tenantId = TenantContext.getTenantId();
         AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
+        requireTeamLead(tenantId, engagement, actorEmployeeCode, MEMBER_NOT_TEAM_LEAD_MESSAGE);
         AuditEngagementGroup group = getGroupOrThrow(tenantId, engagementId, groupId);
         getEmployeeOrThrow(tenantId, request.employeeId());
         if (memberRepository.findByTenantIdAndGroupIdAndEmployeeId(tenantId, groupId, request.employeeId()).isPresent()) {
@@ -222,9 +225,11 @@ public class AuditEngagementTeamService {
 
     /** "Thay doi can bo" - doi nguoi/nghiep vu cua 1 vi tri thanh vien, tinh lai phan cong tu dong. */
     @Transactional
-    public AuditEngagementGroupMemberResponse updateMember(UUID engagementId, UUID groupId, UUID memberId, AuditEngagementGroupMemberRequest request) {
+    public AuditEngagementGroupMemberResponse updateMember(UUID engagementId, UUID groupId, UUID memberId, AuditEngagementGroupMemberRequest request,
+                                                           String actorEmployeeCode) {
         UUID tenantId = TenantContext.getTenantId();
         AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
+        requireTeamLead(tenantId, engagement, actorEmployeeCode, MEMBER_NOT_TEAM_LEAD_MESSAGE);
         AuditEngagementGroup group = getGroupOrThrow(tenantId, engagementId, groupId);
         AuditEngagementGroupMember member = getMemberOrThrow(tenantId, groupId, memberId);
         getEmployeeOrThrow(tenantId, request.employeeId());
@@ -243,9 +248,10 @@ public class AuditEngagementTeamService {
     }
 
     @Transactional
-    public void deleteMember(UUID engagementId, UUID groupId, UUID memberId) {
+    public void deleteMember(UUID engagementId, UUID groupId, UUID memberId, String actorEmployeeCode) {
         UUID tenantId = TenantContext.getTenantId();
-        getEngagementOrThrow(tenantId, engagementId);
+        AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
+        requireTeamLead(tenantId, engagement, actorEmployeeCode, MEMBER_NOT_TEAM_LEAD_MESSAGE);
         getGroupOrThrow(tenantId, engagementId, groupId);
         AuditEngagementGroupMember member = getMemberOrThrow(tenantId, groupId, memberId);
         assignmentRepository.deleteByGroupMemberId(memberId);
@@ -283,7 +289,7 @@ public class AuditEngagementTeamService {
     public List<AuditEngagementAssignmentResponse> assignWorkItems(UUID engagementId, UUID groupId, UUID memberId, AssignWorkItemsRequest request, String actorEmployeeCode) {
         UUID tenantId = TenantContext.getTenantId();
         AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
-        requireTeamLead(tenantId, engagement, actorEmployeeCode);
+        requireTeamLead(tenantId, engagement, actorEmployeeCode, ASSIGNMENT_NOT_TEAM_LEAD_MESSAGE);
         AuditEngagementGroup group = getGroupOrThrow(tenantId, engagementId, groupId);
         AuditEngagementGroupMember member = getMemberOrThrow(tenantId, groupId, memberId);
 
@@ -318,7 +324,7 @@ public class AuditEngagementTeamService {
     public void deleteAssignment(UUID engagementId, UUID groupId, UUID memberId, UUID assignmentId, String actorEmployeeCode) {
         UUID tenantId = TenantContext.getTenantId();
         AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
-        requireTeamLead(tenantId, engagement, actorEmployeeCode);
+        requireTeamLead(tenantId, engagement, actorEmployeeCode, ASSIGNMENT_NOT_TEAM_LEAD_MESSAGE);
         getGroupOrThrow(tenantId, engagementId, groupId);
         getMemberOrThrow(tenantId, groupId, memberId);
         AuditEngagementAssignment assignment = assignmentRepository.findById(assignmentId)
@@ -393,15 +399,15 @@ public class AuditEngagementTeamService {
     private record EligibleItem(UUID id, AuditWorkPhase phase, String code, String name, boolean qt) {
     }
 
-    private void requireTeamLead(UUID tenantId, AuditEngagement engagement, String actorEmployeeCode) {
+    private void requireTeamLead(UUID tenantId, AuditEngagement engagement, String actorEmployeeCode, String deniedMessage) {
         if (actorEmployeeCode == null) {
-            throw new BusinessException("AUDIT_ENGAGEMENT_NOT_TEAM_LEAD", "Chi truong doan moi duoc phep phan cong", HttpStatus.FORBIDDEN);
+            throw new BusinessException("AUDIT_ENGAGEMENT_NOT_TEAM_LEAD", deniedMessage, HttpStatus.FORBIDDEN);
         }
         Employee lead = employeeRepository.findById(engagement.getTeamLeadEmployeeId())
                 .filter(e -> e.getTenantId().equals(tenantId))
                 .orElseThrow(() -> new BusinessException("EMPLOYEE_NOT_FOUND", "Khong tim thay truong doan", HttpStatus.NOT_FOUND));
         if (!actorEmployeeCode.equalsIgnoreCase(lead.getEmployeeCode())) {
-            throw new BusinessException("AUDIT_ENGAGEMENT_NOT_TEAM_LEAD", "Chi truong doan moi duoc phep phan cong", HttpStatus.FORBIDDEN);
+            throw new BusinessException("AUDIT_ENGAGEMENT_NOT_TEAM_LEAD", deniedMessage, HttpStatus.FORBIDDEN);
         }
     }
 

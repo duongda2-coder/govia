@@ -77,21 +77,24 @@ public class AuditEngagementTeamController {
     @PostMapping("/groups/{groupId}/members")
     @PreAuthorize("hasAuthority('PERM_AUDIT.PLAN_ENGAGEMENT_TEAM.CREATE')")
     public ApiResponse<AuditEngagementGroupMemberResponse> addMember(@PathVariable UUID engagementId, @PathVariable UUID groupId,
-                                                                       @Valid @RequestBody AuditEngagementGroupMemberRequest request) {
-        return ApiResponse.ok(service.addMember(engagementId, groupId, request));
+                                                                       @Valid @RequestBody AuditEngagementGroupMemberRequest request,
+                                                                       @AuthenticationPrincipal CurrentUserPrincipal principal) {
+        return ApiResponse.ok(service.addMember(engagementId, groupId, request, principal.employeeCode()));
     }
 
     @PutMapping("/groups/{groupId}/members/{memberId}")
     @PreAuthorize("hasAuthority('PERM_AUDIT.PLAN_ENGAGEMENT_TEAM.EDIT')")
     public ApiResponse<AuditEngagementGroupMemberResponse> updateMember(@PathVariable UUID engagementId, @PathVariable UUID groupId,
-                                                                          @PathVariable UUID memberId, @Valid @RequestBody AuditEngagementGroupMemberRequest request) {
-        return ApiResponse.ok(service.updateMember(engagementId, groupId, memberId, request));
+                                                                          @PathVariable UUID memberId, @Valid @RequestBody AuditEngagementGroupMemberRequest request,
+                                                                          @AuthenticationPrincipal CurrentUserPrincipal principal) {
+        return ApiResponse.ok(service.updateMember(engagementId, groupId, memberId, request, principal.employeeCode()));
     }
 
     @DeleteMapping("/groups/{groupId}/members/{memberId}")
     @PreAuthorize("hasAuthority('PERM_AUDIT.PLAN_ENGAGEMENT_TEAM.DELETE')")
-    public ApiResponse<Void> deleteMember(@PathVariable UUID engagementId, @PathVariable UUID groupId, @PathVariable UUID memberId) {
-        service.deleteMember(engagementId, groupId, memberId);
+    public ApiResponse<Void> deleteMember(@PathVariable UUID engagementId, @PathVariable UUID groupId, @PathVariable UUID memberId,
+                                              @AuthenticationPrincipal CurrentUserPrincipal principal) {
+        service.deleteMember(engagementId, groupId, memberId, principal.employeeCode());
         return ApiResponse.ok(null);
     }
 

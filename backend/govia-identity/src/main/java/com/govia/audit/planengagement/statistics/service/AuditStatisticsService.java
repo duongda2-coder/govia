@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
  * yeu" + kien nghi da gan), AuditEngagement (Nam/Ma CKT/So QD/Xep loai rui ro/Don vi) va Employee (qua
  * AuditTtssRecord.recordUsername -> UserAccount).
  *
- * "So luong KN" o MOI bao cao duoc tinh THONG NHAT la so kien nghi (teamRecommendationId) THUC SU
+ * "So luong KN" o MOI bao cao duoc tinh THONG NHAT la so kien nghi (teamRecommendationIds) THUC SU
  * duoc gan vao it nhat 1 dong TTSS trong pham vi dang xem (dem phan biet, bo qua null) - KHONG phai
  * tong so dong trong danh muc Kien nghi cua CKT, vi danh muc co the co kien nghi chua tung duoc dung. */
 @Service
@@ -225,7 +225,7 @@ public class AuditStatisticsService {
             List<AuditTtssRecord> group = ttssByEngagement.getOrDefault(engagement.getId(), List.of());
             long completed = group.stream()
                     .filter(r -> r.getRecommendationApprovalStatus() == AssignmentApprovalStatus.APPROVED)
-                    .map(AuditTtssRecord::getTeamRecommendationId).filter(Objects::nonNull).distinct().count();
+                    .flatMap(r -> r.getTeamRecommendationIds().stream()).distinct().count();
             rows.add(new UnitDetailStatRow(engagement.getDecisionNumber(), engagement.getYear(), group.size(), materialCount(group),
                     recommendationCount(group), completed, engagement.getRiskRank()));
         }
@@ -317,7 +317,7 @@ public class AuditStatisticsService {
     }
 
     private long recommendationCount(List<AuditTtssRecord> group) {
-        return group.stream().map(AuditTtssRecord::getTeamRecommendationId).filter(Objects::nonNull).distinct().count();
+        return group.stream().flatMap(r -> r.getTeamRecommendationIds().stream()).distinct().count();
     }
 
     private Integer engagementYear(Data data, AuditTtssRecord record) {

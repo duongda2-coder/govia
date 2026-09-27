@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Tag } from "antd";
+import { Select, Space, Tag, Typography } from "antd";
 import type { TFunction } from "i18next";
 import dayjs from "dayjs";
 import { getTdkpLookups, type TdkpDeadlineState, type TdkpLookups, type TdkpStatus, type TdkpTarget } from "../../../api/auditTdkp";
@@ -44,3 +44,30 @@ export const toApiDate = (value: dayjs.Dayjs | null | undefined) => (value ? val
 export const fromApiDate = (value: string | null | undefined) => (value ? dayjs(value) : undefined);
 
 export const filterOption = (input: string, option?: { label?: unknown }) => String(option?.label ?? "").toLowerCase().includes(input.toLowerCase());
+
+export type CompletionClosedFilter = "CLOSED" | "NOT_CLOSED";
+
+/** test25.9: "Đóng thời hạn hoàn thành" khi ngày < ngày hiện tại, còn lại (kể cả chưa nhập ngày) là "Chưa đóng". */
+export const isCompletionClosed = (value: string | null | undefined) => !!value && dayjs(value).isBefore(dayjs(), "day");
+
+export function filterByCompletionClosed<T>(items: T[], filter: CompletionClosedFilter | undefined, dateOf: (item: T) => string | null | undefined): T[] {
+  if (!filter) return items;
+  return items.filter((item) => isCompletionClosed(dateOf(item)) === (filter === "CLOSED"));
+}
+
+/** Bộ lọc "Đóng / Chưa đóng thời hạn hoàn thành" đặt trên bảng. */
+export function CompletionClosedFilterSelect({ t, value, onChange }: { t: TFunction; value: CompletionClosedFilter | undefined; onChange: (value: CompletionClosedFilter | undefined) => void }) {
+  return (
+    <Space style={{ marginBottom: 16 }} wrap>
+      <Typography.Text>{t("auditTdkp.common.completionClosed.label")}</Typography.Text>
+      <Select<CompletionClosedFilter>
+        style={{ width: 260 }}
+        allowClear
+        placeholder={t("auditTdkp.common.completionClosed.all")}
+        options={(["NOT_CLOSED", "CLOSED"] as const).map((v) => ({ value: v, label: t(`auditTdkp.common.completionClosed.${v}`) }))}
+        value={value}
+        onChange={onChange}
+      />
+    </Space>
+  );
+}

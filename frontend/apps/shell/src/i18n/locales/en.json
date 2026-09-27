@@ -1280,6 +1280,12 @@
         "IN_PROGRESS": "In progress",
         "NOT_STARTED": "Not started"
       },
+      "completionClosed": {
+        "label": "Completion deadline filter",
+        "all": "All",
+        "CLOSED": "Completion deadline closed",
+        "NOT_CLOSED": "Completion deadline not closed"
+      },
       "deadline": {
         "ON_TIME": "On time",
         "OVERDUE": "Overdue"
@@ -1734,6 +1740,7 @@
       "groupLeaderCode": "Group Leader Code",
       "groupLeaderName": "Group Leader",
       "groupLeaderUsername": "Group Leader Username",
+      "memberTeamLeadOnly": "Only the engagement team lead can add, edit or remove group members.",
       "groupLeaderLabel": "Group Leader",
       "memberCount": "Member Count",
       "workItemCount": "Work Item Count",

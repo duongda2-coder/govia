@@ -27,6 +27,7 @@ export interface AuditEngagementGroupsDrawerProps {
   open: boolean;
   engagementId: string;
   engagementCode: string;
+  teamLeadEmployeeCode: string | null;
   employees: EmployeeOption[];
   businessSegments: MasterDataItem[];
   onClose: () => void;
@@ -34,12 +35,13 @@ export interface AuditEngagementGroupsDrawerProps {
 
 /** Man hinh "Danh sach nhom cua dot kiem toan" (nut "Danh sach nhom" o man hinh danh sach CKT). */
 export function AuditEngagementGroupsDrawer(props: AuditEngagementGroupsDrawerProps) {
-  const { open, engagementId, engagementCode, employees, businessSegments, onClose } = props;
+  const { open, engagementId, engagementCode, teamLeadEmployeeCode, employees, businessSegments, onClose } = props;
   const { t } = useTranslation();
   const { message, modal } = App.useApp();
-  const { hasPermission } = useAuth();
+  const { user, hasPermission } = useAuth();
   const canCreate = hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.CREATE");
   const canDelete = hasPermission("AUDIT.PLAN_ENGAGEMENT_TEAM.DELETE");
+  const isTeamLead = !!user?.employeeCode && user.employeeCode === teamLeadEmployeeCode;
 
   const [items, setItems] = useState<AuditEngagementGroupItem[]>([]);
   const [codeOptions, setCodeOptions] = useState<AuditEngagementGroupCodeOptions>({ processScoped: false, codes: [] });
@@ -193,6 +195,7 @@ export function AuditEngagementGroupsDrawer(props: AuditEngagementGroupsDrawerPr
         employees={employees}
         businessSegments={businessSegments}
         processScoped={codeOptions.processScoped}
+        canManageMembers={isTeamLead}
         onClose={() => setMembersOpen(false)}
         onChanged={load}
       />

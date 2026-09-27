@@ -2,6 +2,12 @@ import type { ApiResponse, ImportResult } from "@govia/ui-kit";
 import { httpClient } from "./client";
 import type { AssignmentApprovalStatus } from "./auditWorkManagement";
 
+export interface AuditTtssTeamRecommendation {
+  id: string;
+  code: string;
+  content: string;
+}
+
 export interface AuditTtssRecordItem {
   id: string;
   engagementId: string;
@@ -33,9 +39,8 @@ export interface AuditTtssRecordItem {
   uploaderRecommendationCode: string | null;
   uploaderRecommendationName: string | null;
   appendix: string | null;
-  teamRecommendationId: string | null;
-  teamRecommendationCode: string | null;
-  teamRecommendationContent: string | null;
+  /** Cac kien nghi truong doan da gan (1 TTSS co the gan nhieu kien nghi - test25.9). */
+  teamRecommendations: AuditTtssTeamRecommendation[];
   recommendationApprovalStatus: AssignmentApprovalStatus | null;
   recommendationApprovedBy: string | null;
   recommendationApprovedAt: string | null;
@@ -75,8 +80,8 @@ export async function deleteAuditTtssRecord(engagementId: string, recordId: stri
   await httpClient.delete(`${base(engagementId)}/${recordId}`);
 }
 
-export async function linkAuditTtssRecommendation(engagementId: string, ttssRecordIds: string[], recommendationId: string): Promise<void> {
-  await httpClient.post(`${base(engagementId)}/link-recommendation`, { ttssRecordIds, recommendationId });
+export async function linkAuditTtssRecommendation(engagementId: string, ttssRecordIds: string[], recommendationIds: string[]): Promise<void> {
+  await httpClient.post(`${base(engagementId)}/link-recommendation`, { ttssRecordIds, recommendationIds });
 }
 
 export async function approveAuditTtssRecommendations(engagementId: string, ttssRecordIds: string[]): Promise<string[]> {

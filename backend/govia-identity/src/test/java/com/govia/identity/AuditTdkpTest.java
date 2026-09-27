@@ -261,6 +261,42 @@ class AuditTdkpTest {
         assertThat(branchService.listDefects(null)).isEmpty();
     }
 
+    /** test25.9: 1 TTSS gan nhieu kien nghi truong doan -> 1 dong sai sot duoi MOI kien nghi chi nhanh. */
+    @Test
+    void branchTransferCreatesDefectUnderEachLinkedRecommendation() {
+        AuditEngagement engagement = new AuditEngagement();
+        engagement.setTenantId(tenantId);
+        engagement.setCode("CN" + "C200" + "2022" + "01");
+        engagement.setAuditObjectUnitId(unit.getId());
+        engagement.setYear(2022);
+        engagement.setTeamLeadEmployeeId(employee.getId());
+        engagement = engagementRepository.save(engagement);
+        List<UUID> recommendationIds = new ArrayList<>();
+        for (String code : List.of("KNKT001", "KNKT002")) {
+            AuditRecommendation recommendation = new AuditRecommendation();
+            recommendation.setTenantId(tenantId);
+            recommendation.setEngagementId(engagement.getId());
+            recommendation.setCode(code);
+            recommendation.setContent("Kien nghi " + code);
+            recommendationIds.add(auditRecommendationRepository.save(recommendation).getId());
+        }
+        AuditTtssRecord record = new AuditTtssRecord();
+        record.setTenantId(tenantId);
+        record.setEngagementId(engagement.getId());
+        record.getTeamRecommendationIds().addAll(recommendationIds);
+        record.setRecommendationApprovalStatus(AssignmentApprovalStatus.APPROVED);
+        record.setTtssContent("Sai sot chung");
+        ttssRepository.save(record);
+
+        AuditTdkpBranchDto.TransferResult first = branchService.transferFromExecution(2022);
+        AuditTdkpBranchDto.TransferResult second = branchService.transferFromExecution(2022);
+
+        assertThat(first.recommendationsCreated()).isEqualTo(2);
+        assertThat(first.defectsCreated()).isEqualTo(2);
+        assertThat(second.defectsCreated()).isZero();
+        assertThat(branchService.listRecommendations()).hasSize(2).allSatisfy(r -> assertThat(r.defectCount()).isEqualTo(1));
+    }
+
     // ---------- sheet 5, 6 ----------
 
     @Test
@@ -369,7 +405,9 @@ class AuditTdkpTest {
         AuditTtssRecord record = new AuditTtssRecord();
         record.setTenantId(tenantId);
         record.setEngagementId(engagementId);
-        record.setTeamRecommendationId(recommendationId);
+        if (recommendationId != null) {
+            record.getTeamRecommendationIds().add(recommendationId);
+        }
         record.setRecommendationApprovalStatus(status);
         record.setTtssContent(content);
         record.setCustomerName(customer);

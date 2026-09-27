@@ -18,6 +18,8 @@ import type { AssignmentApprovalStatus } from "../../../api/auditWorkManagement"
 import { useAuth } from "../../../auth/AuthContext";
 import {
   approvalStatusOptions,
+  CompletionClosedFilterSelect,
+  filterByCompletionClosed,
   filterOption,
   fromApiDate,
   renderApprovalStatus,
@@ -26,6 +28,7 @@ import {
   renderText,
   toApiDate,
   useTdkpLookups,
+  type CompletionClosedFilter,
 } from "./tdkpShared";
 import type { TFunction } from "i18next";
 import type dayjs from "dayjs";
@@ -84,6 +87,7 @@ export function TdkpResolutionPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<TdkpResolutionItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [completionFilter, setCompletionFilter] = useState<CompletionClosedFilter | undefined>(undefined);
   const [form] = Form.useForm<FormValues>();
 
   const load = useCallback(async () => {
@@ -247,10 +251,11 @@ export function TdkpResolutionPage() {
   return (
     <div>
       <Typography.Title level={4}>{t("auditTdkp.resolution.title")}</Typography.Title>
+      <CompletionClosedFilterSelect t={t} value={completionFilter} onChange={setCompletionFilter} />
       <CrudTable<TdkpResolutionItem>
         tableId="audit.tdkp.resolution"
         columns={columns}
-        dataSource={items}
+        dataSource={filterByCompletionClosed(items, completionFilter, (item) => item.completionDate)}
         rowKey="id"
         loading={loading}
         onAdd={canCreate ? openCreate : undefined}

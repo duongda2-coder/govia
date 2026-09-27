@@ -287,7 +287,7 @@ public class AuditEngagementMonitoringService {
         int ttssTypeCount = distinctFindingCodeCount(ttss, r -> true);
         int totalMaterialFindings = (int) ttss.stream().filter(AuditTtssRecord::isMaterial).count();
         int materialTtssTypeCount = distinctFindingCodeCount(ttss, AuditTtssRecord::isMaterial);
-        int recommendationCount = (int) ttss.stream().filter(r -> r.getTeamRecommendationId() != null).count();
+        int recommendationCount = ttss.stream().mapToInt(r -> r.getTeamRecommendationIds().size()).sum();
 
         ProgressStat cbkt = progressFor(assignments, resolved, AuditWorkPhase.CBKT, null);
         ProgressStat thktSample = progressFor(assignments, resolved, AuditWorkPhase.THKT, true);
@@ -350,7 +350,7 @@ public class AuditEngagementMonitoringService {
         int businessSegmentCount = distinctSegmentCount(members);
         int totalFindings = ttssRecords.size();
         int totalMaterialFindings = (int) ttssRecords.stream().filter(AuditTtssRecord::isMaterial).count();
-        int recommendationCount = (int) ttssRecords.stream().filter(r -> r.getTeamRecommendationId() != null).count();
+        int recommendationCount = ttssRecords.stream().mapToInt(r -> r.getTeamRecommendationIds().size()).sum();
         return new AuditEngagementMonitoringResponse(engagement, memberCount, businessSegmentCount, totalFindings, totalMaterialFindings, recommendationCount);
     }
 

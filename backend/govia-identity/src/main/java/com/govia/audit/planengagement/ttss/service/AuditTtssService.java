@@ -61,10 +61,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -538,25 +541,29 @@ public class AuditTtssService {
     public List<AuditTtssRecordResponse> linkRecommendation(UUID engagementId, AuditTtssLinkRecommendationRequest request) {
         UUID tenantId = TenantContext.getTenantId();
         getEngagementOrThrow(tenantId, engagementId);
-        AuditRecommendation recommendation = recommendationRepository.findById(request.recommendationId())
-                .filter(r -> r.getTenantId().equals(tenantId) && r.getEngagementId().equals(engagementId))
-                .orElseThrow(() -> new BusinessException("AUDIT_RECOMMENDATION_NOT_FOUND", "Khong tim thay kien nghi", HttpStatus.NOT_FOUND));
+        List<AuditRecommendation> recommendations = new ArrayList<>();
+        for (UUID recommendationId : new LinkedHashSet<>(request.recommendationIds())) {
+            recommendations.add(recommendationRepository.findById(recommendationId)
+                    .filter(r -> r.getTenantId().equals(tenantId) && r.getEngagementId().equals(engagementId))
+                    .orElseThrow(() -> new BusinessException("AUDIT_RECOMMENDATION_NOT_FOUND", "Khong tim thay kien nghi", HttpStatus.NOT_FOUND)));
+        }
 
         List<AuditTtssRecord> updated = new ArrayList<>();
         for (UUID recordId : request.ttssRecordIds()) {
             AuditTtssRecord record = getRecordOrThrow(tenantId, engagementId, recordId);
-            record.setTeamRecommendationId(recommendation.getId());
+            record.getTeamRecommendationIds().clear();
+            recommendations.forEach(r -> record.getTeamRecommendationIds().add(r.getId()));
             record.setRecommendationApprovalStatus(null);
             record.setRecommendationApprovedBy(null);
             record.setRecommendationApprovedAt(null);
             updated.add(ttssRepository.save(record));
         }
         auditLogService.record("AuditTtssRecord", engagementId, AuditAction.UPDATE,
-                "Gan kien nghi " + recommendation.getCode() + " cho " + updated.size() + " dong TTSS");
+                "Gan kien nghi " + recommendations.stream().map(AuditRecommendation::getCode).collect(Collectors.joining(", ")) + " cho " + updated.size() + " dong TTSS");
         return toResponses(tenantId, updated);
     }
 
-    /** "5. Phê duyệt kiến nghị" - chi chap nhan dong da duoc gan kien nghi (teamRecommendationId != null). */
+    /** "5. Phê duyệt kiến nghị" - chi chap nhan dong da duoc gan kien nghi (teamRecommendationIds khong rong). */
     @Transactional
     public List<UUID> approveRecommendations(UUID engagementId, AuditTtssApproveRecommendationsRequest request, CurrentUserPrincipal principal) {
         UUID tenantId = TenantContext.getTenantId();
@@ -570,7 +577,7 @@ public class AuditTtssService {
             if (!visibility.canSee(record)) {
                 throw new BusinessException("AUDIT_TTSS_NOT_VISIBLE", "Ban khong co quyen duyet dong TTSS nay", HttpStatus.FORBIDDEN);
             }
-            if (record.getTeamRecommendationId() == null) {
+            if (record.getTeamRecommendationIds().isEmpty()) {
                 throw new BusinessException("AUDIT_TTSS_NOT_LINKED", "Chi duoc phe duyet dong da duoc gan kien nghi", HttpStatus.BAD_REQUEST);
             }
             if (record.getRecommendationApprovalStatus() == AssignmentApprovalStatus.APPROVED) {
@@ -776,7 +783,10 @@ public class AuditTtssService {
         AuditMasterDataItem segment = segments.get(record.getBusinessSegmentId());
         AuditProcessStepSummary stepSummary = stepSummaries.get(record.getProcessStepSummaryId());
         AuditProcessStepDetail stepDetail = stepDetails.get(record.getProcessStepDetailId());
-        AuditRecommendation teamRecommendation = recommendations.get(record.getTeamRecommendationId());
+        List<AuditTtssRecordResponse.TeamRecommendation> teamRecommendations = record.getTeamRecommendationIds().stream()
+                .map(recommendations::get).filter(Objects::nonNull)
+                .sorted(Comparator.comparing(AuditRecommendation::getCode, Comparator.nullsLast(Comparator.naturalOrder())))
+                .map(r -> new AuditTtssRecordResponse.TeamRecommendation(r.getId(), r.getCode(), r.getContent())).toList();
         return new AuditTtssRecordResponse(record.getId(), record.getEngagementId(), record.getBusinessSegmentId(),
                 segment == null ? null : segment.getCode(), record.getRecordUsername(), record.getWorkItemCode(),
                 record.getProcessStepSummaryId(), stepSummary == null ? null : stepSummary.getCode(), stepSummary == null ? null : stepSummary.getName(),
@@ -784,8 +794,7 @@ public class AuditTtssService {
                 record.getFindingCode(), record.getFindingName(), record.isMaterial(), record.getReferenceNumber(), record.getReferenceNumber2(),
                 record.getCustomerCode(), record.getCustomerName(), record.getAmount(), record.getPerformingUser(), record.getTransactionContent(),
                 record.getExceptionDate(), record.getApproverName(), record.getControllerName(), record.getTtssPerformerName(), record.getRelatedStaff(),
-                record.getUploaderRecommendationCode(), record.getUploaderRecommendationName(), record.getAppendix(), record.getTeamRecommendationId(),
-                teamRecommendation == null ? null : teamRecommendation.getCode(), teamRecommendation == null ? null : teamRecommendation.getContent(),
+                record.getUploaderRecommendationCode(), record.getUploaderRecommendationName(), record.getAppendix(), teamRecommendations,
                 record.getRecommendationApprovalStatus(), record.getRecommendationApprovedBy(), record.getRecommendationApprovedAt());
     }
 }
