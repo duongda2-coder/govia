@@ -30,6 +30,7 @@ const CAPABILITY_COLUMNS: { key: CapabilityFlagKey; labelKey: string }[] = [
   { key: "truongNhomCapable", labelKey: "auditEmployeeCapability.columns.truongNhomCapable" },
   { key: "toGiamSatCapable", labelKey: "auditEmployeeCapability.columns.toGiamSatCapable" },
   { key: "dgclCapable", labelKey: "auditEmployeeCapability.columns.dgclCapable" },
+  { key: "dgclControlCapable", labelKey: "auditEmployeeCapability.columns.dgclControlCapable" },
 ];
 
 /**
@@ -98,6 +99,7 @@ export function EmployeeCapabilityPage() {
           truongNhomCapable: r.truongNhomCapable,
           toGiamSatCapable: r.toGiamSatCapable,
           dgclCapable: r.dgclCapable,
+          dgclControlCapable: r.dgclControlCapable,
         })),
       );
       setRows(updated);

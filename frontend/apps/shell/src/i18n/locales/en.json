@@ -64,6 +64,8 @@
     "auditTdkpUnitRecommendation": "Unit recommendations to IA",
     "auditTdkpReport": "Follow-up reports",
     "auditPhbc": "Report Issuance",
+    "auditDgclGroup": "Quality Assessment",
+    "auditDgcl": "Audit Team Quality Assessment",
     "auditPlan": "Planning",
     "auditPlanMasterData": "Master Data",
     "auditPlanMdBranchStaff": "Branch Staff Position",
@@ -813,6 +815,7 @@
       "truongNhomCapable": "Group Lead",
       "toGiamSatCapable": "Supervision Team",
       "dgclCapable": "Quality Assessment",
+      "dgclControlCapable": "Quality Assessment Control",
       "enteredBy": "Entered By",
       "updatedAt": "Updated At",
       "approved": "Approved",
@@ -2998,6 +3001,86 @@
         "deleteError": "Failed to delete",
         "saveError": "Failed to save"
       }
+    }
+  },
+  "auditDgcl": {
+    "pageTitle": "Audit Team Quality Assessment",
+    "evaluateTeamButton": "Assess team quality",
+    "teamTitle": "Quality assessment - {{code}}",
+    "teamRow": "Audit engagement",
+    "sheetTitle": "Quality assessment: {{name}} - {{code}}",
+    "progress": "Confirmed {{done}}/{{total}}",
+    "unsavedHint": "Unsaved changes - scores are recalculated after Save",
+    "readOnlyHint": "View only. Assess/control rights are granted in the \"Quality Assessment\"/\"Quality Assessment Control\" columns of the employee capability screen.",
+    "ownSegmentsOnly": "Show only common items and items of the member’s business segments ({{segments}})",
+    "pl01fHint": "B1/B2 come from PL01A/PL01B; quality deduction = violations × rate × max score (III). PL01A and PL01B must be confirmed before PL01F.",
+    "appendix": {
+      "PL01A": "Appendix 01A - Procedure & timing",
+      "PL01B": "Appendix 01B - Content",
+      "PL01F": "Appendix 01F - Quality assessment"
+    },
+    "columns": {
+      "engagementCode": "Engagement code",
+      "employeeName": "Staff name",
+      "segmentCodes": "Business segments",
+      "role": "Role",
+      "classification": "Rating",
+      "progress": "Assessment progress",
+      "evaluator": "Assessor",
+      "controller": "Controlled by",
+      "stt": "No.",
+      "controlContent": "Engagement control item",
+      "criteria": "Criteria",
+      "lineSegment": "Segment",
+      "required": "Required",
+      "compliant": "Compliant",
+      "nonCompliant": "Non-compliant",
+      "detail": "Non-compliance details",
+      "document": "Supporting documents",
+      "lineEvaluator": "Assessed by",
+      "note": "Note",
+      "maxScore": "Max score",
+      "violationCount": "Violations",
+      "deduction": "Deduction",
+      "points": "Points",
+      "ratio": "Ratio"
+    },
+    "summary": {
+      "total": "Total assigned items",
+      "counts": "Required: {{required}} · Compliant: {{compliant}} · Non-compliant: {{nonCompliant}}",
+      "ratio": "Ratio",
+      "score": "Score",
+      "evaluator": "Assessor",
+      "grandTotal": "Total score (VI)",
+      "bonusPenalty": "Bonus / penalty"
+    },
+    "status": {
+      "draft": "Not confirmed",
+      "confirmed": "Confirmed - {{name}}",
+      "controlled": "Controlled - {{name}}"
+    },
+    "actions": {
+      "confirm": "Confirm assessment",
+      "unconfirm": "Cancel confirmation",
+      "control": "Control assessment",
+      "uncontrol": "Cancel control"
+    },
+    "confirmAction": {
+      "confirm": "Confirm this assessment? The score will be shown on the assessment screen.",
+      "unconfirm": "Cancel confirmation? The score on the assessment screen will be cleared.",
+      "control": "Control this assessment? It will be locked for the assessor.",
+      "uncontrol": "Cancel control? The assessor can edit again."
+    },
+    "messages": {
+      "loadError": "Could not load quality assessment data",
+      "saveSuccess": "Assessment saved",
+      "saveError": "Could not save assessment",
+      "confirmSuccess": "Assessment confirmed",
+      "unconfirmSuccess": "Confirmation cancelled",
+      "controlSuccess": "Assessment controlled",
+      "uncontrolSuccess": "Control cancelled",
+      "actionError": "Action failed",
+      "exportError": "Could not export PL04B1"
     }
   }
 }

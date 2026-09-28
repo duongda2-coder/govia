@@ -63,7 +63,7 @@ class AuditEmployeeCapabilityServiceTest {
 
     private AuditEmployeeCapabilityItemRequest allFalseExcept(UUID employeeId, boolean tdCapable) {
         return new AuditEmployeeCapabilityItemRequest(employeeId, false, false, false, false, false, false, false,
-                false, false, tdCapable, false, false, false, false);
+                false, false, tdCapable, false, false, false, false, false);
     }
 
     @Test

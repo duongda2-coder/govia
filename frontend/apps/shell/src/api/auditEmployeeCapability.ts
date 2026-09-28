@@ -20,6 +20,7 @@ export interface AuditEmployeeCapabilityItem {
   truongNhomCapable: boolean;
   toGiamSatCapable: boolean;
   dgclCapable: boolean;
+  dgclControlCapable: boolean;
   enteredBy: string | null;
   updatedAt: string | null;
   approved: boolean;
@@ -41,7 +42,8 @@ export type CapabilityFlagKey =
   | "truongDoanCapable"
   | "truongNhomCapable"
   | "toGiamSatCapable"
-  | "dgclCapable";
+  | "dgclCapable"
+  | "dgclControlCapable";
 
 export interface AuditEmployeeCapabilityItemRequest {
   employeeId: string;
@@ -59,6 +61,7 @@ export interface AuditEmployeeCapabilityItemRequest {
   truongNhomCapable: boolean;
   toGiamSatCapable: boolean;
   dgclCapable: boolean;
+  dgclControlCapable: boolean;
 }
 
 const BASE = "/api/audit/master-data/employee-capability";

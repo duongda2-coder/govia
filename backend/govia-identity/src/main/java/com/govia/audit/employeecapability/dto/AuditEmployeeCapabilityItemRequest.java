@@ -20,6 +20,7 @@ public record AuditEmployeeCapabilityItemRequest(
         boolean truongDoanCapable,
         boolean truongNhomCapable,
         boolean toGiamSatCapable,
-        boolean dgclCapable
+        boolean dgclCapable,
+        boolean dgclControlCapable
 ) {
 }

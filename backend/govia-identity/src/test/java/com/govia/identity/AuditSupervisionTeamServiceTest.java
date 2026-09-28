@@ -202,7 +202,7 @@ class AuditSupervisionTeamServiceTest {
 
     private void markSupervisionCapable(UUID employeeId, boolean capable) {
         capabilityService.bulkUpdate(List.of(new AuditEmployeeCapabilityItemRequest(employeeId,
-                false, false, false, false, false, false, false, false, false, false, false, false, capable, false)));
+                false, false, false, false, false, false, false, false, false, false, false, false, capable, false, false)));
     }
 
     private AuditEngagement createEngagement(String code, UUID teamLeadEmployeeId) {

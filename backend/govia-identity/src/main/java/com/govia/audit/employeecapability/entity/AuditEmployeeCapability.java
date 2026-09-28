@@ -79,6 +79,10 @@ public class AuditEmployeeCapability extends BaseEntity {
     @Column(name = "dgcl_capable", nullable = false)
     private boolean dgclCapable;
 
+    /** Kiem soat DGCL - duoc khoa/mo khoa ket qua danh gia chat luong cua nguoi danh gia (DGCL_CN.xlsx). */
+    @Column(name = "dgcl_control_capable", nullable = false)
+    private boolean dgclControlCapable;
+
     @Column(name = "approved", nullable = false)
     private boolean approved;
 

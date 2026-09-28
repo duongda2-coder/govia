@@ -131,7 +131,7 @@ public class AuditEmployeeCapabilityService {
         return wordExportService.export("Khai báo khả năng đảm nhận lĩnh vực", exportColumns(), exportRows());
     }
 
-    /** Import khop theo "User Name" (dung dinh dang file da xuat) - chi cap nhat 14 co, khong dong nao tao/xoa nhan vien. */
+    /** Import khop theo "User Name" (dung dinh dang file da xuat) - chi cap nhat 15 co, khong dong nao tao/xoa nhan vien. */
     @Transactional
     public ImportResult importFromExcel(MultipartFile file) {
         List<Map<String, String>> rows;
@@ -165,7 +165,8 @@ public class AuditEmployeeCapabilityService {
                         parseCheckbox(row.get("tcktCapable")), parseCheckbox(row.get("cnttCapable")), parseCheckbox(row.get("ttkqCapable")),
                         parseCheckbox(row.get("pcrtCapable")), parseCheckbox(row.get("ttqtCapable")), parseCheckbox(row.get("xdcbCapable")),
                         parseCheckbox(row.get("tdCapable")), parseCheckbox(row.get("truongDoanCapable")), parseCheckbox(row.get("truongNhomCapable")),
-                        parseCheckbox(row.get("toGiamSatCapable")), parseCheckbox(row.get("dgclCapable")));
+                        parseCheckbox(row.get("toGiamSatCapable")), parseCheckbox(row.get("dgclCapable")),
+                        parseCheckbox(row.get("dgclControlCapable")));
                 bulkUpdate(List.of(item));
                 success++;
             } catch (BusinessException e) {
@@ -193,6 +194,7 @@ public class AuditEmployeeCapabilityService {
         capability.setTruongNhomCapable(item.truongNhomCapable());
         capability.setToGiamSatCapable(item.toGiamSatCapable());
         capability.setDgclCapable(item.dgclCapable());
+        capability.setDgclControlCapable(item.dgclControlCapable());
     }
 
     private Employee getOwnedEmployeeOrThrow(UUID tenantId, UUID employeeId) {
@@ -244,6 +246,7 @@ public class AuditEmployeeCapabilityService {
                 new ExportColumn("truongNhomCapable", "Trưởng nhóm"),
                 new ExportColumn("toGiamSatCapable", "Tổ giám sát"),
                 new ExportColumn("dgclCapable", "Thực hiện ĐGCL"),
+                new ExportColumn("dgclControlCapable", "Kiểm soát ĐGCL"),
                 new ExportColumn("enteredBy", "User nhập"),
                 new ExportColumn("approved", "Phê duyệt"),
                 new ExportColumn("approvedBy", "User phê duyệt"),
@@ -270,6 +273,7 @@ public class AuditEmployeeCapabilityService {
             row.put("truongNhomCapable", checkboxLabel(r.truongNhomCapable()));
             row.put("toGiamSatCapable", checkboxLabel(r.toGiamSatCapable()));
             row.put("dgclCapable", checkboxLabel(r.dgclCapable()));
+            row.put("dgclControlCapable", checkboxLabel(r.dgclControlCapable()));
             row.put("enteredBy", r.enteredBy());
             row.put("approved", checkboxLabel(r.approved()));
             row.put("approvedBy", r.approvedBy());
@@ -286,12 +290,12 @@ public class AuditEmployeeCapabilityService {
     private AuditEmployeeCapabilityResponse toResponse(Employee employee, AuditEmployeeCapability c, String username) {
         if (c == null) {
             return new AuditEmployeeCapabilityResponse(employee.getId(), employee.getEmployeeCode(), username, employee.getFullName(),
-                    false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+                    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
                     null, null, false, null, null);
         }
         return new AuditEmployeeCapabilityResponse(employee.getId(), employee.getEmployeeCode(), username, employee.getFullName(),
                 c.isTheCapable(), c.isQtdhCapable(), c.isHdvCapable(), c.isTcktCapable(), c.isCnttCapable(), c.isTtkqCapable(),
                 c.isPcrtCapable(), c.isTtqtCapable(), c.isXdcbCapable(), c.isTdCapable(), c.isTruongDoanCapable(), c.isTruongNhomCapable(),
-                c.isToGiamSatCapable(), c.isDgclCapable(), c.getCreatedBy(), c.getUpdatedAt(), c.isApproved(), c.getApprovedBy(), c.getApprovedAt());
+                c.isToGiamSatCapable(), c.isDgclCapable(), c.isDgclControlCapable(), c.getCreatedBy(), c.getUpdatedAt(), c.isApproved(), c.getApprovedBy(), c.getApprovedAt());
     }
 }

@@ -64,6 +64,8 @@
     "auditTdkpUnitRecommendation": "Kiến nghị của Đơn vị đối với KTNB",
     "auditTdkpReport": "Báo cáo theo dõi khắc phục",
     "auditPhbc": "Phát hành báo cáo",
+    "auditDgclGroup": "Đánh giá chất lượng",
+    "auditDgcl": "Đánh giá chất lượng đoàn kiểm toán",
     "auditPlan": "Lập kế hoạch",
     "auditPlanMasterData": "Danh mục",
     "auditPlanMdBranchStaff": "Chức danh cán bộ chi nhánh",
@@ -813,6 +815,7 @@
       "truongNhomCapable": "Trưởng nhóm",
       "toGiamSatCapable": "Tổ giám sát",
       "dgclCapable": "Thực hiện ĐGCL",
+      "dgclControlCapable": "Kiểm soát ĐGCL",
       "enteredBy": "User nhập",
       "updatedAt": "Ngày update",
       "approved": "Phê duyệt",
@@ -3110,6 +3113,86 @@
         "deleteError": "Xóa thất bại",
         "saveError": "Lưu thất bại"
       }
+    }
+  },
+  "auditDgcl": {
+    "pageTitle": "Đánh giá chất lượng đoàn kiểm toán",
+    "evaluateTeamButton": "Đánh giá chất lượng ĐKT",
+    "teamTitle": "Đánh giá chất lượng - {{code}}",
+    "teamRow": "Cuộc kiểm toán",
+    "sheetTitle": "Đánh giá chất lượng: {{name}} - {{code}}",
+    "progress": "Đã xác nhận {{done}}/{{total}}",
+    "unsavedHint": "Có thay đổi chưa lưu - điểm được tính lại sau khi Lưu",
+    "readOnlyHint": "Bạn chỉ có quyền xem. Quyền đánh giá/kiểm soát được khai báo ở cột \"Thực hiện ĐGCL\"/\"Kiểm soát ĐGCL\" màn hình Khai báo khả năng đảm nhận.",
+    "ownSegmentsOnly": "Chỉ hiện nội dung chung và nội dung thuộc mảng nghiệp vụ của cán bộ ({{segments}})",
+    "pl01fHint": "Điểm B1/B2 lấy từ PL01A/PL01B; điểm trừ chất lượng = số lỗi × tỷ lệ × điểm tối đa (III). Xác nhận PL01F cần xác nhận PL01A và PL01B trước.",
+    "appendix": {
+      "PL01A": "Phụ lục 01A - Tuân thủ trình tự, thời gian",
+      "PL01B": "Phụ lục 01B - Nội dung",
+      "PL01F": "Phụ lục 01F - Đánh giá chất lượng"
+    },
+    "columns": {
+      "engagementCode": "Mã cuộc kiểm toán",
+      "employeeName": "Tên cán bộ",
+      "segmentCodes": "Mã mảng nghiệp vụ",
+      "role": "Vai trò",
+      "classification": "Xếp loại",
+      "progress": "Tiến độ ĐGCL",
+      "evaluator": "Người ĐGCL",
+      "controller": "Kiểm soát",
+      "stt": "STT",
+      "controlContent": "Nội dung kiểm soát CKT",
+      "criteria": "Tiêu chí",
+      "lineSegment": "Nghiệp vụ",
+      "required": "NDTH",
+      "compliant": "Tuân thủ",
+      "nonCompliant": "Không/chưa tuân thủ",
+      "detail": "Ghi cụ thể nội dung chưa tuân thủ/chưa đạt",
+      "document": "Tài liệu để kiểm soát",
+      "lineEvaluator": "User đánh giá",
+      "note": "Ghi chú",
+      "maxScore": "Điểm tối đa",
+      "violationCount": "Số lượng lỗi vi phạm",
+      "deduction": "Điểm trừ",
+      "points": "Điểm",
+      "ratio": "Tỷ lệ"
+    },
+    "summary": {
+      "total": "Tổng cộng công việc thực hiện theo phân công",
+      "counts": "NDTH: {{required}} · Tuân thủ: {{compliant}} · Không/chưa tuân thủ: {{nonCompliant}}",
+      "ratio": "Tỷ lệ",
+      "score": "Điểm chấm",
+      "evaluator": "Người ĐGCL",
+      "grandTotal": "Tổng điểm đạt được (VI)",
+      "bonusPenalty": "Điểm cộng / điểm trừ"
+    },
+    "status": {
+      "draft": "Chưa xác nhận",
+      "confirmed": "Đã xác nhận hoàn thành - {{name}}",
+      "controlled": "Đã kiểm soát - {{name}}"
+    },
+    "actions": {
+      "confirm": "Xác nhận hoàn thành ĐGCL",
+      "unconfirm": "Hủy xác nhận hoàn thành",
+      "control": "Kiểm soát ĐGCL",
+      "uncontrol": "Hủy kiểm soát ĐGCL"
+    },
+    "confirmAction": {
+      "confirm": "Xác nhận hoàn thành ĐGCL? Điểm sẽ được cập nhật ra màn hình đánh giá chất lượng.",
+      "unconfirm": "Hủy xác nhận hoàn thành? Điểm ở màn hình ngoài sẽ để trống.",
+      "control": "Kiểm soát ĐGCL? Phụ lục sẽ bị khóa, người đánh giá không sửa được nữa.",
+      "uncontrol": "Hủy kiểm soát ĐGCL? Người đánh giá được đánh giá lại."
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu đánh giá chất lượng",
+      "saveSuccess": "Đã lưu đánh giá",
+      "saveError": "Lưu đánh giá thất bại",
+      "confirmSuccess": "Đã xác nhận hoàn thành ĐGCL",
+      "unconfirmSuccess": "Đã hủy xác nhận hoàn thành",
+      "controlSuccess": "Đã kiểm soát ĐGCL",
+      "uncontrolSuccess": "Đã hủy kiểm soát ĐGCL",
+      "actionError": "Thao tác thất bại",
+      "exportError": "Xuất PL04B1 thất bại"
     }
   }
 }

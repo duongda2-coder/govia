@@ -21,6 +21,8 @@ export interface AttachmentPanelProps {
   /** Bao lai cho man hinh cha so file hien tai moi lan danh sach thay doi (upload/xoa) - man hinh
    * danh sach dung de cap nhat badge so file ngay lap tuc, khong doi dong Drawer/Modal dinh kem. */
   onCountChange?: (count: number) => void;
+  /** Chi xem/tai file, an nut upload/xoa (vd ban ghi da khoa/kiem soat). */
+  readOnly?: boolean;
 }
 
 /**
@@ -45,7 +47,9 @@ export async function fetchAttachmentCounts(
  * Chi can truyen entityName ("AUDIT_FINDING", "EMPLOYEE"...) va entityId,
  * goi thang API /api/attachments ben govia-core - khong man hinh nao tu viet upload rieng.
  */
-export function AttachmentPanel({ http, entityName, entityId, onCountChange }: AttachmentPanelProps) {
+const dropFalsy = <T,>(items: (T | false)[]): T[] => items.filter((i): i is T => i !== false);
+
+export function AttachmentPanel({ http, entityName, entityId, onCountChange, readOnly = false }: AttachmentPanelProps) {
   const [items, setItems] = useState<Attachment[]>([]);
   const [loading, setLoading] = useState(false);
   const { message } = App.useApp();
@@ -103,26 +107,30 @@ export function AttachmentPanel({ http, entityName, entityId, onCountChange }: A
 
   return (
     <div>
-      <Upload multiple beforeUpload={handleUpload} showUploadList={false}>
-        <Button icon={<UploadOutlined />}>{t("attachment.upload")}</Button>
-      </Upload>
+      {!readOnly && (
+        <Upload multiple beforeUpload={handleUpload} showUploadList={false}>
+          <Button icon={<UploadOutlined />}>{t("attachment.upload")}</Button>
+        </Upload>
+      )}
       <List
         loading={loading}
         style={{ marginTop: 12 }}
         dataSource={items}
         renderItem={(item) => (
           <List.Item
-            actions={[
+            actions={dropFalsy([
               <Button
                 key="download"
                 type="link"
                 icon={<DownloadOutlined />}
                 onClick={() => handleDownload(item.id, item.fileName)}
               />,
-              <Popconfirm key="delete" title={t("attachment.deleteConfirm")} onConfirm={() => handleDelete(item.id)}>
-                <Button type="link" danger icon={<DeleteOutlined />} />
-              </Popconfirm>,
-            ]}
+              !readOnly && (
+                <Popconfirm key="delete" title={t("attachment.deleteConfirm")} onConfirm={() => handleDelete(item.id)}>
+                  <Button type="link" danger icon={<DeleteOutlined />} />
+                </Popconfirm>
+              ),
+            ])}
           >
             {item.fileName}
           </List.Item>

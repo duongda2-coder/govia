@@ -1,0 +1,99 @@
+databaseChangeLog:
+
+  # ===================== Danh gia chat luong doan kiem toan (DGCL) - file "DGCL_CN.xlsx" =====================
+  - changeSet:
+      id: 183-1-audit-employee-capability-dgcl-control
+      author: govia
+      comment: "DGCL - them cot 'Kiem soat DGCL' vao man hinh Khai bao kha nang dam nhan (ZTC_KNDN)"
+      changes:
+        - addColumn:
+            tableName: audit_employee_capability
+            columns:
+              - column: { name: dgcl_control_capable, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+
+  - changeSet:
+      id: 183-2-audit-dgcl-evaluation
+      author: govia
+      comment: "DGCL - 1 phieu danh gia (PL01A/PL01B/PL01F) cho 1 doi tuong (thanh vien doan hoac ca cuoc kiem toan) cua 1 CKT"
+      changes:
+        - createTable:
+            tableName: audit_dgcl_evaluation
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: engagement_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: subject_key, type: VARCHAR(40), constraints: { nullable: false } }
+              - column: { name: employee_id, type: UUID }
+              - column: { name: appendix, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: score, type: "DECIMAL(9,4)" }
+              - column: { name: bonus_points, type: "DECIMAL(9,4)" }
+              - column: { name: penalty_points, type: "DECIMAL(9,4)" }
+              - column: { name: classification, type: VARCHAR(100) }
+              - column: { name: evaluator_name, type: VARCHAR(255) }
+              - column: { name: confirmed, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: confirmed_by, type: VARCHAR(255) }
+              - column: { name: confirmed_at, type: TIMESTAMP }
+              - column: { name: controlled, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: controlled_by, type: VARCHAR(255) }
+              - column: { name: controlled_at, type: TIMESTAMP }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_dgcl_evaluation
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_dgcl_evaluation_tenant
+        - addForeignKeyConstraint:
+            baseTableName: audit_dgcl_evaluation
+            baseColumnNames: engagement_id
+            referencedTableName: audit_engagement
+            referencedColumnNames: id
+            onDelete: CASCADE
+            constraintName: fk_dgcl_evaluation_engagement
+        - addUniqueConstraint:
+            tableName: audit_dgcl_evaluation
+            columnNames: tenant_id, engagement_id, subject_key, appendix
+            constraintName: uk_dgcl_evaluation_subject
+
+  - changeSet:
+      id: 183-3-audit-dgcl-evaluation-line
+      author: govia
+      comment: "DGCL - gia tri nhap tay tren tung dong tieu chi cua phieu (khoa theo item_key cua bo tieu chi templates/audit/dgcl-criteria.json)"
+      changes:
+        - createTable:
+            tableName: audit_dgcl_evaluation_line
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: evaluation_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: item_key, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: required, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: compliant, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: non_compliant, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: checked, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: violation_count, type: INT }
+              - column: { name: max_score, type: "DECIMAL(9,4)" }
+              - column: { name: detail, type: VARCHAR(2000) }
+              - column: { name: document, type: VARCHAR(1000) }
+              - column: { name: note, type: VARCHAR(1000) }
+              - column: { name: evaluator_name, type: VARCHAR(255) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: audit_dgcl_evaluation_line
+            baseColumnNames: evaluation_id
+            referencedTableName: audit_dgcl_evaluation
+            referencedColumnNames: id
+            onDelete: CASCADE
+            constraintName: fk_dgcl_line_evaluation
+        - addUniqueConstraint:
+            tableName: audit_dgcl_evaluation_line
+            columnNames: evaluation_id, item_key
+            constraintName: uk_dgcl_line_item

@@ -22,6 +22,7 @@ public record AuditEmployeeCapabilityResponse(
         boolean truongNhomCapable,
         boolean toGiamSatCapable,
         boolean dgclCapable,
+        boolean dgclControlCapable,
         String enteredBy,
         Instant updatedAt,
         boolean approved,

@@ -1,0 +1,23 @@
+databaseChangeLog:
+
+  # ===================== PERMISSION CATALOG: Danh gia chat luong doan kiem toan (DGCL) =====================
+  - changeSet:
+      id: 184-1-permission-catalog-audit-dgcl
+      author: govia
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "29daac32-df81-4d5d-a99d-7c54e56e1a11" }
+              - column: { name: code, value: "AUDIT.DGCL.VIEW" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem - Danh gia chat luong doan kiem toan" }
+              - column: { name: resource_label, value: "Đánh giá chất lượng" }
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "adca2e31-73ae-426e-b22e-51cd26b04b9c" }
+              - column: { name: code, value: "AUDIT.DGCL.EXPORT" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xuat PL04B1 - Danh gia chat luong doan kiem toan" }
+              - column: { name: resource_label, value: "Đánh giá chất lượng" }
