@@ -3013,6 +3013,7 @@
     "unsavedHint": "Unsaved changes - scores are recalculated after Save",
     "readOnlyHint": "View only. Assess/control rights are granted in the \"Quality Assessment\"/\"Quality Assessment Control\" columns of the employee capability screen.",
     "ownSegmentsOnly": "Show only common items and items of the member’s business segments ({{segments}})",
+    "preTickedHint": "Not saved yet: the criteria to score have been pre-ticked as Performed and Compliant (PL01B: common criteria and those of the member’s business segments). Review, then click Save.",
     "pl01fHint": "B1/B2 come from PL01A/PL01B; quality deduction = violations × rate × max score (III). PL01A and PL01B must be confirmed before PL01F.",
     "appendix": {
       "PL01A": "Appendix 01A - Procedure & timing",

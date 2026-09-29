@@ -9,57 +9,68 @@
   {
    "key": "A002",
    "stt": "1",
-   "content": "Xác định mục tiêu, phạm vi của cuộc kiểm toán"
+   "content": "Xác định mục tiêu, phạm vi của cuộc kiểm toán",
+   "tick": true
   },
   {
    "key": "A003",
    "stt": "2",
-   "content": "Lập kế hoạch, phân công nhiệm vụ chi tiết"
+   "content": "Lập kế hoạch, phân công nhiệm vụ chi tiết",
+   "tick": true
   },
   {
    "key": "A004",
    "stt": "3",
-   "content": "Thu thập và đánh giá thông tin"
+   "content": "Thu thập và đánh giá thông tin",
+   "tick": true
   },
   {
    "key": "A005",
    "stt": "4",
-   "content": "Thiết lập thủ tục kiểm toán"
+   "content": "Thiết lập thủ tục kiểm toán",
+   "tick": true
   },
   {
    "key": "A006",
    "stt": "5",
-   "content": "- Xác định và đánh giá rủi ro (đối với kiểm toán đơn vị)\n- Soát xét phân tích, xác định rủi ro và trọng tâm kiểm toán (đối với đoàn quy trình, hoạt động)"
+   "content": "- Xác định và đánh giá rủi ro (đối với kiểm toán đơn vị)\n- Soát xét phân tích, xác định rủi ro và trọng tâm kiểm toán (đối với đoàn quy trình, hoạt động)",
+   "tick": true
   },
   {
    "key": "A007",
    "stt": "6",
-   "content": "Chọn mẫu kiểm toán"
+   "content": "Chọn mẫu kiểm toán",
+   "tick": true
   },
   {
    "key": "A008",
    "stt": "7",
-   "content": "Lập báo cáo chuẩn bị kiểm toán"
+   "content": "Lập báo cáo chuẩn bị kiểm toán",
+   "tick": true
   },
   {
    "key": "A009",
    "stt": "8",
-   "content": "Trưởng đoàn tổ chức họp đoàn để trao đổi, thống nhất nội dung báo cáo chuẩn bị kiểm toán của đoàn."
+   "content": "Trưởng đoàn tổ chức họp đoàn để trao đổi, thống nhất nội dung báo cáo chuẩn bị kiểm toán của đoàn.",
+   "tick": true
   },
   {
    "key": "A010",
    "stt": "9",
-   "content": "Trưởng đoàn trình Trưởng Kiểm toán nội bộ (qua phòng Kế hoạch) phê duyệt danh sách chọn mẫu kiểm toán và kế hoạch triển khai kiểm toán đúng thời hạn.\n+ Đối với đoàn kiểm toán hoạt động, quy trình tối thiểu 10 ngày làm việc trước khi\n+ Đối với đoàn kiểm toán tại đơn vị tối thiểu 5 ngày làm việc trước khi triển khai kiểm toán trực tiếp triển khai kiểm toán trực tiếp."
+   "content": "Trưởng đoàn trình Trưởng Kiểm toán nội bộ (qua phòng Kế hoạch) phê duyệt danh sách chọn mẫu kiểm toán và kế hoạch triển khai kiểm toán đúng thời hạn.\n+ Đối với đoàn kiểm toán hoạt động, quy trình tối thiểu 10 ngày làm việc trước khi\n+ Đối với đoàn kiểm toán tại đơn vị tối thiểu 5 ngày làm việc trước khi triển khai kiểm toán trực tiếp triển khai kiểm toán trực tiếp.",
+   "tick": true
   },
   {
    "key": "A011",
    "stt": "10",
-   "content": "Trưởng đoàn kiểm toán có trách nhiệm gửi báo cáo chuẩn bị kiểm toán, tờ trình kết quả chọn mẫu (đã được phê duyệt) cho Trưởng Kiểm toán nội bộ (qua phòng kế hoạch), Thành viên Ban kiểm soát – Tổ trưởng tổ giám sát đoàn kiểm toán để giám sát và Trưởng Ban kiểm soát để báo cáo."
+   "content": "Trưởng đoàn kiểm toán có trách nhiệm gửi báo cáo chuẩn bị kiểm toán, tờ trình kết quả chọn mẫu (đã được phê duyệt) cho Trưởng Kiểm toán nội bộ (qua phòng kế hoạch), Thành viên Ban kiểm soát – Tổ trưởng tổ giám sát đoàn kiểm toán để giám sát và Trưởng Ban kiểm soát để báo cáo.",
+   "tick": true
   },
   {
    "key": "A012",
    "stt": "11",
-   "content": "Lập, gửi văn bản triển khai & yêu cầu cung cấp hồ sơ: tối thiểu trước 03 ngày làm việc"
+   "content": "Lập, gửi văn bản triển khai & yêu cầu cung cấp hồ sơ: tối thiểu trước 03 ngày làm việc",
+   "tick": true
   },
   {
    "key": "A013",
@@ -70,7 +81,8 @@
   {
    "key": "A014",
    "stt": "1",
-   "content": "Triển khai quyết định kiểm toán, tổ chức thực hiện kiểm toán"
+   "content": "Triển khai quyết định kiểm toán, tổ chức thực hiện kiểm toán",
+   "tick": true
   },
   {
    "key": "A015",
@@ -80,62 +92,74 @@
   {
    "key": "A016",
    "stt": "",
-   "content": "Lần thứ 1"
+   "content": "Lần thứ 1",
+   "tick": true
   },
   {
    "key": "A017",
    "stt": "",
-   "content": "Lần thứ 2"
+   "content": "Lần thứ 2",
+   "tick": true
   },
   {
    "key": "A018",
    "stt": "",
-   "content": "Lần thứ 3"
+   "content": "Lần thứ 3",
+   "tick": true
   },
   {
    "key": "A019",
    "stt": "",
-   "content": "Lần thứ 4"
+   "content": "Lần thứ 4",
+   "tick": true
   },
   {
    "key": "A020",
    "stt": "",
-   "content": "Lần thứ 5"
+   "content": "Lần thứ 5",
+   "tick": true
   },
   {
    "key": "A021",
    "stt": "3",
-   "content": "Lập báo cáo kèm lý do điều chỉnh mẫu chọn, trình Trưởng Kiểm toán nội bộ phê duyệt (nếu có)"
+   "content": "Lập báo cáo kèm lý do điều chỉnh mẫu chọn, trình Trưởng Kiểm toán nội bộ phê duyệt (nếu có)",
+   "tick": true
   },
   {
    "key": "A022",
    "stt": "4",
-   "content": "Trưởng đoàn kiểm toán có trách nhiệm gửi danh sách chọn mẫu đã điều chỉnh cho Thành viên Ban kiểm soát – Tổ trưởng tổ giám sát đoàn kiểm toán để giám sát, Trưởng Ban Kiểm soát để báo cáo (nếu có)"
+   "content": "Trưởng đoàn kiểm toán có trách nhiệm gửi danh sách chọn mẫu đã điều chỉnh cho Thành viên Ban kiểm soát – Tổ trưởng tổ giám sát đoàn kiểm toán để giám sát, Trưởng Ban Kiểm soát để báo cáo (nếu có)",
+   "tick": true
   },
   {
    "key": "A023",
    "stt": "5",
-   "content": "Thành viên đoàn kiểm toán hoàn thành Biên bản ghi nhận kết quả kiểm toán, gửi Trưởng Đoàn/đầu mối tổng hợp theo lĩnh vực"
+   "content": "Thành viên đoàn kiểm toán hoàn thành Biên bản ghi nhận kết quả kiểm toán, gửi Trưởng Đoàn/đầu mối tổng hợp theo lĩnh vực",
+   "tick": true
   },
   {
    "key": "A024",
    "stt": "6",
-   "content": "Trưởng Đoàn Kiểm toán tổng hợp/đầu mối tổng hợp theo lĩnh vực từ Biên bản ghi nhận kết quả kiểm toán của các thành viên; Lập dự thảo Biên bản ghi nhận kết quả kiểm toán"
+   "content": "Trưởng Đoàn Kiểm toán tổng hợp/đầu mối tổng hợp theo lĩnh vực từ Biên bản ghi nhận kết quả kiểm toán của các thành viên; Lập dự thảo Biên bản ghi nhận kết quả kiểm toán",
+   "tick": true
   },
   {
    "key": "A025",
    "stt": "7",
-   "content": "Trưởng đoàn kiểm toán tổ chức họp Đoàn để thống nhất dự thảo biên bản ghi nhận kết quả kiểm toán và những nhận định, đánh giá, kết luận trên cơ sở phát hiện kiểm toán."
+   "content": "Trưởng đoàn kiểm toán tổ chức họp Đoàn để thống nhất dự thảo biên bản ghi nhận kết quả kiểm toán và những nhận định, đánh giá, kết luận trên cơ sở phát hiện kiểm toán.",
+   "tick": true
   },
   {
    "key": "A026",
    "stt": "8",
-   "content": "Trưởng Đoàn kiểm toán gửi dự thảo Biên bản ghi nhận kết quả kiểm toán cho người đứng đầu đơn vị được kiểm toán, tổ chức họp thống nhất, thông qua nội dung Biên bản với đơn vị được kiểm toán.\nTrường hợp Đơn vị được kiểm toán có ý kiến không thống nhất với một số nội dung Biên bản ghi nhận kết quả kiểm toán thì yêu cầu đơn vị có văn bản giải trình gửi đoàn kiểm toán kèm tài liệu, hồ sơ (nếu có); trường hợp đơn vị được kiểm toán không có văn bản giải trình, trưởng đoàn báo cáo Trưởng Kiểm toán nội bộ để xử lý theo quy định"
+   "content": "Trưởng Đoàn kiểm toán gửi dự thảo Biên bản ghi nhận kết quả kiểm toán cho người đứng đầu đơn vị được kiểm toán, tổ chức họp thống nhất, thông qua nội dung Biên bản với đơn vị được kiểm toán.\nTrường hợp Đơn vị được kiểm toán có ý kiến không thống nhất với một số nội dung Biên bản ghi nhận kết quả kiểm toán thì yêu cầu đơn vị có văn bản giải trình gửi đoàn kiểm toán kèm tài liệu, hồ sơ (nếu có); trường hợp đơn vị được kiểm toán không có văn bản giải trình, trưởng đoàn báo cáo Trưởng Kiểm toán nội bộ để xử lý theo quy định",
+   "tick": true
   },
   {
    "key": "A027",
    "stt": "9",
-   "content": "Biên bản ghi nhận kết quả kiểm toán được lập và thông qua khi kết thúc cuộc kiểm toán"
+   "content": "Biên bản ghi nhận kết quả kiểm toán được lập và thông qua khi kết thúc cuộc kiểm toán",
+   "tick": true
   },
   {
    "key": "A028",
@@ -151,17 +175,20 @@
   {
    "key": "A030",
    "stt": "",
-   "content": "- Báo cáo kết quả kiểm toán (mẫu 16/BKS-KTNB đính kèm)"
+   "content": "- Báo cáo kết quả kiểm toán (mẫu 16/BKS-KTNB đính kèm)",
+   "tick": true
   },
   {
    "key": "A031",
    "stt": "",
-   "content": "- Dự thảo thông báo kết quả kiểm toán (mẫu 17/BKS-KTNB)"
+   "content": "- Dự thảo thông báo kết quả kiểm toán (mẫu 17/BKS-KTNB)",
+   "tick": true
   },
   {
    "key": "A032",
    "stt": "",
-   "content": "- Báo cáo các vấn đề chủ yếu của cuộc kiểm toán"
+   "content": "- Báo cáo các vấn đề chủ yếu của cuộc kiểm toán",
+   "tick": true
   },
   {
    "key": "A033",
@@ -171,37 +198,68 @@
   {
    "key": "A034",
    "stt": "",
-   "content": "- Trưởng đoàn kiểm toán bổ sung, chỉnh sửa theo ý kiến của Trưởng kiểm toán nội bộ sau 1 ngày làm việc"
+   "content": "- Trưởng đoàn kiểm toán bổ sung, chỉnh sửa theo ý kiến của Trưởng kiểm toán nội bộ sau 1 ngày làm việc",
+   "tick": true
   },
   {
    "key": "A035",
    "stt": "",
-   "content": "- Hoàn thiện dự thảo, lập văn bản báo cáo Thành viên Ban kiểm soát – Tổ trưởng tổ giám sát theo mẫu 18/BKS-KTNB"
+   "content": "- Hoàn thiện dự thảo, lập văn bản báo cáo Thành viên Ban kiểm soát – Tổ trưởng tổ giám sát theo mẫu 18/BKS-KTNB",
+   "tick": true
   },
   {
    "key": "A036",
    "stt": "",
-   "content": "- Hoàn thiện dự thảo theo ý kiến của Trưởng Ban kiểm soát."
+   "content": "- Hoàn thiện dự thảo theo ý kiến của Trưởng Ban kiểm soát.",
+   "tick": true
   },
   {
    "key": "A037",
    "stt": "3",
-   "content": "Ký thông báo kết quả kiểm toán\n- Đối với đoàn kiểm toán hoạt động, quy trình có mẫu chọn tại nhiều đơn vị, sau khi kết thúc kiểm toán các mẫu chọn tại từng đơn vị, Trưởng đoàn kiểm toán lập báo cáo kết quả kiểm toán và dự thảo thông báo kết quả kiểm toán trình Trưởng Kiểm toán nội bộ ký phát hành thông báo kết quả kiểm toán tại Đơn vị theo quy định"
+   "content": "Ký thông báo kết quả kiểm toán\n- Đối với đoàn kiểm toán hoạt động, quy trình có mẫu chọn tại nhiều đơn vị, sau khi kết thúc kiểm toán các mẫu chọn tại từng đơn vị, Trưởng đoàn kiểm toán lập báo cáo kết quả kiểm toán và dự thảo thông báo kết quả kiểm toán trình Trưởng Kiểm toán nội bộ ký phát hành thông báo kết quả kiểm toán tại Đơn vị theo quy định",
+   "tick": true
   },
   {
    "key": "A038",
    "stt": "",
-   "content": "- Trưởng KTNB, Trưởng đoàn kiểm toán cùng ký thông báo kết quả kiểm toán gửi Đơn vị được kiểm toán theo mẫu 17/BKS-KTNB"
+   "content": "- Trưởng KTNB, Trưởng đoàn kiểm toán cùng ký thông báo kết quả kiểm toán gửi Đơn vị được kiểm toán theo mẫu 17/BKS-KTNB",
+   "tick": true
   },
   {
    "key": "A039",
    "stt": "4",
-   "content": "Trưởng Đoàn, thành viên Đoàn kiểm toán tổ chức đánh giá chất lượng cuộc kiểm toán; Kết quả đánh giá được Trưởng đoàn trao đổi thống nhất với các thành viên trong đoàn và tổng hợp gửi Trưởng KTNB chậm nhất sau 7 ngày làm việc kể từ ngày kết thúc cuộc kiểm toán"
+   "content": "Trưởng Đoàn, thành viên Đoàn kiểm toán tổ chức đánh giá chất lượng cuộc kiểm toán; Kết quả đánh giá được Trưởng đoàn trao đổi thống nhất với các thành viên trong đoàn và tổng hợp gửi Trưởng KTNB chậm nhất sau 7 ngày làm việc kể từ ngày kết thúc cuộc kiểm toán",
+   "tick": true
   },
   {
    "key": "A040",
    "stt": "5",
-   "content": "Lưu trữ hồ sơ kiểm toán: Trong thời hạn 07 ngày làm việc kể từ ngày kết thúc cuộc kiểm toán, đoàn kiểm toán phải gửi hồ sơ cuộc kiểm toán cho Trưởng KTNB (qua phòng Kế hoạch )"
+   "content": "Lưu trữ hồ sơ kiểm toán: Trong thời hạn 07 ngày làm việc kể từ ngày kết thúc cuộc kiểm toán, đoàn kiểm toán phải gửi hồ sơ cuộc kiểm toán cho Trưởng KTNB (qua phòng Kế hoạch )",
+   "tick": true
+  },
+  {
+   "key": "A041",
+   "stt": "IV",
+   "content": "Tổng cộng công việc thực hiện theo phân công",
+   "kind": "TOTAL_COUNT"
+  },
+  {
+   "key": "A042",
+   "stt": "V",
+   "content": "Tỷ lệ",
+   "kind": "RATIO"
+  },
+  {
+   "key": "A043",
+   "stt": "",
+   "content": "Xảy ra tình trạng gián đoạn quy trình hoặc chậm báo cáo NHNN, HĐTV, TGĐ",
+   "kind": "DISRUPTION"
+  },
+  {
+   "key": "A044",
+   "stt": "VI",
+   "content": "Điểm chấm",
+   "kind": "SCORE"
   }
  ],
  "PL01B": [
@@ -214,17 +272,22 @@
   {
    "key": "B002",
    "stt": "1",
-   "content": "XÁC ĐỊNH MỤC TIÊU, PHẠM VI CỦA CUỘC KIỂM TOÁN: Đoàn kiểm toán căn cứ các nội dung trong Quyết định tổ chức thực hiện kiểm toán để xác định mục tiêu và phạm vi cụ thể của cuộc kiểm toán."
+   "content": "XÁC ĐỊNH MỤC TIÊU, PHẠM VI CỦA CUỘC KIỂM TOÁN: Đoàn kiểm toán căn cứ các nội dung trong Quyết định tổ chức thực hiện kiểm toán để xác định mục tiêu và phạm vi cụ thể của cuộc kiểm toán.",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B003",
    "stt": "2",
-   "content": "LẬP KẾ HOẠCH, PHÂN CÔNG NHIỆM VỤ CHI TIẾT: Trên cơ sở các nội dung kiểm toán và nguồn nhân lực của Đoàn kiểm toán, Trưởng Đoàn lập kế hoạch, phân công nhiệm vụ chi tiết đối với từng thành viên từ giai đoạn chuẩn bị, thực hiện kiểm toán đến báo cáo kết quả kiểm toán, tập hợp lưu trữ hồ sơ, tài liệu cuộc kiểm toán và các công việc khác có liên quan."
+   "content": "LẬP KẾ HOẠCH, PHÂN CÔNG NHIỆM VỤ CHI TIẾT: Trên cơ sở các nội dung kiểm toán và nguồn nhân lực của Đoàn kiểm toán, Trưởng Đoàn lập kế hoạch, phân công nhiệm vụ chi tiết đối với từng thành viên từ giai đoạn chuẩn bị, thực hiện kiểm toán đến báo cáo kết quả kiểm toán, tập hợp lưu trữ hồ sơ, tài liệu cuộc kiểm toán và các công việc khác có liên quan.",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B004",
    "stt": "3",
-   "content": "THU THẬP THÔNG TIN"
+   "content": "THU THẬP THÔNG TIN",
+   "segment": "CHUNG"
   },
   {
    "key": "B005",
@@ -236,19 +299,22 @@
    "key": "B006",
    "stt": "a",
    "content": "Quyết định xếp loại, xếp hạng chi nhánh; Quyết định phê duyệt quy hoạch, bổ nhiệm cán bộ thuộc diện HĐTV, Chủ tịch HĐTV, TGĐ quản lý; Biên bản Thanh kiểm tra trong thời hiệu kiểm toán, các vụ việc phát sinh tại chi nhánh; Văn bản giao, quyết toán kế hoạch kinh doanh, kế hoạch tài chính, văn bản chấn chỉnh, chỉ đạo của Tổng giám đốc liên quan đến hoạt động kiểm tra, kiểm soát nội bộ.",
-   "segment": "CE"
+   "segment": "CE",
+   "tick": true
   },
   {
    "key": "B007",
    "stt": "b",
    "content": "Thông tin về cơ cấu tổ chức, sự biến động nhân sự, công tác tuyển dụng, quy hoạch,…",
-   "segment": "CE"
+   "segment": "CE",
+   "tick": true
   },
   {
    "key": "B008",
    "stt": "c",
    "content": "Hồ sơ, tài liệu liên quan đến nội dung kiểm toán do đơn vị cung cấp theo yêu cầu của Trưởng KTNB/Trưởng đoàn kiểm toán.",
-   "segment": "CE"
+   "segment": "CE",
+   "tick": true
   },
   {
    "key": "B009",
@@ -260,19 +326,22 @@
    "key": "B010",
    "stt": "a",
    "content": "Thông tin về môi trường pháp lý/kinh tế/tự nhiên có thể ảnh hưởng đến hoạt động cấp tín dụng và đơn vị được kiểm toán; Các vụ việc nổi cộm, các biên bản thanh tra/kiểm tra/kiểm toán; Chỉ đạo điều hành của HĐTV, TGĐ liên quan đến đơn vị được kiểm toán; Văn bản giao và quyết toán kế hoạch kinh doanh...;",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B011",
    "stt": "b",
    "content": "Thu thập số liệu từ hệ thống IPCAS theo phụ lục 02/BKS-KTNB;",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B012",
    "stt": "c",
    "content": "Các hồ sơ, tài liệu liên quan đến nội dung kiểm toán theo yêu cầu cung cấp tài liệu của Trưởng KTNB/Trưởng đoàn kiểm toán.",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B013",
@@ -284,19 +353,22 @@
    "key": "B014",
    "stt": "a",
    "content": "Thông tin về môi trường phát lý/kinh tế/tự nhiên có thể ảnh hưởng đến hoạt động huy động vốn và đơn vị được kiểm toán; Các văn bản của Nhà nước; Các quy trình, quy chế, quy định liên quan đến hoạt động huy động vốn; Các vụ việc nổi cộm, các biên bản thanh tra/kiểm tra/kiểm toán; Chỉ đạo điều hành của HĐTV, TGĐ liên quan đến đơn vị kiểm toán; Văn bản giao và quyết toán kế hoạch kinh doanh.",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B015",
    "stt": "b",
    "content": "Thu thập số liệu từ hệ thống IPCAS",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B016",
    "stt": "c",
    "content": "Các hồ sơ, tài liệu liên quan đến nội dung kiểm toán do đơn vị được kiểm toán cung cấp theo yêu cầu của Trưởng KTNB/Trưởng đoàn kiểm toán yêu cầu cung cấp",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B017",
@@ -308,25 +380,29 @@
    "key": "B018",
    "stt": "a",
    "content": "Thu thập thông tin về tài chính, mua sắm TSCĐ, CCDC của đơn vị;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B019",
    "stt": "b",
    "content": "Thu thập dữ liệu được trích xuất từ hệ thống IPCAS;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B020",
    "stt": "c",
    "content": "Thu thập các biên bản thanh tra, kiểm tra, kiểm toán;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B021",
    "stt": "d",
    "content": "Thu thập các thông tin khác (nếu có): Thu thập các thông tin nổi cộm về hoạt động tài chính kế toán liên quan đến chi nhánh như các vụ việc tham ô, xâm tiêu, đơn thư… qua thông tin đại chúng, internet, thư viện Ban kiểm soát, ioffice…",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B022",
@@ -338,19 +414,22 @@
    "key": "B023",
    "stt": "a",
    "content": "Thông tin về môi trường pháp lý/kinh tế/vị trí địa lý/tự nhiên có thể ảnh hưởng đến hoạt động Tiền tệ- Kho quỹ và đơn vị được kiểm toán; Các vụ việc nổi cộm, các biên bản thanh tra/kiểm tra/kiểm toán; Chỉ đạo điều hành của HĐTV, TGĐ liên quan đến đơn vị được kiểm toán; Văn bản giao định mức tồn quỹ tiền mặt VNĐ, ngoại tệ cho các đơn vị;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B024",
    "stt": "b",
    "content": "Thu thập số liệu trên hệ thống IPCAS: Hạn mức giao dịch, hạn mức tồn quỹ tiền mặt; CCA của thủ quỹ, Giao dịch viên;\n+ Thông tin đăng ký hạn mức, phê duyệt điều chỉnh hạn mức;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B025",
    "stt": "c",
    "content": "Hồ sơ, tài liệu liên quan đến nội dung kiểm toán do Trưởng KTNB/Trưởng đoàn yêu cầu.",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B026",
@@ -362,19 +441,22 @@
    "key": "B027",
    "stt": "a",
    "content": "Thông tin về môi trường pháp lý/kinh tế/tự nhiên có thể ảnh hưởng đến hoạt động TTQT và KDNT và đơn vị được kiểm toán; Các vụ việc nổi cộm, các biên bản thanh tra/kiểm tra/kiểm toán; Chỉ đạo điều hành của HĐTV, TGĐ liên quan đến đơn vị được kiểm toán; Văn bản giao và quyết toán kế hoạch kinh doanh;…",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B028",
    "stt": "b",
    "content": "Thu thập số liệu từ hệ thống IPCAS từ các màn hình vấn tin sao kê;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B029",
    "stt": "c",
    "content": "Hồ sơ, tài liệu liên quan đến nội dung kiểm toán do đơn vị kiểm toán cung cấp.",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B030",
@@ -386,19 +468,22 @@
    "key": "B031",
    "stt": "a",
    "content": "Thông tin về môi trường pháp lý/kinh tế/tự nhiên có thể ảnh hưởng đến hoạt động Phát hành, quản lý, sử dụng và Thanh toán thẻ và đơn vị được kiểm toán; Các vụ việc nổi cộm, các biên bản thanh tra/kiểm tra/kiểm toán; Chỉ đạo điều hành của HĐTV, TGĐ liên quan đến đơn vị được kiểm toán; Văn bản giao và quyết toán kế hoạch kinh doanh...;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B032",
    "stt": "b",
    "content": "Thu thập số liệu từ hệ thống IPCAS;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B033",
    "stt": "c",
    "content": "Hồ sơ, tài liệu liên quan đến nội dung kiểm toán do đơn vị được kiểm toán cung cấp theo yêu cầu của Trưởng KTNB/Trưởng đoàn kiểm toán.",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B034",
@@ -410,19 +495,22 @@
    "key": "B035",
    "stt": "a",
    "content": "Thông tin về môi trường pháp lý/kinh tế/tự nhiên có thể ảnh hưởng đến hoạt động CNTT và đơn vị được kiểm toán; Các vụ việc nổi cộm, các biên bản thanh tra/kiểm tra/kiểm toán; Chỉ đạo điều hành của HĐTV, TGĐ liên quan đến đơn vị được kiểm toán;…",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B036",
    "stt": "b",
    "content": "Thu thập số liệu từ hệ thống IPCAS: Số lượng nhân sự, số lượng user…;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B037",
    "stt": "c",
    "content": "Hồ sơ, tài liệu liên quan đến nội dung kiểm toán theo yêu cầu của Trưởng KTNB/Trưởng đoàn kiểm toán.",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B038",
@@ -434,19 +522,22 @@
    "key": "B039",
    "stt": "a",
    "content": "Thông tin về môi trường pháp lý/kinh tế/tự nhiên có thể ảnh hưởng đến hoạt động quản lý đầu tư xây dựng, mua sắm TSCĐ, đầu tư dự án và đơn vị được kiểm toán; Các vụ việc nổi cộm, các biên bản thanh tra/kiểm tra/kiểm toán; Chỉ đạo điều hành của HĐTV, TGĐ liên quan đến đơn vị được kiểm toán; Văn bản giao và quyết toán kế hoạch đầu tư xây dựng, mua sắm TSCĐ, đầu tư dự án...;",
-   "segment": "FA"
+   "segment": "FA",
+   "tick": true
   },
   {
    "key": "B040",
    "stt": "b",
    "content": "Thu thập số liệu từ hệ thống IPCAS;",
-   "segment": "FA"
+   "segment": "FA",
+   "tick": true
   },
   {
    "key": "B041",
    "stt": "c",
    "content": "Hồ sơ, tài liệu liên quan đến nội dung kiểm toán theo yêu cầu của Trưởng KTNB/Trưởng đoàn kiểm toán",
-   "segment": "FA"
+   "segment": "FA",
+   "tick": true
   },
   {
    "key": "B042",
@@ -458,24 +549,28 @@
    "key": "B043",
    "stt": "a",
    "content": "Thu thập các thông tin từ Internet, hệ thống văn bản nội bộ của Agribank, Ban Kiểm soát: Thông tin về môi trường pháp lý/kinh tế/tự nhiên có thể ảnh hưởng đến hoạt động PCRT; Các văn bản của Nhà nước; Các quy trình, quy chế, quy định liên quan đến hoạt động PCRT",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B044",
    "stt": "b",
    "content": "Thu thập dữ liệu được trích xuất từ hệ thống IPCAS",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B045",
    "stt": "c",
    "content": "Thu thập các biên bản thanh tra, kiểm tra, kiểm toán; thông tin khác",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B046",
    "stt": "4",
-   "content": "PHÂN TÍCH, ĐÁNH GIÁ THÔNG TIN"
+   "content": "PHÂN TÍCH, ĐÁNH GIÁ THÔNG TIN",
+   "segment": "CHUNG"
   },
   {
    "key": "B047",
@@ -487,25 +582,29 @@
    "key": "B048",
    "stt": "a",
    "content": "Cơ cấu, tổ chức bộ máy, nhân sự tại Chi nhánh.",
-   "segment": "CE"
+   "segment": "CE",
+   "tick": true
   },
   {
    "key": "B049",
    "stt": "b",
    "content": "Đánh giá những thay đổi trong Ban giám đốc, trưởng phòng nghiệp vụ (thuộc thẩm quyền quản lý của HĐTV, TGĐ) ảnh hưởng đến công tác chỉ đạo, điều hành, tham mưu giúp việc về các lĩnh vực hoạt động nghiệp vụ được kiểm toán.",
-   "segment": "CE"
+   "segment": "CE",
+   "tick": true
   },
   {
    "key": "B050",
    "stt": "c",
    "content": "Đánh giá những thuận lợi, khó khăn chủ yếu ảnh hưởng đến hoạt động kinh doanh và tài chính của Đơn vị trong thời hiệu kiểm toán.",
-   "segment": "CE"
+   "segment": "CE",
+   "tick": true
   },
   {
    "key": "B051",
    "stt": "d",
    "content": "Rà soát các vụ việc phát sinh có liên quan đến đơn vị được kiểm toán đăng tải trên mạng internet, báo, trang thông tin nội bộ, đánh giá mức độ nghiêm trọng, ảnh hưởng đến hoạt động kinh doanh tại Đơn vị.",
-   "segment": "CE"
+   "segment": "CE",
+   "tick": true
   },
   {
    "key": "B052",
@@ -517,19 +616,22 @@
    "key": "B053",
    "stt": "a",
    "content": "Đánh giá môi trường pháp lý/kinh tế/tự nhiên có thể ảnh hưởng đến hoạt động cấp tín dụng tại đơn vị được kiểm toán.",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B054",
    "stt": "b",
    "content": "Đánh giá các nội dung liên quan đến hệ thống kiểm soát nội bộ đối với hoạt động cấp tín dụng tại đơn vị kiểm toán.",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B055",
    "stt": "c",
    "content": "Kết quả hoạt động:\n- Quy mô tín dụng;\n- Mức độ tập trung tín dụng;\n- Chất lượng tín dụng.",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B056",
@@ -541,31 +643,36 @@
    "key": "B057",
    "stt": "a",
    "content": "Đánh giá kết quả huy động vốn tại đơn vị; kết quả thực hiện kế hoạch kinh doanh; Phân tích đánh giá xu hướng, mức độ tăng trưởng nguồn vốn, mức độ thừa/thiếu vốn tại đơn vị.",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B058",
    "stt": "b",
    "content": "Đánh giá thông tin về môi trường pháp lý/kinh tế/tự nhiên có thể ảnh hưởng đến hoạt động huy động vốn tại đơn vị được kiểm toán.",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B059",
    "stt": "c",
    "content": "Đánh giá các nội dung liên quan đến hệ thống kiểm soát nội bộ của đơn vị/hoạt động được kiểm toán",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B060",
    "stt": "d",
    "content": "Rà soát, đánh giá dữ liệu, thông tin các giao dịch của nghiệp vụ huy động vốn.",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B061",
    "stt": "e",
    "content": "Đánh giá tính hiện hữu của số dư tiền gửi thông qua việc gửi thư xác nhận tại thời điểm kiểm toán",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B062",
@@ -577,19 +684,22 @@
    "key": "B063",
    "stt": "a",
    "content": "Đánh giá tình hình thực hiện kế hoạch tài chính, kế hoạch mua sắm TSCĐ.",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B064",
    "stt": "b",
    "content": "Đánh giá các vấn đề trọng yếu qua rà soát số liệu trên IPCAS:\n- Các chỉ tiêu tài chính không đạt kế hoạch, các chỉ tiêu tài chính bất thường, những khoản chi phí cao bất thường…;\n- Các sai sót trọng yếu, các chốt kiểm soát yếu kém:\n+ Về quản lý chi phí;\n+ Về quản lý các khoản phải thu, phải trả;\n+ Về quản lý TSCĐ, CCDC;\n+ Về hậu kiểm chứng từ;\n+ Về quản lý hạn mức\n+ Về hạch toán kế toán.",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B065",
    "stt": "c",
    "content": "Đánh giá thông qua các tồn tại trọng yếu tại biên bản thanh tra, kiểm tra, kiểm toán.",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B066",
@@ -601,31 +711,36 @@
    "key": "B067",
    "stt": "a",
    "content": "Kết quả hoạt động: Đánh giá việc chấp hành định mức tồn quỹ tiền mặt VND, ngoại tệ so với kế hoạch giao của Trụ sở chính; Việc cấp hạn mức và phê duyệt hạn mức tại chi nhánh;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B068",
    "stt": "b",
    "content": "Đánh giá về môi trường pháp lý/kinh tế/vị trí địa lý/tự nhiên có thể ảnh hưởng đến hoạt động Tiền tệ-Kho quỹ và đơn vị được kiểm toán;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B069",
    "stt": "c",
    "content": "Đánh giá hệ thống kiểm soát nội bộ của đơn vị/hoạt động được kiểm toán.",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B070",
    "stt": "d",
    "content": "Rà soát, đánh giá hệ thống cơ sở dữ liệu, thông tin, công nghệ ứng dụng trong việc xử lý, quản lý các giao dịch của nghiệp vụ ngân quỹ: Hệ thống cơ sở dữ liệu và thông tin, công nghệ ứng dụng trong việc xử lý, quản lý các dịch vụ liên quan đến hoạt động Tiền tệ - Kho quỹ (Hệ thống IPCAS; Hệ thống báo động, Camera);",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B071",
    "stt": "e",
    "content": "Trên cơ sở số liệu sao kê giao dịch phát sinh trên tài khoản liên quan đến hoạt động Tiền tệ - Kho quỹ, thực hiện phân tích các vấn đề tiềm ẩn rủi ro như: các ngày có số dư tồn quỹ lớn, nhiều ngày liên tục; giao hạn mức tồn quỹ, hạn mức giao dịch tại quầy loại 1, loại 2 lớn; các giao dịch viên phát sinh giao dịch hủy thu, chi tiền mặt về nghiệp vụ thu lãi, huy động vốn…",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B072",
@@ -637,25 +752,29 @@
    "key": "B073",
    "stt": "a",
    "content": "Kết quả hoạt động: Phân tích theo mẫu số 06A/BKS-KTNB và so sánh với số kế hoạch được giao;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B074",
    "stt": "b",
    "content": "Đánh giá về môi trường pháp lý/kinh tế/vị trí địa lý/tự nhiên có thể ảnh hưởng đến hoạt động TTQT và KDNT tại đơn vị được kiểm toán;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B075",
    "stt": "c",
    "content": "Đánh giá các nội dung liên quan đến hệ thống kiểm soát nội bộ của đơn vị/hoạt động TTQT và KDNT được kiểm toán;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B076",
    "stt": "d",
    "content": "Rà soát dữ liệu, thông tin các giao dịch của nghiệp vụ TTQT và KDNT, phát hiện các giao dịch tiềm ẩn rủi ro, nghi ngờ có sai sót, giao dịch có giá trị để làm cơ sở chọn mẫu kiểm toán.",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B077",
@@ -667,19 +786,22 @@
    "key": "B078",
    "stt": "a",
    "content": "Đánh giá kết quả hoạt động phát hành, quản lý, sử dụng và thanh toán thẻ tại đơn vị, kết quả thực hiện kế hoạch kinh doanh. Phân tích, đánh giá xu hướng, mức độ tăng trưởng về số lượng thẻ đã phát hành, số đơn vị chấp nhận thẻ phát triển thêm;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B079",
    "stt": "b",
    "content": "Đánh giá thông tin về môi trường pháp lý/kinh tế/tự nhiên có thể ảnh hưởng đến hoạt động Phát hành, quản lý, sử dụng và thanh toán Thẻ tại đơn vị được kiểm toán;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B080",
    "stt": "c",
    "content": "Đánh giá các nội dung liên quan đến hệ thống kiểm soát nội bộ của đơn vị/hoạt động Phát hành, quản lý, sử dụng và thanh toán Thẻ được kiểm toán.",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B081",
@@ -691,13 +813,15 @@
    "key": "B082",
    "stt": "a",
    "content": "Đánh giá thông tin về môi trường pháp lý/kinh tế/vị trí địa lý/tự nhiên có thể ảnh hưởng đến hoạt động CNTT và đơn vị được kiểm toán;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B083",
    "stt": "b",
    "content": "Đánh giá các nội dung liên quan đến hệ thống kiểm soát nội bộ của đơn vị/hoạt động được kiểm toán.",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B084",
@@ -709,25 +833,29 @@
    "key": "B085",
    "stt": "a",
    "content": "Đánh giá kết quả hoạt động: Nhận xét, đánh giá về tiến độ thực hiện thực tế so với thời gian trong hợp đồng; mức độ tạm ứng, thanh toán cho từng nhà thầu có tuân thủ theo quy định về tạm ứng, thanh toán hay không;",
-   "segment": "FA"
+   "segment": "FA",
+   "tick": true
   },
   {
    "key": "B086",
    "stt": "b",
    "content": "Đánh giá thông tin về môi trường pháp lý/kinh tế/tự nhiên có thể ảnh hưởng đến hoạt động quản lý đầu tư xây dựng, mua sắm TSCĐ, đầu tư dự án và đơn vị được kiểm toán;",
-   "segment": "FA"
+   "segment": "FA",
+   "tick": true
   },
   {
    "key": "B087",
    "stt": "c",
    "content": "Đánh giá các nội dung liên quan đến hệ thống kiểm soát nội bộ của đơn vị/hoạt động được kiểm toán;",
-   "segment": "FA"
+   "segment": "FA",
+   "tick": true
   },
   {
    "key": "B088",
    "stt": "d",
    "content": "Rà soát, đánh giá hệ thống cơ sở dữ liệu, thông tin, công nghệ ứng dụng trong việc xử lý, quản lý các giao dịch của nghiệp vụ quản lý đầu tư xây dựng, mua sắm TSCĐ, đầu tư dự án.",
-   "segment": "FA"
+   "segment": "FA",
+   "tick": true
   },
   {
    "key": "B089",
@@ -739,63 +867,83 @@
    "key": "B090",
    "stt": "",
    "content": "Đánh giá các vấn đề trọng yếu qua rà soát số liệu trên IPCAS: Trên cơ sở thông tin thu thập được, tiến hành đánh giá, phân tích, đưa ra các tồn tại sai sót, xác định những rủi ro trọng yếu, các nghi ngờ, những chốt kiểm soát yếu kém liên quan đến hoạt động PCRT",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B091",
    "stt": "",
    "content": "Đánh giá thông qua các tồn tại trọng yếu tại biên bản thanh tra, kiểm tra, kiểm toán: Căn cứ trên các biên bản thu thập được, xem xét các tồn tại trọng yếu, các chốt kiểm soát yếu kém liên quan đến hoạt động PCRT để lưu ý khi tiến hành kiểm toán tại chi nhánh",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B092",
    "stt": "5",
-   "content": "THIẾT LẬP CÁC THỦ TỤC KIỂM TOÁN ĐỐI VỚI CÁC CHỐT KIỂM SOÁT"
+   "content": "THIẾT LẬP CÁC THỦ TỤC KIỂM TOÁN ĐỐI VỚI CÁC CHỐT KIỂM SOÁT",
+   "segment": "CHUNG"
   },
   {
    "key": "B093",
    "stt": "5.1",
-   "content": "Các bước trong quy trình nghiệp vụ;"
+   "content": "Các bước trong quy trình nghiệp vụ;",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B094",
    "stt": "5.2",
-   "content": "Xác định các chốt kiểm soát được thiết lập theo từng bước quy trình;"
+   "content": "Xác định các chốt kiểm soát được thiết lập theo từng bước quy trình;",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B095",
    "stt": "5.3",
-   "content": "Loại hình kiểm soát;"
+   "content": "Loại hình kiểm soát;",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B096",
    "stt": "5.4",
-   "content": "Rủi ro có thể xảy ra;"
+   "content": "Rủi ro có thể xảy ra;",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B097",
    "stt": "5.5",
-   "content": "Thủ tục kiểm soát được thiết lập tại đơn vị;"
+   "content": "Thủ tục kiểm soát được thiết lập tại đơn vị;",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B098",
    "stt": "5.6",
-   "content": "Thủ tục kiểm toán;"
+   "content": "Thủ tục kiểm toán;",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B099",
    "stt": "5.7",
-   "content": "Kết quả kiểm toán"
+   "content": "Kết quả kiểm toán",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B100",
    "stt": "6",
-   "content": "XÁC ĐỊNH VÀ ĐÁNH GIÁ RỦI RO: Trên cơ sở phân tích và đánh giá thông tin, thành viên Đoàn kiểm toán xác định rủi ro tiềm tàng, rủi ro còn lại và xác định thông tin trọng yếu để làm căn cứ xác định mục tiêu kiểm toán."
+   "content": "XÁC ĐỊNH VÀ ĐÁNH GIÁ RỦI RO: Trên cơ sở phân tích và đánh giá thông tin, thành viên Đoàn kiểm toán xác định rủi ro tiềm tàng, rủi ro còn lại và xác định thông tin trọng yếu để làm căn cứ xác định mục tiêu kiểm toán.",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B101",
    "stt": "7",
-   "content": "CHỌN MẪU KIỂM TOÁN"
+   "content": "CHỌN MẪU KIỂM TOÁN",
+   "segment": "CHUNG"
   },
   {
    "key": "B102",
@@ -807,7 +955,8 @@
    "key": "B103",
    "stt": "a",
    "content": "Chọn tỷ lệ mẫu cao đối với các chốt kiểm soát thiết kế trong quy trình nhưng khi áp dụng thực hiện tại đơn vị còn yếu kém;",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B104",
@@ -819,19 +968,22 @@
    "key": "B105",
    "stt": "",
    "content": "- Chọn mẫu đối với đơn vị trực thuộc;",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B106",
    "stt": "",
    "content": "- Chọn mẫu đối với khách hàng;",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B107",
    "stt": "",
    "content": "- Chọn mẫu đối với các giao dịch hạch toán hủy/lùi ngày giá trị giải ngân, thu nợ.",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B108",
@@ -843,7 +995,8 @@
    "key": "B109",
    "stt": "a",
    "content": "Chọn tỷ lệ mẫu cao đối với các chốt kiểm soát thiết kế trong quy trình nhưng khi áp dụng thực hiện tại chi nhánh chưa phù hợp, chưa hiệu quả.",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B110",
@@ -855,55 +1008,64 @@
    "key": "B111",
    "stt": "",
    "content": "- Các giao dịch áp dụng lãi suất vượt quy định;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B112",
    "stt": "",
    "content": "- Chọn mẫu Hồ sơ mở tài khoản tiền gửi thanh toán, tiền gửi có kỳ hạn của tổ chức kinh tế;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B113",
    "stt": "",
    "content": "- Chọn mẫu các sản phẩm tiền gửi đặc thù, sản phẩm do Đơn vị ban hành hoặc không phù hợp với quy định của Agribank;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B114",
    "stt": "",
    "content": "- Các giao dịch chi lãi bổ sung;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B115",
    "stt": "",
    "content": "- Các giao dịch hủy, hủy lùi ngày giá trị, lùi ngày giá trị;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B116",
    "stt": "",
    "content": "- Giao dịch đóng sớm, đóng sớm từng phần;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B117",
    "stt": "",
    "content": "- Giao dịch phát hành lại sổ tiết kiệm, in lại sổ tiết kiệm;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B118",
    "stt": "",
    "content": "- Giao dịch hạch toán ấn chỉ hỏng.",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B119",
    "stt": "c",
    "content": "Chọn mẫu ngẫu nhiên các giao dịch trên sao kê lịch sử các giao dịch TG KKH và CKH; Chọn mẫu các giao dịch mở, đóng sớm, đóng 1 phần theo các loại sản phẩm tiền gửi khác nhau.",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B120",
@@ -915,7 +1077,8 @@
    "key": "B121",
    "stt": "a",
    "content": "Chọn tỷ lệ mẫu cao đối với các chốt kiểm soát thiết kế trong quy trình nhưng khi áp dụng thực hiện tại chi nhánh chưa phù hợp, chưa hiệu quả; Thủ tục kiểm soát được thiết lập, thực hiện tại đơn vị còn yếu kém.",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B122",
@@ -927,49 +1090,57 @@
    "key": "B123",
    "stt": "",
    "content": "- Chọn mẫu ngẫu nhiên với các giao dịch có số tiền lớn, các giao dịch thực hiện tập trung hạch toán nhiều lần vào một tài khoản;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B124",
    "stt": "",
    "content": "- Chọn mẫu các giao dịch có nội dung trùng lặp thực hiện qua nhiều bút toán khác nhau;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B125",
    "stt": "",
    "content": "- Chọn mẫu các giao dịch về mua sắm CCDC, thuê TSCĐ nhưng ko thực hiện phân bổ;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B126",
    "stt": "",
    "content": "- Chọn mẫu các giao dịch thực hiện tạm ứng trước tiền hàng hóa, dịch vụ;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B127",
    "stt": "",
    "content": "- Chọn mẫu các giao dịch hạch toán sai tính chất tài khoản, sai khoản mục tài khoản;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B128",
    "stt": "",
    "content": "- Chọn mẫu các giao dịch thực hiện nhiều tại phòng giao dịch;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B129",
    "stt": "",
    "content": "- Chọn mẫu các giao dịch thường xuyên hay xảy ra các sai sót tại các đơn vị;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B130",
    "stt": "",
    "content": "- Chọn mẫu các giao dịch không có nội dung hoặc có nội dung nhưng không hợp lý, không đúng quy định.",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B131",
@@ -981,13 +1152,15 @@
    "key": "B132",
    "stt": "a",
    "content": "Đối với các giao dịch thu, chi tiền mặt: Chọn mẫu ngẫu nhiên hoặc theo xét đoán nghề nghiệp;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B133",
    "stt": "b",
    "content": "Chọn mẫu giao dịch nộp tiền về NHNN; điều chuyển trong nội bộ chi nhánh để rà soát, đánh giá hồ sơ, thủ tục điều chuyển tiền.",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B134",
@@ -999,7 +1172,8 @@
    "key": "B135",
    "stt": "a",
    "content": "Chọn tỷ lệ mẫu cao đối với các chốt kiểm soát thiết kế trong quy trình nhưng khi áp dụng thực hiện tại chi nhánh chưa phù hợp, chưa hiệu quả; Thủ tục kiểm soát được thiết lập, thực hiện tại đơn vị còn yếu kém;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B136",
@@ -1011,31 +1185,36 @@
    "key": "B137",
    "stt": "",
    "content": "- Các giao dịch nhập khẩu;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B138",
    "stt": "",
    "content": "- Các giao dịch xuất khẩu;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B139",
    "stt": "",
    "content": "- Các giao dịch chuyển tiền;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B140",
    "stt": "",
    "content": "- Các giao dịch mua bán ngoại tệ;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B141",
    "stt": "c",
    "content": "Thực hiện chọn mẫu ngẫu nhiên các giao dịch: Chọn mẫu các giao dịch nhập khẩu, giao dịch xuất khẩu, giao dịch chuyển tiền, giao dịch mua bán ngoại tệ.",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B142",
@@ -1047,7 +1226,8 @@
    "key": "B143",
    "stt": "a",
    "content": "Chọn tỷ lệ mẫu cao đối với các chốt kiểm soát thiết kế trong quy trình nhưng khi áp dụng thực hiện tại chi nhánh chưa phù hợp, chưa hiệu quả; Thủ tục kiểm soát được thiết lập, thực hiện tại đơn vị còn yếu kém;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B144",
@@ -1059,43 +1239,50 @@
    "key": "B145",
    "stt": "",
    "content": "- Phát hành thẻ ghi nợ;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B146",
    "stt": "",
    "content": "- Hạn mức thấu chi cho thẻ ghi nợ nội địa;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B147",
    "stt": "",
    "content": "- Việc phát hành thẻ tín dụng;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B148",
    "stt": "",
    "content": "- Các giao dịch thu phí dịch vụ phát hành thẻ;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B149",
    "stt": "",
    "content": "- Các giao dịch tiếp quỹ ATM;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B150",
    "stt": "",
    "content": "- Giao dịch hạch toán và xử lý chênh lệch thừa thiếu quỹ ATM;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B151",
    "stt": "",
    "content": "- Chọn mẫu ĐVCNT.",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B152",
@@ -1107,19 +1294,22 @@
    "key": "B153",
    "stt": "a",
    "content": "Chọn tỷ lệ mẫu cao đối với các chốt kiểm soát thiết kế trong quy trình nhưng khi áp dụng thực hiện tại chi nhánh chưa phù hợp, chưa hiệu quả; Thủ tục kiểm soát được thiết lập, thực hiện tại đơn vị đối với bước quy trình nào còn yếu kém;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B154",
    "stt": "b",
    "content": "Chọn mẫu theo thông tin thể hiện mức độ rủi ro tiềm tàng được xác định qua rà soát: User chấm công trên hệ thống là nghỉ phép, đi học, đi công tác, nghỉ thai sản… vẫn hoạt động trên hệ thống IPCAS hoặc không được tạm khóa hay thu hồi theo quy định, User không đăng nhập qua địa chỉ MAC, thiết bị bảo mật PKI...;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B155",
    "stt": "c",
    "content": "Chọn mẫu ngẫu nhiên.",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B156",
@@ -1131,13 +1321,15 @@
    "key": "B157",
    "stt": "a",
    "content": "Chọn tỷ lệ mẫu cao đối với các chốt kiểm soát thiết kế trong quy trình nhưng khi áp dụng thực hiện tại chi nhánh chưa phù hợp, chưa hiệu quả; Thủ tục kiểm soát được thiết lập, thực hiện tại đơn vị còn yếu kém;",
-   "segment": "FA"
+   "segment": "FA",
+   "tick": true
   },
   {
    "key": "B158",
    "stt": "b",
    "content": "Chọn mẫu theo mức độ rủi ro tiềm tàng được xác định qua rà soát, đánh giá số liệu, giao dịch về nghiệp vụ XDCB và mua sắm tài sản của đơn vị trong thời hiệu kiểm toán.",
-   "segment": "FA"
+   "segment": "FA",
+   "tick": true
   },
   {
    "key": "B159",
@@ -1149,18 +1341,22 @@
    "key": "B160",
    "stt": "a",
    "content": "Chọn tỷ lệ mẫu cao đối với các chốt kiểm soát thiết kế trong quy trình nhưng khi áp dụng thực hiện tại chi nhánh chưa phù hợp, chưa hiệu quả; Thủ tục kiểm soát được thiết lập, thực hiện tại đơn vị còn yếu kém",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B161",
    "stt": "b",
    "content": "Chọn mẫu theo mức độ rủi ro tiềm tàng được xác định qua rà soát, đánh giá số liệu, giao dịch về hoạt động PCRTcủa đơn vị trong thời hiệu kiểm toán",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B162",
    "stt": "8",
-   "content": "BÁO CÁO GIAI ĐOẠN CHUẨN BỊ: Nội dung tối thiểu bao gồm: (i) Thông tin thu thập; (ii) Phân tích, đánh giá thông tin và xác định rủi ro (rủi ro tiềm tàng, rủi ro còn lại và xác định thông tin trọng yếu); (iii) Đề xuất mẫu chọn/nội dung kiểm toán, nêu rõ tiêu chí chọn mẫu, lý do chọn mẫu, tỷ lệ mẫu chọn; (iv) thiết lập thủ tục kiểm toán"
+   "content": "BÁO CÁO GIAI ĐOẠN CHUẨN BỊ: Nội dung tối thiểu bao gồm: (i) Thông tin thu thập; (ii) Phân tích, đánh giá thông tin và xác định rủi ro (rủi ro tiềm tàng, rủi ro còn lại và xác định thông tin trọng yếu); (iii) Đề xuất mẫu chọn/nội dung kiểm toán, nêu rõ tiêu chí chọn mẫu, lý do chọn mẫu, tỷ lệ mẫu chọn; (iv) thiết lập thủ tục kiểm toán",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B163",
@@ -1172,163 +1368,185 @@
    "key": "B164",
    "stt": "1",
    "content": "HOẠT ĐỘNG QUẢN TRỊ ĐIỀU HÀNH",
-   "segment": "CE"
+   "segment": "CHUNG"
   },
   {
    "key": "B165",
    "stt": "1.1",
    "content": "Kiểm toán mô hình, cơ cấu tổ chức, màng lưới",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B166",
    "stt": "1.2",
    "content": "Kiểm toán việc phân công, phân cấp, ủy quyền",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B167",
    "stt": "1.3",
    "content": "Kiểm toán việc quản lý, điều hành",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B168",
    "stt": "1.4",
    "content": "Đánh giá công tác quản trị nguồn nhân lực tại chi nhánh",
-   "segment": "CE"
+   "segment": "CHUNG"
   },
   {
    "key": "B169",
    "stt": "a",
    "content": "Tuyển dụng, xét tuyển lao động.",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B170",
    "stt": "b",
    "content": "Quy hoạch, bổ nhiệm, điều động, luân chuyển cán bộ:",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B171",
    "stt": "1.5",
    "content": "Công tác đào tạo, khen thưởng, kỷ luật",
-   "segment": "CE"
+   "segment": "CHUNG"
   },
   {
    "key": "B172",
    "stt": "a",
    "content": "Công tác tập huẩn, đào tạo cán bộ",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B173",
    "stt": "b",
    "content": "Nhận xét, đánh giá, phân loại cán bộ và bình xét các danh hiệu thi đua",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B174",
    "stt": "c",
    "content": "Đánh giá công tác xử lý kỷ luật (nếu có)",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B175",
    "stt": "d",
    "content": "Đánh giá việc nghỉ không hưởng lương (nếu có)",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B176",
    "stt": "e",
    "content": "Đánh giá việc tạm hoãn hợp đồng lao động (nếu có)",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B177",
    "stt": "1.6",
    "content": "Việc xây dựng, thực hiện kế hoạch kinh doanh, kế hoạch tài chính",
-   "segment": "CE"
+   "segment": "CHUNG"
   },
   {
    "key": "B178",
    "stt": "a",
    "content": "Về việc xây dựng kế hoạch",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B179",
    "stt": "b",
    "content": "Về giao kế hoạch",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B180",
    "stt": "c",
    "content": "Các biện pháp đã áp dụng để hoàn thành kế hoạch được giao",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B181",
    "stt": "d",
    "content": "Quyết toán kế hoạch",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B182",
    "stt": "e",
    "content": "Kết quả thực hiện kế hoạch kinh doanh, kế hoạch tài chính",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B183",
    "stt": "1.7",
    "content": "Đánh giá công tác kiểm tra, kiểm soát nội bộ",
-   "segment": "CE"
+   "segment": "CHUNG"
   },
   {
    "key": "B184",
    "stt": "a",
    "content": "Kết quả kiểm tra, tự kiểm tra;",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B185",
    "stt": "b",
    "content": "Kiểm tra việc chỉ đạo và kết quả khắc phục tồn tại, sai sót.",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B186",
    "stt": "1.8",
    "content": "Đánh giá việc thiết lập và sử dụng hệ thống thông tin báo cáo phục vụ cho công tác quản lý, điều hành của chi nhánh và chấp hành chế độ theo quy định của NHNN và Agribank",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B187",
    "stt": "1.9",
    "content": "Đánh giá tình hình thực hiện các kiến nghị của các đoàn thanh tra, kiểm tra",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B188",
    "stt": "1.10",
    "content": "Nội dung khác (nếu có)",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B189",
    "stt": "1.11",
    "content": "Ghi nhận kết quả kiểm toán",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B190",
    "stt": "1.12",
    "content": "Tổng hợp kết quả kiểm toán",
-   "segment": "CE"
+   "segment": "CHUNG",
+   "tick": true
   },
   {
    "key": "B191",
@@ -1346,109 +1564,127 @@
    "key": "B193",
    "stt": "a",
    "content": "Rà soát, đánh giá tổ chức màng lưới, cơ cấu tổ chức của đơn vị, các phòng/đơn vị liên quan đến hoạt động cấp tín dụng theo quy định của Agribank",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B194",
    "stt": "b",
    "content": "Rà soát, đánh giá việc phân công, phân cấp tín dụng, ủy quyền ký kết các hợp đồng/giấy tờ liên qua đến hoạt động cấp tín dụng của Giám đốc đơn vị",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B195",
    "stt": "c",
    "content": "Đánh giá việc thực hiện chức năng, nhiệm vụ tại các văn bản phân công công tác đối với lãnh đạo và cán bộ trong hoạt động cấp tín dụng",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B196",
    "stt": "d",
    "content": "Đánh giá cơ chế phối hợp giữa các lãnh đạo, giữa cán bộ với lãnh đạo và giữa các cán bộ",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B197",
    "stt": "e",
    "content": "Kiểm tra việc bố trí, sắp xếp, luân chuyển cán bộ làm công tác tín dụng",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B198",
    "stt": "f",
    "content": "Rà soát, đánh giá việc triển khai các chủ trương, chính sách, nghị quyết, quyết định, quy định, văn bản chỉ đạo liên quan đến hoạt động cấp tín dụng của NHNN, Agribank",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B199",
    "stt": "g",
    "content": "Rà soát đánh giá việc xây dựng, giao và tổ chức thực hiện kế hoạch kinh doanh, việc áp dụng các biện pháp, công cụ để đạt được mục tiêu kinh doanh. Việc quyết toán kế hoạch đối với các phòng/đơn vị trực thuộc (nếu có)",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B200",
    "stt": "h",
    "content": "Rà soát các biện pháp đã áp dụng nhằm tăng trưởng và nâng cao chất lượng của hoạt động cấp tín dụng, các biện pháp thu hồi nợ xấu, nợ sau xử lý.",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B201",
    "stt": "i",
    "content": "Rà soát, đánh giá việc tổ chức tự kiểm tra; Công tác chỉ đạo chỉnh sửa, khắc phục sau thanh tra, kiểm tra, kiểm toán của chi nhánh",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B202",
    "stt": "j",
    "content": "Phân tích, đánh giá sự phối hợp của Phòng/bộ phận thực hiện nghiệp vụ cấp tín dụng với các Phòng/bộ phận có liên quan",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B203",
    "stt": "k",
    "content": "Rà soát, đánh giá hệ thống cơ sở dữ liệu và thông tin, công nghệ ứng dụng trong việc xử lý, quản lý các dịch vụ, nghiệp vụ cấp tín dụng",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B204",
    "stt": "2.2",
    "content": "Kết quả hoạt động cấp tín dụng: Bản xác nhận với chi nhánh về số liệu và đánh giá tình hình hoạt động cấp tín dụng.",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B205",
    "stt": "2.3",
    "content": "Đánh giá việc tuân thủ các quy định của pháp luật, Ngân hàng nhà nước và quy định nội bộ của Agribank; Đánh giá về tính hiệu lực, hiệu quả của các chốt kiểm soát trong quy trình nghiệp vụ",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B206",
    "stt": "2.4",
    "content": "Đánh giá vấn đề tiềm ẩn rủi ro trong hoạt động cấp tín dụng (nếu có)",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B207",
    "stt": "2.5",
    "content": "Đánh giá tình hình thực hiện các kiến nghị của các đoàn thanh tra, kiểm tra",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B208",
    "stt": "2.6",
    "content": "Nội dung khác (nếu có)",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B209",
    "stt": "2.7",
    "content": "Ghi nhận kết quả kiểm toán",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B210",
    "stt": "2.8",
    "content": "Tổng hợp kết quả kiểm toán",
-   "segment": "LN"
+   "segment": "LN",
+   "tick": true
   },
   {
    "key": "B211",
@@ -1466,31 +1702,36 @@
    "key": "B213",
    "stt": "a",
    "content": "Rà soát, đánh giá tổ chức màng lưới, cơ cấu tổ chức của đơn vị, các phòng/đơn vị liên quan đến hoạt động huy động vốn theo quy định của Agribank;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B214",
    "stt": "b",
    "content": "Rà soát, đánh giá việc phân công, phân cấp huy động vốn, ủy quyền ký kết các hợp đồng/giấy tờ liên quan đến hoạt động huy động vốn của Giám đốc đơn vị;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B215",
    "stt": "c",
    "content": "Rà soát, đánh giá việc triển khai các chủ trương, chính sách, nghị quyết, quyết định, quy định, văn bản chỉ đạo liên quan đến hoạt động huy động vốn của NHNN, Agribank;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B216",
    "stt": "d",
    "content": "Rà soát, đánh giá việc xây dựng, giao và tổ chức thực hiện kế hoạch kinh doanh, việc áp dụng các biện pháp, công cụ để đạt được mục tiêu kinh doanh; Việc quyết toán kế hoạch kinh doanh đối với phòng/đơn vị trực thuộc;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B217",
    "stt": "e",
    "content": "Rà soát, đánh giá việc tổ chức tự kiểm tra; Công tác chỉ đạo chỉnh sửa, khắc phục sau thanh tra, kiểm tra, kiểm toán của chi nhánh.",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B218",
@@ -1502,25 +1743,29 @@
    "key": "B219",
    "stt": "a",
    "content": "Kết quả hoạt động huy động vốn: Quy mô nguồn vốn, phân tích theo kỳ hạn, loại tiền tệ, phân tích xu hướng biến động nguồn vốn so với năm trước liền kề…;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B220",
    "stt": "b",
    "content": "Cân đối vốn và sử dụng vốn;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B221",
    "stt": "c",
    "content": "Đánh giá tình hình thực hiện kế hoạch được giao;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B222",
    "stt": "d",
    "content": "Đánh giá chung về tình hình huy động vốn tại chi nhánh (xu hướng phát triển, mức độ tăng trưởng, mức độ thừa/thiếu vốn tại đơn vị).",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B223",
@@ -1532,67 +1777,78 @@
    "key": "B224",
    "stt": "a",
    "content": "Việc niêm yết thông tin tại trụ sở giao dịch;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B225",
    "stt": "b",
    "content": "Việc thực hiện các quy định lãi suất;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B226",
    "stt": "c",
    "content": "Kiểm tra việc thực hiện quy định về sản phẩm, đối tượng, hình thức huy động vốn;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B227",
    "stt": "d",
    "content": "Kiểm tra về thẩm quyền ký các hợp đồng tiền gửi, ký phát hành sổ tiết kiệm/giấy tờ có giá;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B228",
    "stt": "e",
    "content": "Kiểm tra về đăng ký, chỉnh sửa thông tin khách hàng tiền gửi trên hệ thống IPCAS;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B229",
    "stt": "f",
    "content": "Kiểm tra về quy trình nghiệp vụ huy động vốn;",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B230",
    "stt": "g",
    "content": "Kiểm tra về phương thức giao dịch với khách hàng, quy định về lập, ký, tập hợp, luân chuyển, kiểm soát chứng từ và hạch toán kế toán; quy định việc bố trí nhân sự kiểm soát, giao dịch viên tại các quầy giao dịch",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B231",
    "stt": "3.4",
    "content": "Đánh giá tình hình thực hiện các kiến nghị của các đoàn thanh tra, kiểm tra",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B232",
    "stt": "3.5",
    "content": "Nội dung khác (nếu có)",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B233",
    "stt": "3.6",
    "content": "Ghi nhận kết quả kiểm toán",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B234",
    "stt": "3.7",
    "content": "Tổng hợp kết quả kiểm toán",
-   "segment": "DP"
+   "segment": "DP",
+   "tick": true
   },
   {
    "key": "B235",
@@ -1610,25 +1866,29 @@
    "key": "B237",
    "stt": "a",
    "content": "Rà soát, đánh giá tổ chức màng lưới, cơ cấu tổ chức của đơn vị, các phòng/đơn vị liên quan đến hoạt động Tài chính - kế toán theo quy định của Agribank;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B238",
    "stt": "b",
    "content": "Rà soát, đánh giá việc phân công, phân cấp, ủy quyền liên quan đến hoạt động Tài chính - kế toán của Giám đốc đơn vị;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B239",
    "stt": "c",
    "content": "Rà soát, đánh giá việc triển khai các chủ trương, chính sách, nghị quyết, quyết định, quy định, văn bản chỉ đạo liên quan đến hoạt động Tài chính - kế toán của NHNN, Agribank;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B240",
    "stt": "d",
    "content": "Rà soát, đánh giá việc tổ chức tự kiểm tra; Công tác chỉ đạo chỉnh sửa, khắc phục sau thanh tra, kiểm tra, kiểm toán của đơn vị",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B241",
@@ -1640,13 +1900,15 @@
    "key": "B242",
    "stt": "a",
    "content": "Rà soát, đánh giá việc chỉ đạo, điều hành công tác tài chính tại đơn vị (ban hành văn bản giao, quyết toán kế hoạch tài chính, mua sắm tài sản, công cụ); xem xét việc giao đơn giá kế hoạch tài chính, tiền lương cho các đơn vị trực thuộc (nếu có).",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B243",
    "stt": "b",
    "content": "Đánh giá kết quả thực hiện kế hoạch tài chính đối với các chỉ tiêu được giao như: Chỉ tiêu Lợi nhuận khoán tài chính; Chi mua sắm CCDC; Chi bảo dưỡng và sửa chữa thường xuyên TSCĐ; Tỷ lệ chi phí quản lý…",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B244",
@@ -1658,79 +1920,92 @@
    "key": "B245",
    "stt": "a",
    "content": "Về việc lập, luân chuyển, xử lý và bảo quản chứng từ;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B246",
    "stt": "b",
    "content": "Về công tác ký, kiểm soát và phê duyệt chứng từ;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B247",
    "stt": "c",
    "content": "Về hậu kiểm chứng từ;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B248",
    "stt": "d",
    "content": "Về công tác quản lý, thanh lý, sửa chữa, thuê TSCĐ, CCDC và quản lý vật liệu;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B249",
    "stt": "e",
    "content": "Về công tác quản lý các khoản phải thu, phải trả;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B250",
    "stt": "f",
    "content": "Về công tác quản lý Quỹ (Quỹ khen thưởng, Quỹ phúc lợi);",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B251",
    "stt": "g",
    "content": "Việc tuân thủ quy định về quản lý chi phí;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B252",
    "stt": "h",
    "content": "Việc tuân thủ quy định về quản lý thu nhập;",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B253",
    "stt": "i",
    "content": "Việc tuân thủ quy định về hạch toán kế toán đối với hoạt động TCKT.",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B254",
    "stt": "4.4",
    "content": "Đánh giá tình hình thực hiện các kiến nghị của các đoàn thanh tra, kiểm tra",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B255",
    "stt": "4.5",
    "content": "Nội dung khác (nếu có)",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B256",
    "stt": "4.6",
    "content": "Ghi nhận kết quả kiểm toán",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B257",
    "stt": "4.7",
    "content": "Tổng hợp kết quả kiểm toán",
-   "segment": "GA"
+   "segment": "GA",
+   "tick": true
   },
   {
    "key": "B258",
@@ -1742,7 +2017,8 @@
    "key": "B259",
    "stt": "5.1",
    "content": "Đánh giá công tác quản lý, điều hành liên quan hoạt động Tiền tệ - Kho quỹ",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B260",
@@ -1754,169 +2030,195 @@
    "key": "B261",
    "stt": "a",
    "content": "Rà soát, đánh giá việc niêm yết thông tin tại đơn vị: Niêm yết thông tin ra, vào kho tiền, nội quy thu, chi tiền với khách hàng, hạn mức giao dịch tại quầy giao dịch loại 1, loại 2;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B262",
    "stt": "b",
    "content": "Rà soát, đánh giá việc bố trí kho tiền; Thành lập Ban quản lý kho tiền; việc ủy quyền của Trưởng ban/Thành viên Ban quản lý cho người khác tham gia quản lý kho tiền;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B263",
    "stt": "c",
    "content": "Rà soát, đánh giá về việc sử dụng và bảo quản chìa khóa kho tiền; Thủ tục niêm phong và gửi chìa khóa dự phòng cửa kho tiền, ATM, két sắt của Giao dịch viên; bảo quản chìa khóa sử dụng hàng ngày của gian kho, két sắt, thùng chở tiền xe chuyên dùng; Phương án bảo vệ kho tiền; lắp đặt trang thiết bị bảo vệ, an toàn kho quỹ;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B264",
    "stt": "d",
    "content": "Rà soát, đánh giá nội quy kho tiền, quầy giao dịch tiền mặt, phương án bảo vệ kho tiền, trang phục giao dịch của cán bộ làm công tác kho quỹ;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B265",
    "stt": "e",
    "content": "Rà soát, đánh giá việc Hạn mức giao dịch tiền mặt đối với chi nhánh loại II; Phòng giao dịch và Giao dịch viên: Kiểm toán việc quản lý và khai báo cấp hạn mức giao dịch trên hệ thống IPCAS;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B266",
    "stt": "f",
    "content": "Rà soát, đánh giá việc thực hiện quy trình vận chuyển hàng đặc biệt bao gồm: Các thông tin trên lệnh điều chuyển; Quy trình vận chuyển; Giấy ủy quyền vận chuyển; Phương tiện vận chuyển; Đảm bảo an toàn, phối hợp bảo vệ trên đường vận chuyển; tổ chức tiếp nhận; lực lượng tham gia vận chuyển và trách nhiệm của người áp tải;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B267",
    "stt": "g",
    "content": "Rà soát việc bảo quản các tài sản tại kho tiền: tiền mặt, ấn chỉ quan trọng, giấy tờ tài sản bảo đảm của khách hàng vay vốn và các tài sản khác khi đơn vị thực hiện các dịch vụ giữ hộ tài sản;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B268",
    "stt": "h",
    "content": "Rà soát, đánh giá việc bố trí quầy giao dịch loại 1, loại 2; trang thiết bị, phương tiện lao động tại đơn vị;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B269",
    "stt": "i",
    "content": "Rà soát quy trình tiếp quỹ, nộp tiền mặt, ngoại tệ về quỹ;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B270",
    "stt": "j",
    "content": "Rà soát quy trình thu, chi tiền mặt, ngoại tệ với khách hàng;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B271",
    "stt": "k",
    "content": "Rà soát, đánh giá việc thực hiện kiểm kê định kỳ, đột xuất tại đơn vị theo quy định của Agribank.",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B272",
    "stt": "l",
    "content": "Rà soát, đánh giá việc vào, ra kho tiền; quản lý tiền mặt, tài sản quý, giấy tờ có giá trong thời gian giao dịch, nghỉ giao dịch buổi trưa, cuối ngày.",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B273",
    "stt": "m",
    "content": "Rà soát việc xử lý thừa, thiếu tiền mặt, tài sản quý, giấy tờ có giá;",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B274",
    "stt": "n",
    "content": "Rà soát, đánh giá việc mở, ghi chép và lưu trữ các sổ sách trong công tác kho quỹ theo quy định của Agribank.",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B275",
    "stt": "5.3",
    "content": "Kiểm tra đột xuất tồn quỹ tiền mặt nội tệ, ngoại tệ",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B276",
    "stt": "5.4",
    "content": "Kiểm tra đột xuất ấn chỉ quan trọng trắng",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B277",
    "stt": "5.5",
    "content": "Kiểm tra quy trình thu chi tiền mặt",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B278",
    "stt": "5.6",
    "content": "Kiểm tra tình hình thực hiện các kiến nghị của các đoàn thanh tra, kiểm tra, kiểm toán nội bộ",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B279",
    "stt": "5.7",
    "content": "Nội dung khác (nếu có)",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B280",
    "stt": "5.8",
    "content": "Ghi nhận kết quả kiểm toán",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B281",
    "stt": "5.9",
    "content": "Tổng hợp kết quả kiểm toán",
-   "segment": "MF"
+   "segment": "MF",
+   "tick": true
   },
   {
    "key": "B282",
    "stt": "6",
    "content": "HOẠT ĐỘNG THANH TOÁN QUỐC TẾ VÀ KINH DOANH NGOẠI TỆ",
-   "segment": "TF"
+   "segment": "MF"
   },
   {
    "key": "B283",
    "stt": "6.1",
    "content": "Đánh giá công tác quản lý, điều hành liên quan hoạt động TTQT và KDNT",
-   "segment": "TF"
+   "segment": "MF"
   },
   {
    "key": "B284",
    "stt": "a",
    "content": "Rà soát, đánh giá tổ chức màng lưới, cơ cấu tổ chức của đơn vị, các phòng/đơn vị liên quan đến hoạt động TTQT và KDNT theo quy định của Agribank;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B285",
    "stt": "b",
    "content": "Rà soát, đánh giá việc phân công, phân cấp, ủy quyền liên quan đến hoạt động TTQT và KDNT của Giám đốc đơn vị;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B286",
    "stt": "c",
    "content": "Rà soát, đánh giá việc triển khai các chủ trương, chính sách, nghị quyết, quyết định, quy định, văn bản chỉ đạo liên quan đến hoạt động TTQT và KDNT của NHNN, Agribank;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B287",
    "stt": "d",
    "content": "Rà soát đánh giá việc xây dựng, giao và tổ chức thực hiện kế hoạch kinh doanh, việc áp dụng các biện pháp, công cụ để đạt được mục tiêu kinh doanh. Việc quyết toán kế hoạch kinh doanh đối với phòng/đơn vị trực thuộc (nếu có);",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B288",
    "stt": "e",
    "content": "Rà soát, đánh giá việc tổ chức tự kiểm tra; Công tác chỉ đạo chỉnh sửa, khắc phục sau thanh tra, kiểm tra, kiểm toán của đơn vị.",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B289",
@@ -1928,19 +2230,22 @@
    "key": "B290",
    "stt": "a",
    "content": "Phân tích doanh số thanh toán xuất nhập khẩu, doanh số mua ngoại tệ, doanh số bán ngoại tệ đạt được; Phí dịch vụ thanh toán quốc tế và lãi kinh doanh ngoại tệ thu được; phân tích xu hướng biến động so với năm trước liền kề và cùng kỳ năm trước…;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B291",
    "stt": "b",
    "content": "Đánh giá tình hình thực hiện kế hoạch được giao;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B292",
    "stt": "c",
    "content": "Đánh giá chung về hoạt động TTQT và KDNT tại đơn vị.",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B293",
@@ -1952,67 +2257,78 @@
    "key": "B294",
    "stt": "a",
    "content": "Đối với LC nhập khẩu;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B295",
    "stt": "b",
    "content": "Đối với L/C xuất khẩu;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B296",
    "stt": "c",
    "content": "Đối với Nhờ thu hàng nhập;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B297",
    "stt": "d",
    "content": "Đối với Nhờ thu hàng xuất;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B298",
    "stt": "e",
    "content": "Đối với giao dịch chuyển tiền đến;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B299",
    "stt": "f",
    "content": "Đối với giao dịch chuyển tiền đi;",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B300",
    "stt": "g",
    "content": "Đối với nghiệp vụ Kinh doanh ngoại tệ.",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B301",
    "stt": "6.4",
    "content": "Kiểm toán thực hiện kiến nghị của các đoàn thanh tra, kiểm tra, kiểm toán",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B302",
    "stt": "6.5",
    "content": "Nội dung khác (nếu có)",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B303",
    "stt": "6.6",
    "content": "Ghi nhận kết quả kiểm toán",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B304",
    "stt": "6.7",
    "content": "Tổng hợp kết quả kiểm toán",
-   "segment": "TF"
+   "segment": "TF",
+   "tick": true
   },
   {
    "key": "B305",
@@ -2030,31 +2346,36 @@
    "key": "B307",
    "stt": "a",
    "content": "Rà soát, đánh giá tổ chức mạng lưới, cơ cấu tổ chức của đơn vị, các phòng/đơn vị liên quan đến hoạt động Phát hành, quản lý, sử dụng và thanh toán Thẻ theo quy định của Agribank;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B308",
    "stt": "b",
    "content": "Rà soát, đánh giá việc phân công, phân cấp, ủy quyền liên quan đến hoạt động Phát hành, quản lý, sử dụng và thanh toán Thẻ của Giám đốc đơn vị;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B309",
    "stt": "c",
    "content": "Rà soát, đánh giá việc triển khai các chủ trương, chính sách, nghị quyết, quyết định, quy định, văn bản chỉ đạo liên quan đến hoạt động Phát hành, quản lý, sử dụng và thanh toán Thẻ của NHNN, Agribank;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B310",
    "stt": "d",
    "content": "Rà soát đánh giá việc xây dựng, giao và tổ chức thực hiện kế hoạch kinh doanh, việc áp dụng các biện pháp, công cụ để đạt được mục tiêu kinh doanh. Việc quyết toán kế hoạch kinh doanh đối với phòng/đơn vị trực thuộc (nếu có);",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B311",
    "stt": "e",
    "content": "Rà soát, đánh giá việc tổ chức tự kiểm tra; Công tác chỉ đạo chỉnh sửa, khắc phục sau thanh tra, kiểm tra, kiểm toán của chi nhánh.",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B312",
@@ -2066,19 +2387,22 @@
    "key": "B313",
    "stt": "a",
    "content": "Kết quả hoạt động phát hành, quản lý, sử dụng và thanh toán thẻ: Số lượng các loại thẻ đã phát hành, các đơn vị chấp nhận thẻ đã phát triển, doanh số các đơn vị chấp nhận thẻ; Doanh thu dịch vụ từ hoạt động phát hành thẻ…; xu hướng, mức độ tăng trưởng… của hoạt động tại đơn vị;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B314",
    "stt": "b",
    "content": "Đánh giá tình hình thực hiện kế hoạch được giao;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B315",
    "stt": "c",
    "content": "Đánh giá chung về tình hình phát hành, thanh toán Thẻ tại đơn vị.",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B316",
@@ -2090,61 +2414,71 @@
    "key": "B317",
    "stt": "a",
    "content": "Việc sử dụng và quản lý User (ATM, CSP, FIMI, IPCAS) tại đơn vị;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B318",
    "stt": "b",
    "content": "Kiểm tra quy trình phát hành, phát hành lại thẻ ghi nợ nội địa;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B319",
    "stt": "c",
    "content": "Kiểm tra hồ sơ, quy trình thực hiện cấp thấu chi tài khoản tiền gửi đăng ký phát hành thẻ ghi nợ;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B320",
    "stt": "d",
    "content": "Kiểm tra quy trình phát hành thẻ tín dụng;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B321",
    "stt": "e",
    "content": "Kiểm tra hoạt động thanh toán thẻ:\n+ Hoạt động quản lý, giám sát ATM;\n+ Quy trình kiểm quỹ, tiếp quỹ ATM;\n+ Thanh toán thẻ tại đơn vị chấp nhận thẻ;",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B322",
    "stt": "f",
    "content": "Hỗ trợ giải quyết tra soát, khiếu nại của khách hàng.",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B323",
    "stt": "7.4",
    "content": "Kiểm toán kết quả thực hiện kiến nghị của các đoàn thanh tra, kiểm tra, kiểm toán",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B324",
    "stt": "7.5",
    "content": "Nội dung khác (nếu có)",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B325",
    "stt": "7.6",
    "content": "Ghi nhận kết quả kiểm toán",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B326",
    "stt": "7.7",
    "content": "Tổng hợp kết quả kiểm toán",
-   "segment": "CD"
+   "segment": "CD",
+   "tick": true
   },
   {
    "key": "B327",
@@ -2162,37 +2496,43 @@
    "key": "B329",
    "stt": "a",
    "content": "Rà soát, đánh giá tổ chức màng lưới, cơ cấu tổ chức của đơn vị, các phòng/đơn vị liên quan đến hoạt động CNTT theo quy định của Agribank;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B330",
    "stt": "b",
    "content": "Rà soát, đánh giá các quy định nội bộ của đơn vị, các phòng/đơn vị liên quan đến hoạt động CNTT theo quy định của Agribank;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B331",
    "stt": "c",
    "content": "Rà soát, đánh giá việc phân công, phân cấp, ủy quyền liên quan đến hoạt động CNTT của Giám đốc đơn vị;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B332",
    "stt": "d",
    "content": "Rà soát, đánh giá việc triển khai các chủ trương, chính sách, nghị quyết, quyết định, quy định, văn bản chỉ đạo liên quan đến hoạt động CNTT của NHNN, Agribank;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B333",
    "stt": "e",
    "content": "Rà soát, đánh giá việc tổ chức tự kiểm tra; Công tác chỉ đạo chỉnh sửa, khắc phục sau thanh tra, kiểm tra, kiểm toán của chi nhánh;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B334",
    "stt": "f",
    "content": "Rà soát, đánh giá hệ thống cơ sở dữ liệu và thông tin, công nghệ ứng dụng trong việc xử lý, quản lý các dịch vụ, nghiệp vụ (nếu có).",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B335",
@@ -2204,217 +2544,248 @@
    "key": "B336",
    "stt": "a",
    "content": "Kiểm toán môi trường và Quản lý tài sản công nghệ thông tin;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B337",
    "stt": "b",
    "content": "Kiểm toán công tác Quản trị, vận hành hệ thống;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B338",
    "stt": "c",
    "content": "Kiểm toán Mạng truyền thông;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B339",
    "stt": "d",
    "content": "Kiểm toán AD-Mail Antivirus;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B340",
    "stt": "e",
    "content": "Kiểm toán việc quản lý và sử dụng thiết bị bảo mật (thẻ PKI);",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B341",
    "stt": "f",
    "content": "Kiểm toán các ứng dụng CNTT;",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B342",
    "stt": "g",
    "content": "Kiểm toán hệ thống IPCAS.",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B343",
    "stt": "8.3",
    "content": "Kiểm toán kết quả thực hiện các kiến nghị của các đoàn thanh ra, kiểm tra, kiểm toán",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B344",
    "stt": "8.4",
    "content": "Nội dung khác (nếu có)",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B345",
    "stt": "8.5",
    "content": "Ghi nhận kết quả kiểm toán",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B346",
    "stt": "8.6",
    "content": "Tổng hợp kết quả kiểm toán",
-   "segment": "IT"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B347",
    "stt": "9",
    "content": "HOẠT ĐỘNG XÂY DỰNG CƠ BẢN",
-   "segment": "FA"
+   "segment": "IT"
   },
   {
    "key": "B348",
    "stt": "9.1",
    "content": "Đánh giá công tác quản lý điều hành hoạt động XDCB, mua sắm TSCĐ",
-   "segment": "FA"
+   "segment": "IT"
   },
   {
    "key": "B349",
    "stt": "a",
    "content": "Rà soát, đánh giá việc phân công, phân cấp, ủy quyền liên quan đến hoạt động quản lý đầu tư XDCB, mua sắm TSCĐ, đầu tư dự án của Giám đốc đơn vị;",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B350",
    "stt": "b",
    "content": "Rà soát, đánh giá việc triển khai các chủ trương, chính sách, nghị quyết, quyết định, quy định, văn bản chỉ đạo liên quan đến hoạt động quản lý đầu tư XDCB, mua sắm TSCĐ, đầu tư dự án của NHNN, Agribank;",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B351",
    "stt": "c",
    "content": "Rà soát đánh giá việc xây dựng, giao và tổ chức thực hiện kế hoạch kinh doanh, việc áp dụng các biện pháp, công cụ để đạt được mục tiêu kinh doanh. Việc quyết toán kế hoạch kinh doanh đối với phòng/đơn vị trực thuộc (nếu có);",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B352",
    "stt": "d",
    "content": "Rà soát, đánh giá việc tổ chức tự kiểm tra; Công tác chỉ đạo chỉnh sửa, khắc phục sau thanh tra, kiểm ta, kiểm toán của chi nhánh.",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B353",
    "stt": "9.2",
    "content": "Thông tin tổng quan về đối tượng được kiểm toán:",
-   "segment": "FA"
+   "segment": "IT"
   },
   {
    "key": "B354",
    "stt": "a",
    "content": "Rà soát, đánh giá danh mục công trình XDCB, mua sắm TSCĐ tại đơn vị;",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B355",
    "stt": "b",
    "content": "Rà soát các Thông báo kế hoạch vốn đầu tư XDCB, mua sắm TSCĐ của đơn vị theo các năm tài chính của từng công trình, từng TSCĐ đã được Tổng Giám đốc phê duyệt.",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B356",
    "stt": "9.3",
    "content": "Kết quả hoạt động quản lý đầu tư XDCB, mua sắm TSCĐ, đầu tư dự án",
-   "segment": "FA"
+   "segment": "IT"
   },
   {
    "key": "B357",
    "stt": "a",
    "content": "Kết quả hoạt động quản lý đầu tư XDCB, mua sắm TSCĐ, đầu tư dự án",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B358",
    "stt": "b",
    "content": "Đánh giá tình hình thực hiện quản lý, lưu trữ hồ sơ XDCB, mua sắm TSCĐ",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B359",
    "stt": "c",
    "content": "Đánh giá chung về tình hình bảo quản công trình XDCB, TSCĐ",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B360",
    "stt": "9.4",
    "content": "Đánh giá việc tuân thủ quy định, quy trình nghiệp vụ của đơn vị; đánh giá tính hiệu quả của các chốt kiểm soát trong quy trình nghiệp vụ",
-   "segment": "FA"
+   "segment": "IT"
   },
   {
    "key": "B361",
    "stt": "a",
    "content": "Kiểm tra về hồ sơ pháp lý của dự án;",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B362",
    "stt": "b",
    "content": "Kiểm toán việc chấp hành quy định của Nhà nước và của Agribank trong giai đoạn chuẩn bị đầu tư;",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B363",
    "stt": "c",
    "content": "Kiểm toán việc chấp hành quy định của Nhà nước và của Agribank trong giai đoạn thực hiện đầu tư;",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B364",
    "stt": "d",
    "content": "Kiểm toán việc chấp hành quy định của Nhà nước và của Agribank trong giai đoạn kết thúc đầu tư, hoàn thành công trình bàn giao đưa vào sử dụng, trình phê duyệt quyết toán;",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B365",
    "stt": "e",
    "content": "Kiểm tra thực tế thực hiện dự án đầu tư XDCB, mua sắm TSCĐ;",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B366",
    "stt": "f",
    "content": "Kiểm tra về tạm ứng, thanh toán: Kiểm tra việc tạm ứng/thanh toán hợp đồng của từng gói thầu có tuân thủ theo quy định hiện hành của Nhà nước và của Agribank tại thời điểm phát sinh giao dịch hay không?",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B367",
    "stt": "g",
    "content": "Kiểm tra về bảo hành: Kiểm tra việc bảo hành công trình XDCB, TSCĐ có tuân thủ theo quy định hiện hành của Nhà nước và của Agribank tại thời điểm nghiệm thu hoàn thành công trình, hoàn thành mua sắm TSCĐ hay không?",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B368",
    "stt": "9.5",
    "content": "Kiểm toán kết quả thực hiện các kiến nghị của các đoàn thanh ra, kiểm tra, kiểm toán",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B369",
    "stt": "9.6",
    "content": "Nội dung khác (nếu có)",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B370",
    "stt": "9.7",
    "content": "Ghi nhận kết quả kiểm toán",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B371",
    "stt": "9.8",
    "content": "Tổng hợp kết quả kiểm toán",
-   "segment": "FA"
+   "segment": "IT",
+   "tick": true
   },
   {
    "key": "B372",
@@ -2432,61 +2803,71 @@
    "key": "B374",
    "stt": "a",
    "content": "Rà soát, đánh giá việc thành lập bộ phận PCRT tại chi nhánh (về cơ cấu tổ chức, nhân sự); việc đăng ký thông tin liên hệ của các thành viên bộ phận PCRT tai Chi nhánh về bộ phận PCRT tại Trụ sở chính.",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B375",
    "stt": "b",
    "content": "Rà soát đánh giá công tác phân công nhiệm vụ và việc thực hiện nhiệm vụ của bộ phận PCRT tại chi nhánh.",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B376",
    "stt": "c",
    "content": "Rà soát, đánh giá việc phân công, phân cấp, ủy quyền cho thành viên Ban giám đốc phụ trách công tác PCRT tại chi nhánh.",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B377",
    "stt": "d",
    "content": "Rà soát, đánh giá việc triển khai các chủ trương, chính sách, nghị quyết, quyết định, quy định, văn bản chỉ đạo liên quan đến hoạt động PCRT của Nhà Nước, Ngân hàng Nhà nước, Agribank.",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B378",
    "stt": "e",
    "content": "Rà soát công tác tổ chức kiểm tra, kiểm soát việc thực hiện công tác PCRT và Tài trợ khủng bố (TTKB) tại Chi nhánh, đơn vị trực thuộc.",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B379",
    "stt": "f",
    "content": "Rà soát công tác tổ chức triển khai, đào tạo quy chế, quy trình PCRT và TTKB; đào tạo về PCRT và TTKB, tuân thủ cấm vấn theo kế hoạch hàng năm đối với tất cả cán bộ có liên quan đến các giao dịch về tiền và tài sản tại đơn vị; đào tạo đối với người lao động mới tuyển dụng dự kiến được giao nhiệm vụ PCRT hoặc có liên quan đến giao dịch tiền, tài sản với khách hàng.",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B380",
    "stt": "g",
    "content": "Rà soát đánh giá việc ban hành quy định về phân loại khách hàng theo mức độ rủi ro rửa tiền.",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B381",
    "stt": "h",
    "content": "Rà soát công tác trao đổi thông tin giữa các đơn vị trong hệ thống Agribank với nhau, giữa Chi nhánh với các tổ chức tài chính có quan hệ đối tác nhằm phục vụ hoạt động PCRT và TTKB.",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B382",
    "stt": "i",
    "content": "Rà soát, đánh giá việc báo cáo hàng quý về tình hình công tác PCRT và TTKB, tuân thủ cấm vận tại đơn vị.",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B383",
    "stt": "j",
    "content": "Rà soát, đánh giá việc tổ chức tự kiểm tra, công tác chỉ đạo chỉnh sửa, khắc phục sau thanh tra, kiểm tra, kiểm toán của đơn vị.",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B384",
@@ -2498,81 +2879,98 @@
    "key": "B385",
    "stt": "a",
    "content": "Về rà soát hệ thống kiểm soát nội bộ",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B386",
    "stt": "b",
    "content": "Về công tác nhận biết, đăng ký thông tin khách hàng",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B387",
    "stt": "c",
    "content": "Về cập nhật thông tin khách hàng",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B388",
    "stt": "d",
    "content": "Về công tác xử lý thông tin và báo cáo theo quy định",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B389",
    "stt": "e",
    "content": "Về công tác lưu trữ hồ sơ, báo cáo",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B390",
    "stt": "f",
    "content": "Về công tác bảo mật thông tin",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B391",
    "stt": "10.3",
    "content": "Đánh giá tình hình thực hiện các kiến nghị của các đoàn thanh tra, kiểm tra",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B392",
    "stt": "10.4",
    "content": "Nội dung khác (nếu có)",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B393",
    "stt": "10.5",
    "content": "Ghi nhận kết quả kiểm toán",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B394",
    "stt": "10.6",
    "content": "Tổng hợp kết quả kiểm toán",
-   "segment": "AM"
+   "segment": "AM",
+   "tick": true
   },
   {
    "key": "B395",
    "stt": "11",
-   "content": "THỰC HIỆN NHIỆM VỤ KHÁC (NẾU CÓ)"
+   "content": "THỰC HIỆN NHIỆM VỤ KHÁC (NẾU CÓ)",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B396",
    "stt": "12",
-   "content": "LẬP BIÊN BẢN GHI NHẬN KẾT QUẢ KIỂM TOÁN"
+   "content": "LẬP BIÊN BẢN GHI NHẬN KẾT QUẢ KIỂM TOÁN",
+   "segment": "CHUNG"
   },
   {
    "key": "B397",
    "stt": "12.3",
-   "content": "Biên bản ghi nhận kết quả kiểm toán được lập và thông qua khi kết thúc cuộc kiểm toán. Có Chữ ký và họ tên của Trưởng Đoàn kiểm toán; Chữ ký, họ tên, đóng dấu của Trưởng đơn vị được kiểm toán hoặc người được ủy quyền hợp pháp (Đối với đoàn quy trình, hoạt động tại TSC: Trưởng đoàn ký Biên bản ghi nhận kết quả với Người đứng đầu ban/Trung tâm tại TSC có liên quan đến quy trình, hoạt động được kiểm toán)"
+   "content": "Biên bản ghi nhận kết quả kiểm toán được lập và thông qua khi kết thúc cuộc kiểm toán. Có Chữ ký và họ tên của Trưởng Đoàn kiểm toán; Chữ ký, họ tên, đóng dấu của Trưởng đơn vị được kiểm toán hoặc người được ủy quyền hợp pháp (Đối với đoàn quy trình, hoạt động tại TSC: Trưởng đoàn ký Biên bản ghi nhận kết quả với Người đứng đầu ban/Trung tâm tại TSC có liên quan đến quy trình, hoạt động được kiểm toán)",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B398",
    "stt": "12.4",
-   "content": "Biên bản ghi nhận kết quả kiểm toán bao gồm đầy đủ các nội dung chủ yếu (Ngày, tháng, năm lập/thông qua; Thành phần tham dự cuộc họp thông qua; Căn cứ kiểm toán; Phạm vi kiểm toán; Nội dung kiểm toán; Giới hạn kiểm toán; Thời kỳ, thời gian kiểm toán; Thông tin chung về đơn vị được kiểm toán; Kết quả kiểm toán; Những nhận định đánh giá, kết luận trên cơ sở kiểm toán; Ý kiến của đơn vị được kiểm toán (nếu có); Số lượng Biên bản ghi nhận kết quả kiểm toán lưu hành, các bên lưu giữ (cụ thể số bản gốc, số bản chính))"
+   "content": "Biên bản ghi nhận kết quả kiểm toán bao gồm đầy đủ các nội dung chủ yếu (Ngày, tháng, năm lập/thông qua; Thành phần tham dự cuộc họp thông qua; Căn cứ kiểm toán; Phạm vi kiểm toán; Nội dung kiểm toán; Giới hạn kiểm toán; Thời kỳ, thời gian kiểm toán; Thông tin chung về đơn vị được kiểm toán; Kết quả kiểm toán; Những nhận định đánh giá, kết luận trên cơ sở kiểm toán; Ý kiến của đơn vị được kiểm toán (nếu có); Số lượng Biên bản ghi nhận kết quả kiểm toán lưu hành, các bên lưu giữ (cụ thể số bản gốc, số bản chính))",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B399",
@@ -2583,17 +2981,41 @@
   {
    "key": "B400",
    "stt": "1",
-   "content": "Báo cáo kết quả kiểm toán, bao gồm các nội dung ghi nhận tại biên bản ghi nhận kết quả kiểm toán; các nhận định, đánh giá, kết luận; các nội dung kiến nghị, khuyến nghị với Hội đồng thành viên, Tổng giám đốc (nếu có) và Đơn vị được kiểm toán; nội dung không thống nhất giữa Đoàn kiểm toán và Đơn vị được kiểm toán, lý do chưa thống nhất của Đơn vị kiểm toán, cơ sở đưa ra nhận định, đánh giá của Đoàn kiểm toán (nếu có)"
+   "content": "Báo cáo kết quả kiểm toán, bao gồm các nội dung ghi nhận tại biên bản ghi nhận kết quả kiểm toán; các nhận định, đánh giá, kết luận; các nội dung kiến nghị, khuyến nghị với Hội đồng thành viên, Tổng giám đốc (nếu có) và Đơn vị được kiểm toán; nội dung không thống nhất giữa Đoàn kiểm toán và Đơn vị được kiểm toán, lý do chưa thống nhất của Đơn vị kiểm toán, cơ sở đưa ra nhận định, đánh giá của Đoàn kiểm toán (nếu có)",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B401",
    "stt": "2",
-   "content": "Dự thảo thông báo kết quả kiểm toán bao gồm các nội dung ghi nhận tại biên bản ghi nhận kết quả kiểm toán; các nhận định, đánh giá, kết luận trên cơ sở phát hiện kiểm toán; các nội dung kiến nghị Đơn vị được kiểm toán"
+   "content": "Dự thảo thông báo kết quả kiểm toán bao gồm các nội dung ghi nhận tại biên bản ghi nhận kết quả kiểm toán; các nhận định, đánh giá, kết luận trên cơ sở phát hiện kiểm toán; các nội dung kiến nghị Đơn vị được kiểm toán",
+   "tick": true,
+   "segment": "CHUNG"
   },
   {
    "key": "B402",
    "stt": "3",
-   "content": "Báo cáo các vấn đề chủ yếu của cuộc kiểm toán, tối thiểu gồm: Căn cứ lập báo cáo (quyết định tổ chức thực hiện cuộc kiểm toán, biên bản ghi nhận kết quả kiểm toán chính thức đã được ký xác nhận với đơn vị kiểm toán); các phát hiện chủ yếu của cuộc kiểm toán hoặc các mô tả kết quả kiểm toán (trong trường hợp cuộc kiểm toán không có các phát hiện chủ yếu); nguyên nhân của các tồn tại, sai sót chủ yếu; các đề xuất, kiến nghị đối với Hội đồng thành viên, Tổng Giám đốc, Ban Kiểm soát (nếu có)."
+   "content": "Báo cáo các vấn đề chủ yếu của cuộc kiểm toán, tối thiểu gồm: Căn cứ lập báo cáo (quyết định tổ chức thực hiện cuộc kiểm toán, biên bản ghi nhận kết quả kiểm toán chính thức đã được ký xác nhận với đơn vị kiểm toán); các phát hiện chủ yếu của cuộc kiểm toán hoặc các mô tả kết quả kiểm toán (trong trường hợp cuộc kiểm toán không có các phát hiện chủ yếu); nguyên nhân của các tồn tại, sai sót chủ yếu; các đề xuất, kiến nghị đối với Hội đồng thành viên, Tổng Giám đốc, Ban Kiểm soát (nếu có).",
+   "tick": true,
+   "segment": "CHUNG"
+  },
+  {
+   "key": "B403",
+   "stt": "IV",
+   "content": "Tổng cộng công việc thực hiện theo phân công",
+   "kind": "TOTAL_COUNT"
+  },
+  {
+   "key": "B404",
+   "stt": "V",
+   "content": "Tỷ lệ",
+   "kind": "RATIO"
+  },
+  {
+   "key": "B405",
+   "stt": "VI",
+   "content": "Điểm chấm",
+   "kind": "SCORE"
   }
  ],
  "PL01F": [

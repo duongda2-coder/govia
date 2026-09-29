@@ -46,6 +46,8 @@ export interface DgclLine {
   segment: string | null;
   kind: string | null;
   rate: number | null;
+  /** Cot "tick" cua file 01A/pl01b: tieu chi can cham (phieu moi tu tich san). */
+  tick: boolean;
   required: boolean;
   compliant: boolean;
   nonCompliant: boolean;
@@ -85,6 +87,8 @@ export interface DgclSheet {
   appendix: DgclAppendix;
   lines: DgclLine[];
   summary: DgclSummary;
+  /** false = phieu chua luu lan nao, NDTH/Tuân thủ dang la gia tri tich san. */
+  saved: boolean;
   evaluatorName: string | null;
   confirmed: boolean;
   confirmedBy: string | null;

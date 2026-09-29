@@ -3125,6 +3125,7 @@
     "unsavedHint": "Có thay đổi chưa lưu - điểm được tính lại sau khi Lưu",
     "readOnlyHint": "Bạn chỉ có quyền xem. Quyền đánh giá/kiểm soát được khai báo ở cột \"Thực hiện ĐGCL\"/\"Kiểm soát ĐGCL\" màn hình Khai báo khả năng đảm nhận.",
     "ownSegmentsOnly": "Chỉ hiện nội dung chung và nội dung thuộc mảng nghiệp vụ của cán bộ ({{segments}})",
+    "preTickedHint": "Phiếu chưa lưu: hệ thống đã tự tích sẵn NDTH và Tuân thủ cho các tiêu chí cần chấm (PL01B: tiêu chí chung và tiêu chí thuộc mảng nghiệp vụ của cán bộ). Rà soát lại rồi bấm Lưu.",
     "pl01fHint": "Điểm B1/B2 lấy từ PL01A/PL01B; điểm trừ chất lượng = số lỗi × tỷ lệ × điểm tối đa (III). Xác nhận PL01F cần xác nhận PL01A và PL01B trước.",
     "appendix": {
       "PL01A": "Phụ lục 01A - Tuân thủ trình tự, thời gian",

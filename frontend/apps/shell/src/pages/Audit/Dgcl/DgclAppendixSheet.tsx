@@ -41,12 +41,18 @@ const HIGHLIGHT_KINDS = new Set([
   "PENALTY_GROUP",
   "GRAND_TOTAL",
   "CLASSIFICATION",
+  "TOTAL_COUNT",
+  "RATIO",
+  "SCORE",
 ]);
-const SCORE_KINDS = new Set(["SCORE_A", "SCORE_B", "SCORE_QUALITY"]);
+/** Dong IV/V/VI + dong "gián đoạn" cuoi PL01A/PL01B (test 29.9). */
+const FOOTER_KINDS = new Set(["TOTAL_COUNT", "RATIO", "SCORE"]);
+const COMMON_SEGMENT = "CHUNG";
 const ATTACHMENT_COUNT_CHUNK = 80;
 
 /** Dong tieu de: muc La Ma cua PL01A/B, dong "A"/"B" cua PL01F. */
 const isHeading = (line: DgclLine) => line.header || line.kind === "HEADER";
+const isFooter = (line: DgclLine) => line.kind != null && FOOTER_KINDS.has(line.kind);
 
 function toInput(line: DgclLine): DgclLineInput {
   return {
@@ -75,7 +81,7 @@ export function DgclAppendixSheet({ engagementId, subjectKey, subjectSegments, t
   const [dirty, setDirty] = useState(false);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState<DgclSheetAction | "save" | null>(null);
-  const [ownSegmentsOnly, setOwnSegmentsOnly] = useState(true);
+  const [ownSegmentsOnly, setOwnSegmentsOnly] = useState(false);
   const [attachmentLine, setAttachmentLine] = useState<DgclLine | null>(null);
   const [attachmentCounts, setAttachmentCounts] = useState<Record<string, number>>({});
 
@@ -159,20 +165,23 @@ export function DgclAppendixSheet({ engagementId, subjectKey, subjectSegments, t
     [attachmentEntityId],
   );
 
-  const segments = useMemo(() => new Set((subjectSegments ?? "").split(",").filter(Boolean)), [subjectSegments]);
+  const segments = useMemo(() => new Set((subjectSegments ?? "").split(",").map((c) => c.trim().toUpperCase()).filter(Boolean)), [subjectSegments]);
   const canFilterSegments = appendix === "PL01B" && !team && segments.size > 0;
   const lines = useMemo(() => {
     const all = sheet?.lines ?? [];
     if (!canFilterSegments || !ownSegmentsOnly) return all;
-    return all.filter((l) => !l.segment || segments.has(l.segment));
+    return all.filter((l) => !l.segment || l.segment === COMMON_SEGMENT || segments.has(l.segment.toUpperCase()));
   }, [sheet, canFilterSegments, ownSegmentsOnly, segments]);
 
   const editable = !!sheet?.canEdit;
+  const summary = sheet?.summary;
+  // Phieu chua luu: cac o tich san chua duoc ghi, cho Lưu ngay ca khi chua sua gi.
+  const unsaved = !!sheet && !sheet.saved;
   const dash = (v: string | null | undefined) => v ?? "-";
   const value = (key: string) => inputs[key];
 
   const attachmentCell = (line: DgclLine) => {
-    if (line.header) return null;
+    if (line.header || isFooter(line)) return null;
     const count = attachmentCounts[line.attachmentEntityId] ?? 0;
     return (
       <Badge count={count} size="small">
@@ -182,7 +191,7 @@ export function DgclAppendixSheet({ engagementId, subjectKey, subjectSegments, t
   };
 
   const textCell = (field: "detail" | "document" | "note", maxLength: number) => (_: unknown, line: DgclLine) => {
-    if (line.header || line.kind === "NOTE" || line.kind === "HEADER") return null;
+    if (line.header || line.kind === "NOTE" || line.kind === "HEADER" || isFooter(line)) return null;
     const v = value(line.key)?.[field];
     return editable ? (
       <Input size="small" value={v ?? ""} maxLength={maxLength} onChange={(e) => update(line.key, { [field]: e.target.value })} />
@@ -206,20 +215,37 @@ export function DgclAppendixSheet({ engagementId, subjectKey, subjectSegments, t
     { title: t("auditDgcl.columns.detail"), width: 220, render: textCell("detail", 2000) },
     { title: t("auditDgcl.columns.document"), width: 220, render: textCell("document", 1000) },
     { title: t("common.attachment"), width: 70, align: "center", render: (_: unknown, line) => attachmentCell(line) },
-    { title: t("auditDgcl.columns.lineEvaluator"), dataIndex: "evaluatorName", width: 160, render: (v: string | null, line) => (line.header ? null : dash(v)) },
+    { title: t("auditDgcl.columns.lineEvaluator"), dataIndex: "evaluatorName", width: 160, render: (v: string | null, line) => (line.header || isFooter(line) ? null : dash(v)) },
     { title: t("auditDgcl.columns.note"), width: 200, render: textCell("note", 1000) },
   ];
 
-  const checkboxCell = (field: "required" | "compliant" | "nonCompliant") => (_: unknown, line: DgclLine) =>
-    line.header ? null : (
-      <Checkbox checked={!!value(line.key)?.[field]} disabled={!editable} onChange={(e) => update(line.key, { [field]: e.target.checked })} />
-    );
+  const summaryCount = (field: "required" | "compliant" | "nonCompliant") =>
+    field === "required" ? summary?.requiredCount : field === "compliant" ? summary?.compliantCount : summary?.nonCompliantCount;
+
+  /** Dong IV: dem so dong tich o tung cot; V: ty le; VI: diem cham (sau quy tac "gián đoạn") - dat o cot Tuân thủ nhu sheet PL 01A. */
+  const footerCell = (field: "required" | "compliant" | "nonCompliant", line: DgclLine) => {
+    const text = (v: string | number | null | undefined) => <Typography.Text strong>{v ?? "-"}</Typography.Text>;
+    if (line.kind === "TOTAL_COUNT") return text(summaryCount(field) ?? 0);
+    if (field !== "compliant") return null;
+    return line.kind === "RATIO" ? text(formatPercent(summary?.ratio)) : text(formatScore(summary?.score));
+  };
+
+  const checkboxCell = (field: "required" | "compliant" | "nonCompliant") => (_: unknown, line: DgclLine) => {
+    if (line.header) return null;
+    if (isFooter(line)) return footerCell(field, line);
+    if (line.kind === "DISRUPTION") {
+      return field === "required" ? (
+        <Checkbox checked={!!value(line.key)?.checked} disabled={!editable} onChange={(e) => update(line.key, { checked: e.target.checked })} />
+      ) : null;
+    }
+    return <Checkbox checked={!!value(line.key)?.[field]} disabled={!editable} onChange={(e) => update(line.key, { [field]: e.target.checked })} />;
+  };
 
   const complianceColumns: TableProps<DgclLine>["columns"] = [
     sttColumn,
     contentColumn,
     ...(appendix === "PL01B"
-      ? [{ title: t("auditDgcl.columns.lineSegment"), dataIndex: "segment", width: 90, render: (v: string | null, line: DgclLine) => (line.header ? null : dash(v)) }]
+      ? [{ title: t("auditDgcl.columns.lineSegment"), dataIndex: "segment", width: 90, render: (v: string | null, line: DgclLine) => (line.header || line.kind ? null : dash(v)) }]
       : []),
     { title: t("auditDgcl.columns.required"), width: 70, align: "center" as const, render: checkboxCell("required") },
     { title: t("auditDgcl.columns.compliant"), width: 80, align: "center" as const, render: checkboxCell("compliant") },
@@ -234,19 +260,8 @@ export function DgclAppendixSheet({ engagementId, subjectKey, subjectSegments, t
       title: t("auditDgcl.columns.maxScore"),
       width: 110,
       align: "right",
-      render: (_: unknown, line) =>
-        line.kind && SCORE_KINDS.has(line.kind) && editable ? (
-          <InputNumber
-            size="small"
-            min={0}
-            style={{ width: 90 }}
-            placeholder={formatScore(line.calcMax) ?? "100"}
-            value={value(line.key)?.maxScore ?? null}
-            onChange={(v) => update(line.key, { maxScore: v })}
-          />
-        ) : (
-          formatScore(line.calcMax)
-        ),
+      // test 29.9: diem toi da I/II/III co dinh 100, khong cho nhap.
+      render: (_: unknown, line) => formatScore(line.calcMax),
     },
     {
       title: t("auditDgcl.columns.violationCount"),
@@ -277,7 +292,6 @@ export function DgclAppendixSheet({ engagementId, subjectKey, subjectSegments, t
     ...tailColumns,
   ];
 
-  const summary = sheet?.summary;
   const statusTag = sheet?.controlled ? (
     <Tag icon={<LockOutlined />} color="red">
       {t("auditDgcl.status.controlled", { name: sheet.controlledBy ?? "" })}
@@ -295,7 +309,7 @@ export function DgclAppendixSheet({ engagementId, subjectKey, subjectSegments, t
       <Space wrap style={{ marginBottom: 12 }}>
         {capability.canEvaluate && (
           <>
-            <Button type="primary" icon={<SaveOutlined />} disabled={!editable || !dirty} loading={busy === "save"} onClick={save}>
+            <Button type="primary" icon={<SaveOutlined />} disabled={!editable || (!dirty && !unsaved)} loading={busy === "save"} onClick={save}>
               {t("common.save")}
             </Button>
             <Button icon={<CheckCircleOutlined />} disabled={!sheet?.canConfirm || dirty} loading={busy === "confirm"} onClick={() => runAction("confirm")}>
@@ -348,6 +362,7 @@ export function DgclAppendixSheet({ engagementId, subjectKey, subjectSegments, t
         </Descriptions>
       )}
 
+      {unsaved && editable && appendix !== "PL01F" && <Typography.Paragraph type="warning">{t("auditDgcl.preTickedHint")}</Typography.Paragraph>}
       {canFilterSegments && (
         <Space style={{ marginBottom: 8 }}>
           <Switch size="small" checked={ownSegmentsOnly} onChange={setOwnSegmentsOnly} />

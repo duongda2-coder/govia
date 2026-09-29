@@ -12,6 +12,9 @@ import com.govia.audit.dgcl.DgclScoring.LineValues;
 import com.govia.audit.dgcl.DgclScoring.QualityResult;
 import com.govia.audit.employeecapability.dto.AuditEmployeeCapabilityItemRequest;
 import com.govia.audit.employeecapability.service.AuditEmployeeCapabilityService;
+import com.govia.audit.masterdata.entity.AuditMasterDataCategory;
+import com.govia.audit.masterdata.entity.AuditMasterDataItem;
+import com.govia.audit.masterdata.repository.AuditMasterDataItemRepository;
 import com.govia.audit.planengagement.entity.AuditEngagement;
 import com.govia.audit.planengagement.entity.AuditEngagementGroup;
 import com.govia.audit.planengagement.entity.AuditEngagementGroupMember;
@@ -67,6 +70,7 @@ class AuditDgclTest {
     @Autowired private AuditEngagementRepository engagementRepository;
     @Autowired private AuditEngagementGroupRepository groupRepository;
     @Autowired private AuditEngagementGroupMemberRepository memberRepository;
+    @Autowired private AuditMasterDataItemRepository masterDataItemRepository;
 
     private UUID tenantId;
 
@@ -99,35 +103,104 @@ class AuditDgclTest {
         assertThat(q.calcByKey().get("F004").points()).isCloseTo(80, within(0.0001));
     }
 
+    /** test 29.9: diem PL01A >= 90 ma khong tich dong "gián đoạn..." thi = 100, tich thi giu nguyen; < 90 giu nguyen. */
+    @Test
+    void pl01a_disruptionRowRule() {
+        List<DgclCriteriaCatalog.Item> items = catalog.items(DgclAppendix.PL01A);
+        List<String> keys = items.stream().filter(DgclCriteriaCatalog.Item::isTick).map(DgclCriteriaCatalog.Item::key).limit(11).toList();
+        String disruptionKey = items.stream().filter(i -> "DISRUPTION".equals(i.kind())).findFirst().orElseThrow().key();
+        Map<String, LineValues> values = new HashMap<>();
+        for (int i = 0; i < keys.size(); i++) {
+            values.put(keys.get(i), new LineValues(true, i < 10, i >= 10, false, null, null)); // 10/11 = 90.9%
+        }
+        assertThat(DgclScoring.compliance(items, values).score()).isEqualTo(100d);
+        values.put(disruptionKey, new LineValues(false, false, false, true, null, null));
+        assertThat(DgclScoring.compliance(items, values).score()).isCloseTo(90.909, within(0.001));
+        values.remove(disruptionKey);
+        values.put(keys.get(9), new LineValues(true, false, true, false, null, null)); // 9/11 = 81.8%
+        assertThat(DgclScoring.compliance(items, values).score()).isCloseTo(81.818, within(0.001));
+    }
+
+    /** test 29.9: phieu moi tu tich san NDTH + Tuân thủ theo cot "tick"; PL01B hien du moi mang nhung chi tich san CHUNG + mang
+     * cua thanh vien; PL01F diem toi da I/II/III co dinh 100. */
+    @Test
+    void newSheets_arePreTickedBySegment() {
+        EmployeeResponse lead = createEmployee("NV-DGCL-TL2");
+        EmployeeResponse member = createEmployee("NV-DGCL-TV2");
+        setDgcl(lead.id(), true, false);
+        AuditEngagement engagement = createEngagement("CKT-DGCL-02", lead.id(), member.id());
+        AuditMasterDataItem dp = new AuditMasterDataItem();
+        dp.setTenantId(tenantId);
+        dp.setCategory(AuditMasterDataCategory.BUSINESS_SEGMENT);
+        dp.setCode("DP");
+        dp.setName("Huy dong von");
+        dp = masterDataItemRepository.save(dp);
+        AuditEngagementGroupMember m = memberRepository.findAll().stream().filter(x -> x.getEmployeeId().equals(member.id())).findFirst().orElseThrow();
+        m.setBusinessSegment1Id(dp.getId());
+        memberRepository.save(m);
+        CurrentUserPrincipal ev = principal(lead);
+        UUID id = engagement.getId();
+
+        Sheet a = service.getSheet(id, member.id().toString(), DgclAppendix.PL01A, ev);
+        assertThat(a.saved()).isFalse();
+        assertThat(a.summary().requiredCount()).isEqualTo(34);
+        assertThat(a.summary().score()).isEqualTo(100d);
+
+        Sheet b = service.getSheet(id, member.id().toString(), DgclAppendix.PL01B, ev);
+        assertThat(b.lines()).hasSize(catalog.items(DgclAppendix.PL01B).size());
+        assertThat(b.lines()).filteredOn(l -> l.required()).extracting(l -> l.segment()).containsOnly("CHUNG", "DP");
+        assertThat(b.lines()).filteredOn(l -> l.tick() && "DP".equals(l.segment())).allMatch(l -> l.required() && l.compliant());
+        assertThat(b.lines()).filteredOn(l -> l.tick() && "GA".equals(l.segment())).noneMatch(l -> l.required());
+
+        Sheet leadB = service.getSheet(id, lead.id().toString(), DgclAppendix.PL01B, ev);
+        assertThat(leadB.lines()).filteredOn(l -> l.required()).extracting(l -> l.segment()).containsOnly("CHUNG");
+
+        service.saveSheet(id, member.id().toString(), DgclAppendix.PL01F, new SaveRequest(List.of(
+                new LineInput("F002", false, false, false, false, null, java.math.BigDecimal.valueOf(50), null, null, null))), ev);
+        Sheet f = service.getSheet(id, member.id().toString(), DgclAppendix.PL01F, ev);
+        assertThat(f.lines().stream().filter(l -> l.key().equals("F002")).findFirst().orElseThrow().calcMax()).isEqualTo(100d);
+    }
+
     @Test
     void fullFlow_evaluateConfirmControlAndExport() throws Exception {
         EmployeeResponse lead = createEmployee("NV-DGCL-TL");
         EmployeeResponse member = createEmployee("NV-DGCL-TV");
-        EmployeeResponse evaluator = createEmployee("NV-DGCL-EV");
+        EmployeeResponse evaluator = lead;
         EmployeeResponse controller = createEmployee("NV-DGCL-KS");
         EmployeeResponse outsider = createEmployee("NV-DGCL-OUT");
+        EmployeeResponse outsideEvaluator = createEmployee("NV-DGCL-OEV");
         setDgcl(evaluator.id(), true, false);
+        setDgcl(outsideEvaluator.id(), true, false);
         setDgcl(controller.id(), false, true);
         AuditEngagement engagement = createEngagement("CKT-DGCL-01", lead.id(), member.id());
         UUID id = engagement.getId();
         CurrentUserPrincipal ev = principal(evaluator);
         CurrentUserPrincipal ks = principal(controller);
         CurrentUserPrincipal out = principal(outsider);
+        CurrentUserPrincipal oev = principal(outsideEvaluator);
 
-        List<SubjectRow> subjects = service.listSubjects(id);
+        // test 29.9 muc 1: chi thanh vien doan (hoac NSD kiem soat DGCL) thay/vao duoc CKT
+        assertThat(service.listEngagements(ev)).extracting(r -> r.id()).contains(id);
+        assertThat(service.listEngagements(ks)).extracting(r -> r.id()).contains(id);
+        assertThat(service.listEngagements(oev)).extracting(r -> r.id()).doesNotContain(id);
+        assertThatThrownBy(() -> service.listSubjects(id, oev)).isInstanceOf(BusinessException.class);
+
+        List<SubjectRow> subjects = service.listSubjects(id, ev);
         assertThat(subjects).extracting(SubjectRow::role).containsExactly("TD", "TV", null);
         assertThat(subjects.get(2).team()).isTrue();
         String memberKey = member.id().toString();
 
         SaveRequest pl01a = new SaveRequest(List.of(compliant("A002", true), compliant("A003", true), compliant("A004", true), compliant("A005", false)));
         assertThatThrownBy(() -> service.saveSheet(id, memberKey, DgclAppendix.PL01A, pl01a, out)).isInstanceOf(BusinessException.class);
+        assertThatThrownBy(() -> service.saveSheet(id, memberKey, DgclAppendix.PL01A, pl01a, oev)).as("co quyen DGCL nhung khong thuoc doan")
+                .isInstanceOf(BusinessException.class);
 
         Sheet a = service.saveSheet(id, memberKey, DgclAppendix.PL01A, pl01a, ev);
         assertThat(a.summary().score()).isCloseTo(75, within(0.0001));
         assertThat(a.lines().stream().filter(l -> l.key().equals("A005")).findFirst().orElseThrow().evaluatorName()).isEqualTo(evaluator.fullName());
-        assertThat(service.listSubjects(id).get(1).pl01aScore()).as("chua xac nhan thi chua day diem ra ngoai").isNull();
+        assertThat(service.listSubjects(id, ev).get(1).pl01aScore()).as("chua xac nhan thi chua day diem ra ngoai").isNull();
         service.confirm(id, memberKey, DgclAppendix.PL01A, ev);
-        assertThat(service.listSubjects(id).get(1).pl01aScore().doubleValue()).isCloseTo(75, within(0.0001));
+        assertThat(service.listSubjects(id, ev).get(1).pl01aScore().doubleValue()).isCloseTo(75, within(0.0001));
         assertThatThrownBy(() -> service.saveSheet(id, memberKey, DgclAppendix.PL01A, pl01a, ev)).isInstanceOf(BusinessException.class);
 
         service.saveSheet(id, memberKey, DgclAppendix.PL01B, new SaveRequest(List.of(compliant("B002", true), compliant("B003", true))), ev);
@@ -142,7 +215,7 @@ class AuditDgclTest {
         assertThat(f.summary().classification()).isEqualTo("Chất lượng khá");
         service.confirm(id, memberKey, DgclAppendix.PL01F, ev);
 
-        SubjectRow row = service.listSubjects(id).get(1);
+        SubjectRow row = service.listSubjects(id, ev).get(1);
         assertThat(row.pl01fScore().doubleValue()).isCloseTo(85.5, within(0.0001));
         assertThat(row.classification()).isEqualTo("Chất lượng khá");
         assertThat(row.confirmedCount()).isEqualTo(3);
@@ -156,10 +229,10 @@ class AuditDgclTest {
         assertThat(service.getSheet(id, memberKey, DgclAppendix.PL01F, ev).canUnconfirm()).isFalse();
         service.uncontrol(id, memberKey, DgclAppendix.PL01F, ks);
         assertThat(service.unconfirm(id, memberKey, DgclAppendix.PL01F, ev).confirmed()).isFalse();
-        assertThat(service.listSubjects(id).get(1).pl01fScore()).isNull();
+        assertThat(service.listSubjects(id, ev).get(1).pl01fScore()).isNull();
 
         service.confirm(id, memberKey, DgclAppendix.PL01F, ev);
-        byte[] excel = service.exportPl04b1(id);
+        byte[] excel = service.exportPl04b1(id, ev);
         List<String> texts = new ArrayList<>();
         try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(excel))) {
             for (Row r : wb.getSheetAt(0)) {

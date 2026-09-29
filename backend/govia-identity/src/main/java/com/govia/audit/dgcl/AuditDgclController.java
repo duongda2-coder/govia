@@ -38,8 +38,8 @@ public class AuditDgclController {
 
     @GetMapping("/engagements")
     @PreAuthorize("hasAuthority('PERM_AUDIT.DGCL.VIEW')")
-    public ApiResponse<List<AuditEngagementResponse>> listEngagements() {
-        return ApiResponse.ok(service.listEngagements());
+    public ApiResponse<List<AuditEngagementResponse>> listEngagements(@AuthenticationPrincipal CurrentUserPrincipal principal) {
+        return ApiResponse.ok(service.listEngagements(principal));
     }
 
     @GetMapping("/capability")
@@ -50,8 +50,8 @@ public class AuditDgclController {
 
     @GetMapping("/engagements/{engagementId}/subjects")
     @PreAuthorize("hasAuthority('PERM_AUDIT.DGCL.VIEW')")
-    public ApiResponse<List<SubjectRow>> listSubjects(@PathVariable UUID engagementId) {
-        return ApiResponse.ok(service.listSubjects(engagementId));
+    public ApiResponse<List<SubjectRow>> listSubjects(@PathVariable UUID engagementId, @AuthenticationPrincipal CurrentUserPrincipal principal) {
+        return ApiResponse.ok(service.listSubjects(engagementId, principal));
     }
 
     @GetMapping("/engagements/{engagementId}/subjects/{subjectKey}/{appendix}")
@@ -98,10 +98,10 @@ public class AuditDgclController {
 
     @GetMapping("/engagements/{engagementId}/pl04b1")
     @PreAuthorize("hasAuthority('PERM_AUDIT.DGCL.EXPORT')")
-    public ResponseEntity<byte[]> exportPl04b1(@PathVariable UUID engagementId) {
+    public ResponseEntity<byte[]> exportPl04b1(@PathVariable UUID engagementId, @AuthenticationPrincipal CurrentUserPrincipal principal) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"pl04b1_dgcl.xlsx\"")
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(service.exportPl04b1(engagementId));
+                .body(service.exportPl04b1(engagementId, principal));
     }
 }

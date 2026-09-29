@@ -53,6 +53,8 @@ public final class AuditDgclDto {
             String segment,
             String kind,
             Double rate,
+            /** cot "tick" cua file 01A/pl01b: tieu chi can cham. */
+            boolean tick,
             boolean required,
             boolean compliant,
             boolean nonCompliant,
@@ -95,6 +97,8 @@ public final class AuditDgclDto {
             DgclAppendix appendix,
             List<Line> lines,
             Summary summary,
+            /** false = phieu chua luu lan nao, cac o NDTH/Tuân thủ dang la gia tri tich san (chua tinh vao diem ngoai). */
+            boolean saved,
             String evaluatorName,
             boolean confirmed,
             String confirmedBy,

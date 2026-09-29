@@ -100,9 +100,12 @@ public class AuditDgclService {
 
     // ===================== Man hinh 1: danh sach CKT =====================
 
+    /** test 29.9: thanh vien doan nao chi thay/danh gia CKT cua doan do (truong doan, thanh vien nhom, to giam sat - dung
+     * dinh nghia "được phân công" cua {@link AuditEngagementService#listAssignedToCurrentUser}); NSD duoc tich "Kiểm soát ĐGCL"
+     * o KNDN (kiem soat moi doan) hoac co quyen AUDIT.PLAN_ENGAGEMENT.VIEW_ALL thi thay tat ca. */
     @Transactional(readOnly = true)
-    public List<AuditEngagementResponse> listEngagements() {
-        return engagementService.list();
+    public List<AuditEngagementResponse> listEngagements(CurrentUserPrincipal principal) {
+        return actor(principal).canControl() ? engagementService.list() : engagementService.listAssignedToCurrentUser(principal);
     }
 
     @Transactional(readOnly = true)
@@ -114,7 +117,12 @@ public class AuditDgclService {
     // ===================== Man hinh 2: thanh vien doan + diem =====================
 
     @Transactional(readOnly = true)
-    public List<SubjectRow> listSubjects(UUID engagementId) {
+    public List<SubjectRow> listSubjects(UUID engagementId, CurrentUserPrincipal principal) {
+        requireAccess(engagementId, principal);
+        return listSubjects(engagementId);
+    }
+
+    private List<SubjectRow> listSubjects(UUID engagementId) {
         AuditEngagementResponse engagement = engagementService.get(engagementId);
         UUID tenantId = TenantContext.getTenantId();
         Map<String, Map<DgclAppendix, AuditDgclEvaluation>> evaluations = new HashMap<>();
@@ -130,6 +138,7 @@ public class AuditDgclService {
 
     @Transactional(readOnly = true)
     public Sheet getSheet(UUID engagementId, String subjectKey, DgclAppendix appendix, CurrentUserPrincipal principal) {
+        requireAccess(engagementId, principal);
         AuditEngagementResponse engagement = engagementService.get(engagementId);
         Subject subject = subjectOrThrow(engagement, subjectKey);
         Optional<AuditDgclEvaluation> evaluation = findEvaluation(engagementId, subjectKey, appendix);
@@ -138,6 +147,7 @@ public class AuditDgclService {
 
     @Transactional
     public Sheet saveSheet(UUID engagementId, String subjectKey, DgclAppendix appendix, SaveRequest request, CurrentUserPrincipal principal) {
+        requireAccess(engagementId, principal);
         AuditEngagementResponse engagement = engagementService.get(engagementId);
         Subject subject = subjectOrThrow(engagement, subjectKey);
         Actor actor = actor(principal);
@@ -155,7 +165,7 @@ public class AuditDgclService {
                 .collect(Collectors.toMap(AuditDgclEvaluationLine::getItemKey, Function.identity()));
         for (LineInput input : request.lines()) {
             Item item = itemsByKey.get(input.key());
-            if (item == null || item.isHeader()) {
+            if (item == null || item.isHeader() || item.isFooter()) {
                 continue;
             }
             if (input.compliant() && input.nonCompliant()) {
@@ -192,6 +202,7 @@ public class AuditDgclService {
     /** Nut 1 "Xác nhận hoàn thành ĐGCL": diem duoc day ra man hinh ngoai. */
     @Transactional
     public Sheet confirm(UUID engagementId, String subjectKey, DgclAppendix appendix, CurrentUserPrincipal principal) {
+        requireAccess(engagementId, principal);
         AuditEngagementResponse engagement = engagementService.get(engagementId);
         Subject subject = subjectOrThrow(engagement, subjectKey);
         Actor actor = actor(principal);
@@ -224,6 +235,7 @@ public class AuditDgclService {
     /** Nut 2 "Hủy xác nhận hoàn thành": diem o man hinh ngoai de trong. */
     @Transactional
     public Sheet unconfirm(UUID engagementId, String subjectKey, DgclAppendix appendix, CurrentUserPrincipal principal) {
+        requireAccess(engagementId, principal);
         AuditEngagementResponse engagement = engagementService.get(engagementId);
         Subject subject = subjectOrThrow(engagement, subjectKey);
         Actor actor = actor(principal);
@@ -246,6 +258,7 @@ public class AuditDgclService {
     /** Nut 3 "Kiểm soát ĐGCL": khoa phieu, NSD danh gia khong sua/huy xac nhan duoc nua. */
     @Transactional
     public Sheet control(UUID engagementId, String subjectKey, DgclAppendix appendix, CurrentUserPrincipal principal) {
+        requireAccess(engagementId, principal);
         AuditEngagementResponse engagement = engagementService.get(engagementId);
         Subject subject = subjectOrThrow(engagement, subjectKey);
         Actor actor = actor(principal);
@@ -266,6 +279,7 @@ public class AuditDgclService {
     /** Nut 4 "Hủy kiểm soát ĐGCL": tra lai quyen danh gia. */
     @Transactional
     public Sheet uncontrol(UUID engagementId, String subjectKey, DgclAppendix appendix, CurrentUserPrincipal principal) {
+        requireAccess(engagementId, principal);
         AuditEngagementResponse engagement = engagementService.get(engagementId);
         Subject subject = subjectOrThrow(engagement, subjectKey);
         Actor actor = actor(principal);
@@ -285,7 +299,8 @@ public class AuditDgclService {
     // ===================== Nut "PL04B1" =====================
 
     @Transactional(readOnly = true)
-    public byte[] exportPl04b1(UUID engagementId) {
+    public byte[] exportPl04b1(UUID engagementId, CurrentUserPrincipal principal) {
+        requireAccess(engagementId, principal);
         AuditEngagementResponse engagement = engagementService.get(engagementId);
         return DgclPl04b1Writer.write(engagement, listSubjects(engagementId));
     }
@@ -355,7 +370,9 @@ public class AuditDgclService {
         Map<String, AuditDgclEvaluationLine> stored = evaluation == null || evaluation.getId() == null ? Map.of()
                 : lineRepository.findByEvaluationId(evaluation.getId()).stream()
                 .collect(Collectors.toMap(AuditDgclEvaluationLine::getItemKey, Function.identity()));
-        Map<String, LineValues> values = toValues(stored);
+        boolean exists = evaluation != null && evaluation.getId() != null;
+        // Phieu chua luu lan nao: tu tich san NDTH + Tuân thủ cac tieu chi cot "tick" (test 29.9) de NSD ra soat lai.
+        Map<String, LineValues> values = exists ? toValues(stored) : defaultValues(items, subject);
 
         Summary summary;
         Map<String, Calc> calc = Map.of();
@@ -372,10 +389,10 @@ public class AuditDgclService {
         List<Line> lines = new ArrayList<>(items.size());
         for (Item item : items) {
             AuditDgclEvaluationLine line = stored.get(item.key());
+            LineValues v = values.getOrDefault(item.key(), LineValues.EMPTY);
             Calc c = calc.get(item.key());
-            lines.add(new Line(item.key(), item.stt(), item.content(), item.isHeader(), item.segment(), item.kind(), item.rate(),
-                    line != null && line.isRequired(), line != null && line.isCompliant(), line != null && line.isNonCompliant(),
-                    line != null && line.isChecked(), line == null ? null : line.getViolationCount(), line == null ? null : line.getMaxScore(),
+            lines.add(new Line(item.key(), item.stt(), item.content(), item.isHeader(), item.segment(), item.kind(), item.rate(), item.isTick(),
+                    v.required(), v.compliant(), v.nonCompliant(), v.checked(), line == null ? null : line.getViolationCount(), null,
                     line == null ? null : line.getDetail(), line == null ? null : line.getDocument(), line == null ? null : line.getNote(),
                     line == null ? null : line.getEvaluatorName(),
                     c == null ? null : c.max(), c == null ? null : c.deduction(), c == null ? null : c.points(), c == null ? null : c.ratio(),
@@ -384,9 +401,8 @@ public class AuditDgclService {
 
         boolean confirmed = evaluation != null && evaluation.isConfirmed();
         boolean controlled = evaluation != null && evaluation.isControlled();
-        boolean exists = evaluation != null && evaluation.getId() != null;
         return new Sheet(engagement.id(), engagement.code(), subject.key(), subject.team(), subject.name(), subject.segmentCodes(), appendix,
-                lines, summary, evaluation == null ? null : evaluation.getEvaluatorName(),
+                lines, summary, exists, evaluation == null ? null : evaluation.getEvaluatorName(),
                 confirmed, evaluation == null ? null : evaluation.getConfirmedBy(), evaluation == null ? null : evaluation.getConfirmedAt(),
                 controlled, evaluation == null ? null : evaluation.getControlledBy(), evaluation == null ? null : evaluation.getControlledAt(),
                 actor.canEvaluate() && !confirmed && !controlled,
@@ -394,6 +410,26 @@ public class AuditDgclService {
                 actor.canEvaluate() && confirmed && !controlled,
                 actor.canControl() && confirmed && !controlled,
                 actor.canControl() && controlled);
+    }
+
+    /** Gia tri tich san cua phieu chua luu: moi dong co "tick" = NDTH + Tuân thủ. PL01B chi tich san dong dung chung (CHUNG)
+     * va dong thuoc mang nghiep vu cua doi tuong (vd lam GA, DP chi tich san tieu chi GA, DP; dong "Cuộc kiểm toán" = mang
+     * cua ca doan) - cac mang khac van hien de xem nhung de trong. */
+    private Map<String, LineValues> defaultValues(List<Item> items, Subject subject) {
+        Set<String> segments = subject.segmentCodes() == null ? Set.of()
+                : Stream.of(subject.segmentCodes().split(",")).map(String::trim).map(String::toUpperCase).collect(Collectors.toSet());
+        Map<String, LineValues> values = new HashMap<>();
+        for (Item item : items) {
+            if (!item.isTick()) {
+                continue;
+            }
+            String segment = item.segment() == null ? null : item.segment().trim().toUpperCase();
+            boolean applies = segment == null || Item.COMMON_SEGMENT.equals(segment) || segments.contains(segment);
+            if (applies) {
+                values.put(item.key(), new LineValues(true, true, false, false, null, null));
+            }
+        }
+        return values;
     }
 
     /** Tinh lai diem luu tren phieu tu cac dong da luu. */
@@ -440,14 +476,15 @@ public class AuditDgclService {
         boolean required = input.required() || input.compliant() || input.nonCompliant();
         boolean changed = line.isRequired() != required || line.isCompliant() != input.compliant() || line.isNonCompliant() != input.nonCompliant()
                 || line.isChecked() != input.checked() || !Objects.equals(line.getViolationCount(), input.violationCount())
-                || !sameDecimal(line.getMaxScore(), input.maxScore()) || !Objects.equals(line.getDetail(), blankToNull(input.detail()))
+                || line.getMaxScore() != null || !Objects.equals(line.getDetail(), blankToNull(input.detail()))
                 || !Objects.equals(line.getDocument(), blankToNull(input.document())) || !Objects.equals(line.getNote(), blankToNull(input.note()));
         line.setRequired(required);
         line.setCompliant(input.compliant());
         line.setNonCompliant(input.nonCompliant());
         line.setChecked(input.checked());
         line.setViolationCount(input.violationCount());
-        line.setMaxScore(input.maxScore());
+        // test 29.9: diem toi da I/II/III PL01F co dinh 100, khong nhap nua.
+        line.setMaxScore(null);
         line.setDetail(blankToNull(input.detail()));
         line.setDocument(blankToNull(input.document()));
         line.setNote(blankToNull(input.note()));
@@ -456,12 +493,8 @@ public class AuditDgclService {
 
     private boolean isEmpty(LineInput input) {
         return !input.required() && !input.compliant() && !input.nonCompliant() && !input.checked() && input.violationCount() == null
-                && input.maxScore() == null && blankToNull(input.detail()) == null && blankToNull(input.document()) == null
+                && blankToNull(input.detail()) == null && blankToNull(input.document()) == null
                 && blankToNull(input.note()) == null;
-    }
-
-    private boolean sameDecimal(BigDecimal a, BigDecimal b) {
-        return a == null ? b == null : b != null && a.compareTo(b) == 0;
     }
 
     private String blankToNull(String s) {
@@ -510,6 +543,14 @@ public class AuditDgclService {
         requireNotControlled(evaluation);
         if (evaluation.isConfirmed()) {
             throw new BusinessException("AUDIT_DGCL_CONFIRMED", "Phu luc da xac nhan hoan thanh, hay huy xac nhan truoc khi sua");
+        }
+    }
+
+    private void requireAccess(UUID engagementId, CurrentUserPrincipal principal) {
+        boolean allowed = listEngagements(principal).stream().anyMatch(e -> e.id().equals(engagementId));
+        if (!allowed) {
+            throw new BusinessException("AUDIT_DGCL_NOT_TEAM_MEMBER",
+                    "Ban khong thuoc doan cua cuoc kiem toan nay nen khong duoc vao danh gia chat luong", HttpStatus.FORBIDDEN);
         }
     }
 

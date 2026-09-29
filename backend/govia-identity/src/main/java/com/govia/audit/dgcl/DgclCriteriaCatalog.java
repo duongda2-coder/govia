@@ -21,11 +21,24 @@ public class DgclCriteriaCatalog {
 
     static final String RESOURCE = "templates/audit/dgcl-criteria.json";
 
-    /** PL01B: segment = ma mang nghiep vu (CE, LN...) suy ra tu muc "Hoạt động ..." chua dong do.
+    /** PL01B: segment = cot "Nghiệp vụ" cua file pl01b (test 29.9) - CHUNG = dung chung moi mang, con lai la ma mang (CE, LN, DP...).
+     * tick = cot "tick" cua file 01A/pl01b: tieu chi NSD can cham, phieu moi tu tich san NDTH + Tuân thủ.
+     * PL01A/PL01B: kind TOTAL_COUNT/RATIO/SCORE = dong IV/V/VI, DISRUPTION = dong "Xảy ra tình trạng gián đoạn..." (chi PL01A).
      * PL01F: kind/rate/flag mo ta vai tro cua dong trong cong thuc (xem {@link DgclScoring}). */
-    public record Item(String key, String stt, String content, Boolean header, String segment, String kind, Double rate, String flag) {
+    public record Item(String key, String stt, String content, Boolean header, String segment, String kind, Double rate, String flag, Boolean tick) {
+        public static final String COMMON_SEGMENT = "CHUNG";
+
         public boolean isHeader() {
             return Boolean.TRUE.equals(header);
+        }
+
+        public boolean isTick() {
+            return Boolean.TRUE.equals(tick);
+        }
+
+        /** Dong tong hop IV/V/VI cua PL01A/PL01B: chi hien thi so lieu tinh ra, khong nhap. */
+        public boolean isFooter() {
+            return "TOTAL_COUNT".equals(kind) || "RATIO".equals(kind) || "SCORE".equals(kind);
         }
     }
 

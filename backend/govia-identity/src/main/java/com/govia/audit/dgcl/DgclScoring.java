@@ -10,7 +10,8 @@ import java.util.Map;
  * Cong thuc cham diem cua 3 phu luc, dich tu cac o cong thuc trong DGCL_CN.xlsx:
  * <ul>
  *   <li>PL01A/PL01B (sheet logic dong 72-73): ty le = so dong "Tuân thủ" / so dong "NDTH", diem = ty le x 100
- *       (vd 91% -> 91 diem). Chi dem "Tuân thủ" tren dong co NDTH.</li>
+ *       (vd 91% -> 91 diem). Chi dem "Tuân thủ" tren dong co NDTH. PL01A them quy tac dong "gián đoạn" - xem
+ *       {@link #disruptionAdjusted}.</li>
  *   <li>PL01F (sheet logic dong 74, "tu dong B23 -> B38"): B1 = ty le PL01A x diem toi da I, B2 = ty le PL01B x diem toi da II,
  *       B3 = max(0, diem toi da III - tong diem tru chat luong) voi diem tru moi dong = so loi x ty le x diem toi da III;
  *       tong (dong 23) = B1x10% + B2x20% + B3x70%; diem cong/tru (dong IV/V) = tong ty le da tich x diem toi da dong 23;
@@ -46,8 +47,15 @@ public final class DgclScoring {
         int required = 0;
         int compliant = 0;
         int nonCompliant = 0;
+        boolean hasDisruptionRow = false;
+        boolean disrupted = false;
         for (Item item : items) {
-            if (item.isHeader()) {
+            if ("DISRUPTION".equals(item.kind())) {
+                hasDisruptionRow = true;
+                disrupted = values.getOrDefault(item.key(), LineValues.EMPTY).checked();
+                continue;
+            }
+            if (item.isHeader() || item.kind() != null) {
                 continue;
             }
             LineValues v = values.getOrDefault(item.key(), LineValues.EMPTY);
@@ -62,28 +70,27 @@ public final class DgclScoring {
             }
         }
         Double ratio = required == 0 ? null : (double) compliant / required;
-        return new ComplianceResult(required, compliant, nonCompliant, ratio, ratio == null ? null : ratio * 100);
+        Double score = ratio == null ? null : ratio * 100;
+        if (score != null && hasDisruptionRow) {
+            score = disruptionAdjusted(score, disrupted);
+        }
+        return new ComplianceResult(required, compliant, nonCompliant, ratio, score);
+    }
+
+    /** PL01A dong "Xảy ra tình trạng gián đoạn quy trình hoặc chậm báo cáo NHNN, HĐTV, TGĐ" (test 29.9): diem >= 90 va
+     * KHONG tich dong nay thi diem cham = 100; tich thi giu nguyen diem (vd 91 -> tich: 91, khong tich: 100). */
+    static double disruptionAdjusted(double score, boolean disrupted) {
+        // lam tron de 9/10 x 100 = 90.00000000000001 hay 89.99999 van so dung voi nguong 90
+        return !disrupted && Math.round(score * 1_000_000d) / 1_000_000d >= 90 ? DEFAULT_MAX_SCORE : score;
     }
 
     /** ratioA/ratioB = ty le cua PL01A/PL01B cung doi tuong (null = chua danh gia, tinh nhu 0). */
     public static QualityResult quality(List<Item> items, Map<String, LineValues> values, Double ratioA, Double ratioB) {
         Map<String, Calc> calc = new HashMap<>();
+        // test 29.9: diem toi da cua I/II/III co dinh 100, khong cho nhap (bo qua maxScore da luu truoc day).
         double maxA = DEFAULT_MAX_SCORE;
         double maxB = DEFAULT_MAX_SCORE;
         double maxQ = DEFAULT_MAX_SCORE;
-        for (Item item : items) {
-            Double custom = values.getOrDefault(item.key(), LineValues.EMPTY).maxScore();
-            if (custom == null) {
-                continue;
-            }
-            switch (kind(item)) {
-                case "SCORE_A" -> maxA = custom;
-                case "SCORE_B" -> maxB = custom;
-                case "SCORE_QUALITY" -> maxQ = custom;
-                default -> {
-                }
-            }
-        }
 
         // Diem tru chat luong theo tung nhom (1)/(2)/(3); flag BLOCKS_GOOD/BLOCKS_FAIR = o E19/E20 dung trong xep loai.
         double qualityDeduction = 0;
