@@ -194,6 +194,13 @@ public class AuditDgclService {
         evaluation.setEvaluatorName(actor.name());
         recalculate(evaluation, subject);
         evaluationRepository.save(evaluation);
+        if (appendix != DgclAppendix.PL01F) {
+            // Diem PL01F da luu dung B1/B2 cua PL01A/PL01B: tinh lai de cot PL01F/xep loai man hinh ngoai khong bi cu (test 30.9).
+            findEvaluation(engagementId, subjectKey, DgclAppendix.PL01F).ifPresent(f -> {
+                recalculate(f, subject);
+                evaluationRepository.save(f);
+            });
+        }
         auditLogService.record("AuditDgclEvaluation", evaluationId, AuditAction.UPDATE,
                 "Danh gia chat luong " + appendix + " - " + subject.name() + " - CKT " + engagement.code());
         return toSheet(engagement, subject, appendix, evaluation, actor);
@@ -305,6 +312,15 @@ public class AuditDgclService {
         return DgclPl04b1Writer.write(engagement, listSubjects(engagementId));
     }
 
+    // ===================== Nut "Xuất PL01A/PL01B/PL01F" (test 30.9) =====================
+
+    /** Xuat dung phieu dang xem (ke ca gia tri tich san khi chua luu) vao mau FORM_PL01A/B/F. */
+    @Transactional(readOnly = true)
+    public byte[] exportSheet(UUID engagementId, String subjectKey, DgclAppendix appendix, CurrentUserPrincipal principal) {
+        Sheet sheet = getSheet(engagementId, subjectKey, appendix, principal);
+        return DgclAppendixWriter.write(engagementService.get(engagementId), sheet);
+    }
+
     // ===================== Helpers =====================
 
     private List<Subject> subjects(AuditEngagementResponse engagement) {
@@ -350,14 +366,19 @@ public class AuditDgclService {
         int controlled = (int) evaluations.values().stream().filter(AuditDgclEvaluation::isControlled).count();
         String evaluators = distinctJoin(evaluations.values().stream().map(AuditDgclEvaluation::getEvaluatorName));
         String controllers = distinctJoin(evaluations.values().stream().filter(AuditDgclEvaluation::isControlled).map(AuditDgclEvaluation::getControlledBy));
+        // test 30.9 muc 1: diem lay tu phieu da Lưu ben trong (khong doi den khi xac nhan), co confirmed de man hinh phan biet.
         return new SubjectRow(subject.key(), subject.team(), engagement.code(), subject.employeeId(), subject.employeeCode(), subject.name(),
-                subject.segmentCodes(), subject.role(), confirmedScore(a), confirmedScore(b), confirmedScore(f),
-                f != null && f.isConfirmed() ? f.getBonusPoints() : null, f != null && f.isConfirmed() ? f.getPenaltyPoints() : null,
-                f != null && f.isConfirmed() ? f.getClassification() : null, confirmed, controlled, evaluators, controllers);
+                subject.segmentCodes(), subject.role(), savedScore(a), savedScore(b), savedScore(f),
+                f == null ? null : f.getBonusPoints(), f == null ? null : f.getPenaltyPoints(), f == null ? null : f.getClassification(),
+                isConfirmed(a), isConfirmed(b), isConfirmed(f), confirmed, controlled, evaluators, controllers);
     }
 
-    private BigDecimal confirmedScore(AuditDgclEvaluation evaluation) {
-        return evaluation != null && evaluation.isConfirmed() ? evaluation.getScore() : null;
+    private BigDecimal savedScore(AuditDgclEvaluation evaluation) {
+        return evaluation == null ? null : evaluation.getScore();
+    }
+
+    private boolean isConfirmed(AuditDgclEvaluation evaluation) {
+        return evaluation != null && evaluation.isConfirmed();
     }
 
     private String distinctJoin(Stream<String> values) {

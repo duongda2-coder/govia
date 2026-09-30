@@ -96,6 +96,17 @@ public class AuditDgclController {
         return ApiResponse.ok(service.uncontrol(engagementId, subjectKey, appendix, principal));
     }
 
+    /** test 30.9: nut "Xuất PL01A/PL01B/PL01F" tren tung phieu - ai xem duoc phieu thi xuat duoc (cung du lieu tren man hinh). */
+    @GetMapping("/engagements/{engagementId}/subjects/{subjectKey}/{appendix}/export")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.DGCL.VIEW')")
+    public ResponseEntity<byte[]> exportSheet(@PathVariable UUID engagementId, @PathVariable String subjectKey, @PathVariable DgclAppendix appendix,
+                                              @AuthenticationPrincipal CurrentUserPrincipal principal) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + appendix.name().toLowerCase() + "_dgcl.xlsx\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(service.exportSheet(engagementId, subjectKey, appendix, principal));
+    }
+
     @GetMapping("/engagements/{engagementId}/pl04b1")
     @PreAuthorize("hasAuthority('PERM_AUDIT.DGCL.EXPORT')")
     public ResponseEntity<byte[]> exportPl04b1(@PathVariable UUID engagementId, @AuthenticationPrincipal CurrentUserPrincipal principal) {

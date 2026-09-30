@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Button, Col, Row, Space, Tag, Typography } from "antd";
+import { App, Button, Col, Row, Space, Tag, Tooltip, Typography } from "antd";
 import { FileExcelOutlined, StarOutlined } from "@ant-design/icons";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
@@ -59,7 +59,19 @@ export function DgclTeamPage({ engagement, onBack }: Props) {
     return <DgclSheetPage engagement={engagement} subject={evaluating} onBack={() => setEvaluating(null)} />;
   }
 
-  const score = (v: number | null) => formatScore(v) ?? "-";
+  /** test 30.9 muc 1: diem/xep loai lay tu phieu da Lưu; phieu chua "Xác nhận hoàn thành" hien chu xam + tooltip. */
+  const savedValue = (text: string | null, confirmed: boolean) => {
+    if (text === null) return "-";
+    return confirmed ? (
+      text
+    ) : (
+      <Tooltip title={t("auditDgcl.unconfirmedScore")}>
+        <Typography.Text type="secondary" italic>
+          {text}
+        </Typography.Text>
+      </Tooltip>
+    );
+  };
   const columns: TableProps<DgclSubjectRow>["columns"] = [
     { title: t("auditDgcl.columns.engagementCode"), dataIndex: "engagementCode", width: 140 },
     {
@@ -69,10 +81,15 @@ export function DgclTeamPage({ engagement, onBack }: Props) {
     },
     { title: t("auditDgcl.columns.segmentCodes"), dataIndex: "segmentCodes", width: 130, render: (v: string | null) => v ?? "-" },
     { title: t("auditDgcl.columns.role"), dataIndex: "role", width: 80, render: (v: string | null) => v ?? "-" },
-    { title: "PL01A", dataIndex: "pl01aScore", width: 80, align: "right", render: score },
-    { title: "PL01B", dataIndex: "pl01bScore", width: 80, align: "right", render: score },
-    { title: "PL01F", dataIndex: "pl01fScore", width: 80, align: "right", render: score },
-    { title: t("auditDgcl.columns.classification"), dataIndex: "classification", width: 190, render: (v: string | null) => v ?? "-" },
+    { title: "PL01A", dataIndex: "pl01aScore", width: 80, align: "right", render: (v: number | null, r) => savedValue(formatScore(v), r.pl01aConfirmed) },
+    { title: "PL01B", dataIndex: "pl01bScore", width: 80, align: "right", render: (v: number | null, r) => savedValue(formatScore(v), r.pl01bConfirmed) },
+    { title: "PL01F", dataIndex: "pl01fScore", width: 80, align: "right", render: (v: number | null, r) => savedValue(formatScore(v), r.pl01fConfirmed) },
+    {
+      title: t("auditDgcl.columns.classification"),
+      dataIndex: "classification",
+      width: 190,
+      render: (v: string | null, r) => savedValue(v, r.pl01fConfirmed),
+    },
     {
       title: t("auditDgcl.columns.progress"),
       width: 150,

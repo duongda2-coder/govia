@@ -30,6 +30,10 @@ export interface DgclSubjectRow {
   bonusPoints: number | null;
   penaltyPoints: number | null;
   classification: string | null;
+  /** test 30.9: diem/xep loai la cua phieu da Luu; cac co nay cho biet phieu da "Xac nhan hoan thanh" chua. */
+  pl01aConfirmed: boolean;
+  pl01bConfirmed: boolean;
+  pl01fConfirmed: boolean;
   confirmedCount: number;
   controlledCount: number;
   evaluatorNames: string | null;
@@ -151,12 +155,22 @@ export async function runDgclSheetAction(engagementId: string, subjectKey: strin
   return res.data.data;
 }
 
-export async function exportDgclPl04b1(engagementId: string, engagementCode: string): Promise<void> {
-  const res = await httpClient.get(`${BASE}/engagements/${engagementId}/pl04b1`, { responseType: "blob" });
-  const blobUrl = window.URL.createObjectURL(res.data as Blob);
+function downloadBlob(data: Blob, fileName: string) {
+  const blobUrl = window.URL.createObjectURL(data);
   const link = document.createElement("a");
   link.href = blobUrl;
-  link.download = `PL04B1_${engagementCode}.xlsx`;
+  link.download = fileName;
   link.click();
   window.URL.revokeObjectURL(blobUrl);
+}
+
+export async function exportDgclPl04b1(engagementId: string, engagementCode: string): Promise<void> {
+  const res = await httpClient.get(`${BASE}/engagements/${engagementId}/pl04b1`, { responseType: "blob" });
+  downloadBlob(res.data as Blob, `PL04B1_${engagementCode}.xlsx`);
+}
+
+/** Nut "Xuất PL01A/PL01B/PL01F" (test 30.9): phieu dang xem do vao mau FORM_PL01A/B/F. */
+export async function exportDgclSheet(engagementId: string, subjectKey: string, appendix: DgclAppendix, fileName: string): Promise<void> {
+  const res = await httpClient.get(`${sheetUrl(engagementId, subjectKey, appendix)}/export`, { responseType: "blob" });
+  downloadBlob(res.data as Blob, fileName);
 }

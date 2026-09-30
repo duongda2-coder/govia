@@ -122,6 +122,9 @@ final class DgclPl04b1Writer {
     }
 
     private static void fillResult(Row row, Styles st, SubjectRow s) {
+        if (!s.pl01fConfirmed()) {
+            return;
+        }
         number(row.getCell(6), s.pl01fScore(), st);
         number(row.getCell(7), s.bonusPoints(), st);
         number(row.getCell(8), s.penaltyPoints(), st);

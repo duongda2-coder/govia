@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { App, Badge, Button, Checkbox, Descriptions, Drawer, Input, InputNumber, Space, Switch, Table, Tag, Typography, theme } from "antd";
-import { CheckCircleOutlined, LockOutlined, PaperClipOutlined, SaveOutlined, StopOutlined, UnlockOutlined } from "@ant-design/icons";
+import { App, Badge, Button, Checkbox, Descriptions, Drawer, Input, InputNumber, Space, Switch, Table, Tag, Tooltip, Typography, theme } from "antd";
+import { CheckCircleOutlined, FileExcelOutlined, LockOutlined, PaperClipOutlined, SaveOutlined, StopOutlined, UnlockOutlined } from "@ant-design/icons";
 import type { TableProps } from "antd";
 import { useTranslation } from "react-i18next";
 import { AttachmentPanel, fetchAttachmentCounts, getApiErrorMessage } from "@govia/ui-kit";
 import {
   DGCL_ATTACHMENT_ENTITY,
+  exportDgclSheet,
   getDgclSheet,
   runDgclSheetAction,
   saveDgclSheet,
@@ -80,7 +81,7 @@ export function DgclAppendixSheet({ engagementId, subjectKey, subjectSegments, t
   const [inputs, setInputs] = useState<Record<string, DgclLineInput>>({});
   const [dirty, setDirty] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [busy, setBusy] = useState<DgclSheetAction | "save" | null>(null);
+  const [busy, setBusy] = useState<DgclSheetAction | "save" | "export" | null>(null);
   const [ownSegmentsOnly, setOwnSegmentsOnly] = useState(false);
   const [attachmentLine, setAttachmentLine] = useState<DgclLine | null>(null);
   const [attachmentCounts, setAttachmentCounts] = useState<Record<string, number>>({});
@@ -155,6 +156,20 @@ export function DgclAppendixSheet({ engagementId, subjectKey, subjectSegments, t
       }
     };
     modal.confirm({ title: t(`auditDgcl.confirmAction.${action}`), onOk: execute });
+  };
+
+  /** test 30.9: xuat phieu dang xem ra mau FORM_PL01A/B/F (du lieu phia server = ban da luu, nen phai Lưu truoc). */
+  const exportSheet = async () => {
+    if (!sheet) return;
+    setBusy("export");
+    try {
+      const who = (sheet.team ? t("auditDgcl.teamRow") : sheet.subjectName).replace(/[\\/:*?"<>|]/g, "_");
+      await exportDgclSheet(engagementId, subjectKey, appendix, `${appendix}_${sheet.engagementCode}_${who}.xlsx`);
+    } catch {
+      message.error(t("auditDgcl.messages.exportSheetError", { appendix }));
+    } finally {
+      setBusy(null);
+    }
   };
 
   const attachmentEntityId = attachmentLine?.attachmentEntityId;
@@ -330,6 +345,11 @@ export function DgclAppendixSheet({ engagementId, subjectKey, subjectSegments, t
             </Button>
           </>
         )}
+        <Tooltip title={dirty ? t("auditDgcl.exportDirtyHint") : undefined}>
+          <Button icon={<FileExcelOutlined />} disabled={!sheet || dirty} loading={busy === "export"} onClick={exportSheet}>
+            {t("auditDgcl.actions.export", { appendix })}
+          </Button>
+        </Tooltip>
         {statusTag}
         {dirty && <Typography.Text type="warning">{t("auditDgcl.unsavedHint")}</Typography.Text>}
       </Space>

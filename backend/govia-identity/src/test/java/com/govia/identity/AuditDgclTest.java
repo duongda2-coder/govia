@@ -198,9 +198,12 @@ class AuditDgclTest {
         Sheet a = service.saveSheet(id, memberKey, DgclAppendix.PL01A, pl01a, ev);
         assertThat(a.summary().score()).isCloseTo(75, within(0.0001));
         assertThat(a.lines().stream().filter(l -> l.key().equals("A005")).findFirst().orElseThrow().evaluatorName()).isEqualTo(evaluator.fullName());
-        assertThat(service.listSubjects(id, ev).get(1).pl01aScore()).as("chua xac nhan thi chua day diem ra ngoai").isNull();
+        // test 30.9 muc 1: diem da Luu hien ngay ra man hinh ngoai, co pl01aConfirmed cho biet chua xac nhan
+        SubjectRow saved = service.listSubjects(id, ev).get(1);
+        assertThat(saved.pl01aScore().doubleValue()).isCloseTo(75, within(0.0001));
+        assertThat(saved.pl01aConfirmed()).isFalse();
         service.confirm(id, memberKey, DgclAppendix.PL01A, ev);
-        assertThat(service.listSubjects(id, ev).get(1).pl01aScore().doubleValue()).isCloseTo(75, within(0.0001));
+        assertThat(service.listSubjects(id, ev).get(1).pl01aConfirmed()).isTrue();
         assertThatThrownBy(() -> service.saveSheet(id, memberKey, DgclAppendix.PL01A, pl01a, ev)).isInstanceOf(BusinessException.class);
 
         service.saveSheet(id, memberKey, DgclAppendix.PL01B, new SaveRequest(List.of(compliant("B002", true), compliant("B003", true))), ev);
@@ -229,10 +232,45 @@ class AuditDgclTest {
         assertThat(service.getSheet(id, memberKey, DgclAppendix.PL01F, ev).canUnconfirm()).isFalse();
         service.uncontrol(id, memberKey, DgclAppendix.PL01F, ks);
         assertThat(service.unconfirm(id, memberKey, DgclAppendix.PL01F, ev).confirmed()).isFalse();
-        assertThat(service.listSubjects(id, ev).get(1).pl01fScore()).isNull();
+        SubjectRow unconfirmed = service.listSubjects(id, ev).get(1);
+        assertThat(unconfirmed.pl01fScore().doubleValue()).isCloseTo(85.5, within(0.0001));
+        assertThat(unconfirmed.pl01fConfirmed()).isFalse();
+        assertThat(texts(service.exportPl04b1(id, ev))).as("PL04B1 chi dung PL01F da xac nhan").doesNotContain("Chất lượng khá");
 
         service.confirm(id, memberKey, DgclAppendix.PL01F, ev);
-        byte[] excel = service.exportPl04b1(id, ev);
+        assertThat(texts(service.exportPl04b1(id, ev)))
+                .contains("Chất lượng khá", "Trưởng đoàn: " + lead.fullName(), "Thành viên 1: " + member.fullName(), "Đoàn kiểm toán");
+
+        // test 30.9 muc 2-4: xuat phieu vao mau FORM_PL01A/B/F
+        try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(service.exportSheet(id, memberKey, DgclAppendix.PL01A, ev)))) {
+            var sheet = wb.getSheetAt(0);
+            assertThat(sheet.getRow(5).getCell(0).getStringCellValue()).contains("Thành viên: " + member.fullName()).doesNotContain("[");
+            assertThat(sheet.getRow(16).getCell(1).getStringCellValue()).startsWith("Xác định mục tiêu"); // A002
+            assertThat(sheet.getRow(16).getCell(2).getStringCellValue()).isEqualTo("X");
+            assertThat(sheet.getRow(16).getCell(3).getStringCellValue()).isEqualTo("X");
+            assertThat(sheet.getRow(19).getCell(4).getStringCellValue()).isEqualTo("X"); // A005 khong tuan thu
+            assertThat(sheet.getRow(55).getCell(2).getNumericCellValue()).isEqualTo(4); // IV
+            assertThat(sheet.getRow(56).getCell(3).getNumericCellValue()).isCloseTo(0.75, within(0.0001)); // V
+            assertThat(sheet.getRow(58).getCell(3).getNumericCellValue()).isCloseTo(75, within(0.0001)); // VI
+        }
+        try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(service.exportSheet(id, memberKey, DgclAppendix.PL01B, ev)))) {
+            var sheet = wb.getSheetAt(0);
+            assertThat(sheet.getRow(15).getCell(2).getStringCellValue()).isEqualTo("X"); // B002
+            assertThat(sheet.getRow(416).getCell(2).getNumericCellValue()).isEqualTo(2); // IV
+            assertThat(sheet.getRow(418).getCell(3).getNumericCellValue()).isCloseTo(100, within(0.0001)); // VI
+        }
+        try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(service.exportSheet(id, memberKey, DgclAppendix.PL01F, ev)))) {
+            var sheet = wb.getSheetAt(0);
+            assertThat(sheet.getRow(26).getCell(1).getStringCellValue()).startsWith("Phát hiện ra sai phạm trọng yếu"); // F013, mau khong co F005
+            assertThat(sheet.getRow(26).getCell(3).getNumericCellValue()).isEqualTo(1);
+            assertThat(sheet.getRow(26).getCell(7).getStringCellValue()).isEqualTo("1 loi");
+            assertThat(sheet.getRow(32).getCell(3).getStringCellValue()).isEqualTo("X"); // F019 diem cong muc 1
+            assertThat(sheet.getRow(39).getCell(5).getNumericCellValue()).isCloseTo(85.5, within(0.0001)); // VI
+            assertThat(sheet.getRow(40).getCell(2).getStringCellValue()).isEqualTo("Chất lượng khá");
+        }
+    }
+
+    private List<String> texts(byte[] excel) throws Exception {
         List<String> texts = new ArrayList<>();
         try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(excel))) {
             for (Row r : wb.getSheetAt(0)) {
@@ -243,7 +281,7 @@ class AuditDgclTest {
                 }
             }
         }
-        assertThat(texts).contains("Chất lượng khá", "Trưởng đoàn: " + lead.fullName(), "Thành viên 1: " + member.fullName(), "Đoàn kiểm toán");
+        return texts;
     }
 
     private LineInput compliant(String key, boolean ok) {

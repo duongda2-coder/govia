@@ -22,7 +22,8 @@ public final class AuditDgclDto {
     }
 
     /** 1 dong man hinh "Đánh giá chất lượng" - 1 thanh vien doan hoac dong cuoi "Cuộc kiểm toán" (team = true).
-     * Diem PL01A/PL01B/PL01F chi hien khi phu luc do da "Xác nhận hoàn thành ĐGCL". */
+     * test 30.9: diem PL01A/PL01B/PL01F + diem cong/tru/xep loai lay tu phieu da Lưu ben trong (xac nhan hay chua);
+     * cac co plXxConfirmed cho biet phieu nao da "Xác nhận hoàn thành ĐGCL" (PL04B1 chi dung ket qua da xac nhan). */
     public record SubjectRow(
             String subjectKey,
             boolean team,
@@ -38,6 +39,9 @@ public final class AuditDgclDto {
             BigDecimal bonusPoints,
             BigDecimal penaltyPoints,
             String classification,
+            boolean pl01aConfirmed,
+            boolean pl01bConfirmed,
+            boolean pl01fConfirmed,
             int confirmedCount,
             int controlledCount,
             String evaluatorNames,

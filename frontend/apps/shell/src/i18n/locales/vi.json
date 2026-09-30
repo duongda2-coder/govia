@@ -3126,6 +3126,8 @@
     "readOnlyHint": "Bạn chỉ có quyền xem. Quyền đánh giá/kiểm soát được khai báo ở cột \"Thực hiện ĐGCL\"/\"Kiểm soát ĐGCL\" màn hình Khai báo khả năng đảm nhận.",
     "ownSegmentsOnly": "Chỉ hiện nội dung chung và nội dung thuộc mảng nghiệp vụ của cán bộ ({{segments}})",
     "preTickedHint": "Phiếu chưa lưu: hệ thống đã tự tích sẵn NDTH và Tuân thủ cho các tiêu chí cần chấm (PL01B: tiêu chí chung và tiêu chí thuộc mảng nghiệp vụ của cán bộ). Rà soát lại rồi bấm Lưu.",
+    "unconfirmedScore": "Điểm đã lưu, chưa xác nhận hoàn thành ĐGCL",
+    "exportDirtyHint": "Lưu thay đổi trước khi xuất",
     "pl01fHint": "Điểm B1/B2 lấy từ PL01A/PL01B; điểm trừ chất lượng = số lỗi × tỷ lệ × điểm tối đa (III). Xác nhận PL01F cần xác nhận PL01A và PL01B trước.",
     "appendix": {
       "PL01A": "Phụ lục 01A - Tuân thủ trình tự, thời gian",
@@ -3176,11 +3178,12 @@
       "confirm": "Xác nhận hoàn thành ĐGCL",
       "unconfirm": "Hủy xác nhận hoàn thành",
       "control": "Kiểm soát ĐGCL",
-      "uncontrol": "Hủy kiểm soát ĐGCL"
+      "uncontrol": "Hủy kiểm soát ĐGCL",
+      "export": "Xuất {{appendix}}"
     },
     "confirmAction": {
-      "confirm": "Xác nhận hoàn thành ĐGCL? Điểm sẽ được cập nhật ra màn hình đánh giá chất lượng.",
-      "unconfirm": "Hủy xác nhận hoàn thành? Điểm ở màn hình ngoài sẽ để trống.",
+      "confirm": "Xác nhận hoàn thành ĐGCL? Phiếu sẽ không sửa được nữa cho đến khi hủy xác nhận.",
+      "unconfirm": "Hủy xác nhận hoàn thành? Phiếu được sửa lại; điểm ở màn hình ngoài chuyển về trạng thái chưa xác nhận.",
       "control": "Kiểm soát ĐGCL? Phụ lục sẽ bị khóa, người đánh giá không sửa được nữa.",
       "uncontrol": "Hủy kiểm soát ĐGCL? Người đánh giá được đánh giá lại."
     },
@@ -3193,7 +3196,8 @@
       "controlSuccess": "Đã kiểm soát ĐGCL",
       "uncontrolSuccess": "Đã hủy kiểm soát ĐGCL",
       "actionError": "Thao tác thất bại",
-      "exportError": "Xuất PL04B1 thất bại"
+      "exportError": "Xuất PL04B1 thất bại",
+      "exportSheetError": "Xuất {{appendix}} thất bại"
     }
   }
 }

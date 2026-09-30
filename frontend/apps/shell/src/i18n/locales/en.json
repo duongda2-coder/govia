@@ -3014,6 +3014,8 @@
     "readOnlyHint": "View only. Assess/control rights are granted in the \"Quality Assessment\"/\"Quality Assessment Control\" columns of the employee capability screen.",
     "ownSegmentsOnly": "Show only common items and items of the member’s business segments ({{segments}})",
     "preTickedHint": "Not saved yet: the criteria to score have been pre-ticked as Performed and Compliant (PL01B: common criteria and those of the member’s business segments). Review, then click Save.",
+    "unconfirmedScore": "Saved score, not yet confirmed",
+    "exportDirtyHint": "Save changes before exporting",
     "pl01fHint": "B1/B2 come from PL01A/PL01B; quality deduction = violations × rate × max score (III). PL01A and PL01B must be confirmed before PL01F.",
     "appendix": {
       "PL01A": "Appendix 01A - Procedure & timing",
@@ -3064,11 +3066,12 @@
       "confirm": "Confirm assessment",
       "unconfirm": "Cancel confirmation",
       "control": "Control assessment",
-      "uncontrol": "Cancel control"
+      "uncontrol": "Cancel control",
+      "export": "Export {{appendix}}"
     },
     "confirmAction": {
-      "confirm": "Confirm this assessment? The score will be shown on the assessment screen.",
-      "unconfirm": "Cancel confirmation? The score on the assessment screen will be cleared.",
+      "confirm": "Confirm this assessment? It can no longer be edited until the confirmation is cancelled.",
+      "unconfirm": "Cancel confirmation? The sheet becomes editable again; the score on the assessment screen is marked as not confirmed.",
       "control": "Control this assessment? It will be locked for the assessor.",
       "uncontrol": "Cancel control? The assessor can edit again."
     },
@@ -3081,7 +3084,8 @@
       "controlSuccess": "Assessment controlled",
       "uncontrolSuccess": "Control cancelled",
       "actionError": "Action failed",
-      "exportError": "Could not export PL04B1"
+      "exportError": "Could not export PL04B1",
+      "exportSheetError": "Could not export {{appendix}}"
     }
   }
 }
