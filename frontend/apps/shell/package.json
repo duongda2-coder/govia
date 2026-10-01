@@ -13,7 +13,7 @@
     "@ant-design/plots": "^2.6.8",
     "@govia/ui-kit": "*",
     "antd": "^5.21.0",
-    "axios": "^1.7.7",
+    "axios": "^1.20.0",
     "flag-icons": "^7.2.3",
     "i18next": "^24.2.0",
     "i18next-browser-languagedetector": "^8.0.2",
