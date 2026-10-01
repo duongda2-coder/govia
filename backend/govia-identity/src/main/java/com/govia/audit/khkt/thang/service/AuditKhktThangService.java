@@ -97,6 +97,14 @@ public class AuditKhktThangService {
 
     @Transactional
     public AuditKhktThangRowResponse update(Integer year, String auditObjectCode, AuditKhktThangUpdateRequest request) {
+        // test 10.1: moi doi tuong (chi nhanh) chi kiem toan 1 thang trong nam
+        long selectedMonths = java.util.stream.Stream.of(request.month1(), request.month2(), request.month3(), request.month4(), request.month5(),
+                request.month6(), request.month7(), request.month8(), request.month9(), request.month10(), request.month11(), request.month12())
+                .filter(Boolean::booleanValue).count();
+        if (selectedMonths > 1) {
+            throw new BusinessException("AUDIT_KHKT_THANG_MULTIPLE_MONTHS", "Moi doi tuong chi duoc chon 1 thang kiem toan trong nam");
+        }
+
         UUID tenantId = TenantContext.getTenantId();
         AuditKhktThConfirmed confirmed = eligibleConfirmedRows(tenantId, year).stream()
                 .filter(row -> row.getAuditObjectCode().equals(auditObjectCode)).findFirst()

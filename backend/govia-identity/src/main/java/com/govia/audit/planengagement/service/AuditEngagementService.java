@@ -352,12 +352,12 @@ public class AuditEngagementService {
 
     /** "Ma CKT" = Loai doi tuong (unitType) + Ma DTKT (code) + Nam + STT 2 chu so, dem theo don vi + nam. */
     private String generateCode(UUID tenantId, AuditObjectUnit unit, Integer year) {
-        long existing = repository.countByTenantIdAndAuditObjectUnitIdAndYear(tenantId, unit.getId(), year);
-        String seq = String.format("%02d", existing + 1);
-        String code = unit.getUnitType() + unit.getCode() + year + seq;
-        if (repository.findByTenantIdAndCode(tenantId, code).isPresent()) {
-            // truong hop hiem: 2 request chen nhau - lui lai 1 lan quet tiep theo thay vi tao trung ma
-            code = unit.getUnitType() + unit.getCode() + year + String.format("%02d", existing + 2);
+        long seq = repository.countByTenantIdAndAuditObjectUnitIdAndYear(tenantId, unit.getId(), year) + 1;
+        String code = unit.getUnitType() + unit.getCode() + year + String.format("%02d", seq);
+        // STT da bi chiem (CKT giua bi xoa lam count < STT lon nhat, hoac 2 request chen nhau) -> tang tiep den ma con trong
+        while (repository.findByTenantIdAndCode(tenantId, code).isPresent()) {
+            seq++;
+            code = unit.getUnitType() + unit.getCode() + year + String.format("%02d", seq);
         }
         return code;
     }

@@ -63,3 +63,8 @@ export async function updateAuditEngagementTeamMemberScoring(
   const res = await httpClient.patch<ApiResponse<AuditEngagementTeamMemberDetailItem>>(`${BASE}/${engagementId}/team-members/${memberId}`, request);
   return res.data.data;
 }
+
+/** test 10.1: chi SUPER_ADMIN - xoa han CKT kem toan bo du lieu phat sinh (nhom, TTSS, mau chung, bao cao...). */
+export async function adminDeleteAuditEngagement(engagementId: string): Promise<void> {
+  await httpClient.delete(`${BASE}/${engagementId}`);
+}

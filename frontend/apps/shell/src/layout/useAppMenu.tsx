@@ -369,6 +369,8 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
 
   const auditTdkpGroupLabel = t("menu.auditTdkp");
   const auditTdkpChildren = dropNulls([
+    // test 10.1: "Phat hanh bao cao" dung dau phan he Theo doi khac phuc
+    hasPermission("AUDIT.PHBC.VIEW") && leaf("audit-phbc", t("menu.auditPhbc"), auditTdkpGroupLabel),
     hasPermission("AUDIT.TDKP_PC.VIEW") && leaf("audit-tdkp-assignment", t("menu.auditTdkpAssignment"), auditTdkpGroupLabel),
     hasPermission("AUDIT.TDKP_CEO_ALL.VIEW") && leaf("audit-tdkp-ceo-all", t("menu.auditTdkpCeoAll"), auditTdkpGroupLabel),
     hasPermission("AUDIT.TDKP_CEO_KH.VIEW") && leaf("audit-tdkp-ceo-kh", t("menu.auditTdkpCeoKh"), auditTdkpGroupLabel),
@@ -381,11 +383,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
   const auditChildren = dropNulls([
     auditMdChildren.length > 0 && { key: "audit-master-data", label: menuLabel(t("menu.auditMasterData")), children: auditMdChildren },
     auditRsChildren.length > 0 && { key: "audit-risk-scoring", label: menuLabel(t("menu.riskScoring")), children: auditRsChildren },
-    auditExecChildren.length > 0 && {
-      key: "audit-plan-execution",
-      label: menuLabel(t("menu.auditPlanExecution")),
-      children: auditExecChildren,
-    },
+    // test 10.1: phan he "Ke hoach kiem toan" dung truoc "Thuc hien kiem toan"
     (hasPermission("AUDIT.KHKT_BP.VIEW") ||
       hasPermission("AUDIT.KHKT_TH.VIEW") ||
       hasPermission("AUDIT.KHKT_THANG.VIEW") ||
@@ -401,18 +399,23 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
           leaf("audit-plan-khkt-th", t("menu.auditPlanKhktTh"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
         hasPermission("AUDIT.KHKT_THANG.VIEW") &&
           leaf("audit-plan-khkt-thang", t("menu.auditPlanKhktThang"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
-        hasPermission("AUDIT.KHKT_DTKH_FILE.VIEW") &&
-          leaf("audit-plan-khkt-dtkh-file", t("menu.auditPlanKhktDtkhFile"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
-        hasPermission("AUDIT.KHNS_NAM.VIEW") &&
-          leaf("audit-plan-khns-nam", t("menu.auditPlanKhnsNam"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
+        // test 10.1: "Phan bo can bo theo thang" dung truoc "Du kien nhan su nam", "Bao cao tham khao cho PKH" xuong cuoi
         hasPermission("AUDIT.KHNS_NAM.VIEW") &&
           leaf("audit-plan-khns-pb", t("menu.auditPlanKhnsPb"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
+        hasPermission("AUDIT.KHNS_NAM.VIEW") &&
+          leaf("audit-plan-khns-nam", t("menu.auditPlanKhnsNam"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
         hasPermission("AUDIT.KHTH_TRANSFER.VIEW") &&
           leaf("audit-plan-khth-transfer", t("menu.auditPlanKhthTransfer"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
+        hasPermission("AUDIT.KHKT_DTKH_FILE.VIEW") &&
+          leaf("audit-plan-khkt-dtkh-file", t("menu.auditPlanKhktDtkhFile"), `${auditGroupLabel} / ${t("menu.auditPlanKeHoach")}`),
       ]),
     },
+    auditExecChildren.length > 0 && {
+      key: "audit-plan-execution",
+      label: menuLabel(t("menu.auditPlanExecution")),
+      children: auditExecChildren,
+    },
     auditTdkpChildren.length > 0 && { key: "audit-tdkp", label: menuLabel(t("menu.auditTdkp")), children: auditTdkpChildren },
-    hasPermission("AUDIT.PHBC.VIEW") && leaf("audit-phbc", t("menu.auditPhbc"), auditGroupLabel),
     hasPermission("AUDIT.DGCL.VIEW") && {
       key: "audit-dgcl-group",
       label: menuLabel(t("menu.auditDgclGroup")),

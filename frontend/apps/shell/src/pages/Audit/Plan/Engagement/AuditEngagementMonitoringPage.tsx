@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { App, Button, Form, Input, Modal, Result, Space, Typography } from "antd";
 import type { TableProps } from "antd";
+import { isAxiosError } from "axios";
 import { useTranslation } from "react-i18next";
 import { CrudTable, useClientSearchColumn } from "@govia/ui-kit";
 import {
+  adminDeleteAuditEngagement,
   listAuditEngagementMonitoring,
   updateAuditEngagementTeamRanking,
   type AuditEngagementMonitoringItem,
@@ -21,13 +23,15 @@ interface RankingFormValues {
 
 /** Man hinh "Quản lý đợt kiểm toán" (nguon: "Tao CKT (2).xlsx", sheet cung ten) - dashboard giam
  * sat tien do doan kiem toan theo tung CKT, khac voi man hinh CRUD "Khoi tao va quan ly cuoc kiem
- * toan": chi xem so lieu tong hop + cap nhat "Xếp loại đoàn", khong tao/sua/xoa CKT o day. Phan
+ * toan": chi xem so lieu tong hop + cap nhat "Xếp loại đoàn", khong tao/sua CKT o day (rieng
+ * SUPER_ADMIN duoc xoa han CKT kem du lieu - test 10.1). Phan
  * quyen theo dac ta ("Truong/Pho KTNB, BKS xem tat ca; nhan vien phong ban chi xem CKT da tham
  * gia") duoc ap dung o backend (AuditEngagementMonitoringService), FE chi hien thi ket qua da loc. */
 export function AuditEngagementMonitoringPage() {
   const { t } = useTranslation();
-  const { message } = App.useApp();
-  const { hasPermission } = useAuth();
+  const { message, modal } = App.useApp();
+  const { user, hasPermission } = useAuth();
+  const isSuperAdmin = user?.roles.includes("SUPER_ADMIN") ?? false;
   const canView = hasPermission("AUDIT.PLAN_ENGAGEMENT.VIEW");
   const canEdit = hasPermission("AUDIT.PLAN_ENGAGEMENT.EDIT");
   const canEvaluateSupervision = hasPermission("AUDIT.SUPERVISION_TEAM.EVALUATE");
@@ -76,6 +80,29 @@ export function AuditEngagementMonitoringPage() {
     } catch (err) {
       if (err instanceof Error) message.error(t("auditEngagementMonitoring.messages.updateRankingError"));
     }
+  };
+
+  const handleAdminDelete = () => {
+    const target = selected[0];
+    if (!target) return;
+    modal.confirm({
+      title: t("auditEngagementMonitoring.adminDeleteConfirmTitle", { code: target.code }),
+      content: t("auditEngagementMonitoring.adminDeleteConfirmContent"),
+      okText: t("common.yes"),
+      cancelText: t("common.no"),
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        try {
+          await adminDeleteAuditEngagement(target.id);
+          message.success(t("common.deleteSuccess"));
+          setSelected([]);
+          await load();
+        } catch (err) {
+          const code = isAxiosError<{ errorCode?: string }>(err) ? err.response?.data?.errorCode : undefined;
+          message.error(t(code === "AUDIT_ENGAGEMENT_HAS_TDKP" ? "auditEngagementMonitoring.messages.deleteHasTdkp" : "auditEngagementMonitoring.messages.deleteError"));
+        }
+      },
+    });
   };
 
   const columns: TableProps<AuditEngagementMonitoringItem>["columns"] = [
@@ -128,6 +155,11 @@ export function AuditEngagementMonitoringPage() {
         {canEvaluateSupervision && (
           <Button disabled={selected.length !== 1} onClick={() => selected[0] && setEvaluationFor(selected[0])}>
             {t("auditSupervisionTeam.evaluateButton")}
+          </Button>
+        )}
+        {isSuperAdmin && (
+          <Button danger disabled={selected.length !== 1} onClick={handleAdminDelete}>
+            {t("common.delete")}
           </Button>
         )}
       </Space>

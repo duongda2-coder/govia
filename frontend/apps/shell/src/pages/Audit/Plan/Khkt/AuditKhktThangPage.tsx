@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { App, Button, Checkbox, Form, Input, Modal, Result, Select, Space, Table, Tag, Typography } from "antd";
+import { App, Button, Form, Input, Modal, Result, Select, Space, Table, Tag, Typography } from "antd";
 import type { TableProps } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -10,7 +10,8 @@ import { useAuth } from "../../../../auth/AuthContext";
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 
 interface EditFormValues {
-  months: number[];
+  /** test 10.1: moi DTKT/chi nhanh chi duoc chon 1 thang kiem toan trong nam. */
+  month?: number | null;
   note?: string;
 }
 
@@ -65,8 +66,8 @@ export function AuditKhktThangPage() {
 
   const openEdit = () => {
     if (!selectedRow) return;
-    const months = MONTHS.filter((m) => selectedRow[`month${m}` as keyof AuditKhktThangRowItem] as boolean);
-    form.setFieldsValue({ months, note: selectedRow.note ?? undefined });
+    const month = MONTHS.find((m) => selectedRow[`month${m}` as keyof AuditKhktThangRowItem] as boolean);
+    form.setFieldsValue({ month: month ?? null, note: selectedRow.note ?? undefined });
     setEditModalOpen(true);
   };
 
@@ -80,7 +81,7 @@ export function AuditKhktThangPage() {
     }
     setSubmitting(true);
     try {
-      const monthSet = new Set(values.months ?? []);
+      const monthSet = new Set(values.month ? [values.month] : []);
       await updateAuditKhktThang(year, selectedRow.auditObjectCode, {
         month1: monthSet.has(1),
         month2: monthSet.has(2),
@@ -202,8 +203,11 @@ export function AuditKhktThangPage() {
         width={520}
       >
         <Form<EditFormValues> form={form} layout="vertical">
-          <Form.Item name="months" label={t("auditKhktThang.form.months")}>
-            <Checkbox.Group options={MONTHS.map((m) => ({ value: m, label: t("auditKhktThang.columns.month", { month: m }) }))} />
+          <Form.Item name="month" label={t("auditKhktThang.form.month")}>
+            <Select
+              allowClear
+              options={MONTHS.map((m) => ({ value: m, label: t("auditKhktThang.columns.month", { month: m }) }))}
+            />
           </Form.Item>
           <Form.Item name="note" label={t("auditKhktThang.columns.note")}>
             <Input.TextArea rows={2} maxLength={250} />

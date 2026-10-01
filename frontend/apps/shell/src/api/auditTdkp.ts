@@ -233,6 +233,9 @@ export interface TdkpBranchDefectItem {
   creditContract: string | null;
   defectCode: string | null;
   defectType: string | null;
+  /** test 10.1: tu dong TTSS nguon - "Mã KN người upload" / "Loại kiến nghị" (chi doc). */
+  memberRecommendationCode: string | null;
+  recommendationTypeName: string | null;
   recommendationDefectStatus: TdkpStatus | null;
   recommendationDefectStatusLabel: string | null;
   customerStatus: TdkpStatus | null;

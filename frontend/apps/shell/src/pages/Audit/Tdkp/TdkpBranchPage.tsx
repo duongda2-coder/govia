@@ -343,6 +343,8 @@ export function TdkpBranchPage() {
     { title: t(`${d}.creditContract`), dataIndex: "creditContract", width: 180, render: renderText },
     { title: t(`${d}.defectCode`), dataIndex: "defectCode", width: 140, render: renderText },
     { title: t(`${d}.defectType`), dataIndex: "defectType", width: 200, render: renderText },
+    { title: t(`${d}.memberRecommendationCode`), dataIndex: "memberRecommendationCode", width: 160, render: renderText },
+    { title: t(`${d}.recommendationTypeName`), dataIndex: "recommendationTypeName", width: 200, render: renderText },
     { title: t(`${d}.recommendationDefectStatus`), dataIndex: "recommendationDefectStatus", width: 180, render: renderStatus(t) },
     { title: t(`${d}.customerStatus`), dataIndex: "customerStatus", width: 180, render: renderStatus(t) },
     { title: t(`${d}.relatedStaff`), dataIndex: "relatedStaff", width: 200, render: renderText },

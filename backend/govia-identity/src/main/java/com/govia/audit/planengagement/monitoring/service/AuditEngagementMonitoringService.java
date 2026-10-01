@@ -31,6 +31,8 @@ import com.govia.core.tenant.TenantContext;
 import com.govia.core.web.BusinessException;
 import com.govia.identity.entity.Employee;
 import com.govia.identity.repository.EmployeeRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,6 +74,9 @@ public class AuditEngagementMonitoringService {
     private final AuditEngagementTeamService teamService;
     private final AuditSupervisionTeamMemberRepository supervisionTeamMemberRepository;
     private final AuditLogService auditLogService;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public AuditEngagementMonitoringService(AuditEngagementRepository engagementRepository, AuditEngagementGroupRepository groupRepository,
                                              AuditEngagementGroupMemberRepository memberRepository, AuditEngagementAssignmentRepository assignmentRepository,
@@ -424,6 +429,58 @@ public class AuditEngagementMonitoringService {
             return null;
         }
         return employeeRepository.findByTenantIdAndEmployeeCode(tenantId, principal.employeeCode()).map(Employee::getId).orElse(null);
+    }
+
+    /** Bang du lieu CKT (cm_*) - moi bang mot man hinh "Mau chung" cua giai doan thuc hien, deu co cot engagement_id. */
+    private static final List<String> SAMPLE_TABLES = List.of("audit_cm_td1", "audit_cm_td2", "audit_cm_ntd1", "audit_cm_ntd2", "audit_cm_ntd3",
+            "audit_cm_ntd4", "audit_cm_ntd6", "audit_cm_ntd7", "audit_cm_ntd8", "audit_cm_ntd9", "audit_cm_ntd10", "audit_cm_ntd11",
+            "audit_cm_ntd12", "audit_cm_ntd13", "audit_cm_ntd14", "audit_cm_ntd15", "audit_cm_ntd16");
+
+    /**
+     * test 10.1 muc 1: "Admin co quyen xoa cuoc kiem toan o man hinh Quan ly dot kiem toan". Khac voi
+     * xoa o man hinh CRUD ({@link AuditEngagementService#delete}, chan khi CKT da co nhom), day la xoa
+     * HAN CKT kem toan bo du lieu phat sinh (nhom/thanh vien/phan cong, TTSS + kien nghi, mau chung,
+     * bao cao tien do, doan giam sat, DGCL) - chi SUPER_ADMIN (kiem o controller). Van chan neu CKT
+     * da chuyen sang "Theo doi khac phuc" (audit_tdkp_branch_recommendation khong co FK, xoa CKT se de
+     * lai kien nghi mo coi) - admin phai xoa ben TDKP truoc.
+     */
+    @Transactional
+    public void adminDelete(UUID engagementId) {
+        UUID tenantId = TenantContext.getTenantId();
+        AuditEngagement engagement = getEngagementOrThrow(tenantId, engagementId);
+
+        Number tdkpCount = (Number) entityManager.createNativeQuery("select count(*) from audit_tdkp_branch_recommendation where engagement_id = :id")
+                .setParameter("id", engagementId).getSingleResult();
+        if (tdkpCount.longValue() > 0) {
+            throw new BusinessException("AUDIT_ENGAGEMENT_HAS_TDKP",
+                    "Cuoc kiem toan " + engagement.getCode() + " da chuyen sang Theo doi khac phuc, can xoa kien nghi ben TDKP truoc");
+        }
+
+        execute("delete from audit_ttss_record_recommendation where ttss_record_id in (select id from audit_ttss_record where engagement_id = :id)"
+                + " or recommendation_id in (select id from audit_recommendation where engagement_id = :id)", engagementId);
+        execute("delete from audit_ttss_record where engagement_id = :id", engagementId);
+        execute("delete from audit_recommendation where engagement_id = :id", engagementId);
+        for (String table : SAMPLE_TABLES) {
+            execute("delete from " + table + " where engagement_id = :id", engagementId);
+        }
+        execute("delete from audit_progress_report where engagement_id = :id", engagementId);
+        execute("delete from audit_supervision_evaluation where engagement_id = :id", engagementId);
+        execute("delete from audit_supervision_team_member where engagement_id = :id", engagementId);
+        execute("delete from audit_dgcl_evaluation_line where evaluation_id in (select id from audit_dgcl_evaluation where engagement_id = :id)", engagementId);
+        execute("delete from audit_dgcl_evaluation where engagement_id = :id", engagementId);
+        execute("delete from audit_engagement_assignment where group_member_id in (select m.id from audit_engagement_group_member m"
+                + " join audit_engagement_group g on g.id = m.group_id where g.audit_engagement_id = :id)", engagementId);
+        execute("delete from audit_engagement_group_member where group_id in (select id from audit_engagement_group where audit_engagement_id = :id)", engagementId);
+        execute("delete from audit_engagement_group where audit_engagement_id = :id", engagementId);
+        execute("delete from audit_engagement_related_unit where audit_engagement_id = :id", engagementId);
+        execute("delete from audit_engagement where id = :id", engagementId);
+        entityManager.clear();
+
+        auditLogService.record("AuditEngagement", engagementId, AuditAction.DELETE, "Admin xoa cuoc kiem toan (kem du lieu): " + engagement.getCode());
+    }
+
+    private void execute(String sql, UUID engagementId) {
+        entityManager.createNativeQuery(sql).setParameter("id", engagementId).executeUpdate();
     }
 
     private AuditEngagement getEngagementOrThrow(UUID tenantId, UUID id) {

@@ -73,6 +73,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.govia.audit.masterdata.entity.AuditMasterDataCategory.BUSINESS_SEGMENT;
+import static com.govia.audit.masterdata.entity.AuditMasterDataCategory.RECOMMENDATION_TYPE;
 
 /**
  * "Quản lý TTSS & Kiến nghị" (Khối C, sheet "Quản lý công việc" trong Tạo CKT (1).xlsx, mục C).
@@ -443,6 +444,7 @@ public class AuditTtssService {
                 : employeeRepository.findByTenantIdAndEmployeeCode(tenantId, principal.employeeCode()).orElse(null);
         String performerName = uploader == null ? principal.username() : uploader.getFullName();
 
+        Map<String, String> recommendationTypeNames = recommendationTypeNamesByCode(tenantId);
         Map<String, UUID> segmentIdsByCode = masterDataItemRepository.findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, BUSINESS_SEGMENT)
                 .stream().collect(Collectors.toMap(AuditMasterDataItem::getCode, AuditMasterDataItem::getId, (a, b) -> a));
         Map<String, UUID> stepSummaryIdsByCode = processStepSummaryRepository.findByTenantIdOrderByCodeAsc(tenantId).stream()
@@ -506,8 +508,9 @@ public class AuditTtssService {
                 uploaderRecommendationCode = DEFAULT_UPLOADER_RECOMMENDATION_CODE;
                 uploaderRecommendationName = DEFAULT_UPLOADER_RECOMMENDATION_NAME;
             }
+            String catalogTypeName = recommendationTypeNames.get(normalizeCode(uploaderRecommendationCode));
             record.setUploaderRecommendationCode(uploaderRecommendationCode);
-            record.setUploaderRecommendationName(uploaderRecommendationName);
+            record.setUploaderRecommendationName(catalogTypeName != null ? catalogTypeName : uploaderRecommendationName);
             record.setAppendix(emptyToNull(row.get("appendix")));
 
             AuditTtssRecord persisted = ttssRepository.save(record);
@@ -662,6 +665,18 @@ public class AuditTtssService {
                 .orElseThrow(() -> new BusinessException("AUDIT_TTSS_NOT_FOUND", "Khong tim thay dong TTSS", HttpStatus.NOT_FOUND));
     }
 
+    /** test 10.1: "Loại kiến nghị" = ten trong danh muc "Loại kiến nghị" (RECOMMENDATION_TYPE) co ma = "Mã KN người upload"
+     * (vd KN00 -> "Kiến nghị chung"). Key da chuan hoa qua {@link #normalizeCode}. */
+    private Map<String, String> recommendationTypeNamesByCode(UUID tenantId) {
+        return masterDataItemRepository.findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, RECOMMENDATION_TYPE).stream()
+                .filter(i -> i.getCode() != null)
+                .collect(Collectors.toMap(i -> normalizeCode(i.getCode()), AuditMasterDataItem::getName, (a, b) -> a));
+    }
+
+    private static String normalizeCode(String code) {
+        return code == null ? null : code.trim().toUpperCase(java.util.Locale.ROOT);
+    }
+
     private Map<UUID, AuditMasterDataItem> segmentsById(UUID tenantId) {
         return masterDataItemRepository.findByTenantIdAndCategoryOrderBySortOrderAscNameAsc(tenantId, BUSINESS_SEGMENT)
                 .stream().collect(Collectors.toMap(AuditMasterDataItem::getId, i -> i));
@@ -774,12 +789,13 @@ public class AuditTtssService {
         Map<UUID, AuditRecommendation> recommendations = recommendationRepository
                 .findByTenantIdAndEngagementIdInOrderByCodeAsc(tenantId, engagementIds).stream()
                 .collect(Collectors.toMap(AuditRecommendation::getId, r -> r));
-        return records.stream().map(r -> toResponse(r, segments, stepSummaries, stepDetails, recommendations)).toList();
+        Map<String, String> recommendationTypeNames = recommendationTypeNamesByCode(tenantId);
+        return records.stream().map(r -> toResponse(r, segments, stepSummaries, stepDetails, recommendations, recommendationTypeNames)).toList();
     }
 
     private AuditTtssRecordResponse toResponse(AuditTtssRecord record, Map<UUID, AuditMasterDataItem> segments,
                                                 Map<UUID, AuditProcessStepSummary> stepSummaries, Map<UUID, AuditProcessStepDetail> stepDetails,
-                                                Map<UUID, AuditRecommendation> recommendations) {
+                                                Map<UUID, AuditRecommendation> recommendations, Map<String, String> recommendationTypeNames) {
         AuditMasterDataItem segment = segments.get(record.getBusinessSegmentId());
         AuditProcessStepSummary stepSummary = stepSummaries.get(record.getProcessStepSummaryId());
         AuditProcessStepDetail stepDetail = stepDetails.get(record.getProcessStepDetailId());
@@ -787,6 +803,9 @@ public class AuditTtssService {
                 .map(recommendations::get).filter(Objects::nonNull)
                 .sorted(Comparator.comparing(AuditRecommendation::getCode, Comparator.nullsLast(Comparator.naturalOrder())))
                 .map(r -> new AuditTtssRecordResponse.TeamRecommendation(r.getId(), r.getCode(), r.getContent())).toList();
+        // tra cuu song theo danh muc (du lieu upload truoc khi khai bao danh muc van hien dung); khong co ma trong danh muc -> giu ten da luu
+        String recommendationTypeName = recommendationTypeNames.getOrDefault(normalizeCode(record.getUploaderRecommendationCode()),
+                record.getUploaderRecommendationName());
         return new AuditTtssRecordResponse(record.getId(), record.getEngagementId(), record.getBusinessSegmentId(),
                 segment == null ? null : segment.getCode(), record.getRecordUsername(), record.getWorkItemCode(),
                 record.getProcessStepSummaryId(), stepSummary == null ? null : stepSummary.getCode(), stepSummary == null ? null : stepSummary.getName(),
@@ -794,7 +813,7 @@ public class AuditTtssService {
                 record.getFindingCode(), record.getFindingName(), record.isMaterial(), record.getReferenceNumber(), record.getReferenceNumber2(),
                 record.getCustomerCode(), record.getCustomerName(), record.getAmount(), record.getPerformingUser(), record.getTransactionContent(),
                 record.getExceptionDate(), record.getApproverName(), record.getControllerName(), record.getTtssPerformerName(), record.getRelatedStaff(),
-                record.getUploaderRecommendationCode(), record.getUploaderRecommendationName(), record.getAppendix(), teamRecommendations,
+                record.getUploaderRecommendationCode(), recommendationTypeName, record.getAppendix(), teamRecommendations,
                 record.getRecommendationApprovalStatus(), record.getRecommendationApprovedBy(), record.getRecommendationApprovedAt());
     }
 }

@@ -1119,7 +1119,7 @@
     },
     "form": {
       "editTitle": "Edit",
-      "months": "Audit months"
+      "month": "Audit month"
     },
     "messages": {
       "loadError": "Failed to load data",
@@ -1396,6 +1396,8 @@
         "creditContract": "Related credit contract (LAV)",
         "defectCode": "Error code",
         "defectType": "Error type",
+        "memberRecommendationCode": "Member recommendation code",
+        "recommendationTypeName": "Recommendation type",
         "recommendationDefectStatus": "Correction status of errors related to the recommendation",
         "customerStatus": "Correction status of errors related to the customer",
         "relatedStaff": "Related officer"
@@ -2643,6 +2645,8 @@
     }
   },
   "auditEngagementMonitoring": {
+    "adminDeleteConfirmTitle": "Delete audit engagement {{code}}?",
+    "adminDeleteConfirmContent": "All data of this engagement (groups, members, assignments, findings & recommendations, samples, progress reports, supervision team, quality assessment) will be permanently deleted.",
     "pageTitle": "Audit Engagement Monitoring",
     "columns": {
       "code": "Engagement Code",
@@ -2697,7 +2701,9 @@
       "updateRankingSuccess": "Team ranking updated",
       "updateRankingError": "Failed to update team ranking",
       "updateScoringSuccess": "Member score updated",
-      "updateScoringError": "Failed to update member score"
+      "updateScoringError": "Failed to update member score",
+      "deleteError": "Failed to delete audit engagement",
+      "deleteHasTdkp": "This engagement has been transferred to Remediation Tracking; delete its TDKP recommendations first"
     }
   },
   "auditSupervisionTeam": {

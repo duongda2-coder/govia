@@ -142,6 +142,13 @@ public class AuditTdkpBranchService {
         List<AuditTdkpBranchRecommendation> recommendations = recommendationRepository.findByTenantIdOrderByManagementCodeAsc(tenantId);
         Map<UUID, List<AuditTdkpBranchDefect>> byRecommendation = defectsByRecommendation(tenantId, recommendations);
         Map<UUID, AuditTdkpBranchRecommendation> recommendationById = recommendations.stream().collect(Collectors.toMap(AuditTdkpBranchRecommendation::getId, r -> r));
+        List<UUID> sourceTtssIds = byRecommendation.values().stream().flatMap(List::stream)
+                .map(AuditTdkpBranchDefect::getSourceTtssId).filter(Objects::nonNull).distinct().toList();
+        Map<UUID, AuditTtssRecord> sourceTtss = sourceTtssIds.isEmpty() ? new HashMap<>()
+                : ttssRepository.findAllById(sourceTtssIds).stream().collect(Collectors.toMap(AuditTtssRecord::getId, t -> t));
+        Map<String, String> recommendationTypeNames = masterData.items(AuditMasterDataCategory.RECOMMENDATION_TYPE).values().stream()
+                .filter(i -> i.getCode() != null)
+                .collect(Collectors.toMap(i -> normalizeCode(i.getCode()), AuditMasterDataItem::getName, (x, y) -> x));
         List<AuditTdkpBranchDto.DefectResponse> result = new ArrayList<>();
         for (AuditTdkpBranchRecommendation recommendation : recommendations) {
             if (recommendationId != null && !recommendationId.equals(recommendation.getId())) {
@@ -150,7 +157,8 @@ public class AuditTdkpBranchService {
             List<AuditTdkpBranchDefect> defects = byRecommendation.getOrDefault(recommendation.getId(), List.of());
             TdkpStatus overall = computeDefectStatus(defects.stream().map(AuditTdkpBranchDefect::getCustomerStatus).toList());
             for (AuditTdkpBranchDefect defect : defects) {
-                result.add(toDefectResponse(defect, recommendationById.get(defect.getBranchRecommendationId()), overall));
+                result.add(toDefectResponse(defect, recommendationById.get(defect.getBranchRecommendationId()), overall,
+                        sourceTtss.get(defect.getSourceTtssId()), recommendationTypeNames));
             }
         }
         return result;
@@ -331,6 +339,7 @@ public class AuditTdkpBranchService {
         List<ExportColumn> columns = List.of(new ExportColumn("managementCode", "Mã quản lý kiến nghị"), new ExportColumn("defectContent", "Sai sót liên quan đến kiến nghị"),
                 new ExportColumn("customerEntry", "Khách hàng/Bút toán"), new ExportColumn("creditContract", "Hợp đồng tín dụng liên quan (LAV)"),
                 new ExportColumn("defectCode", "Mã tồn tại sai sót"), new ExportColumn("defectType", "Loại sai sót"),
+                new ExportColumn("memberRecommendationCode", "Mã kiến nghị của thành viên"), new ExportColumn("recommendationTypeName", "Loại kiến nghị"),
                 new ExportColumn("recommendationDefectStatus", "Hiện trạng chỉnh sửa sai sót liên quan đến kiến nghị"),
                 new ExportColumn("customerStatus", "Hiện trạng chỉnh sửa sai sót liên quan đến khách hàng"), new ExportColumn("relatedStaff", "Cán bộ liên quan"));
         List<Map<String, Object>> rows = listDefects(null).stream().map(d -> {
@@ -341,6 +350,8 @@ public class AuditTdkpBranchService {
             row.put("creditContract", d.creditContract());
             row.put("defectCode", d.defectCode());
             row.put("defectType", d.defectType());
+            row.put("memberRecommendationCode", d.memberRecommendationCode());
+            row.put("recommendationTypeName", d.recommendationTypeName());
             row.put("recommendationDefectStatus", d.recommendationDefectStatusLabel());
             row.put("customerStatus", d.customerStatusLabel());
             row.put("relatedStaff", d.relatedStaff());
@@ -474,10 +485,19 @@ public class AuditTdkpBranchService {
                 defects.size(), done);
     }
 
-    private AuditTdkpBranchDto.DefectResponse toDefectResponse(AuditTdkpBranchDefect item, AuditTdkpBranchRecommendation recommendation, TdkpStatus overall) {
+    private AuditTdkpBranchDto.DefectResponse toDefectResponse(AuditTdkpBranchDefect item, AuditTdkpBranchRecommendation recommendation, TdkpStatus overall,
+                                                                AuditTtssRecord ttss, Map<String, String> recommendationTypeNames) {
+        String memberRecommendationCode = ttss == null ? null : ttss.getUploaderRecommendationCode();
+        // cung quy tac voi cot "Loại kiến nghị" o man Quan ly TTSS & Kien nghi (AuditTtssService): ten trong danh muc theo ma, khong co thi ten da luu
+        String recommendationTypeName = ttss == null ? null
+                : recommendationTypeNames.getOrDefault(normalizeCode(memberRecommendationCode), ttss.getUploaderRecommendationName());
         return new AuditTdkpBranchDto.DefectResponse(item.getId(), item.getBranchRecommendationId(),
                 Objects.requireNonNull(recommendation).getManagementCode(), item.getDefectContent(), item.getCustomerEntry(), item.getCreditContract(),
-                item.getDefectCode(), item.getDefectType(), overall, TdkpStatus.labelOf(overall), item.getCustomerStatus(), TdkpStatus.labelOf(item.getCustomerStatus()),
+                item.getDefectCode(), item.getDefectType(), memberRecommendationCode, recommendationTypeName, overall, TdkpStatus.labelOf(overall), item.getCustomerStatus(), TdkpStatus.labelOf(item.getCustomerStatus()),
                 item.getRelatedStaff());
+    }
+
+    private static String normalizeCode(String code) {
+        return code == null ? null : code.trim().toUpperCase(java.util.Locale.ROOT);
     }
 }

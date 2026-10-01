@@ -387,7 +387,7 @@ class AuditKhnsPbAllocationTest {
     }
 
     /** "Chuyen thong tin KHTH": KHNS_NAM khong con nhap So QD / Ngay QD -> van phai chuyen duoc, CKT de trong cac cot do; chuyen lai
-     * thi khong ghi de gia tri da nhap tay o CKT. */
+     * thi tao CKT MOI (STT tang), khong ghi de CKT da co (test 10.1). */
     @Test
     void transferToKhthDoesNotRequireDecisionNumberDateOrMonth() {
         object("OBJ-A", AuditKhktApprovalStatus.APPROVED, true, "12000", Set.of(3), lnId, gaId);
@@ -426,11 +426,17 @@ class AuditKhnsPbAllocationTest {
         assertThat(engagement.getDecisionDate()).isNull();
         assertThat(engagement.getTeamLeadEmployeeId()).isNotNull();
 
-        // NSD nhap tay so QD o man CKT, roi chuyen lai tu KHTH -> gia tri nhap tay duoc giu
+        assertThat(engagement.getCode()).isEqualTo("CNOBJ-A" + YEAR + "01");
+
+        // NSD nhap tay so QD o man CKT, roi chuyen lai tu KHTH -> tao CKT moi ...02, CKT cu giu nguyen
         engagement.setDecisionNumber("QD-TAY-01");
         engagementRepository.save(engagement);
-        assertThat(transferService.transfer(YEAR, List.of("OBJ-A"))).singleElement().satisfies(r -> assertThat(r.success()).isTrue());
+        assertThat(transferService.transfer(YEAR, List.of("OBJ-A"))).singleElement().satisfies(r -> {
+            assertThat(r.success()).isTrue();
+            assertThat(r.engagementCode()).isEqualTo("CNOBJ-A" + YEAR + "02");
+        });
         assertThat(engagementRepository.findById(engagement.getId()).orElseThrow().getDecisionNumber()).isEqualTo("QD-TAY-01");
+        assertThat(engagementRepository.countByTenantIdAndAuditObjectUnitIdAndYear(tenantId, unit.getId(), YEAR)).isEqualTo(2);
     }
 
     /** "Xuat QD thanh lap doan" / "Xuat QD kiem ke": moi file la doan kiem toan cua 1 chi nhanh trong thang - Truong doan dung dau, kem

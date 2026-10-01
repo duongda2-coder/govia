@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -108,29 +107,12 @@ public class AuditKhktTransferService {
         Employee teamLead = employeeRepository.findByTenantIdAndEmployeeCode(tenantId, candidate.teamLeadEmployeeCode())
                 .orElseThrow(() -> new IllegalStateException("Khong tim thay can bo Truong doan: " + candidate.teamLeadEmployeeCode()));
 
-        Optional<AuditEngagement> existing = engagementRepository
-                .findFirstByTenantIdAndAuditObjectUnitIdAndYearOrderByCreatedAtAsc(tenantId, unit.getId(), year);
-        // KHNS_NAM khong co thang/so QD/ngay QD -> giu gia tri da nhap tay o CKT hien co (neu co), khong ghi de bang null
-        AuditEngagementRequest request = new AuditEngagementRequest(unit.getId(), year,
-                candidate.expectedMonth() != null ? candidate.expectedMonth() : existing.map(AuditEngagement::getExpectedMonth).orElse(null),
-                candidate.decisionDate() != null ? candidate.decisionDate() : existing.map(AuditEngagement::getDecisionDate).orElse(null),
-                teamLead.getId(),
-                candidate.decisionNumber() != null && !candidate.decisionNumber().isBlank() ? candidate.decisionNumber()
-                        : existing.map(AuditEngagement::getDecisionNumber).orElse(null),
-                existing.map(AuditEngagement::getStatus).orElse(AuditEngagementStatus.DRAFT),
-                existing.map(AuditEngagement::getRiskRank).orElse(thRow.getRankLabel()),
-                existing.map(AuditEngagement::getName).orElse(null), existing.map(AuditEngagement::getObjective).orElse(null),
-                existing.map(AuditEngagement::getScope).orElse(null), existing.map(AuditEngagement::getPlanningStartDate).orElse(null),
-                existing.map(AuditEngagement::getPlanningEndDate).orElse(null), existing.map(AuditEngagement::getFieldworkStartDate).orElse(null),
-                existing.map(AuditEngagement::getFieldworkEndDate).orElse(null), existing.map(AuditEngagement::getReportStartDate).orElse(null),
-                existing.map(AuditEngagement::getReportEndDate).orElse(null), existing.map(AuditEngagement::getInfoCollectionStart).orElse(null),
-                existing.map(AuditEngagement::getInfoCollectionEnd).orElse(null), existing.map(AuditEngagement::getSampleRequestStart).orElse(null),
-                existing.map(AuditEngagement::getSampleRequestEnd).orElse(null), existing.map(AuditEngagement::getReportPlanStart).orElse(null),
-                existing.map(AuditEngagement::getReportPlanEnd).orElse(null), existing.map(AuditEngagement::getProcessEngagementId).orElse(null));
-
-        if (existing.isPresent()) {
-            return engagementService.update(existing.get().getId(), request).code();
-        }
+        // test 10.1: moi lan chuyen la mot CKT MOI (vd da co CN1300202601 -> tao CN1300202602), khong ghi de CKT da co cua
+        // cung doi tuong/nam - CKT cu co the dang thuc hien (nhom, TTSS...), ghi de lam mat/lan du lieu.
+        AuditEngagementRequest request = new AuditEngagementRequest(unit.getId(), year, candidate.expectedMonth(), candidate.decisionDate(),
+                teamLead.getId(), candidate.decisionNumber() != null && !candidate.decisionNumber().isBlank() ? candidate.decisionNumber() : null,
+                AuditEngagementStatus.DRAFT, thRow.getRankLabel(),
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         return engagementService.create(request).code();
     }
 

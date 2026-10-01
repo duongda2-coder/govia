@@ -1119,7 +1119,7 @@
     },
     "form": {
       "editTitle": "Sửa",
-      "months": "Các tháng kiểm toán"
+      "month": "Tháng kiểm toán"
     },
     "messages": {
       "loadError": "Không tải được dữ liệu",
@@ -1396,6 +1396,8 @@
         "creditContract": "Hợp đồng tín dụng liên quan (LAV)",
         "defectCode": "Mã tồn tại sai sót",
         "defectType": "Loại sai sót",
+        "memberRecommendationCode": "Mã kiến nghị của thành viên",
+        "recommendationTypeName": "Loại kiến nghị",
         "recommendationDefectStatus": "Hiện trạng chỉnh sửa sai sót liên quan đến kiến nghị",
         "customerStatus": "Hiện trạng chỉnh sửa sai sót liên quan đến khách hàng",
         "relatedStaff": "Cán bộ liên quan"
@@ -2755,6 +2757,8 @@
     }
   },
   "auditEngagementMonitoring": {
+    "adminDeleteConfirmTitle": "Xoá cuộc kiểm toán {{code}}?",
+    "adminDeleteConfirmContent": "Toàn bộ dữ liệu của cuộc kiểm toán (nhóm, thành viên, phân công, TTSS & kiến nghị, mẫu chung, báo cáo tiến độ, đoàn giám sát, đánh giá chất lượng) sẽ bị xoá và không thể khôi phục.",
     "pageTitle": "Quản lý đợt kiểm toán",
     "columns": {
       "code": "Mã CKT",
@@ -2809,7 +2813,9 @@
       "updateRankingSuccess": "Đã cập nhật xếp loại đoàn",
       "updateRankingError": "Cập nhật xếp loại đoàn thất bại",
       "updateScoringSuccess": "Đã cập nhật điểm thành viên",
-      "updateScoringError": "Cập nhật điểm thành viên thất bại"
+      "updateScoringError": "Cập nhật điểm thành viên thất bại",
+      "deleteError": "Xoá cuộc kiểm toán thất bại",
+      "deleteHasTdkp": "Cuộc kiểm toán đã chuyển sang Theo dõi khắc phục, cần xoá kiến nghị bên TDKP trước"
     }
   },
   "auditSupervisionTeam": {

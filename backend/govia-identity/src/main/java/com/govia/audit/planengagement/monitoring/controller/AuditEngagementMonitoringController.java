@@ -10,6 +10,7 @@ import com.govia.core.web.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,5 +59,13 @@ public class AuditEngagementMonitoringController {
     public ApiResponse<AuditEngagementTeamMemberDetailResponse> updateTeamMemberScoring(@PathVariable UUID id, @PathVariable UUID memberId,
                                                                                          @Valid @RequestBody TeamMemberScoringRequest request) {
         return ApiResponse.ok(service.updateTeamMemberScoring(id, memberId, request));
+    }
+
+    /** test 10.1: chi admin (SUPER_ADMIN) xoa han CKT kem du lieu phat sinh tu man hinh nay. */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ApiResponse<Void> adminDelete(@PathVariable UUID id) {
+        service.adminDelete(id);
+        return ApiResponse.ok(null);
     }
 }

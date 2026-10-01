@@ -78,6 +78,10 @@ public final class AuditTdkpBranchDto {
             String creditContract,
             String defectCode,
             String defectType,
+            /** test 10.1: "Mã kiến nghị của thành viên" / "Loại kiến nghị" - lấy sống từ dòng TTSS nguồn (Quản lý TTSS & Kiến nghị:
+             * "Mã KN người upload" / "Loại kiến nghị"); dòng nhập tay (không có TTSS nguồn) để trống. */
+            String memberRecommendationCode,
+            String recommendationTypeName,
             /** Hiện trạng chỉnh sửa sai sót liên quan đến kiến nghị - hệ thống đếm và so sánh các dòng cùng kiến nghị. */
             TdkpStatus recommendationDefectStatus,
             String recommendationDefectStatusLabel,
