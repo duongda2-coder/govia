@@ -154,7 +154,86 @@ public class AuditToolRegistry {
                             "limit", prop("integer", "So van ban toi da, mac dinh 5, toi da 10"),
                             "includeExpired", prop("boolean", "true = lay ca van ban da het hieu luc (mac dinh false)")
                     ), List.of("query")),
-                    "/api/audit/agent/tools/documents")
+                    "/api/audit/agent/tools/documents"),
+
+            // ---------------- G2: A3 Tac nghiep KT, A4 Phat hien & Kien nghi, A7 Danh muc
+            def("list_my_engagements",
+                    "Danh sach cuoc kiem toan (CKT) nguoi dung duoc phan cong: ma, ten, don vi, nam, thang, trang thai, "
+                            + "truong doan, thoi gian thuc dia. Dung de tim ma CKT khi nguoi dung chi noi ten don vi.",
+                    schema(Map.of(
+                            "search", prop("string", "Tu khoa loc theo ma/ten CKT hoac don vi (tuy chon)"),
+                            "limit", prop("integer", "So CKT toi da, mac dinh 30")
+                    ), List.of()),
+                    "/api/audit/plan/engagement/assigned"),
+
+            def("get_engagement_work_items",
+                    "Cong viec da phan cong cua 1 CKT (Quan ly cong viec CBKT/THKT/DCKT): ma/ten cong viec, can bo, "
+                            + "trang thai, trang thai duyet, kem so luong theo trang thai va giai doan.",
+                    schema(Map.of(
+                            "engagement", prop("string", "Ma cuoc kiem toan, vd CN55202601"),
+                            "phase", enumProp("Giai doan (bo trong = ca 3)", "CBKT", "THKT", "DCKT"),
+                            "status", enumProp("Loc trang thai (tuy chon)", "NOT_STARTED", "IN_PROGRESS", "DONE")
+                    ), List.of("engagement")),
+                    "/api/audit/plan/engagement/{engagementId}/work-management"),
+
+            def("get_ttss_summary",
+                    "Tong hop ton tai sai sot (TTSS) cua 1 CKT: tong so, so trong yeu, so chua gan kien nghi truong doan, "
+                            + "tong so tien, so luong theo nghiep vu va trang thai duyet, cac phat hien xuat hien nhieu nhat.",
+                    schema(Map.of(
+                            "engagement", prop("string", "Ma cuoc kiem toan")
+                    ), List.of("engagement")),
+                    "/api/audit/plan/engagement/{engagementId}/ttss"),
+
+            def("get_ttss_records",
+                    "Chi tiet cac dong TTSS (rut gon) cua 1 CKT, loc theo nghiep vu/ma phat hien/trong yeu/chua gan kien nghi.",
+                    schema(Map.of(
+                            "engagement", prop("string", "Ma cuoc kiem toan"),
+                            "businessSegmentCode", prop("string", "Ma nghiep vu, vd LN, DP (tuy chon)"),
+                            "findingCode", prop("string", "Ma phat hien (tuy chon)"),
+                            "materialOnly", prop("boolean", "true = chi TTSS trong yeu"),
+                            "withoutRecommendationOnly", prop("boolean", "true = chi TTSS chua gan kien nghi truong doan"),
+                            "limit", prop("integer", "So dong toi da, mac dinh 30, toi da 50")
+                    ), List.of("engagement")),
+                    "/api/audit/plan/engagement/{engagementId}/ttss"),
+
+            def("list_engagement_recommendations",
+                    "Danh muc kien nghi (Luu ma kien nghi KNKTxxx) da tao cua 1 CKT: ma, nghiep vu, noi dung.",
+                    schema(Map.of(
+                            "engagement", prop("string", "Ma cuoc kiem toan")
+                    ), List.of("engagement")),
+                    "/api/audit/plan/engagement/{engagementId}/ttss/recommendations"),
+
+            def("search_similar_findings",
+                    "Tim TTSS va kien nghi co noi dung tuong tu o cac CKT khac nguoi dung duoc xem - de tham khao cach "
+                            + "viet kien nghi va phat hien lap lai.",
+                    schema(Map.of(
+                            "query", prop("string", "Noi dung phat hien can tim, vd 'ho so vay thieu tai san bao dam'"),
+                            "excludeEngagement", prop("string", "Ma CKT hien tai de loai tru (tuy chon)"),
+                            "limit", prop("integer", "So ket qua moi loai, mac dinh 8")
+                    ), List.of("query")),
+                    null),
+
+            def("search_catalog",
+                    "Tim trong danh muc nghiep vu kiem toan theo tu khoa: diem kiem soat, cong viec kiem toan, loai ngoai le, "
+                            + "mapping ngoai le, buoc quy trinh (ban chi nhanh va ban quy trinh _qt).",
+                    schema(Map.of(
+                            "catalog", enumProp("Danh muc can tim", "control_point", "control_point_qt", "work_item", "work_item_qt",
+                                    "exception_type", "exception_type_qt", "exception_mapping", "exception_mapping_qt", "process_step", "process_step_qt"),
+                            "query", prop("string", "Tu khoa (bo trong = lay cac dong dau tien)"),
+                            "businessSegmentCode", prop("string", "Loc theo ma nghiep vu (tuy chon)"),
+                            "limit", prop("integer", "So dong toi da, mac dinh 10, toi da 20")
+                    ), List.of("catalog")),
+                    null),
+
+            def("find_catalog_duplicates",
+                    "Tim cac dong co TEN trung lap (bo dau, khong phan biet hoa thuong) trong cung nghiep vu/nam cua 1 danh muc "
+                            + "- de nguoi quan tri ra soat. Mang rong = khong phat hien trung lap.",
+                    schema(Map.of(
+                            "catalog", enumProp("Danh muc can kiem tra", "control_point", "control_point_qt", "work_item", "work_item_qt",
+                                    "exception_type", "exception_type_qt", "exception_mapping", "exception_mapping_qt", "process_step", "process_step_qt"),
+                            "limit", prop("integer", "So nhom trung toi da, mac dinh 20")
+                    ), List.of("catalog")),
+                    null)
     );
 
     private final AuditToolDefinition finalAnswerTool = def(

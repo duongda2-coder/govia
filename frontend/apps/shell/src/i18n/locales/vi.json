@@ -7,16 +7,40 @@
     "widget": {
       "title": "Trợ lý AI"
     },
+    "draft": {
+      "recommendationButton": "AI soạn kiến nghị từ TTSS",
+      "recommendationHint": "Bản nháp do AI soạn từ {{count}} TTSS. Kiểm tra, chỉnh sửa rồi mới bấm Thêm.",
+      "noDrafts": "AI chưa đề xuất được kiến nghị nào cho dữ liệu này.",
+      "use": "Dùng nội dung này",
+      "notGrounded": "Cần kiểm tra: có thông tin không khớp dữ liệu TTSS",
+      "similarTitle": "Kiến nghị tương tự ở cuộc kiểm toán khác ({{count}})",
+      "rewriteButton": "AI chuẩn hoá câu chữ",
+      "rewriteEmpty": "Nhập nội dung trước khi nhờ AI chuẩn hoá.",
+      "rewriteNotGrounded": "Bản viết lại có số liệu không có trong nội dung gốc - kiểm tra kỹ trước khi dùng.",
+      "replace": "Thay thế",
+      "dismiss": "Bỏ qua",
+      "errorNoTtss": "Chưa có TTSS nào (trong phạm vi bạn được xem) để AI soạn kiến nghị cho nghiệp vụ này.",
+      "errorGeneric": "AI chưa soạn được nội dung. Vui lòng thử lại."
+    },
     "suggestions": {
       "general1": "Việc cần xử lý của tôi là gì?",
       "general2": "Màn hình kế hoạch kiểm toán tháng ở đâu?",
       "general3": "Văn bản nào quy định về chọn mẫu kiểm toán?",
       "risk1": "Chi nhánh nào có rủi ro cao nhất năm nay?",
       "risk2": "Chi nhánh nào biến động điểm rủi ro nhiều nhất so với năm trước?",
-      "risk3": "Chuyên gia đã xếp hạng lại những chi nhánh nào năm nay?"
+      "risk3": "Chuyên gia đã xếp hạng lại những chi nhánh nào năm nay?",
+      "finding1": "Tổng hợp TTSS của cuộc kiểm toán tôi đang làm",
+      "finding2": "TTSS trọng yếu nào chưa được gắn kiến nghị?",
+      "finding3": "Các cuộc kiểm toán khác đã kiến nghị gì cho phát hiện tương tự?",
+      "execution1": "Tôi đang tham gia những cuộc kiểm toán nào?",
+      "execution2": "Tiến độ công việc THKT của cuộc kiểm toán đang làm?",
+      "execution3": "Điểm kiểm soát nào áp dụng cho nghiệp vụ tín dụng?",
+      "catalog1": "Danh mục loại ngoại lệ có tên nào bị trùng lặp không?",
+      "catalog2": "Tìm trong danh mục điểm kiểm soát theo từ khoá phê duyệt",
+      "catalog3": "Danh mục công việc kiểm toán có mục nào trùng tên không?"
     },
     "chat": {
-      "emptyHint": "Hỏi về rủi ro chi nhánh, việc cần xử lý, màn hình chức năng hoặc văn bản quy định. Gợi ý:",
+      "emptyHint": "Hỏi về rủi ro, cuộc kiểm toán, TTSS & kiến nghị, danh mục, việc cần xử lý hoặc văn bản quy định. Gợi ý:",
       "inputPlaceholder": "Nhập câu hỏi, vd: Chi nhánh nào có rủi ro cao nhất?",
       "errorUnavailable": "Trợ lý AI chưa trả lời được câu này. Vui lòng thử lại.",
       "errorPaused": "Trợ lý AI tạm thời chưa phản hồi. Các chức năng nghiệp vụ vẫn hoạt động bình thường.",

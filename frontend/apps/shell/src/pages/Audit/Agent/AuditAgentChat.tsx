@@ -21,7 +21,20 @@ interface ChatEntry {
 
 const LOADING_STEP_KEYS = ["agent.chat.loading.analyze", "agent.chat.loading.data", "agent.chat.loading.evidence", "agent.chat.loading.compose"];
 const CONVERSATION_STORAGE_KEY = "govia.agent.conversationId";
-const RISK_PATH_PREFIX = "/audit/risk-scoring";
+/** Nhom cau goi y theo man hinh dang mo - khop voi duong dan ma AgentRouter (backend) dung de chon agent. */
+const SUGGESTION_GROUPS: [prefix: string, group: string][] = [
+  ["/audit/risk-scoring", "risk"],
+  ["/audit/plan/execution/work-management/ttss", "finding"],
+  ["/audit/phbc", "finding"],
+  ["/audit/plan/execution", "execution"],
+  ["/audit/plan/engagement", "execution"],
+  ["/audit/master-data", "catalog"],
+  ["/audit/plan/master-data", "catalog"],
+];
+
+function suggestionGroupFor(path: string): string {
+  return SUGGESTION_GROUPS.find(([prefix]) => path.startsWith(prefix))?.[1] ?? "general";
+}
 const SCREEN_PATH_PATTERN = /(\/(?:audit|people|admin|workflow)[\w\-/]*)/g;
 
 function readStoredConversationId(): string | null {
@@ -115,10 +128,8 @@ export function AuditAgentChat({ pageContext = null, screens = [], llmReachable 
 
   const activeContext = contextDismissed ? null : pageContext;
   const knownPaths = useMemo(() => new Set(screens.map((s) => s.path)), [screens]);
-  const onRiskScreen = pageContext?.path.startsWith(RISK_PATH_PREFIX) ?? false;
-  const suggestionKeys = onRiskScreen
-    ? ["agent.suggestions.risk1", "agent.suggestions.risk2", "agent.suggestions.risk3"]
-    : ["agent.suggestions.general1", "agent.suggestions.general2", "agent.suggestions.general3"];
+  const suggestionGroup = suggestionGroupFor(pageContext?.path ?? "");
+  const suggestionKeys = [1, 2, 3].map((n) => `agent.suggestions.${suggestionGroup}${n}`);
 
   const loadHistory = () => {
     agentApi

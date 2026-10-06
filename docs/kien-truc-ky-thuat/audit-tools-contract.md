@@ -332,3 +332,37 @@ cấu trúc** — chỉ có field tự do `AuditObjectUnit.keyFindings`. Để t
 4. Schema ở tài liệu này phải khớp 100% với code thật (`AuditToolsController`
    + `AuditToolsService`). Khi sửa 1 trong 2 file đó, cập nhật tài liệu này
    trong cùng 1 lần đổi.
+
+## Bổ sung giai đoạn G2 (2026-10): A3, A4, A7 + soạn nháp
+
+| Agent | Tool |
+|---|---|
+| A4 Trợ lý Phát hiện & Kiến nghị | `list_my_engagements`, `get_ttss_summary`, `get_ttss_records`, `list_engagement_recommendations`, `search_similar_findings` |
+| A3 Trợ lý Tác nghiệp KT | `list_my_engagements`, `get_engagement_work_items`, `search_catalog` |
+| A7 Trợ lý Danh mục | `search_catalog`, `find_catalog_duplicates` |
+
+Tất cả nằm trong `AgentWorkToolsService` và **chỉ gọi lại method của controller nghiệp vụ sẵn có** (không
+gọi repository), nên giữ nguyên `@PreAuthorize` và phân quyền theo dòng (vd TTSS: thành viên chỉ thấy dòng
+của mình, trưởng nhóm thấy nhóm mình, trưởng đoàn/VIEW_ALL thấy tất cả). Tham số `engagement` nhận **mã hoặc
+id** cuộc kiểm toán, nhưng chỉ trong danh sách `GET /api/audit/plan/engagement/assigned` của người hỏi.
+
+| Tool | Nguồn (endpoint sẵn có) | Quyền | Ghi chú |
+|---|---|---|---|
+| `list_my_engagements(search?, limit?)` | `/api/audit/plan/engagement/assigned` | `AUDIT.PLAN_ENGAGEMENT.VIEW` | tối đa 30 |
+| `get_engagement_work_items(engagement, phase?, status?)` | `/api/audit/plan/engagement/{id}/work-management` × CBKT/THKT/DCKT | `AUDIT.WORK_MANAGEMENT.VIEW` | kèm đếm theo trạng thái/giai đoạn, tối đa 60 dòng |
+| `get_ttss_summary(engagement)` | `/api/audit/plan/engagement/{id}/ttss` | `AUDIT.TTSS.VIEW` | tổng, trọng yếu, chưa gắn KN, tổng tiền, top 15 phát hiện |
+| `get_ttss_records(engagement, businessSegmentCode?, findingCode?, materialOnly?, withoutRecommendationOnly?, limit?)` | như trên | `AUDIT.TTSS.VIEW` | rút gọn, tối đa 50 |
+| `list_engagement_recommendations(engagement)` | `/api/audit/plan/engagement/{id}/ttss/recommendations` | `AUDIT.TTSS.VIEW` | |
+| `search_similar_findings(query, excludeEngagement?, limit?)` | 2 endpoint trên, lặp các CKT được phân công (≤ 30) | `AUDIT.TTSS.VIEW` | so khớp từ khoá ≥ 50% |
+| `search_catalog(catalog, query?, businessSegmentCode?, limit?)` | `list()` của 10 danh mục: `control_point(_qt)`, `work_item(_qt)`, `exception_type(_qt)`, `exception_mapping(_qt)`, `process_step(_qt)` | quyền VIEW của danh mục tương ứng | bỏ các cột id nội bộ |
+| `find_catalog_duplicates(catalog, limit?)` | như trên | như trên | nhóm theo tên (bỏ dấu, không phân biệt hoa thường) + nghiệp vụ/năm/bộ công việc/giai đoạn |
+
+### Soạn nháp (mức M2 — không có tool ghi)
+
+| Endpoint | Quyền | Đầu vào | Kiểm soát |
+|---|---|---|---|
+| `POST /api/audit/agent/drafts/recommendations` | `AUDIT.AGENT.VIEW` + `AUDIT.TTSS.VIEW` | `engagementId`, `businessSegmentId?`, `instruction?` | Hệ thống tự lấy TTSS (ưu tiên dòng chưa gắn KN), nhóm theo mã phát hiện (≤ 12 nhóm), kèm KN đã có và KN tương tự ở CKT khác; 1 lần gọi model qua tool `submit_recommendation_drafts`. Bản nháp có mã phát hiện không có trong dữ liệu hoặc số (≥ 3 chữ số) không có trong dữ liệu ⇒ `grounded=false`. **Không lưu gì** — người dùng bấm "Dùng nội dung này" rồi tự bấm Thêm. |
+| `POST /api/audit/agent/drafts/rewrite` | `AUDIT.AGENT.VIEW` | `text`, `purpose` (`RECOMMENDATION`/`FINDING`/`SUMMARY`) | Viết lại giữ nguyên sự kiện; số không có trong văn bản gốc ⇒ `grounded=false`. Người dùng bấm "Thay thế" mới đổi nội dung ô nhập. |
+
+Cả hai tôn trọng công tắc `govia.agent.enabled` và `govia.agent.disabled-agents=A4` (trả 503), mô hình lỗi
+trả 503 `AGENT_LLM_UNAVAILABLE`, và ghi `agent_tool_call_log` (`draft_recommendations` / `rewrite_text`).

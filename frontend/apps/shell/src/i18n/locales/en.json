@@ -7,16 +7,40 @@
     "widget": {
       "title": "AI Assistant"
     },
+    "draft": {
+      "recommendationButton": "AI draft recommendations from findings",
+      "recommendationHint": "Drafted by AI from {{count}} findings. Review and edit before clicking Add.",
+      "noDrafts": "The AI could not suggest any recommendation for this data.",
+      "use": "Use this text",
+      "notGrounded": "Check: contains information not found in the findings",
+      "similarTitle": "Similar recommendations in other audits ({{count}})",
+      "rewriteButton": "AI polish wording",
+      "rewriteEmpty": "Enter some text before asking the AI to polish it.",
+      "rewriteNotGrounded": "The rewrite contains figures not present in the original - check carefully before using it.",
+      "replace": "Replace",
+      "dismiss": "Dismiss",
+      "errorNoTtss": "There are no findings (within your visibility) for the AI to draft recommendations for this segment.",
+      "errorGeneric": "The AI could not draft the text. Please try again."
+    },
     "suggestions": {
       "general1": "What tasks are waiting for me?",
       "general2": "Where is the monthly audit plan screen?",
       "general3": "Which document regulates audit sampling?",
       "risk1": "Which branch has the highest risk this year?",
       "risk2": "Which branches changed risk score the most versus last year?",
-      "risk3": "Which branches did experts re-rank this year?"
+      "risk3": "Which branches did experts re-rank this year?",
+      "finding1": "Summarize the findings of the audit I am working on",
+      "finding2": "Which material findings have no recommendation yet?",
+      "finding3": "What did other audits recommend for similar findings?",
+      "execution1": "Which audits am I assigned to?",
+      "execution2": "What is the fieldwork (THKT) progress of my current audit?",
+      "execution3": "Which control points apply to the credit segment?",
+      "catalog1": "Are there duplicate names in the exception type catalog?",
+      "catalog2": "Search the control point catalog for approval",
+      "catalog3": "Are there duplicate names in the audit work item catalog?"
     },
     "chat": {
-      "emptyHint": "Ask about branch risk, your pending tasks, where a screen is, or internal regulations. Suggestions:",
+      "emptyHint": "Ask about risk, audits, findings & recommendations, catalogs, your pending tasks or regulations. Suggestions:",
       "inputPlaceholder": "Type a question, e.g. Which branch has the highest risk?",
       "errorUnavailable": "The AI Assistant could not answer this question. Please try again.",
       "errorPaused": "The AI Assistant is temporarily not responding. All business functions keep working normally.",

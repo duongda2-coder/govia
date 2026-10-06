@@ -110,3 +110,45 @@ export const agentApi = {
     await httpClient.delete(`${BASE}/conversations/${conversationId}`);
   },
 };
+
+export interface RecommendationDraft {
+  content: string;
+  findingCodes: string[];
+  rationale: string | null;
+  /** false = ban nhap nhac ma phat hien/so lieu khong co trong du lieu TTSS - can kiem tra ky. */
+  grounded: boolean;
+}
+
+export interface RecommendationDraftResult {
+  engagementCode: string;
+  businessSegmentCode: string | null;
+  sourceTtssCount: number;
+  drafts: RecommendationDraft[];
+  similarRecommendations: { engagementCode: string; code: string; content: string }[];
+  model: string;
+}
+
+export type RewritePurpose = "RECOMMENDATION" | "FINDING" | "SUMMARY";
+
+export interface RewriteResult {
+  text: string;
+  changes: string[];
+  grounded: boolean;
+  model: string;
+}
+
+/** Soan nhap bang AI - chi tra ve ban nhap, KHONG luu gi; nguoi dung tu bam Them/Luu nhu binh thuong. */
+export const agentDraftApi = {
+  async recommendations(engagementId: string, businessSegmentId?: string | null, instruction?: string): Promise<RecommendationDraftResult> {
+    const res = await httpClient.post<ApiResponse<RecommendationDraftResult>>(`${BASE}/drafts/recommendations`, {
+      engagementId,
+      businessSegmentId: businessSegmentId ?? null,
+      instruction: instruction ?? null,
+    });
+    return res.data.data;
+  },
+  async rewrite(text: string, purpose: RewritePurpose): Promise<RewriteResult> {
+    const res = await httpClient.post<ApiResponse<RewriteResult>>(`${BASE}/drafts/rewrite`, { text, purpose });
+    return res.data.data;
+  },
+};

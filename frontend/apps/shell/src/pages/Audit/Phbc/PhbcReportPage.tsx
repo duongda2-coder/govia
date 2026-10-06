@@ -25,6 +25,7 @@ import {
   type PhbcReportRequest,
 } from "../../../api/auditPhbc";
 import { useAuth } from "../../../auth/AuthContext";
+import { AiRewriteAssist } from "../../../components/agent/AiRewriteAssist";
 import { filterOption, fromApiDate, recommendationCodeOptions, renderDate, renderText, targetOptions, toApiDate, usePhbcLookups } from "./phbcShared";
 import type dayjs from "dayjs";
 
@@ -397,7 +398,11 @@ export function PhbcReportPage() {
           <Form.Item name="reportName" label={t(`${c}.reportName`)} rules={[{ required: true }]}>
             <Input maxLength={255} />
           </Form.Item>
-          <Form.Item name="summaryContent" label={t(`${c}.summaryContent`)}>
+          <Form.Item
+            name="summaryContent"
+            label={t(`${c}.summaryContent`)}
+            extra={<AiRewriteAssist form={form} field="summaryContent" purpose="SUMMARY" maxLength={1000} />}
+          >
             <Input.TextArea rows={3} maxLength={1000} showCount />
           </Form.Item>
           <Form.Item name="issuingUnit" label={t(`${c}.issuingUnit`)}>
@@ -428,7 +433,12 @@ export function PhbcReportPage() {
               </Form.Item>
             </Col>
           </Row>
-          <Form.Item name="content" label={t(`${r}.content`)} rules={[{ required: true }]}>
+          <Form.Item
+            name="content"
+            label={t(`${r}.content`)}
+            rules={[{ required: true }]}
+            extra={<AiRewriteAssist form={recommendationForm} field="content" purpose="RECOMMENDATION" maxLength={1000} />}
+          >
             <Input.TextArea rows={3} maxLength={1000} showCount />
           </Form.Item>
           <Row gutter={16}>

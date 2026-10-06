@@ -38,10 +38,13 @@ public class AuditToolExecutor {
     private final AuditToolsController controller;
     private final AgentToolsController agentToolsController;
     private final WorkflowTaskController workflowTaskController;
+    private final AgentWorkToolsService workTools;
     private final ObjectMapper objectMapper;
 
     public AuditToolExecutor(AuditToolsController controller, AgentToolsController agentToolsController,
-                             WorkflowTaskController workflowTaskController, ObjectMapper objectMapper) {
+                             WorkflowTaskController workflowTaskController, AgentWorkToolsService workTools,
+                             ObjectMapper objectMapper) {
+        this.workTools = workTools;
         this.controller = controller;
         this.agentToolsController = agentToolsController;
         this.workflowTaskController = workflowTaskController;
@@ -83,6 +86,15 @@ public class AuditToolExecutor {
             case "get_my_tasks" -> workflowTaskController.myTasks(currentPrincipal());
             case "search_screens" -> searchScreens(requireString(a, "query"));
             case "search_documents" -> agentToolsController.searchDocuments(requireString(a, "query"), optInt(a, "limit"), optBoolean(a, "includeExpired"));
+            case "list_my_engagements" -> workTools.listMyEngagements(currentPrincipal(), optString(a, "search"), optInt(a, "limit"));
+            case "get_engagement_work_items" -> workTools.getEngagementWorkItems(currentPrincipal(), requireString(a, "engagement"), optString(a, "phase"), optString(a, "status"));
+            case "get_ttss_summary" -> workTools.getTtssSummary(currentPrincipal(), requireString(a, "engagement"));
+            case "get_ttss_records" -> workTools.getTtssRecords(currentPrincipal(), requireString(a, "engagement"), optString(a, "businessSegmentCode"),
+                    optString(a, "findingCode"), optBoolean(a, "materialOnly"), optBoolean(a, "withoutRecommendationOnly"), optInt(a, "limit"));
+            case "list_engagement_recommendations" -> workTools.listEngagementRecommendations(currentPrincipal(), requireString(a, "engagement"));
+            case "search_similar_findings" -> workTools.searchSimilarFindings(currentPrincipal(), requireString(a, "query"), optString(a, "excludeEngagement"), optInt(a, "limit"));
+            case "search_catalog" -> workTools.searchCatalog(requireString(a, "catalog"), optString(a, "query"), optString(a, "businessSegmentCode"), optInt(a, "limit"));
+            case "find_catalog_duplicates" -> workTools.findCatalogDuplicates(requireString(a, "catalog"), optInt(a, "limit"));
             default -> null;
         };
     }
