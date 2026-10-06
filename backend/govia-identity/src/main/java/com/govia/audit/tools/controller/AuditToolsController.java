@@ -3,9 +3,11 @@ package com.govia.audit.tools.controller;
 import com.govia.audit.finding.dto.AuditFindingResponse;
 import com.govia.audit.riskscoring.masterdata.dto.AuditObjectUnitResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreCombinedRowResponse;
+import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreExpertRankResponse;
 import com.govia.audit.tools.dto.EvidenceResponse;
 import com.govia.audit.tools.dto.RiskBreakdownResponse;
 import com.govia.audit.tools.dto.RiskCriteriaToolResponse;
+import com.govia.audit.tools.dto.ScoreChangeResponse;
 import com.govia.audit.tools.service.AuditToolsService;
 import com.govia.core.web.ApiResponse;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,8 +22,8 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Be mat API DUY NHAT ma AI Agent duoc goi (xem docs/audit-tools-contract.md) - 10 endpoint,
- * toan bo GET/read-only, tuong ung 1-1 voi 10 tool trong contract. Khong endpoint nao o day ghi/sua
+ * Be mat API ma AI Agent duoc goi cho du lieu rui ro/phat hien (xem docs/audit-tools-contract.md),
+ * toan bo GET/read-only, tuong ung 1-1 voi cac tool trong contract. Khong endpoint nao o day ghi/sua
  * du lieu; agent phai dua vao dung nhung gi cac endpoint nay tra ve, khong duoc tu bia them.
  */
 @RestController
@@ -102,5 +104,21 @@ public class AuditToolsController {
     @PreAuthorize("hasAuthority('PERM_AUDIT.FINDING.VIEW')")
     public ApiResponse<List<EvidenceResponse>> getEvidence(@RequestParam UUID findingId) {
         return ApiResponse.ok(service.getEvidence(findingId));
+    }
+
+    @GetMapping("/score-changes")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.VIEW')")
+    public ApiResponse<List<ScoreChangeResponse>> getScoreChanges(@RequestParam Integer year,
+                                                                  @RequestParam(required = false) Integer compareYear,
+                                                                  @RequestParam(required = false) String direction,
+                                                                  @RequestParam(required = false) Integer limit) {
+        return ApiResponse.ok(service.getScoreChanges(year, compareYear, direction, limit));
+    }
+
+    @GetMapping("/expert-rank-overrides")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.RISK_SCORING_EXEC.VIEW')")
+    public ApiResponse<List<RiskBranchScoreExpertRankResponse>> getExpertRankOverrides(@RequestParam Integer year,
+                                                                                       @RequestParam(required = false) Boolean onlyChanged) {
+        return ApiResponse.ok(service.getExpertRankOverrides(year, onlyChanged));
     }
 }

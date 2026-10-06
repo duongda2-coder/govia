@@ -1,0 +1,75 @@
+databaseChangeLog:
+
+  # ===================== AI Agent G1 - luu hoi thoai =====================
+  # Chi THEM 2 bang moi cua module agent (tien to agent_), khong sua/khoa ngoai toi bat ky bang nghiep
+  # vu nao - tat AI hoac xoa 2 bang nay khong anh huong du lieu kiem toan. Cot van ban VARCHAR(4000)
+  # theo quy uoc chung (giong nhau tren Postgres/H2/Oracle), noi dung dai hon duoc rut gon khi luu.
+  - changeSet:
+      id: 185-1-agent-conversation-schema
+      author: govia
+      comment: "Bang agent_conversation + agent_message - luu hoi thoai cua Tro ly AI"
+      changes:
+        - createTable:
+            tableName: agent_conversation
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: conversation_key, type: UUID, constraints: { nullable: false } }
+              - column: { name: user_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: title, type: VARCHAR(200), constraints: { nullable: false } }
+              - column: { name: last_agent_code, type: VARCHAR(10) }
+              - column: { name: last_message_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: message_count, type: INT, defaultValueNumeric: 0, constraints: { nullable: false } }
+              - column: { name: archived, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: agent_conversation
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_agent_conversation_tenant
+        - addUniqueConstraint:
+            tableName: agent_conversation
+            columnNames: tenant_id, conversation_key
+            constraintName: uq_agent_conversation_key
+        - createIndex:
+            tableName: agent_conversation
+            indexName: ix_agent_conversation_user
+            columns:
+              - column: { name: tenant_id }
+              - column: { name: user_id }
+              - column: { name: last_message_at }
+        - createTable:
+            tableName: agent_message
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: conversation_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: seq, type: INT, constraints: { nullable: false } }
+              - column: { name: role, type: VARCHAR(20), constraints: { nullable: false } }
+              - column: { name: content, type: VARCHAR(4000), constraints: { nullable: false } }
+              - column: { name: agent_code, type: VARCHAR(10) }
+              - column: { name: response_json, type: VARCHAR(4000) }
+              - column: { name: page_label, type: VARCHAR(300) }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: agent_message
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_agent_message_tenant
+        - createIndex:
+            tableName: agent_message
+            indexName: ix_agent_message_conversation
+            columns:
+              - column: { name: tenant_id }
+              - column: { name: conversation_id }
+              - column: { name: seq }

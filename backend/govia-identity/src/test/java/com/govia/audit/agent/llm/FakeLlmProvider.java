@@ -21,10 +21,30 @@ public class FakeLlmProvider implements LlmProvider {
 
     private final Deque<ChatResult> script = new ArrayDeque<>();
     private boolean available = true;
+    private boolean failNextCall = false;
+    private List<ToolSpec> lastTools = List.of();
+    private List<ChatMessage> lastMessages = List.of();
 
     public void reset() {
         script.clear();
         available = true;
+        failNextCall = false;
+        lastTools = List.of();
+        lastMessages = List.of();
+    }
+
+    /** Lan goi chat() tiep theo nem loi nhu khi may chay model khong phan hoi (het thoi gian). */
+    public void failNextCall() {
+        this.failNextCall = true;
+    }
+
+    /** Bo tool da gui cho model o lan goi gan nhat - de test kiem tra agent chi thay dung bo tool cua minh. */
+    public List<ToolSpec> lastTools() {
+        return lastTools;
+    }
+
+    public List<ChatMessage> lastMessages() {
+        return lastMessages;
     }
 
     public void enqueueToolCall(String toolName, Map<String, Object> arguments) {
@@ -45,6 +65,12 @@ public class FakeLlmProvider implements LlmProvider {
 
     @Override
     public ChatResult chat(List<ChatMessage> messages, List<ToolSpec> tools) {
+        lastTools = tools;
+        lastMessages = messages;
+        if (failNextCall) {
+            failNextCall = false;
+            throw new IllegalStateException("LLM timeout (gia lap)");
+        }
         if (script.isEmpty()) {
             return new ChatResult(null, List.of(new ToolCallRequest(null, AuditToolRegistry.FINAL_ANSWER_TOOL_NAME,
                     Map.of("answer", "Hien chua co du lieu trong he thong de ket luan.", "facts", List.of()))));

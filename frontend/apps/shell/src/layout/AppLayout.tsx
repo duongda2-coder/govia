@@ -140,7 +140,7 @@ export function AppLayout() {
       </Layout>
 
       <ChangePasswordModal open={changePasswordOpen} onClose={() => setChangePasswordOpen(false)} />
-      <AuditAgentWidget />
+      <AuditAgentWidget screens={searchableScreens} />
     </Layout>
   );
 }

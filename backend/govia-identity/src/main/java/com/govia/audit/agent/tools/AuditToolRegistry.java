@@ -11,7 +11,7 @@ import java.util.Map;
  * bao tay tung tool khop 1-1 voi contract (ten, input schema, endpoint). Neu sua 1 trong 2 cho
  * (contract .md hoac registry nay) PHAI sua ca cho kia theo cho khop.
  *
- * <p>Rieng {@link #FINAL_ANSWER_TOOL_NAME} khong nam trong 10 Audit Tools that - day la "tool" gia
+ * <p>Rieng {@link #FINAL_ANSWER_TOOL_NAME} khong phai Audit Tool that - day la "tool" gia
  * AgentOrchestratorService dung de bat model tra loi cuoi theo dung schema FACT/ANALYSIS/
  * RECOMMENDATION/EVIDENCE thay vi tra text tu do (xem AgentOrchestratorService).
  */
@@ -109,7 +109,52 @@ public class AuditToolRegistry {
                     schema(Map.of(
                             "findingId", prop("string", "UUID cua audit finding, lay tu get_audit_findings")
                     ), List.of("findingId")),
-                    "/api/audit/tools/evidence")
+                    "/api/audit/tools/evidence"),
+
+            def("get_score_changes",
+                    "Tim cac chi nhanh co diem rui ro tong hop BIEN DONG nhieu nhat giua 2 nam (mac dinh so voi "
+                            + "nam truoc). Dung khi hoi chi nhanh nao tang/giam diem manh, bien dong bat thuong.",
+                    schema(Map.of(
+                            "year", prop("integer", "Nam can xem"),
+                            "compareYear", prop("integer", "Nam dem so sanh, mac dinh year - 1 (tuy chon)"),
+                            "direction", enumProp("increase = chi lay tang diem, decrease = chi lay giam diem; bo trong = ca hai", "increase", "decrease"),
+                            "limit", prop("integer", "So chi nhanh muon lay, mac dinh 10")
+                    ), List.of("year")),
+                    "/api/audit/tools/score-changes"),
+
+            def("get_expert_rank_overrides",
+                    "Lay ket qua Xep hang chuyen gia cua 1 nam: chi nhanh nao duoc chuyen gia xep lai khac xep "
+                            + "loai he thong, ly do, nguoi danh gia. Mang rong = chua co chi nhanh nao bi xep lai.",
+                    schema(Map.of(
+                            "year", prop("integer", "Nam can xem"),
+                            "onlyChanged", prop("boolean", "true (mac dinh) = chi dong bi xep lai khac he thong")
+                    ), List.of("year")),
+                    "/api/audit/tools/expert-rank-overrides"),
+
+            def("get_my_tasks",
+                    "Lay danh sach viec dang cho CHINH nguoi dung hien tai xu ly trong quy trinh phe duyet "
+                            + "(ten viec, ngay tao, han xu ly). Mang rong = hien khong co viec nao cho xu ly.",
+                    schema(Map.of(), List.of()),
+                    "/api/workflow/tasks/my"),
+
+            def("search_screens",
+                    "Tim man hinh/chuc nang tren menu ma nguoi dung duoc phep vao, theo tu khoa. Tra ve ten "
+                            + "man hinh, nhom menu va duong dan (path). Chi duoc huong dan nguoi dung toi man hinh "
+                            + "co trong ket qua.",
+                    schema(Map.of(
+                            "query", prop("string", "Tu khoa ten chuc nang, vd 'ke hoach kiem toan thang'")
+                    ), List.of("query")),
+                    null),
+
+            def("search_documents",
+                    "Tim van ban, quy dinh noi bo trong Thu vien tai lieu theo noi dung cau hoi. Tra ve so hieu, "
+                            + "ten van ban, ngay hieu luc, con/het hieu luc va doan trich noi dung.",
+                    schema(Map.of(
+                            "query", prop("string", "Noi dung can tim, vd 'quy dinh chon mau kiem toan tin dung'"),
+                            "limit", prop("integer", "So van ban toi da, mac dinh 5, toi da 10"),
+                            "includeExpired", prop("boolean", "true = lay ca van ban da het hieu luc (mac dinh false)")
+                    ), List.of("query")),
+                    "/api/audit/agent/tools/documents")
     );
 
     private final AuditToolDefinition finalAnswerTool = def(
@@ -138,6 +183,13 @@ public class AuditToolRegistry {
 
     public List<AuditToolDefinition> allDefinitions() {
         return java.util.stream.Stream.concat(definitions.stream(), java.util.stream.Stream.of(finalAnswerTool)).toList();
+    }
+
+    /** Bo tool cua 1 agent (theo AgentProfile.toolNames) + submit_final_answer - dung thu tu khai bao o tren. */
+    public List<AuditToolDefinition> definitionsFor(java.util.Collection<String> toolNames) {
+        return java.util.stream.Stream.concat(
+                definitions.stream().filter(d -> toolNames.contains(d.name())),
+                java.util.stream.Stream.of(finalAnswerTool)).toList();
     }
 
     private static AuditToolDefinition def(String name, String description, Map<String, Object> schema, String path) {

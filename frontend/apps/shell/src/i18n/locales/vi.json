@@ -4,10 +4,38 @@
     "tagline": "Governance, Organization, Verification, Identity & Access"
   },
   "agent": {
+    "widget": {
+      "title": "Trợ lý AI"
+    },
+    "suggestions": {
+      "general1": "Việc cần xử lý của tôi là gì?",
+      "general2": "Màn hình kế hoạch kiểm toán tháng ở đâu?",
+      "general3": "Văn bản nào quy định về chọn mẫu kiểm toán?",
+      "risk1": "Chi nhánh nào có rủi ro cao nhất năm nay?",
+      "risk2": "Chi nhánh nào biến động điểm rủi ro nhiều nhất so với năm trước?",
+      "risk3": "Chuyên gia đã xếp hạng lại những chi nhánh nào năm nay?"
+    },
     "chat": {
-      "emptyHint": "Hỏi về rủi ro chi nhánh, so sánh, lịch sử điểm, hoặc phát hiện kiểm toán...",
+      "emptyHint": "Hỏi về rủi ro chi nhánh, việc cần xử lý, màn hình chức năng hoặc văn bản quy định. Gợi ý:",
       "inputPlaceholder": "Nhập câu hỏi, vd: Chi nhánh nào có rủi ro cao nhất?",
-      "errorUnavailable": "AI Assistant hiện không khả dụng vì local LLM service chưa sẵn sàng.",
+      "errorUnavailable": "Trợ lý AI chưa trả lời được câu này. Vui lòng thử lại.",
+      "errorPaused": "Trợ lý AI tạm thời chưa phản hồi. Các chức năng nghiệp vụ vẫn hoạt động bình thường.",
+      "errorDisabled": "Trợ lý AI đang được tắt theo cấu hình hệ thống.",
+      "errorLoadConversation": "Không mở được cuộc trò chuyện này.",
+      "pausedBanner": "Trợ lý AI đang tạm ngưng (máy chạy mô hình chưa phản hồi). Các chức năng nghiệp vụ không bị ảnh hưởng.",
+      "historyPlaceholder": "Cuộc trò chuyện trước",
+      "historyEmpty": "Chưa có cuộc trò chuyện nào",
+      "newConversation": "Cuộc trò chuyện mới",
+      "deleteConversation": "Xoá cuộc trò chuyện này",
+      "deleteConfirmTitle": "Xoá cuộc trò chuyện?",
+      "deleteConfirmContent": "Cuộc trò chuyện sẽ không còn trong danh sách của bạn.",
+      "viewing": "Đang xem: {{screen}}",
+      "loading": {
+        "analyze": "Đang phân tích câu hỏi...",
+        "data": "Đang lấy dữ liệu...",
+        "evidence": "Đang kiểm tra căn cứ...",
+        "compose": "Đang tổng hợp câu trả lời..."
+      },
       "facts": "Dữ kiện",
       "analysis": "Phân tích",
       "recommendations": "Đề xuất",

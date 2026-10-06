@@ -4,10 +4,38 @@
     "tagline": "Governance, Organization, Verification, Identity & Access"
   },
   "agent": {
+    "widget": {
+      "title": "AI Assistant"
+    },
+    "suggestions": {
+      "general1": "What tasks are waiting for me?",
+      "general2": "Where is the monthly audit plan screen?",
+      "general3": "Which document regulates audit sampling?",
+      "risk1": "Which branch has the highest risk this year?",
+      "risk2": "Which branches changed risk score the most versus last year?",
+      "risk3": "Which branches did experts re-rank this year?"
+    },
     "chat": {
-      "emptyHint": "Ask about branch risk, comparisons, score history, or audit findings...",
+      "emptyHint": "Ask about branch risk, your pending tasks, where a screen is, or internal regulations. Suggestions:",
       "inputPlaceholder": "Type a question, e.g. Which branch has the highest risk?",
-      "errorUnavailable": "AI Assistant is currently unavailable because the local LLM service is not ready.",
+      "errorUnavailable": "The AI Assistant could not answer this question. Please try again.",
+      "errorPaused": "The AI Assistant is temporarily not responding. All business functions keep working normally.",
+      "errorDisabled": "The AI Assistant is turned off by system configuration.",
+      "errorLoadConversation": "Could not open this conversation.",
+      "pausedBanner": "The AI Assistant is paused (the model server is not responding). Business functions are not affected.",
+      "historyPlaceholder": "Previous conversations",
+      "historyEmpty": "No conversations yet",
+      "newConversation": "New conversation",
+      "deleteConversation": "Delete this conversation",
+      "deleteConfirmTitle": "Delete conversation?",
+      "deleteConfirmContent": "The conversation will no longer appear in your list.",
+      "viewing": "Viewing: {{screen}}",
+      "loading": {
+        "analyze": "Analyzing the question...",
+        "data": "Fetching data...",
+        "evidence": "Checking evidence...",
+        "compose": "Composing the answer..."
+      },
       "facts": "Facts",
       "analysis": "Analysis",
       "recommendations": "Recommendations",

@@ -1,6 +1,6 @@
 # Audit Tools — data contract cho AI Agent
 
-Tài liệu này là **nguồn duy nhất** mô tả 10 "tool" mà AI Agent hỗ trợ module
+Tài liệu này là **nguồn duy nhất** mô tả các "tool" mà AI Agent hỗ trợ module
 Chấm điểm rủi ro được phép gọi. Toàn bộ tool đều là **GET, read-only** — agent
 không có bất kỳ tool nào ghi/sửa dữ liệu, và mọi field trong output đều đọc
 trực tiếp từ database qua service đã có sẵn (không có field nào do agent tự
@@ -231,6 +231,76 @@ Lấy danh sách file chứng minh (evidence) đính kèm cho 1 phát hiện ki�
 | `downloadUrl` | string — endpoint thật `/api/attachments/{id}/download`, cần Bearer token khi tải |
 
 > Mảng rỗng nghĩa là phát hiện đó chưa được đính kèm file nào — không suy diễn nội dung file.
+
+---
+
+## Bổ sung giai đoạn G1 (2026-10): 5 tool mới + phân tool theo agent
+
+Từ G1, mỗi tool thuộc về **1 agent chuyên trách** (`AgentProfileRegistry`): model chỉ được thấy bộ tool
+của agent mà A0 điều phối (`AgentRouter`) chọn cho câu hỏi, và `AgentOrchestratorService` chặn cứng
+mọi tool ngoài bộ đó (ghi `agent_tool_call_log` với status `ERROR`).
+
+| Agent | Tool |
+|---|---|
+| A0 Trợ lý chung | `get_my_tasks`, `search_screens`, `search_documents` |
+| A1 Trợ lý Rủi ro | 10 tool ở trên + `get_score_changes`, `get_expert_rank_overrides` |
+
+### 11. `get_score_changes`
+
+Chi nhánh có điểm rủi ro tổng hợp biến động nhiều nhất giữa 2 năm.
+
+- **Endpoint**: `GET /api/audit/tools/score-changes?year&compareYear&direction&limit`
+- **Permission**: `AUDIT.RISK_SCORING_EXEC.VIEW`
+- **Nguồn**: 2 lần `RiskBranchScoreCombinedService.list(...)` — không tính lại điểm
+- **Input**: `year` (bắt buộc), `compareYear` (mặc định `year - 1`), `direction` (`increase` \| `decrease` \| bỏ trống = cả hai, xếp theo độ lớn), `limit` (mặc định 10)
+- **Output**: `ScoreChangeResponse[]` — `branchCode`, `branchName`, `year`, `totalScore`, `rankLabel`, `previousYear`, `previousTotalScore`, `previousRankLabel`, `scoreChange` (= totalScore − previousTotalScore), `rankChanged`
+
+> Chỉ chi nhánh có điểm ở **cả 2 năm** mới được so sánh.
+
+### 12. `get_expert_rank_overrides`
+
+Kết quả "Xếp hạng chuyên gia" đã lưu của 1 năm.
+
+- **Endpoint**: `GET /api/audit/tools/expert-rank-overrides?year&onlyChanged`
+- **Permission**: `AUDIT.RISK_SCORING_EXEC.VIEW`
+- **Nguồn**: `RiskBranchScoreExpertRankService.list(year)` (chỉ đọc — không gọi `syncFromSource`)
+- **Input**: `year` (bắt buộc), `onlyChanged` (mặc định `true` = chỉ dòng có `reRankLabel` khác `baseRankLabel`)
+- **Output**: `RiskBranchScoreExpertRankResponse[]` như màn "Xếp hạng chuyên gia"
+
+### 13. `get_my_tasks`
+
+Việc đang chờ chính người dùng hiện tại xử lý trong quy trình phê duyệt (Flowable).
+
+- **Endpoint**: `GET /api/workflow/tasks/my` (endpoint sẵn có của màn "Việc cần xử lý")
+- **Permission**: `WORKFLOW.TASK.VIEW`
+- **Input**: không có — luôn là người dùng đang hỏi
+- **Output**: `TaskSummary[]`
+
+### 14. `search_screens`
+
+Tìm màn hình/chức năng trên menu theo từ khoá.
+
+- **Không có endpoint riêng**: dữ liệu là danh sách menu mà frontend gửi kèm mỗi request chat
+  (`AgentChatRequest.screens`, đã lọc theo quyền của chính người dùng trong `useAppMenu`), nên trợ lý
+  không bao giờ chỉ tới màn hình người dùng không được vào.
+- **Permission**: `AUDIT.AGENT.VIEW`
+- **Input**: `query` (bắt buộc)
+- **Output**: tối đa 8 phần tử `{label, group, path}`; giao diện chat biến `path` thành link bấm được.
+
+### 15. `search_documents`
+
+Tìm văn bản, quy định nội bộ trong Thư viện tài liệu (RAG giai đoạn G1).
+
+- **Endpoint**: `GET /api/audit/agent/tools/documents?query&limit&includeExpired`
+- **Permission**: `AUDIT.DOCUMENT_LIBRARY.VIEW`
+- **Nguồn**: `AuditDocumentLibraryService.list()` — chỉ mục giữ **trong bộ nhớ** theo tenant, cập nhật
+  tăng dần mỗi lần tìm (văn bản mới/sửa mới embed lại); không thêm cột/bảng vào dữ liệu nghiệp vụ.
+- **Cách xếp hạng**: 0.7 × cosine (khi cấu hình `govia.llm.embedding.model`, vd `bge-m3`) + 0.3 × điểm từ
+  khoá (âm tiết + cặp âm tiết, trọng số IDF, không dấu). Không cấu hình embedding thì chỉ dùng từ khoá.
+- **Input**: `query` (bắt buộc), `limit` (mặc định 5, tối đa 10), `includeExpired` (mặc định `false`)
+- **Output**: `KnowledgeHit[]` — `documentId`, `documentNumber`, `documentName`, `topic`, `businessActivity`,
+  `issueDate`, `effectiveDate`, `expired`, `expiryDate`, `legalBasis`, `excerpt` (≤ 600 ký tự), `score`,
+  `matchMode` (`semantic` \| `keyword`)
 
 ---
 

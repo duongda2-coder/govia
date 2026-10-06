@@ -11,16 +11,19 @@ import com.govia.audit.riskscoring.masterdata.service.AuditObjectUnitService;
 import com.govia.audit.riskscoring.masterdata.service.CriteriaQualitativeService;
 import com.govia.audit.riskscoring.masterdata.service.CriteriaQuantitativeService;
 import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreCombinedRowResponse;
+import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreExpertRankResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreQualitativeRowResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskBranchScoreQuantitativeRowResponse;
 import com.govia.audit.riskscoring.scoring.dto.RiskCriteriaOtherResponse;
 import com.govia.audit.riskscoring.scoring.service.RiskBranchScoreCombinedService;
+import com.govia.audit.riskscoring.scoring.service.RiskBranchScoreExpertRankService;
 import com.govia.audit.riskscoring.scoring.service.RiskBranchScoreQualitativeService;
 import com.govia.audit.riskscoring.scoring.service.RiskBranchScoreQuantitativeService;
 import com.govia.audit.riskscoring.scoring.service.RiskCriteriaOtherService;
 import com.govia.audit.tools.dto.EvidenceResponse;
 import com.govia.audit.tools.dto.RiskBreakdownResponse;
 import com.govia.audit.tools.dto.RiskCriteriaToolResponse;
+import com.govia.audit.tools.dto.ScoreChangeResponse;
 import com.govia.core.attachment.Attachment;
 import com.govia.core.attachment.AttachmentService;
 import com.govia.core.web.BusinessException;
@@ -54,6 +57,7 @@ public class AuditToolsService {
     private final AuditFindingService auditFindingService;
     private final AttachmentService attachmentService;
     private final MasterDataItemService masterDataItemService;
+    private final RiskBranchScoreExpertRankService expertRankService;
 
     public AuditToolsService(RiskBranchScoreCombinedService combinedService,
                               RiskBranchScoreQuantitativeService quantitativeScoreService,
@@ -64,7 +68,8 @@ public class AuditToolsService {
                               RiskCriteriaOtherService criteriaOtherService,
                               AuditFindingService auditFindingService,
                               AttachmentService attachmentService,
-                              MasterDataItemService masterDataItemService) {
+                              MasterDataItemService masterDataItemService,
+                              RiskBranchScoreExpertRankService expertRankService) {
         this.combinedService = combinedService;
         this.quantitativeScoreService = quantitativeScoreService;
         this.qualitativeScoreService = qualitativeScoreService;
@@ -75,6 +80,7 @@ public class AuditToolsService {
         this.auditFindingService = auditFindingService;
         this.attachmentService = attachmentService;
         this.masterDataItemService = masterDataItemService;
+        this.expertRankService = expertRankService;
     }
 
     /** get_branch_risk - null neu chi nhanh chua co diem cham cho nam do (KHONG phai loi). */
@@ -193,6 +199,57 @@ public class AuditToolsService {
         return attachmentService.listByEntity("AUDIT_FINDING", findingId).stream()
                 .map(a -> new EvidenceResponse(a.getId(), a.getFileName(), a.getContentType(), a.getSizeBytes(),
                         "/api/attachments/" + a.getId() + "/download"))
+                .toList();
+    }
+
+    /**
+     * get_score_changes - so ket qua cham diem tong hop cua "year" voi "compareYear" (mac dinh year - 1).
+     * Chi chi nhanh co diem o CA 2 nam moi duoc so sanh. direction: "increase" | "decrease" | null (ca hai,
+     * xep theo do lon bien dong).
+     */
+    @Transactional(readOnly = true)
+    public List<ScoreChangeResponse> getScoreChanges(Integer year, Integer compareYear, String direction, Integer limit) {
+        int previousYear = compareYear != null ? compareYear : year - 1;
+        int effectiveLimit = limit != null && limit > 0 ? limit : DEFAULT_TOP_LIMIT;
+        Map<String, RiskBranchScoreCombinedRowResponse> previous = combinedService.list(previousYear).stream()
+                .collect(java.util.stream.Collectors.toMap(r -> r.branchCode().toUpperCase(), r -> r, (a, b) -> a));
+        String dir = direction == null ? "" : direction.trim().toLowerCase();
+        if (!dir.isEmpty() && !dir.equals("increase") && !dir.equals("decrease")) {
+            throw new BusinessException("AUDIT_TOOLS_INVALID_DIRECTION",
+                    "direction phai la 'increase', 'decrease' hoac de trong, nhan duoc: " + direction);
+        }
+        Comparator<ScoreChangeResponse> order = switch (dir) {
+            case "increase" -> Comparator.comparing(ScoreChangeResponse::scoreChange).reversed();
+            case "decrease" -> Comparator.comparing(ScoreChangeResponse::scoreChange);
+            default -> Comparator.comparing((ScoreChangeResponse c) -> c.scoreChange().abs()).reversed();
+        };
+        return combinedService.list(year).stream()
+                .filter(r -> r.totalScore() != null)
+                .map(r -> {
+                    RiskBranchScoreCombinedRowResponse p = previous.get(r.branchCode().toUpperCase());
+                    if (p == null || p.totalScore() == null) {
+                        return null;
+                    }
+                    return new ScoreChangeResponse(r.branchCode(), r.branchName(), r.year(), r.totalScore(), r.rankLabel(),
+                            previousYear, p.totalScore(), p.rankLabel(), r.totalScore().subtract(p.totalScore()),
+                            !java.util.Objects.equals(r.rankLabel(), p.rankLabel()));
+                })
+                .filter(java.util.Objects::nonNull)
+                .filter(c -> !dir.equals("increase") || c.scoreChange().signum() > 0)
+                .filter(c -> !dir.equals("decrease") || c.scoreChange().signum() < 0)
+                .sorted(order)
+                .limit(effectiveLimit)
+                .toList();
+    }
+
+    /** get_expert_rank_overrides - ket qua "Xep hang chuyen gia" da luu; mac dinh chi dong chuyen gia
+     * xep lai KHAC xep loai cua he thong (onlyChanged=false de lay het). */
+    @Transactional(readOnly = true)
+    public List<RiskBranchScoreExpertRankResponse> getExpertRankOverrides(Integer year, Boolean onlyChanged) {
+        boolean changedOnly = onlyChanged == null || onlyChanged;
+        return expertRankService.list(year).stream()
+                .filter(r -> !changedOnly || (r.reRankLabel() != null && !r.reRankLabel().isBlank()
+                        && !r.reRankLabel().equals(r.baseRankLabel())))
                 .toList();
     }
 

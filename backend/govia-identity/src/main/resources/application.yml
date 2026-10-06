@@ -61,6 +61,22 @@ govia:
       timeout-seconds: ${OLLAMA_TIMEOUT_SECONDS:120}
       access-client-id: ${OLLAMA_ACCESS_CLIENT_ID:}
       access-client-secret: ${OLLAMA_ACCESS_CLIENT_SECRET:}
+    # Moi truong van hanh: GOVIA_LLM_PROVIDER=openai-compatible + vLLM chay model ~30B tren may GPU noi bo
+    openai-compatible:
+      base-url: ${LLM_BASE_URL:http://127.0.0.1:8000}
+      model: ${LLM_MODEL:}
+      api-key: ${LLM_API_KEY:}
+      timeout-seconds: ${LLM_TIMEOUT_SECONDS:120}
+    # Tim van ban theo nghia (RAG). De trong = tim theo tu khoa. Ollama: "ollama pull bge-m3" roi dat bge-m3
+    embedding:
+      model: ${LLM_EMBEDDING_MODEL:}
+      timeout-seconds: ${LLM_EMBEDDING_TIMEOUT_SECONDS:60}
+  # CONG TAC TAT AI: GOVIA_AGENT_ENABLED=false -> an nut AI, he thong nghiep vu chay nhu chua co AI.
+  # GOVIA_AGENT_DISABLED_AGENTS=A1 -> tat rieng agent A1 (cau hoi chuyen ve A0).
+  agent:
+    enabled: ${GOVIA_AGENT_ENABLED:true}
+    disabled-agents: ${GOVIA_AGENT_DISABLED_AGENTS:}
+    history-messages: ${GOVIA_AGENT_HISTORY_MESSAGES:20}
   notification:
     email:
       # Mac dinh TAT: chua co SMTP that nao duoc cau hinh. Khi bat len (true) can dien them

@@ -536,3 +536,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/184-audit-dgcl-permission-catalog.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/185-audit-agent-g1-conversation.yaml
+      relativeToChangelogFile: false
