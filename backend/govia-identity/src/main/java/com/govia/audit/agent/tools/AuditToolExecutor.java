@@ -3,6 +3,7 @@ package com.govia.audit.agent.tools;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.govia.audit.agent.controller.AgentToolsController;
 import com.govia.audit.agent.dto.AgentScreenRef;
+import com.govia.audit.agent.service.AgentFileService;
 import com.govia.audit.agent.service.AgentRequestContext;
 import com.govia.audit.agent.service.AgentText;
 import com.govia.audit.tools.controller.AuditToolsController;
@@ -39,11 +40,15 @@ public class AuditToolExecutor {
     private final AgentToolsController agentToolsController;
     private final WorkflowTaskController workflowTaskController;
     private final AgentWorkToolsService workTools;
+    private final AgentPlanTdkpToolsService planTdkpTools;
+    private final AgentFileService fileService;
     private final ObjectMapper objectMapper;
 
     public AuditToolExecutor(AuditToolsController controller, AgentToolsController agentToolsController,
                              WorkflowTaskController workflowTaskController, AgentWorkToolsService workTools,
-                             ObjectMapper objectMapper) {
+                             AgentPlanTdkpToolsService planTdkpTools, AgentFileService fileService, ObjectMapper objectMapper) {
+        this.planTdkpTools = planTdkpTools;
+        this.fileService = fileService;
         this.workTools = workTools;
         this.controller = controller;
         this.agentToolsController = agentToolsController;
@@ -95,6 +100,14 @@ public class AuditToolExecutor {
             case "search_similar_findings" -> workTools.searchSimilarFindings(currentPrincipal(), requireString(a, "query"), optString(a, "excludeEngagement"), optInt(a, "limit"));
             case "search_catalog" -> workTools.searchCatalog(requireString(a, "catalog"), optString(a, "query"), optString(a, "businessSegmentCode"), optInt(a, "limit"));
             case "find_catalog_duplicates" -> workTools.findCatalogDuplicates(requireString(a, "catalog"), optInt(a, "limit"));
+            case "get_tdkp_overview" -> planTdkpTools.getTdkpOverview(optInt(a, "dueWithinDays"));
+            case "list_tdkp_items" -> planTdkpTools.listTdkpItems(requireString(a, "source"), optString(a, "state"), optString(a, "unit"),
+                    optInt(a, "dueWithinDays"), optInt(a, "limit"));
+            case "get_plan_overview" -> planTdkpTools.getPlanOverview(requireInt(a, "year"));
+            case "suggest_plan_candidates" -> planTdkpTools.suggestPlanCandidates(requireInt(a, "year"), optInt(a, "limit"));
+            case "get_monthly_staffing" -> planTdkpTools.getMonthlyStaffing(requireInt(a, "year"));
+            case "list_attachments" -> fileService.listAttachments(requireString(a, "entityType"), requireUuid(a, "entityId"));
+            case "read_attachment_text" -> fileService.readAttachmentText(requireUuid(a, "attachmentId"));
             default -> null;
         };
     }

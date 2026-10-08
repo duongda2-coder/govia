@@ -6,6 +6,8 @@ export function agentErrorKey(err: unknown): string {
   switch (code) {
     case "AGENT_DRAFT_NO_TTSS":
       return "agent.draft.errorNoTtss";
+    case "AGENT_REMINDER_NO_ITEMS":
+      return "agent.reminder.errorNoItems";
     case "AGENT_LLM_UNAVAILABLE":
       return "agent.chat.errorPaused";
     case "AGENT_DISABLED":

@@ -4,6 +4,7 @@ import com.govia.audit.agent.dto.KnowledgeHit;
 import com.govia.audit.agent.llm.EmbeddingClient;
 import com.govia.audit.documentlibrary.dto.AuditDocumentLibraryResponse;
 import com.govia.audit.documentlibrary.service.AuditDocumentLibraryService;
+import com.govia.core.attachment.AttachmentService;
 import com.govia.core.tenant.TenantContext;
 import org.springframework.stereotype.Service;
 
@@ -45,17 +46,26 @@ public class AgentKnowledgeService {
     private static final double MIN_COSINE = 0.35;
     private static final long EMBED_RETRY_AFTER_MILLIS = 5 * 60 * 1000L;
 
-    private record IndexedDoc(AuditDocumentLibraryResponse doc, int hash, String normalizedText, float[] vector) {
+    private static final int FILE_TEXT_MAX = 20_000;
+    private static final int EMBED_TEXT_MAX = 4_000;
+
+    /** fileText: noi dung chu cac file dinh kem (chi co khi bat doc file - xem AgentFileService), rong neu khong. */
+    private record IndexedDoc(AuditDocumentLibraryResponse doc, int hash, String normalizedText, String fileText, float[] vector) {
     }
 
     private final AuditDocumentLibraryService documentLibraryService;
     private final EmbeddingClient embeddingClient;
+    private final AgentFileService fileService;
+    private final AttachmentService attachmentService;
     private final Map<UUID, Map<UUID, IndexedDoc>> indexByTenant = new ConcurrentHashMap<>();
     private volatile long embedFailedAtMillis = 0;
 
-    public AgentKnowledgeService(AuditDocumentLibraryService documentLibraryService, EmbeddingClient embeddingClient) {
+    public AgentKnowledgeService(AuditDocumentLibraryService documentLibraryService, EmbeddingClient embeddingClient,
+                                 AgentFileService fileService, AttachmentService attachmentService) {
         this.documentLibraryService = documentLibraryService;
         this.embeddingClient = embeddingClient;
+        this.fileService = fileService;
+        this.attachmentService = attachmentService;
     }
 
     public List<KnowledgeHit> searchDocuments(String query, Integer limit, Boolean includeExpired) {
@@ -93,7 +103,7 @@ public class AgentKnowledgeService {
         return scored.stream()
                 .sorted(Comparator.comparingDouble(Scored::score).reversed())
                 .limit(effectiveLimit)
-                .map(s -> toHit(s.doc().doc(), s.score(), s.mode()))
+                .map(s -> toHit(s.doc(), s.score(), s.mode(), units))
                 .toList();
     }
 
@@ -104,13 +114,18 @@ public class AgentKnowledgeService {
         Set<UUID> currentIds = current.stream().map(AuditDocumentLibraryResponse::id).collect(Collectors.toSet());
         index.keySet().removeIf(id -> !currentIds.contains(id));
 
+        // Bat doc file: dem so file moi van ban 1 lan (1 truy van) - so file doi thi doc lai file cua van ban do
+        Map<UUID, Long> fileCounts = fileService.enabled() && !currentIds.isEmpty()
+                ? attachmentService.countByEntity(AgentFileService.DOCUMENT_LIBRARY, List.copyOf(currentIds)) : Map.of();
         List<IndexedDoc> needVector = new ArrayList<>();
         for (AuditDocumentLibraryResponse doc : current) {
             String text = indexText(doc);
-            int hash = text.hashCode();
+            long files = fileCounts.getOrDefault(doc.id(), 0L);
+            int hash = (text + "#files=" + files + "#" + fileService.enabled()).hashCode();
             IndexedDoc existing = index.get(doc.id());
             if (existing == null || existing.hash() != hash) {
-                IndexedDoc fresh = new IndexedDoc(doc, hash, AgentText.normalize(text), null);
+                String fileText = files > 0 ? fileService.documentLibraryText(doc.id(), FILE_TEXT_MAX).orElse("") : "";
+                IndexedDoc fresh = new IndexedDoc(doc, hash, AgentText.normalize(text + "\n" + fileText), fileText, null);
                 index.put(doc.id(), fresh);
                 needVector.add(fresh);
             } else if (existing.vector() == null) {
@@ -127,14 +142,14 @@ public class AgentKnowledgeService {
         }
         for (int start = 0; start < docs.size(); start += EMBED_BATCH) {
             List<IndexedDoc> batch = docs.subList(start, Math.min(start + EMBED_BATCH, docs.size()));
-            Optional<List<float[]>> vectors = embeddingClient.embed(batch.stream().map(d -> indexText(d.doc())).toList());
+            Optional<List<float[]>> vectors = embeddingClient.embed(batch.stream().map(AgentKnowledgeService::embedText).toList());
             if (vectors.isEmpty()) {
                 embedFailedAtMillis = System.currentTimeMillis();
                 return;
             }
             for (int i = 0; i < batch.size(); i++) {
                 IndexedDoc d = batch.get(i);
-                index.put(d.doc().id(), new IndexedDoc(d.doc(), d.hash(), d.normalizedText(), vectors.get().get(i)));
+                index.put(d.doc().id(), new IndexedDoc(d.doc(), d.hash(), d.normalizedText(), d.fileText(), vectors.get().get(i)));
             }
         }
     }
@@ -192,11 +207,39 @@ public class AgentKnowledgeService {
                 .collect(Collectors.joining("\n"));
     }
 
-    private static KnowledgeHit toHit(AuditDocumentLibraryResponse d, double score, String mode) {
+    private static KnowledgeHit toHit(IndexedDoc indexed, double score, String mode, List<String> units) {
+        AuditDocumentLibraryResponse d = indexed.doc();
         String content = d.content() == null ? null
                 : d.content().length() > EXCERPT_LENGTH ? d.content().substring(0, EXCERPT_LENGTH) + "..." : d.content();
         return new KnowledgeHit(d.id(), d.documentNumber(), d.documentName(), d.topic(), d.businessActivity(),
                 d.issueDate(), d.effectiveDate(), d.expired(), d.expiryDate(), d.legalBasis(), content,
-                BigDecimal.valueOf(score).setScale(3, RoundingMode.HALF_UP), mode);
+                BigDecimal.valueOf(score).setScale(3, RoundingMode.HALF_UP), mode, bestFileExcerpt(indexed.fileText(), units));
+    }
+
+    private static String embedText(IndexedDoc d) {
+        String text = indexText(d.doc()) + (d.fileText() == null || d.fileText().isEmpty() ? "" : "\n" + d.fileText());
+        return text.length() > EMBED_TEXT_MAX ? text.substring(0, EMBED_TEXT_MAX) : text;
+    }
+
+    /** Doan ~600 ky tu trong noi dung file chua nhieu tu khoa cau hoi nhat (tung doan van) - de AI trich dan
+     * dung cho trong quy dinh, khong chi ten van ban. Rong neu van ban khong co file hoac dang tat doc file. */
+    private static String bestFileExcerpt(String fileText, List<String> units) {
+        if (fileText == null || fileText.isBlank()) {
+            return null;
+        }
+        String best = null;
+        long bestHits = 0;
+        for (String paragraph : fileText.split("\n")) {
+            String normalized = AgentText.normalize(paragraph);
+            long hits = units.stream().filter(u -> AgentText.containsPhrase(normalized, u)).count();
+            if (hits > bestHits) {
+                bestHits = hits;
+                best = paragraph.trim();
+            }
+        }
+        if (best == null) {
+            return null;
+        }
+        return best.length() > EXCERPT_LENGTH ? best.substring(0, EXCERPT_LENGTH) + "..." : best;
     }
 }

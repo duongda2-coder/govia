@@ -13,7 +13,6 @@ import {
   type AuditRecommendationItem,
 } from "../../../../../api/auditRecommendation";
 import { listMasterDataItems, type MasterDataItem } from "../../../../../api/auditMasterData";
-import { RecommendationDraftAssist } from "../../../../../components/agent/RecommendationDraftAssist";
 
 /** Ma mac dinh luon co san cho moi engagement, khong duoc phep xoa - khop DEFAULT_CODE ben
  * AuditRecommendationService (backend cung chan neu co goi xoa). */
@@ -44,7 +43,6 @@ export function RecommendationCatalogModal({ open, engagementId, onClose, onChan
   const [submitting, setSubmitting] = useState(false);
   const [importing, setImporting] = useState(false);
   const [form] = Form.useForm<FormValues>();
-  const selectedSegmentId = Form.useWatch("businessSegmentId", form);
 
   const load = useCallback(async () => {
     if (!engagementId) return;
@@ -167,11 +165,6 @@ export function RecommendationCatalogModal({ open, engagementId, onClose, onChan
           </Button>
         </Form.Item>
       </Form>
-      <RecommendationDraftAssist
-        engagementId={engagementId}
-        businessSegmentId={selectedSegmentId}
-        onUse={(content) => form.setFieldsValue({ content: content.slice(0, 2000) })}
-      />
       <Table<AuditRecommendationItem> rowKey="id" loading={loading} dataSource={items} columns={columns} pagination={false} />
     </Modal>
   );

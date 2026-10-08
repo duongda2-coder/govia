@@ -43,6 +43,8 @@ export interface AgentHealth {
   model: string;
   provider: string;
   semanticSearch: boolean;
+  /** Cong 3: AI duoc doc noi dung file dinh kem (mac dinh tat, bat sau khi ATTT duyet). */
+  fileReading: boolean;
   agents: AgentInfo[];
 }
 
@@ -130,6 +132,25 @@ export interface RecommendationDraftResult {
 
 export type RewritePurpose = "RECOMMENDATION" | "FINDING" | "SUMMARY";
 
+export type TdkpReminderSource = "CEO_ALL" | "CEO_KH" | "BRANCH" | "RESOLUTION" | "UNIT";
+
+/** Thu don doc - danh sach kien nghi trong `body` do he thong dung tu du lieu that; AI chi viet loi mo/ket. */
+export interface ReminderLetter {
+  unit: string;
+  subject: string;
+  body: string;
+  items: { code: string | null; content: string | null; deadline: string | null; daysOverdue: number | null; status: string | null }[];
+}
+
+export interface ReminderDraftResult {
+  source: TdkpReminderSource;
+  sourceLabel: string;
+  letters: ReminderLetter[];
+  /** false = AI khong tra dung mau, he thong dung mau co dinh (so lieu van dung). */
+  grounded: boolean;
+  model: string;
+}
+
 export interface RewriteResult {
   text: string;
   changes: string[];
@@ -145,6 +166,10 @@ export const agentDraftApi = {
       businessSegmentId: businessSegmentId ?? null,
       instruction: instruction ?? null,
     });
+    return res.data.data;
+  },
+  async reminder(source: TdkpReminderSource, itemIds: string[], dueWithinDays?: number): Promise<ReminderDraftResult> {
+    const res = await httpClient.post<ApiResponse<ReminderDraftResult>>(`${BASE}/drafts/reminder`, { source, itemIds, dueWithinDays: dueWithinDays ?? null });
     return res.data.data;
   },
   async rewrite(text: string, purpose: RewritePurpose): Promise<RewriteResult> {

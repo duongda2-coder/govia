@@ -5,20 +5,52 @@
   },
   "agent": {
     "widget": {
-      "title": "Trợ lý AI"
+      "title": "Trợ lý AI",
+      "chat": "Trò chuyện",
+      "draft": "Soạn nháp"
+    },
+    "panel": {
+      "toolRecommendation": "Kiến nghị từ TTSS",
+      "toolRewrite": "Chuẩn hoá câu chữ",
+      "toolReminder": "Thư đôn đốc",
+      "hint": "AI chỉ soạn bản nháp để anh/chị sao chép. Không có gì được lưu, điền vào màn hình hay gửi đi.",
+      "noTools": "Quản trị đang tắt các trợ lý soạn nháp.",
+      "engagement": "Cuộc kiểm toán",
+      "engagementPlaceholder": "Chọn cuộc kiểm toán được phân công",
+      "businessSegment": "Loại nghiệp vụ (tuỳ chọn)",
+      "runRecommendation": "Soạn kiến nghị",
+      "purpose": "Loại nội dung",
+      "purposeRECOMMENDATION": "Kiến nghị",
+      "purposeFINDING": "Mô tả phát hiện / TTSS",
+      "purposeSUMMARY": "Tóm tắt báo cáo",
+      "originalText": "Nội dung cần chuẩn hoá",
+      "reminderSource": "Danh sách theo dõi khắc phục",
+      "sourceCEO_ALL": "Kiến nghị KTNB đối với HĐTV, TGĐ",
+      "sourceCEO_KH": "Kiến nghị HĐTV, TGĐ - khối/phòng thực hiện",
+      "sourceBRANCH": "Kiến nghị chi nhánh",
+      "sourceRESOLUTION": "Nghị quyết",
+      "sourceUNIT": "Kiến nghị KTNB đối với đơn vị",
+      "dueWithinDays": "Gồm cả kiến nghị sắp đến hạn trong (ngày)",
+      "reminderScope": "AI lấy mọi kiến nghị chưa hoàn thành đã quá hạn hoặc sắp đến hạn trong số ngày này.",
+      "runReminder": "Soạn thư đôn đốc",
+      "copy": "Sao chép",
+      "copied": "Đã sao chép",
+      "copyFailed": "Không sao chép được, hãy bôi đen và sao chép thủ công"
+    },
+    "reminder": {
+      "hint": "{{count}} thư nháp, mỗi đơn vị 1 thư. Danh sách kiến nghị do hệ thống lấy từ dữ liệu; hệ thống KHÔNG tự gửi - hãy sao chép và gửi theo kênh văn bản hiện có.",
+      "fallback": "AI chưa trả đúng mẫu nên hệ thống dùng lời văn mẫu; danh sách kiến nghị vẫn lấy đúng từ dữ liệu.",
+      "copy": "Sao chép thư",
+      "errorNoItems": "Không có kiến nghị nào chưa hoàn thành, quá hạn hoặc sắp đến hạn để soạn thư đôn đốc."
     },
     "draft": {
-      "recommendationButton": "AI soạn kiến nghị từ TTSS",
       "recommendationHint": "Bản nháp do AI soạn từ {{count}} TTSS. Kiểm tra, chỉnh sửa rồi mới bấm Thêm.",
       "noDrafts": "AI chưa đề xuất được kiến nghị nào cho dữ liệu này.",
-      "use": "Dùng nội dung này",
       "notGrounded": "Cần kiểm tra: có thông tin không khớp dữ liệu TTSS",
       "similarTitle": "Kiến nghị tương tự ở cuộc kiểm toán khác ({{count}})",
       "rewriteButton": "AI chuẩn hoá câu chữ",
       "rewriteEmpty": "Nhập nội dung trước khi nhờ AI chuẩn hoá.",
       "rewriteNotGrounded": "Bản viết lại có số liệu không có trong nội dung gốc - kiểm tra kỹ trước khi dùng.",
-      "replace": "Thay thế",
-      "dismiss": "Bỏ qua",
       "errorNoTtss": "Chưa có TTSS nào (trong phạm vi bạn được xem) để AI soạn kiến nghị cho nghiệp vụ này.",
       "errorGeneric": "AI chưa soạn được nội dung. Vui lòng thử lại."
     },
@@ -37,7 +69,13 @@
       "execution3": "Điểm kiểm soát nào áp dụng cho nghiệp vụ tín dụng?",
       "catalog1": "Danh mục loại ngoại lệ có tên nào bị trùng lặp không?",
       "catalog2": "Tìm trong danh mục điểm kiểm soát theo từ khoá phê duyệt",
-      "catalog3": "Danh mục công việc kiểm toán có mục nào trùng tên không?"
+      "catalog3": "Danh mục công việc kiểm toán có mục nào trùng tên không?",
+      "remediation1": "Kiến nghị nào đã quá hạn khắc phục?",
+      "remediation2": "Đơn vị nào có nhiều kiến nghị quá hạn nhất?",
+      "remediation3": "Nghị quyết nào sắp đến hạn trong 30 ngày tới?",
+      "plan1": "Kế hoạch kiểm toán năm nay có bao nhiêu đối tượng?",
+      "plan2": "Đối tượng rủi ro cao nào chưa vào kế hoạch?",
+      "plan3": "Phân bổ cán bộ tháng nào còn thiếu người?"
     },
     "chat": {
       "emptyHint": "Hỏi về rủi ro, cuộc kiểm toán, TTSS & kiến nghị, danh mục, việc cần xử lý hoặc văn bản quy định. Gợi ý:",

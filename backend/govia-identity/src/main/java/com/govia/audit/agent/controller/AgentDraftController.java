@@ -2,6 +2,8 @@ package com.govia.audit.agent.controller;
 
 import com.govia.audit.agent.dto.RecommendationDraftRequest;
 import com.govia.audit.agent.dto.RecommendationDraftResponse;
+import com.govia.audit.agent.dto.ReminderDraftRequest;
+import com.govia.audit.agent.dto.ReminderDraftResponse;
 import com.govia.audit.agent.dto.RewriteRequest;
 import com.govia.audit.agent.dto.RewriteResponse;
 import com.govia.audit.agent.service.AgentDraftService;
@@ -34,6 +36,14 @@ public class AgentDraftController {
     public ApiResponse<RecommendationDraftResponse> draftRecommendations(@Valid @RequestBody RecommendationDraftRequest request,
                                                                          @AuthenticationPrincipal CurrentUserPrincipal principal) {
         return ApiResponse.ok(draftService.draftRecommendations(request, principal));
+    }
+
+    /** Thu don doc TDKP - quyen xem danh sach TDKP tuong ung duoc kiem tra lai ben trong (controller TDKP). */
+    @PostMapping("/reminder")
+    @PreAuthorize("hasAuthority('PERM_AUDIT.AGENT.VIEW')")
+    public ApiResponse<ReminderDraftResponse> draftReminder(@Valid @RequestBody ReminderDraftRequest request,
+                                                            @AuthenticationPrincipal CurrentUserPrincipal principal) {
+        return ApiResponse.ok(draftService.draftReminder(request, principal));
     }
 
     @PostMapping("/rewrite")

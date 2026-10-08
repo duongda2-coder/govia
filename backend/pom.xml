@@ -25,6 +25,7 @@
         <jjwt.version>0.12.6</jjwt.version>
         <springdoc.version>2.6.0</springdoc.version>
         <poi.version>5.5.1</poi.version>
+        <pdfbox.version>3.0.3</pdfbox.version>
         <liquibase.version>4.29.2</liquibase.version>
         <flowable.version>7.2.0</flowable.version>
     </properties>
@@ -77,6 +78,11 @@
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>pdfbox</artifactId>
+                <version>${pdfbox.version}</version>
             </dependency>
 
             <!-- DB migration -->

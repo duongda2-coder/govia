@@ -11,6 +11,9 @@ import com.govia.audit.agent.llm.ChatResult;
 import com.govia.audit.agent.llm.LlmProvider;
 import com.govia.audit.agent.llm.ToolCallRequest;
 import com.govia.audit.agent.llm.ToolSpec;
+import com.govia.audit.agent.dto.ReminderDraftRequest;
+import com.govia.audit.agent.dto.ReminderDraftResponse;
+import com.govia.audit.agent.tools.AgentPlanTdkpToolsService;
 import com.govia.audit.agent.tools.AgentWorkToolsService;
 import com.govia.audit.agent.tools.ToolExecutionResult;
 import com.govia.audit.planengagement.dto.AuditEngagementResponse;
@@ -56,18 +59,23 @@ public class AgentDraftService {
     private static final Pattern NUMBER = Pattern.compile("\\d[\\d.,]{2,}");
     private static final String DRAFT_TOOL = "submit_recommendation_drafts";
     private static final String REWRITE_TOOL = "submit_rewrite";
+    private static final String REMINDER_TOOL = "submit_reminder_template";
+    private static final java.time.format.DateTimeFormatter VN_DATE = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final LlmProvider llmProvider;
     private final AgentWorkToolsService workTools;
+    private final AgentPlanTdkpToolsService planTdkpTools;
     private final AuditTtssController ttssController;
     private final AgentAuditLogService auditLogService;
     private final AgentProperties agentProperties;
     private final ObjectMapper objectMapper;
 
-    public AgentDraftService(LlmProvider llmProvider, AgentWorkToolsService workTools, AuditTtssController ttssController,
+    public AgentDraftService(LlmProvider llmProvider, AgentWorkToolsService workTools, AgentPlanTdkpToolsService planTdkpTools,
+                             AuditTtssController ttssController,
                              AgentAuditLogService auditLogService, AgentProperties agentProperties, ObjectMapper objectMapper) {
         this.llmProvider = llmProvider;
         this.workTools = workTools;
+        this.planTdkpTools = planTdkpTools;
         this.ttssController = ttssController;
         this.auditLogService = auditLogService;
         this.agentProperties = agentProperties;
@@ -183,6 +191,105 @@ public class AgentDraftService {
                 "rewrite_text", Map.of("purpose", request.purpose().name(), "length", request.text().length()),
                 ToolExecutionResult.success(text), System.currentTimeMillis() - start);
         return response;
+    }
+
+    /**
+     * "AI soạn thư đôn đốc" (A5, G3): 1 thu cho moi don vi co kien nghi qua han/sap den han. Danh sach kien
+     * nghi trong thu do he thong dung tu du lieu that; AI chi viet tieu de + loi mo dau + loi ket (dung chung
+     * cho moi don vi, cho trong {don_vi}). Khong gui thu, khong doi hien trang.
+     */
+    public ReminderDraftResponse draftReminder(ReminderDraftRequest request, CurrentUserPrincipal principal) {
+        if (!agentProperties.isAgentEnabled(AgentProfileRegistry.REMEDIATION)) {
+            throw new BusinessException("AGENT_DISABLED", "Tro ly AI theo doi khac phuc dang duoc tat theo cau hinh", HttpStatus.SERVICE_UNAVAILABLE);
+        }
+        long start = System.currentTimeMillis();
+        int days = request.dueWithinDays() == null || request.dueWithinDays() <= 0 ? 30 : request.dueWithinDays();
+        String sourceLabel = planTdkpTools.sourceLabel(request.source());
+        List<AgentPlanTdkpToolsService.TdkpItem> items = planTdkpTools.itemsForReminder(request.source(), request.itemIds(), days).stream()
+                .filter(i -> !i.done())
+                .toList();
+        if (items.isEmpty()) {
+            throw new BusinessException("AGENT_REMINDER_NO_ITEMS",
+                    "Khong co kien nghi nao chua hoan thanh, qua han hoac sap den han de soan thu don doc", HttpStatus.BAD_REQUEST);
+        }
+        Map<String, List<AgentPlanTdkpToolsService.TdkpItem>> byUnit = items.stream()
+                .collect(Collectors.groupingBy(i -> i.unit() == null || i.unit().isBlank() ? "(Chưa xác định đơn vị)" : i.unit(),
+                        LinkedHashMap::new, Collectors.toList()));
+
+        Map<String, Object> input = new LinkedHashMap<>();
+        input.put("danhSach", sourceLabel);
+        input.put("soDonVi", byUnit.size());
+        input.put("soKienNghi", items.size());
+        input.put("soQuaHan", items.stream().filter(i -> i.daysOverdue() != null && i.daysOverdue() > 0).count());
+        input.put("viDu", items.stream().limit(5).map(i -> i.code() + ": " + (i.content() == null ? "" : i.content().length() > 150 ? i.content().substring(0, 150) : i.content())).toList());
+        String inputJson = toJson(input);
+        String system = """
+                Ban la can bo Kiem toan noi bo ngan hang soan cong van DON DOC thuc hien kien nghi. Viet tieng Viet trang \
+                trong, lich su, ngan gon. Chi viet: "subject" (tieu de, toi da 120 ky tu), "opening" (1 doan mo dau: can cu \
+                theo doi khac phuc, de nghi don vi khan truong thuc hien cac kien nghi o danh sach ben duoi) va "closing" \
+                (1 doan ket: de nghi bao cao ket qua/ly do cham tre va gui bang chung khac phuc, cam on). Dung dung chuoi \
+                {don_vi} o cho can ten don vi. KHONG liet ke kien nghi, KHONG viet so lieu, ngay thang, ten nguoi - he \
+                thong tu chen danh sach chinh xac. PHAI tra loi bang cach goi tool "%s".
+                """.formatted(REMINDER_TOOL);
+        Map<String, Object> args = callForTool(system, "Thong tin (JSON):\n" + inputJson, reminderToolSpec(), REMINDER_TOOL, principal,
+                "AI soan thu don doc " + request.source());
+        String subject = stringOrNull(args.get("subject"));
+        String opening = stringOrNull(args.get("opening"));
+        String closing = stringOrNull(args.get("closing"));
+        boolean grounded = subject != null && opening != null && closing != null
+                && numbersFrom(subject + " " + opening + " " + closing, inputJson);
+        if (subject == null || opening == null || closing == null) {
+            // Model khong tra dung cau truc - dung mau co dinh de nguoi dung van co ban nhap dung so lieu
+            subject = "Đôn đốc thực hiện kiến nghị của Kiểm toán nội bộ";
+            opening = "Căn cứ kết quả theo dõi khắc phục, Kiểm toán nội bộ đề nghị {don_vi} khẩn trương thực hiện các kiến nghị dưới đây:";
+            closing = "Đề nghị {don_vi} báo cáo kết quả thực hiện (hoặc lý do chậm trễ) kèm bằng chứng khắc phục về Kiểm toán nội bộ. Trân trọng cảm ơn.";
+        }
+
+        List<ReminderDraftResponse.Letter> letters = new ArrayList<>();
+        for (Map.Entry<String, List<AgentPlanTdkpToolsService.TdkpItem>> e : byUnit.entrySet()) {
+            String unit = e.getKey();
+            List<ReminderDraftResponse.Item> letterItems = e.getValue().stream()
+                    .sorted(Comparator.comparing(AgentPlanTdkpToolsService.TdkpItem::deadline, Comparator.nullsLast(Comparator.naturalOrder())))
+                    .map(i -> new ReminderDraftResponse.Item(i.code(), i.content(), i.deadline(), i.daysOverdue(), i.statusLabel()))
+                    .toList();
+            StringBuilder body = new StringBuilder("Kính gửi: ").append(unit).append("\n\n")
+                    .append(opening.replace("{don_vi}", unit)).append("\n\n");
+            int n = 0;
+            for (ReminderDraftResponse.Item item : letterItems) {
+                body.append(++n).append(". ").append(item.code() == null ? "" : "[" + item.code() + "] ")
+                        .append(item.content() == null ? "" : item.content().length() > 400 ? item.content().substring(0, 400) + "..." : item.content())
+                        .append("\n   Thời hạn: ").append(item.deadline() == null ? "chưa xác định" : item.deadline().format(VN_DATE))
+                        .append(daysText(item.daysOverdue()))
+                        .append(" - Hiện trạng: ").append(item.status() == null ? "chưa cập nhật" : item.status()).append('\n');
+            }
+            body.append('\n').append(closing.replace("{don_vi}", unit));
+            letters.add(new ReminderDraftResponse.Letter(unit, subject.replace("{don_vi}", unit), body.toString(), letterItems));
+        }
+        ReminderDraftResponse response = new ReminderDraftResponse(request.source(), sourceLabel, letters, grounded, llmProvider.modelId());
+        auditLogService.logToolCall(principal.userId(), UUID.randomUUID(), 0, "AI soan thu don doc " + request.source(),
+                "draft_reminder", Map.of("source", request.source(), "items", items.size(), "units", byUnit.size()),
+                ToolExecutionResult.success(toJson(Map.of("subject", subject, "opening", opening, "closing", closing))),
+                System.currentTimeMillis() - start);
+        return response;
+    }
+
+    private static String daysText(Long daysOverdue) {
+        if (daysOverdue == null) {
+            return "";
+        }
+        if (daysOverdue > 0) {
+            return " (quá hạn " + daysOverdue + " ngày)";
+        }
+        return daysOverdue == 0 ? " (đến hạn hôm nay)" : " (còn " + (-daysOverdue) + " ngày)";
+    }
+
+    private static ToolSpec reminderToolSpec() {
+        return new ToolSpec(REMINDER_TOOL, "Nop mau thu don doc (tieu de, mo dau, ket) - he thong tu chen danh sach kien nghi",
+                Map.of("type", "object", "properties", Map.of(
+                                "subject", Map.of("type", "string", "description", "Tieu de cong van"),
+                                "opening", Map.of("type", "string", "description", "Doan mo dau, dung {don_vi}"),
+                                "closing", Map.of("type", "string", "description", "Doan ket, dung {don_vi}")),
+                        "required", List.of("subject", "opening", "closing")));
     }
 
     // ------------------------------------------------------------------ helpers

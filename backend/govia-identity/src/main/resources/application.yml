@@ -77,6 +77,12 @@ govia:
     enabled: ${GOVIA_AGENT_ENABLED:true}
     disabled-agents: ${GOVIA_AGENT_DISABLED_AGENTS:}
     history-messages: ${GOVIA_AGENT_HISTORY_MESSAGES:20}
+    # CONG 3: AI doc NOI DUNG file dinh kem (Thu vien tai lieu, bang chung phat hien, luu tru bao cao TDKP).
+    # MAC DINH TAT - chi bat sau khi ATTT phe duyet.
+    file-reading:
+      enabled: ${GOVIA_AGENT_FILE_READING_ENABLED:false}
+      max-bytes: ${GOVIA_AGENT_FILE_MAX_BYTES:10485760}
+      max-chars: ${GOVIA_AGENT_FILE_MAX_CHARS:20000}
   notification:
     email:
       # Mac dinh TAT: chua co SMTP that nao duoc cau hinh. Khi bat len (true) can dien them

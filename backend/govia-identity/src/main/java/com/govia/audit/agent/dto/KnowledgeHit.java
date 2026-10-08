@@ -19,6 +19,8 @@ public record KnowledgeHit(
         String legalBasis,
         String excerpt,
         BigDecimal score,
-        String matchMode
+        String matchMode,
+        /** Doan trich trong noi dung FILE dinh kem khop cau hoi nhat (chi khi bat doc file), null neu khong co. */
+        String fileExcerpt
 ) {
 }

@@ -5,20 +5,52 @@
   },
   "agent": {
     "widget": {
-      "title": "AI Assistant"
+      "title": "AI Assistant",
+      "chat": "Chat",
+      "draft": "Drafts"
+    },
+    "panel": {
+      "toolRecommendation": "Recommendations from findings",
+      "toolRewrite": "Polish wording",
+      "toolReminder": "Reminder letters",
+      "hint": "The AI only drafts text for you to copy. Nothing is saved, filled into screens or sent.",
+      "noTools": "Drafting assistants are turned off by the administrator.",
+      "engagement": "Audit engagement",
+      "engagementPlaceholder": "Choose an engagement you are assigned to",
+      "businessSegment": "Business segment (optional)",
+      "runRecommendation": "Draft recommendations",
+      "purpose": "Content type",
+      "purposeRECOMMENDATION": "Recommendation",
+      "purposeFINDING": "Finding description",
+      "purposeSUMMARY": "Report summary",
+      "originalText": "Text to polish",
+      "reminderSource": "Remediation tracking list",
+      "sourceCEO_ALL": "Internal audit recommendations to the Board/CEO",
+      "sourceCEO_KH": "Board/CEO recommendations - executing divisions",
+      "sourceBRANCH": "Branch recommendations",
+      "sourceRESOLUTION": "Resolutions",
+      "sourceUNIT": "Internal audit recommendations to units",
+      "dueWithinDays": "Also include items due within (days)",
+      "reminderScope": "The AI takes every unfinished item that is overdue or due within this many days.",
+      "runReminder": "Draft reminder letters",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copyFailed": "Could not copy - select the text and copy it manually"
+    },
+    "reminder": {
+      "hint": "{{count}} draft letters, one per unit. The item list comes from the data; the system does NOT send anything - copy and send through the usual channel.",
+      "fallback": "The AI did not return the expected format, so a standard wording was used; the item list is still taken from the data.",
+      "copy": "Copy letter",
+      "errorNoItems": "There are no unfinished, overdue or soon-due recommendations to remind about."
     },
     "draft": {
-      "recommendationButton": "AI draft recommendations from findings",
       "recommendationHint": "Drafted by AI from {{count}} findings. Review and edit before clicking Add.",
       "noDrafts": "The AI could not suggest any recommendation for this data.",
-      "use": "Use this text",
       "notGrounded": "Check: contains information not found in the findings",
       "similarTitle": "Similar recommendations in other audits ({{count}})",
       "rewriteButton": "AI polish wording",
       "rewriteEmpty": "Enter some text before asking the AI to polish it.",
       "rewriteNotGrounded": "The rewrite contains figures not present in the original - check carefully before using it.",
-      "replace": "Replace",
-      "dismiss": "Dismiss",
       "errorNoTtss": "There are no findings (within your visibility) for the AI to draft recommendations for this segment.",
       "errorGeneric": "The AI could not draft the text. Please try again."
     },
@@ -37,7 +69,13 @@
       "execution3": "Which control points apply to the credit segment?",
       "catalog1": "Are there duplicate names in the exception type catalog?",
       "catalog2": "Search the control point catalog for approval",
-      "catalog3": "Are there duplicate names in the audit work item catalog?"
+      "catalog3": "Are there duplicate names in the audit work item catalog?",
+      "remediation1": "Which recommendations are overdue?",
+      "remediation2": "Which units have the most overdue recommendations?",
+      "remediation3": "Which resolutions are due in the next 30 days?",
+      "plan1": "How many audit objects are in this year plan?",
+      "plan2": "Which high-risk objects are not in the plan yet?",
+      "plan3": "Which months are short of staff in the allocation?"
     },
     "chat": {
       "emptyHint": "Ask about risk, audits, findings & recommendations, catalogs, your pending tasks or regulations. Suggestions:",

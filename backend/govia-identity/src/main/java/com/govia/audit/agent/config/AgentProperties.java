@@ -47,6 +47,46 @@ public class AgentProperties {
         this.historyMessages = historyMessages;
     }
 
+    private final FileReading fileReading = new FileReading();
+
+    public FileReading getFileReading() {
+        return fileReading;
+    }
+
+    /**
+     * Cong 3 trong phuong an: AI DOC NOI DUNG FILE dinh kem. MAC DINH TAT - chi bat (GOVIA_AGENT_FILE_READING_ENABLED
+     * =true) sau khi ATTT phe duyet. Tat thi tool doc file khong duoc dua cho model, RAG chi dung metadata.
+     */
+    public static class FileReading {
+        private boolean enabled = false;
+        private long maxBytes = 10L * 1024 * 1024;
+        private int maxChars = 20_000;
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public long getMaxBytes() {
+            return maxBytes;
+        }
+
+        public void setMaxBytes(long maxBytes) {
+            this.maxBytes = maxBytes;
+        }
+
+        public int getMaxChars() {
+            return maxChars;
+        }
+
+        public void setMaxChars(int maxChars) {
+            this.maxChars = maxChars;
+        }
+    }
+
     public boolean isAgentEnabled(String agentCode) {
         return enabled && disabledAgents.stream().noneMatch(code -> code.equalsIgnoreCase(agentCode));
     }

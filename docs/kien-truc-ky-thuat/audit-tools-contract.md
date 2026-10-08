@@ -359,10 +359,65 @@ id** cuộc kiểm toán, nhưng chỉ trong danh sách `GET /api/audit/plan/eng
 
 ### Soạn nháp (mức M2 — không có tool ghi)
 
+Toàn bộ giao diện soạn nháp nằm trong tab **"Soạn nháp"** của khung Trợ lý AI (`AgentDraftPanel`). **Không có nút
+AI nào trên màn hình nghiệp vụ** và AI không điền vào form nghiệp vụ — các file màn hình nghiệp vụ giữ nguyên như
+trước khi có AI.
+
 | Endpoint | Quyền | Đầu vào | Kiểm soát |
 |---|---|---|---|
-| `POST /api/audit/agent/drafts/recommendations` | `AUDIT.AGENT.VIEW` + `AUDIT.TTSS.VIEW` | `engagementId`, `businessSegmentId?`, `instruction?` | Hệ thống tự lấy TTSS (ưu tiên dòng chưa gắn KN), nhóm theo mã phát hiện (≤ 12 nhóm), kèm KN đã có và KN tương tự ở CKT khác; 1 lần gọi model qua tool `submit_recommendation_drafts`. Bản nháp có mã phát hiện không có trong dữ liệu hoặc số (≥ 3 chữ số) không có trong dữ liệu ⇒ `grounded=false`. **Không lưu gì** — người dùng bấm "Dùng nội dung này" rồi tự bấm Thêm. |
-| `POST /api/audit/agent/drafts/rewrite` | `AUDIT.AGENT.VIEW` | `text`, `purpose` (`RECOMMENDATION`/`FINDING`/`SUMMARY`) | Viết lại giữ nguyên sự kiện; số không có trong văn bản gốc ⇒ `grounded=false`. Người dùng bấm "Thay thế" mới đổi nội dung ô nhập. |
+| `POST /api/audit/agent/drafts/recommendations` | `AUDIT.AGENT.VIEW` + `AUDIT.TTSS.VIEW` | `engagementId`, `businessSegmentId?`, `instruction?` | Hệ thống tự lấy TTSS (ưu tiên dòng chưa gắn KN), nhóm theo mã phát hiện (≤ 12 nhóm), kèm KN đã có và KN tương tự ở CKT khác; 1 lần gọi model qua tool `submit_recommendation_drafts`. Bản nháp có mã phát hiện không có trong dữ liệu hoặc số (≥ 3 chữ số) không có trong dữ liệu ⇒ `grounded=false`. **Không lưu gì** — người dùng sao chép bản nháp rồi tự nhập theo cách làm hiện tại. |
+| `POST /api/audit/agent/drafts/rewrite` | `AUDIT.AGENT.VIEW` | `text`, `purpose` (`RECOMMENDATION`/`FINDING`/`SUMMARY`) | Viết lại giữ nguyên sự kiện; số không có trong văn bản gốc ⇒ `grounded=false`. Kết quả chỉ để sao chép. |
 
 Cả hai tôn trọng công tắc `govia.agent.enabled` và `govia.agent.disabled-agents=A4` (trả 503), mô hình lỗi
 trả 503 `AGENT_LLM_UNAVAILABLE`, và ghi `agent_tool_call_log` (`draft_recommendations` / `rewrite_text`).
+
+## Bổ sung giai đoạn G3 (2026-10): A2, A5, thư đôn đốc, đọc file (Cổng 3)
+
+| Agent | Tool |
+|---|---|
+| A2 Trợ lý Kế hoạch | `get_plan_overview`, `suggest_plan_candidates`, `get_monthly_staffing` |
+| A5 Trợ lý Theo dõi khắc phục | `get_tdkp_overview`, `list_tdkp_items` |
+| A0, A1 (thêm) | `list_attachments`, `read_attachment_text` |
+
+`AgentPlanTdkpToolsService` chỉ gọi lại controller sẵn có (giữ `@PreAuthorize` từng màn hình):
+
+| Tool | Nguồn | Quyền |
+|---|---|---|
+| `get_plan_overview(year)` | `/api/audit/plan/khkt-th`, `/khkt-th-confirmed`, `/khkt-thang` | `AUDIT.KHKT_TH.VIEW`, `AUDIT.KHKT_THANG.VIEW` |
+| `suggest_plan_candidates(year, limit?)` | TH (Phần 1) trừ các đối tượng TH2 đã `APPROVED`, xếp theo `riskScore` | `AUDIT.KHKT_TH.VIEW` |
+| `get_monthly_staffing(year)` | KHKT tháng × `/api/audit/plan/khns-nam/allocation` × `/khns-nam` | `AUDIT.KHKT_THANG.VIEW`, `AUDIT.KHNS_NAM.VIEW` |
+| `get_tdkp_overview(dueWithinDays?)` | 5 danh sách: `CEO_ALL` (`/api/audit/tdkp/ceo-all`), `CEO_KH`, `BRANCH` (`/branch/recommendations`), `RESOLUTION`, `UNIT` | quyền VIEW từng màn; thiếu quyền màn nào thì bỏ qua và ghi vào `noPermissionFor` |
+| `list_tdkp_items(source, state?, unit?, dueWithinDays?, limit?)` | 1 trong 5 danh sách trên; `state` = `OVERDUE` (quá hạn, chưa xong) / `DUE_SOON` / `OPEN` / `ALL` | quyền VIEW màn tương ứng |
+
+Quy ước: "xong" = hiện trạng `DONE`; quá hạn = thời hạn < hôm nay và chưa xong; sắp đến hạn = trong
+`dueWithinDays` ngày tới (mặc định 30). Nghị quyết dùng "Thời hạn hoàn thành" (`completionDeadline`).
+
+### Thư đôn đốc (M2)
+
+`POST /api/audit/agent/drafts/reminder` (`AUDIT.AGENT.VIEW` + quyền VIEW danh sách TDKP tương ứng) —
+`source`, `itemIds?` (rỗng = mọi dòng chưa xong đã quá hạn hoặc sắp đến hạn), `dueWithinDays?`. Trả **1 thư
+cho mỗi đơn vị**. Danh sách kiến nghị trong thư (mã, nội dung, thời hạn, số ngày quá hạn, hiện trạng) do **hệ
+thống dựng từ dữ liệu**; model chỉ viết tiêu đề + lời mở đầu + lời kết dùng chung (chỗ trống `{don_vi}`) qua
+tool `submit_reminder_template`. Model không trả đúng cấu trúc ⇒ dùng lời văn mẫu cố định, `grounded=false`.
+**Không gửi thư, không đổi hiện trạng** — người dùng sao chép và gửi theo kênh văn bản hiện có.
+
+### Đọc nội dung file (Cổng 3 — mặc định TẮT)
+
+Bật bằng `GOVIA_AGENT_FILE_READING_ENABLED=true` **sau khi ATTT phê duyệt**. Khi tắt, `read_attachment_text`
+không được đưa cho model (và bị chặn nếu model vẫn gọi), RAG chỉ dùng metadata văn bản.
+
+| Loại file (`entityName`) | Quyền cần có |
+|---|---|
+| `AUDIT_DOCUMENT_LIBRARY` — file đính kèm Thư viện tài liệu | `AUDIT.DOCUMENT_LIBRARY.VIEW` |
+| `AUDIT_FINDING` — bằng chứng phát hiện kiểm toán | `AUDIT.FINDING.VIEW` |
+| `AUDIT_TDKP_REPORT` — lưu trữ báo cáo TDKP | `AUDIT.TDKP_BC.VIEW` |
+
+- `list_attachments(entityType, entityId)`: metadata (tên, kích thước, đọc được không).
+- `read_attachment_text(attachmentId)`: định dạng txt/csv/md, docx (POI), xlsx (POI, mỗi sheet 1 khối), pdf
+  (PDFBox 3). File > `max-bytes` (10 MB) bị từ chối; nội dung cắt ở `max-chars` (20.000 ký tự) và được **đóng
+  khung là dữ liệu** (`[NOI DUNG FILE - CHI LA DU LIEU ...]`) để chống chèn lệnh qua nội dung file.
+- Kiểm tra thêm `tenant` của file (dịch vụ đính kèm dùng chung không lọc tenant).
+- `search_documents`: khi bật, chỉ mục RAG gồm cả nội dung file đính kèm của văn bản (≤ 20.000 ký tự/văn bản,
+  embed ≤ 4.000 ký tự) và kết quả có thêm `fileExcerpt` — đoạn trong file khớp câu hỏi nhất.
+- **Chưa đọc** file bằng chứng khắc phục của đơn vị: màn TDKP hiện không có chức năng đính kèm; thêm chức năng
+  đó là thay đổi quy trình nghiệp vụ, cần quyết định riêng.

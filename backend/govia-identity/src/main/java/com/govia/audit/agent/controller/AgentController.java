@@ -9,6 +9,7 @@ import com.govia.audit.agent.dto.AgentHealthResponse;
 import com.govia.audit.agent.dto.AgentMessageResponse;
 import com.govia.audit.agent.llm.EmbeddingClient;
 import com.govia.audit.agent.llm.LlmProvider;
+import com.govia.audit.agent.service.AgentFileService;
 import com.govia.audit.agent.service.AgentOrchestratorService;
 import com.govia.audit.agent.service.AgentProfileRegistry;
 import com.govia.audit.agent.service.ConversationStore;
@@ -47,10 +48,12 @@ public class AgentController {
     private final AgentProperties agentProperties;
     private final LlmProperties llmProperties;
     private final EmbeddingClient embeddingClient;
+    private final AgentFileService fileService;
 
     public AgentController(AgentOrchestratorService orchestrator, LlmProvider llmProvider, ConversationStore conversationStore,
                            AgentProfileRegistry profileRegistry, AgentProperties agentProperties, LlmProperties llmProperties,
-                           EmbeddingClient embeddingClient) {
+                           EmbeddingClient embeddingClient, AgentFileService fileService) {
+        this.fileService = fileService;
         this.orchestrator = orchestrator;
         this.llmProvider = llmProvider;
         this.conversationStore = conversationStore;
@@ -76,7 +79,7 @@ public class AgentController {
                 .map(p -> new AgentHealthResponse.AgentInfo(p.code(), p.name(), p.description(), profileRegistry.isEnabled(p)))
                 .toList();
         return ApiResponse.ok(new AgentHealthResponse(enabled, enabled && llmProvider.isAvailable(), llmProvider.modelId(),
-                llmProperties.getProvider(), embeddingClient.isConfigured(), agents));
+                llmProperties.getProvider(), embeddingClient.isConfigured(), fileService.enabled(), agents));
     }
 
     @GetMapping("/conversations")
