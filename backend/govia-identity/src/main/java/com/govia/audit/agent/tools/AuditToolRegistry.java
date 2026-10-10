@@ -298,6 +298,43 @@ public class AuditToolRegistry {
                     schema(Map.of(
                             "attachmentId", prop("string", "Id file - lay tu list_attachments, get_evidence")
                     ), List.of("attachmentId")),
+                    null),
+
+            // ---------------- G4: A6 Chat luong (DGCL)
+            def("get_dgcl_overview",
+                    "Danh gia chat luong (DGCL). Khong truyen engagement: danh sach cuoc kiem toan xem duoc kem so thanh vien, so "
+                            + "PL01F da xac nhan, so chua cham. Co engagement: tung thanh vien + dong ca doan voi diem PL01A/PL01B/PL01F "
+                            + "da luu (kem da/chua xac nhan), diem cong/tru, xep loai, nguoi cham, nguoi kiem soat; ai chua cham, chua xac nhan, chua kiem soat.",
+                    schema(Map.of(
+                            "engagement", prop("string", "Ma cuoc kiem toan (tuy chon)")
+                    ), List.of()),
+                    null),
+
+            def("get_dgcl_sheet",
+                    "Chi tiet 1 phieu DGCL cua 1 thanh vien (hoac ca doan): tieu chi KHONG tuan thu, tieu chi chua cham, so loi tru "
+                            + "diem PL01F, tong hop diem/xep loai, trang thai xac nhan/kiem soat.",
+                    schema(Map.of(
+                            "engagement", prop("string", "Ma cuoc kiem toan"),
+                            "subject", prop("string", "Ma NV hoac ho ten thanh vien; TEAM = dong ca doan"),
+                            "appendix", enumProp("Phu luc", "PL01A", "PL01B", "PL01F"),
+                            "issuesOnly", prop("boolean", "true (mac dinh) = chi dong khong tuan thu/chua cham; false = moi tieu chi ap dung")
+                    ), List.of("engagement", "subject", "appendix")),
+                    null),
+
+            def("get_engagement_dossier",
+                    "Ho so doan lam can cu danh gia chat luong: quyet dinh, moc thoi gian chuan bi/thuc dia/bao cao, tien do cong "
+                            + "viec CBKT/THKT/DCKT theo trang thai, so TTSS (trong yeu, chua gan kien nghi), so kien nghi.",
+                    schema(Map.of(
+                            "engagement", prop("string", "Ma cuoc kiem toan")
+                    ), List.of("engagement")),
+                    null),
+
+            def("get_dgcl_evaluator_variance",
+                    "So sanh diem DGCL da luu theo NGUOI CHAM tren cac cuoc kiem toan xem duoc: so phieu, trung binh, min/max moi phu "
+                            + "luc, chenh lech so voi trung binh chung; 'alerts' = nguoi cham lech tu 10 diem tro len.",
+                    schema(Map.of(
+                            "year", prop("integer", "Nam cuoc kiem toan (tuy chon)")
+                    ), List.of()),
                     null)
     );
 

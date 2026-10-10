@@ -12,4 +12,6 @@ public interface AgentMessageRepository extends JpaRepository<AgentMessage, UUID
     List<AgentMessage> findByTenantIdAndConversationIdOrderBySeqAsc(UUID tenantId, UUID conversationId);
 
     List<AgentMessage> findByTenantIdAndConversationIdOrderBySeqDesc(UUID tenantId, UUID conversationId, Pageable pageable);
+
+    List<AgentMessage> findByTenantIdAndCreatedAtAfter(UUID tenantId, java.time.Instant after);
 }

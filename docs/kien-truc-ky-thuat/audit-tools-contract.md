@@ -421,3 +421,102 @@ không được đưa cho model (và bị chặn nếu model vẫn gọi), RAG c
   embed ≤ 4.000 ký tự) và kết quả có thêm `fileExcerpt` — đoạn trong file khớp câu hỏi nhất.
 - **Chưa đọc** file bằng chứng khắc phục của đơn vị: màn TDKP hiện không có chức năng đính kèm; thêm chức năng
   đó là thay đổi quy trình nghiệp vụ, cần quyết định riêng.
+
+## Bổ sung giai đoạn G4 (2026-10): A6 Chất lượng, "Gợi ý AI" theo lịch, kiểm tra file import, KPI
+
+Vẫn đúng nguyên tắc "chỉ nhúng AI": không sửa entity/service/BPMN/vai trò nghiệp vụ, không màn hình nghiệp vụ
+nào bị sửa; mọi giao diện mới nằm trong khung Trợ lý AI. Thêm 1 bảng `agent_suggestion` và 1 quyền catalog
+`AUDIT.AGENT.ADMIN` (changelog 186, không gán cho vai trò nào — SUPER_ADMIN tự có qua wildcard).
+
+### A6 — Trợ lý Chất lượng (ĐGCL), 4 tool chỉ đọc
+
+Gọi lại `AuditDgclController` ⇒ giữ `AUDIT.DGCL.VIEW` và quy tắc "chỉ thành viên đoàn / NSD Kiểm soát ĐGCL
+thấy cuộc kiểm toán" của màn ĐGCL. Agent A6 nhận câu hỏi có "đánh giá chất lượng", "ĐGCL", "PL01A/B/F",
+"người chấm"… hoặc mở từ màn `/audit/dgcl`.
+
+| Tool | Tham số | Trả về |
+|---|---|---|
+| `get_dgcl_overview` | `engagement?` | Không có: danh sách CKT xem được + số phiếu PL01F đã xác nhận/chưa chấm. Có: từng thành viên + dòng cả đoàn, điểm PL01A/B/F đã lưu (kèm đã/chưa xác nhận), cộng/trừ, xếp loại, người chấm/kiểm soát; ai chưa chấm, chưa xác nhận, chưa kiểm soát |
+| `get_dgcl_sheet` | `engagement`, `subject` (mã NV / họ tên / `TEAM`), `appendix`, `issuesOnly?` (mặc định true) | Tiêu chí không tuân thủ, chưa chấm, số lỗi PL01F, tổng hợp điểm/xếp loại, trạng thái xác nhận/kiểm soát |
+| `get_engagement_dossier` | `engagement` | Quyết định, mốc chuẩn bị/thực địa/báo cáo, tiến độ công việc CBKT/THKT/DCKT theo trạng thái, TTSS (trọng yếu, chưa gắn kiến nghị), số kiến nghị; phần thiếu quyền ghi trong `notAvailable` |
+| `get_dgcl_evaluator_variance` | `year?` | Điểm đã lưu theo người chấm (số phiếu, TB, min/max mỗi phụ lục, lệch so với TB chung); `alerts` = lệch ≥ 10 điểm |
+
+### Gợi ý chấm ĐGCL (M2 — không lưu phiếu)
+
+`POST /api/audit/agent/drafts/dgcl-score` (`AUDIT.AGENT.VIEW` + `AUDIT.DGCL.VIEW`) — `engagementId`,
+`subjectKey`, `appendix`, `instruction?`. Hệ thống lấy tiêu chí đang áp dụng của phiếu (PL01A/B: dòng "tick" +
+đúng nghiệp vụ của thành viên, tối đa 80; PL01F: dòng trừ điểm/cộng/trừ) và hồ sơ đoàn; 1 lần gọi model qua tool
+`submit_dgcl_suggestions`. Mỗi tiêu chí: `COMPLIANT | NON_COMPLIANT | NEED_REVIEW` (PL01F: `APPLIES |
+NOT_APPLIES | NEED_REVIEW` + `violationCount`), lý do, căn cứ; so với giá trị đang có trên phiếu
+(`differsFromCurrent`). Tiêu chí model không trả ⇒ `NEED_REVIEW`; key lạ bị bỏ và số liệu không có trong dữ liệu
+đầu vào ⇒ `grounded=false`. **Không ghi gì vào phiếu** — người chấm tự nhập, Lưu, Xác nhận như hiện nay.
+
+### Gợi ý AI theo lịch (M3) — `agent_suggestion`
+
+- Job `AgentSuggestionScheduler` (Spring `@Scheduled`, **không** timer BPMN), mặc định `0 0 6 * * MON-FRI`
+  (`GOVIA_AGENT_SCHEDULE_CRON`), tắt bằng `GOVIA_AGENT_SCHEDULE_ENABLED=false`.
+- Chạy cho từng người dùng ACTIVE có `AUDIT.AGENT.VIEW`, **bằng đúng vai trò + quyền của người đó** (tính như lúc
+  đăng nhập; không tạo phiên/token). **Không gọi model, không tạo task Flowable, không gửi thư.**
+- Kiểm tra (thiếu quyền màn nguồn thì bỏ qua): A0 việc chờ xử lý (chờ quá `stale-task-days`=3 ngày ⇒ Cần chú ý);
+  A5 kiến nghị quá hạn (Khẩn) / đến hạn trong `due-soon-days`=7 ngày, theo từng danh sách TDKP; A4 TTSS trọng yếu
+  chưa gắn kiến nghị ở CKT năm nay/năm trước; A2 đối tượng rủi ro cao chưa vào TH2 đã duyệt, đối tượng tháng
+  này/tháng sau chưa phân bổ cán bộ; A6 phiếu ĐGCL chưa chấm/chưa xác nhận (chỉ người có cột "Thực hiện ĐGCL").
+- Mỗi lần chạy thay gợi ý cũ của người đó; loại gợi ý người dùng đã "Ẩn" trong ngày không hiện lại trong ngày.
+
+| Endpoint | Quyền | Tác dụng |
+|---|---|---|
+| `GET /api/audit/agent/suggestions` | `AUDIT.AGENT.VIEW` | Gợi ý của chính mình |
+| `POST /api/audit/agent/suggestions/refresh` | `AUDIT.AGENT.VIEW` | Chạy ngay cho chính mình |
+| `POST /api/audit/agent/suggestions/{id}/dismiss` | `AUDIT.AGENT.VIEW` | Ẩn 1 gợi ý |
+| `POST /api/audit/agent/suggestions/read` | `AUDIT.AGENT.VIEW` | Đánh dấu đã đọc |
+| `POST /api/audit/agent/suggestions/run-all` | `AUDIT.AGENT.ADMIN` | Chạy job ngay cho mọi người dùng |
+
+### Kiểm tra file trước khi import (A7)
+
+`POST /api/audit/agent/drafts/import-check` (multipart `catalog`, `file`; `AUDIT.AGENT.VIEW` + VIEW và EXPORT
+của danh mục, kiểm tra lại qua controller). So file với **đúng dòng tiêu đề mà chức năng Import hiện có đọc** (=
+file Xuất Excel của danh mục, khớp tiêu đề chính xác) và dữ liệu đang có: thiếu cột, cột lạ/gõ sai dấu (Import sẽ
+bỏ qua), dòng thiếu mã/tên, mã (+năm) trùng trong file (lỗi), mã đã có, tên trùng (cảnh báo). Cột mã/năm/tên
+được dò theo dữ liệu thật của danh mục. **Không gọi model, không lưu file, không import** — file chỉ đọc trong bộ
+nhớ của request (không thuộc Cổng 3). 10 danh mục: `control_point(_qt)`, `work_item(_qt)`, `exception_type(_qt)`,
+`exception_mapping(_qt)`, `process_step(_qt)`.
+
+### Giới hạn trợ lý theo vai trò, KPI
+
+- `GOVIA_AGENT_AGENT_ROLES="A6=TRUONG_DOAN|KSCL;A2=KE_HOACH"`: chỉ người có 1 trong các vai trò đó dùng được
+  agent tương ứng (câu hỏi chuyển về A0, công cụ soạn nháp/gợi ý của agent đó tắt). SUPER_ADMIN luôn dùng được.
+- `GET /api/audit/agent/kpi?days=` (`AUDIT.AGENT.ADMIN`): số câu hỏi, người dùng, câu trả lời theo agent, tỷ lệ
+  grounded (từ `agent_message.response_json`), độ trễ P50/P90, tỷ lệ < 15 giây, lỗi mô hình, lượt bị chặn quyền,
+  số bản nháp theo công cụ, số gợi ý đã sinh; so với mục tiêu của phương án (grounded ≥ 80%, 90% < 15 giây).
+
+### Tham số sinh của Ollama (sửa sau khi test thật G4)
+
+Test trên máy dev với `qwen2.5:7b-instruct` cho thấy Ollama chạy với mặc định nhiệt độ 0,8, `num_ctx` 4096 và không giới
+hạn độ dài: "Gợi ý chấm ĐGCL" (34 tiêu chí) khiến model sinh > 3.300 token, tràn ngữ cảnh tới hết 120 giây chờ.
+Đã thêm `govia.llm.ollama.temperature` (0.1, như provider vLLM), `max-tokens` → `num_predict` (2048), `context-size`
+→ `num_ctx` (8192); công cụ ĐGCL gọi model theo **lô 12 tiêu chí**, chỉ yêu cầu trả tiêu chí có căn cứ, lý do ≤ 25 từ.
+
+### Chặn gợi ý ĐGCL không có căn cứ (sửa sau test thật G4)
+
+Với hồ sơ đoàn trống, `qwen2.5:7b` vẫn gợi ý "Tuân thủ" 31/34 tiêu chí với lý do bịa, và coi "chưa có thông tin" là "Không
+tuân thủ". Kiểm tra số liệu không bắt được vì lý do không có số. Đã thêm chặn phía hệ thống:
+- Hệ thống chỉ đưa cho model các **trường hồ sơ có dữ liệu** (`canCu`: quyết định, mốc thời gian, công việc, TTSS, kiến
+  nghị, mục tiêu, phạm vi). Hồ sơ không có trường nào ⇒ **không gọi model**, mọi tiêu chí "Cần xem hồ sơ".
+- Mỗi gợi ý bắt buộc có `evidence` = tên 1 trường trong `canCu` (enum trong tool). Thiếu/sai tên, hoặc lý do kiểu "chưa
+  có thông tin" ⇒ hạ về `NEED_REVIEW`, đếm vào `downgraded` và hiện cảnh báo trên giao diện.
+
+### AI đọc kiến nghị không còn làm phát sinh dữ liệu
+
+`AuditRecommendationController.list` (màn "Lưu mã kiến nghị") **tự tạo dòng mặc định KNKT000** khi CKT chưa có dòng
+nào. Từ G2 các tool `list_engagement_recommendations`, `search_similar_findings`, soạn kiến nghị và hồ sơ ĐGCL gọi hàm
+này ⇒ AI đọc vô tình ghi. Nay agent đọc qua `AuditRecommendationService.listByEngagementIds` (transaction chỉ đọc,
+không seed), tự kiểm tra cùng quyền `AUDIT.TTSS.VIEW` như endpoint. Không sửa code nghiệp vụ.
+- Test thật lần 2: model lấy 1 căn cứ có thật ("đã có quyết định kiểm toán") để kết luận "Tuân thủ" cho mọi tiêu chí không
+  liên quan, và "chưa thấy …" thành "Không tuân thủ". Bổ sung: `reason` bắt buộc và **phải có ít nhất 1 từ nội dung chung
+  với chính tiêu chí** (bỏ từ chung như "kiểm toán", "đoàn", "đã", "có", "quy định"…); bộ lọc thiếu dữ liệu bắt cả "chưa
+  thấy / không thấy / chưa ghi nhận / chưa thể hiện". Vi phạm ⇒ `NEED_REVIEW`.
+- Test thật lần 3: còn lọt kiểu lặp lại chữ của tiêu chí ("Đã thấy biên bản ghi nhận…") trong khi hồ sơ không có biên bản.
+  Bổ sung: lý do **phải nhắc tới chính căn cứ đã dẫn** (từ neo: quyết định/QĐ, công việc/tiến độ, TTSS/sai sót, kiến
+  nghị, mục tiêu, phạm vi, thời gian/ngày…; hoặc trích đúng 1 giá trị có số như số QĐ). Kết quả trên hồ sơ CN55202601
+  (chỉ có quyết định + 1 kiến nghị): 1 gợi ý "Tuân thủ" (tiêu chí "Triển khai quyết định kiểm toán"), còn lại "Cần xem
+  hồ sơ" — 6 câu trả lời thật của model được đưa vào `AgentG4ApiTest` để khoá hành vi.

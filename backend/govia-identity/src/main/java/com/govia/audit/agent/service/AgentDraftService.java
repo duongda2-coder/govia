@@ -68,11 +68,14 @@ public class AgentDraftService {
     private final AuditTtssController ttssController;
     private final AgentAuditLogService auditLogService;
     private final AgentProperties agentProperties;
+    private final AgentProfileRegistry registry;
     private final ObjectMapper objectMapper;
 
     public AgentDraftService(LlmProvider llmProvider, AgentWorkToolsService workTools, AgentPlanTdkpToolsService planTdkpTools,
                              AuditTtssController ttssController,
-                             AgentAuditLogService auditLogService, AgentProperties agentProperties, ObjectMapper objectMapper) {
+                             AgentAuditLogService auditLogService, AgentProperties agentProperties, AgentProfileRegistry registry,
+                             ObjectMapper objectMapper) {
+        this.registry = registry;
         this.llmProvider = llmProvider;
         this.workTools = workTools;
         this.planTdkpTools = planTdkpTools;
@@ -199,7 +202,7 @@ public class AgentDraftService {
      * cho moi don vi, cho trong {don_vi}). Khong gui thu, khong doi hien trang.
      */
     public ReminderDraftResponse draftReminder(ReminderDraftRequest request, CurrentUserPrincipal principal) {
-        if (!agentProperties.isAgentEnabled(AgentProfileRegistry.REMEDIATION)) {
+        if (!registry.isEnabled(AgentProfileRegistry.REMEDIATION)) {
             throw new BusinessException("AGENT_DISABLED", "Tro ly AI theo doi khac phuc dang duoc tat theo cau hinh", HttpStatus.SERVICE_UNAVAILABLE);
         }
         long start = System.currentTimeMillis();
@@ -295,14 +298,14 @@ public class AgentDraftService {
     // ------------------------------------------------------------------ helpers
 
     private void requireEnabled() {
-        if (!agentProperties.isAgentEnabled(AgentProfileRegistry.FINDING)) {
+        if (!registry.isEnabled(AgentProfileRegistry.FINDING)) {
             throw new BusinessException("AGENT_DISABLED", "Tro ly AI soan thao dang duoc tat theo cau hinh he thong", HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
     /** 1 lan goi model, bat buoc tra qua 1 tool co cau truc; neu model tra text tu do thi nhac 1 lan, van
      * khong duoc thi tra text do o khoa "_freeText" de nguoi goi tu xu ly (danh dau chua kiem chung). */
-    private Map<String, Object> callForTool(String system, String user, ToolSpec tool, String toolName,
+    Map<String, Object> callForTool(String system, String user, ToolSpec tool, String toolName,
                                             CurrentUserPrincipal principal, String logQuestion) {
         List<ChatMessage> messages = new ArrayList<>(List.of(ChatMessage.system(system), ChatMessage.user(user)));
         String freeText = null;
@@ -374,7 +377,7 @@ public class AgentDraftService {
     }
 
     /** Moi so (>= 3 chu so) trong ban nhap phai xuat hien trong du lieu goc - chan so lieu tu bia. */
-    private static boolean numbersFrom(String text, String source) {
+    static boolean numbersFrom(String text, String source) {
         String normalizedSource = source.replaceAll("[.,\\s]", "");
         Matcher m = NUMBER.matcher(text);
         while (m.find()) {
@@ -415,21 +418,21 @@ public class AgentDraftService {
     }
 
     @SuppressWarnings("unchecked")
-    private static List<Map<String, Object>> mapList(Object value) {
+    static List<Map<String, Object>> mapList(Object value) {
         if (!(value instanceof List<?> list)) {
             return List.of();
         }
         return list.stream().filter(i -> i instanceof Map<?, ?>).map(i -> (Map<String, Object>) i).toList();
     }
 
-    private static List<String> stringList(Object value) {
+    static List<String> stringList(Object value) {
         if (!(value instanceof List<?> list)) {
             return List.of();
         }
         return list.stream().filter(Objects::nonNull).map(String::valueOf).toList();
     }
 
-    private static String stringOrNull(Object value) {
+    static String stringOrNull(Object value) {
         return value == null || String.valueOf(value).isBlank() ? null : String.valueOf(value);
     }
 

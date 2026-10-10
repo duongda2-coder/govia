@@ -1,18 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
-import { Drawer, FloatButton, Segmented } from "antd";
+import { Badge, Drawer, FloatButton, Segmented } from "antd";
 import { RobotOutlined } from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthContext";
 import { AuditAgentChat } from "../pages/Audit/Agent/AuditAgentChat";
 import { AgentDraftPanel } from "./agent/AgentDraftPanel";
-import { agentApi, type AgentHealth, type AgentPageContext, type AgentScreenRef } from "../api/agent";
+import { AgentSuggestionPanel } from "./agent/AgentSuggestionPanel";
+import { AgentKpiPanel } from "./agent/AgentKpiPanel";
+import { agentApi, agentSuggestionApi, type AgentHealth, type AgentPageContext, type AgentScreenRef } from "../api/agent";
 import type { SearchableScreen } from "../layout/useAppMenu";
 
-type WidgetView = "chat" | "draft";
+type WidgetView = "chat" | "draft" | "suggestion" | "kpi";
 
 /** Nut noi "Tro ly AI" - hien tren MOI man hinh (mount 1 lan trong AppLayout), mo khung AI ben phai voi 2
- * phan: "Trò chuyện" va "Soạn nháp". TOAN BO tinh nang AI nam trong khung nay - khong co nut AI nao tren man
+ * phan: "Trò chuyện", "Soạn nháp", "Gợi ý AI" (G4) va "Thống kê" (G4, chi quan tri AUDIT.AGENT.ADMIN). TOAN BO tinh nang AI nam trong khung nay - khong co nut AI nao tren man
  * hinh nghiep vu. Chi hien khi co quyen AUDIT.AGENT.VIEW VA AI dang bat (health.enabled); tat AI la nut bien
  * mat. Tu biet man hinh dang mo (pageContext) va danh sach man hinh nguoi dung duoc thay (screens). */
 export function AuditAgentWidget({ screens }: { screens: SearchableScreen[] }) {
@@ -22,7 +24,9 @@ export function AuditAgentWidget({ screens }: { screens: SearchableScreen[] }) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<WidgetView>("chat");
   const [health, setHealth] = useState<AgentHealth | null>(null);
+  const [unread, setUnread] = useState(0);
   const canUse = hasPermission("AUDIT.AGENT.VIEW");
+  const canKpi = hasPermission("AUDIT.AGENT.ADMIN");
 
   useEffect(() => {
     if (!canUse) return;
@@ -35,6 +39,19 @@ export function AuditAgentWidget({ screens }: { screens: SearchableScreen[] }) {
       cancelled = true;
     };
   }, [canUse, open]);
+
+  // So "Gợi ý AI" chua doc hien tren nut robot ngay ca khi chua mo khung (khung chi mount khi mo lan dau)
+  useEffect(() => {
+    if (!canUse || !health?.enabled || open) return;
+    let cancelled = false;
+    agentSuggestionApi
+      .list()
+      .then((list) => !cancelled && setUnread(list.filter((s) => !s.read).length))
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [canUse, health?.enabled, open, location.pathname]);
 
   const screenRefs = useMemo<AgentScreenRef[]>(
     () => screens.map((s) => ({ label: s.label, group: s.groupLabel, path: s.path })),
@@ -54,7 +71,13 @@ export function AuditAgentWidget({ screens }: { screens: SearchableScreen[] }) {
 
   return (
     <>
-      <FloatButton icon={<RobotOutlined />} type="primary" tooltip={t("agent.widget.title")} onClick={() => setOpen(true)} />
+      <FloatButton
+        icon={<RobotOutlined />}
+        type="primary"
+        tooltip={t("agent.widget.title")}
+        badge={unread > 0 ? { count: unread, overflowCount: 9 } : undefined}
+        onClick={() => setOpen(true)}
+      />
       <Drawer
         title={t("agent.widget.title")}
         extra={
@@ -64,12 +87,21 @@ export function AuditAgentWidget({ screens }: { screens: SearchableScreen[] }) {
             options={[
               { value: "chat", label: t("agent.widget.chat") },
               { value: "draft", label: t("agent.widget.draft") },
+              {
+                value: "suggestion",
+                label: (
+                  <Badge count={unread} size="small" offset={[6, -2]}>
+                    {t("agent.widget.suggestion")}
+                  </Badge>
+                ),
+              },
+              ...(canKpi ? [{ value: "kpi" as const, label: t("agent.widget.kpi") }] : []),
             ]}
           />
         }
         open={open}
         onClose={() => setOpen(false)}
-        width={560}
+        width={620}
         destroyOnClose={false}
         styles={{ body: { display: "flex", flexDirection: "column", padding: 16 } }}
       >
@@ -80,6 +112,14 @@ export function AuditAgentWidget({ screens }: { screens: SearchableScreen[] }) {
         <div style={{ display: view === "draft" ? "block" : "none", overflowY: "auto" }}>
           <AgentDraftPanel pageContext={pageContext} agents={health.agents} />
         </div>
+        <div style={{ display: view === "suggestion" ? "block" : "none", overflowY: "auto" }}>
+          <AgentSuggestionPanel active={open && view === "suggestion"} scheduled={health.scheduledSuggestions} onUnreadChange={setUnread} />
+        </div>
+        {canKpi && view === "kpi" && (
+          <div style={{ overflowY: "auto" }}>
+            <AgentKpiPanel />
+          </div>
+        )}
       </Drawer>
     </>
   );

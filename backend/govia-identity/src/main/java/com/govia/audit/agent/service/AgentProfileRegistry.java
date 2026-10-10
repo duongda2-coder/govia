@@ -1,6 +1,9 @@
 package com.govia.audit.agent.service;
 
 import com.govia.audit.agent.config.AgentProperties;
+import com.govia.core.security.CurrentUserPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,6 +25,8 @@ public class AgentProfileRegistry {
     public static final String CATALOG = "A7";
     public static final String PLANNING = "A2";
     public static final String REMEDIATION = "A5";
+    public static final String QUALITY = "A6";
+    static final String SUPER_ADMIN_ROLE = "SUPER_ADMIN";
 
     private final AgentProperties agentProperties;
 
@@ -46,6 +51,21 @@ public class AgentProfileRegistry {
                             "cho toi duyet", "man hinh", "chuc nang", "menu", "tai lieu", "van ban", "quy dinh", "quy che",
                             "thu vien", "huong dan su dung"),
                     List.of("/workflow")),
+            new AgentProfile(QUALITY, "Trợ lý Chất lượng",
+                    "Đánh giá chất lượng (ĐGCL) PL01A/B/F: tiến độ chấm, phiếu chưa xác nhận/kiểm soát, tiêu chí không tuân thủ, hồ sơ đoàn, chênh lệch giữa người chấm",
+                    """
+                    Pham vi cua ban (A6 - Tro ly Chat luong): danh gia chat luong doan kiem toan (DGCL) theo phieu PL01A                     (trinh tu, thoi gian), PL01B (noi dung), PL01F (chat luong, diem cong/tru, xep loai).
+                    - Tong quan 1 cuoc kiem toan: get_dgcl_overview (diem da luu, phieu nao chua xac nhan/kiem soat, nguoi cham).
+                    - Chi tiet 1 phieu: get_dgcl_sheet (tieu chi khong tuan thu, chua cham, so loi PL01F).
+                    - Ho so doan lam can cu: get_engagement_dossier (tien do CBKT/THKT/DCKT, TTSS, kien nghi).
+                    - Chenh lech giua nguoi cham: get_dgcl_evaluator_variance.
+                    Chua biet cuoc kiem toan thi goi get_dgcl_overview khong tham so de lay danh sach. Ban chi PHAN TICH va                     GOI Y; DIEM DGCL do nguoi cham tu nhap, xac nhan va kiem soat tren man hinh Danh gia chat luong. Muon AI                     goi y tung tieu chi: huong dan nguoi dung mo tab "Soạn nháp" -> "Gợi ý chấm ĐGCL".
+                    """,
+                    List.of("get_dgcl_overview", "get_dgcl_sheet", "get_engagement_dossier", "get_dgcl_evaluator_variance"),
+                    List.of("danh gia chat luong", "dgcl", "pl01a", "pl01b", "pl01f", "pl04b1", "cham chat luong",
+                            "diem chat luong", "xep loai chat luong", "nguoi cham", "phieu danh gia", "kiem soat chat luong",
+                            "chenh lech cham"),
+                    List.of("/audit/dgcl")),
             new AgentProfile(REMEDIATION, "Trợ lý Theo dõi khắc phục",
                     "Kiến nghị/nghị quyết quá hạn, sắp đến hạn theo đơn vị trên 5 danh sách theo dõi khắc phục; soạn nháp thư đôn đốc",
                     """
@@ -143,8 +163,30 @@ public class AgentProfileRegistry {
         return profiles.stream().filter(p -> p.code().equalsIgnoreCase(code)).findFirst();
     }
 
-    /** A0 luon bat khi AI bat; agent chuyen trach co the tat rieng qua govia.agent.disabled-agents. */
+    /** A0 luon bat khi AI bat; agent chuyen trach co the tat rieng qua govia.agent.disabled-agents va (G4) gioi han
+     * theo vai tro qua govia.agent.agent-roles - xet theo nguoi dung dang dang nhap (SecurityContext). */
     public boolean isEnabled(AgentProfile profile) {
-        return GENERAL.equals(profile.code()) ? agentProperties.isEnabled() : agentProperties.isAgentEnabled(profile.code());
+        if (GENERAL.equals(profile.code())) {
+            return agentProperties.isEnabled();
+        }
+        return agentProperties.isAgentEnabled(profile.code()) && roleAllowed(profile.code());
+    }
+
+    /** Agent (theo ma) dung duoc cho nguoi dung hien tai khong - dung cho cac cong cu soan nhap. */
+    public boolean isEnabled(String code) {
+        return find(code).map(this::isEnabled).orElse(false);
+    }
+
+    private boolean roleAllowed(String code) {
+        java.util.Set<String> allowed = agentProperties.rolesFor(code);
+        if (allowed.isEmpty()) {
+            return true;
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof CurrentUserPrincipal principal) || principal.roles() == null) {
+            return false;
+        }
+        return principal.roles().stream().map(r -> r.toUpperCase(java.util.Locale.ROOT))
+                .anyMatch(r -> SUPER_ADMIN_ROLE.equals(r) || allowed.contains(r));
     }
 }

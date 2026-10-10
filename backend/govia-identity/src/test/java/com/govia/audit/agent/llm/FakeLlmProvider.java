@@ -24,6 +24,7 @@ public class FakeLlmProvider implements LlmProvider {
     private boolean failNextCall = false;
     private List<ToolSpec> lastTools = List.of();
     private List<ChatMessage> lastMessages = List.of();
+    private int callCount = 0;
 
     public void reset() {
         script.clear();
@@ -41,6 +42,11 @@ public class FakeLlmProvider implements LlmProvider {
     /** Bo tool da gui cho model o lan goi gan nhat - de test kiem tra agent chi thay dung bo tool cua minh. */
     public List<ToolSpec> lastTools() {
         return lastTools;
+    }
+
+    /** Tong so lan chat() da duoc goi (khong reset) - de test khang dinh 1 luong KHONG goi model. */
+    public int callCount() {
+        return callCount;
     }
 
     public List<ChatMessage> lastMessages() {
@@ -65,6 +71,7 @@ public class FakeLlmProvider implements LlmProvider {
 
     @Override
     public ChatResult chat(List<ChatMessage> messages, List<ToolSpec> tools) {
+        callCount++;
         lastTools = tools;
         lastMessages = messages;
         if (failNextCall) {

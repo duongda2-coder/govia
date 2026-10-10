@@ -59,6 +59,10 @@ govia:
       base-url: ${OLLAMA_BASE_URL:http://127.0.0.1:11434}
       model: ${OLLAMA_MODEL:qwen2.5:7b-instruct}
       timeout-seconds: ${OLLAMA_TIMEOUT_SECONDS:120}
+      # Tham so sinh (G4): nhiet do thap, gioi han token tra loi, ngu canh 8192 (mac dinh Ollama 4096 bi tran)
+      temperature: ${OLLAMA_TEMPERATURE:0.1}
+      max-tokens: ${OLLAMA_MAX_TOKENS:2048}
+      context-size: ${OLLAMA_CONTEXT_SIZE:8192}
       access-client-id: ${OLLAMA_ACCESS_CLIENT_ID:}
       access-client-secret: ${OLLAMA_ACCESS_CLIENT_SECRET:}
     # Moi truong van hanh: GOVIA_LLM_PROVIDER=openai-compatible + vLLM chay model ~30B tren may GPU noi bo
@@ -83,6 +87,14 @@ govia:
       enabled: ${GOVIA_AGENT_FILE_READING_ENABLED:false}
       max-bytes: ${GOVIA_AGENT_FILE_MAX_BYTES:10485760}
       max-chars: ${GOVIA_AGENT_FILE_MAX_CHARS:20000}
+    # G4: gioi han tro ly theo vai tro, vd "A6=TRUONG_DOAN|KSCL;A2=KE_HOACH" (trong = khong gioi han, SUPER_ADMIN luon duoc).
+    agent-roles: ${GOVIA_AGENT_AGENT_ROLES:}
+    # G4 (M3): job "Goi y AI" theo lich rieng cua module agent (khong timer BPMN, khong goi model, khong gui thu).
+    schedule:
+      enabled: ${GOVIA_AGENT_SCHEDULE_ENABLED:true}
+      cron: "${GOVIA_AGENT_SCHEDULE_CRON:0 0 6 * * MON-FRI}"
+      due-soon-days: ${GOVIA_AGENT_SCHEDULE_DUE_SOON_DAYS:7}
+      stale-task-days: ${GOVIA_AGENT_SCHEDULE_STALE_TASK_DAYS:3}
   notification:
     email:
       # Mac dinh TAT: chua co SMTP that nao duoc cau hinh. Khi bat len (true) can dien them

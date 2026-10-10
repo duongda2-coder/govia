@@ -27,6 +27,7 @@ const SUGGESTION_GROUPS: [prefix: string, group: string][] = [
   ["/audit/plan/execution/work-management/ttss", "finding"],
   ["/audit/phbc", "finding"],
   ["/audit/tdkp", "remediation"],
+  ["/audit/dgcl", "quality"],
   ["/audit/plan/khkt", "plan"],
   ["/audit/plan/khns", "plan"],
   ["/audit/plan/khth", "plan"],

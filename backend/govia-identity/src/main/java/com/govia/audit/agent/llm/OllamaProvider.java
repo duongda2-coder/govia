@@ -56,6 +56,7 @@ public class OllamaProvider implements LlmProvider {
         body.put("messages", messages.stream().map(this::toOllamaMessage).toList());
         body.put("tools", tools.stream().map(this::toOllamaTool).toList());
         body.put("stream", false);
+        body.put("options", options());
 
         Map<String, Object> response = restClient.post()
                 .uri("/api/chat")
@@ -66,6 +67,19 @@ public class OllamaProvider implements LlmProvider {
                 });
 
         return parseResponse(response);
+    }
+
+    /** Tham so sinh: nhiet do thap + gioi han do dai tra loi + ngu canh du lon (xem LlmProperties.Ollama). */
+    private Map<String, Object> options() {
+        Map<String, Object> options = new LinkedHashMap<>();
+        options.put("temperature", config.getTemperature());
+        if (config.getMaxTokens() > 0) {
+            options.put("num_predict", config.getMaxTokens());
+        }
+        if (config.getContextSize() > 0) {
+            options.put("num_ctx", config.getContextSize());
+        }
+        return options;
     }
 
     @Override

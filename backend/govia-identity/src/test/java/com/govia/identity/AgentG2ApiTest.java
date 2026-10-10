@@ -137,7 +137,8 @@ class AgentG2ApiTest extends AbstractApiTest {
         AgentAuditLog similar = log(conv, "search_similar_findings");
         assertThat(similar.getResponseSummary()).contains("CKTG2A02").contains("PH09").contains("bổ sung tài sản bảo đảm")
                 .doesNotContain("CKTG2A01");
-        assertThat(log(conv, "list_engagement_recommendations").getResponseSummary()).contains("KNKT000");
+        // G4: AI doc khong con lam man hinh "Luu ma kien nghi" tu tao dong mac dinh KNKT000 (truoc day bi ghi ngam)
+        assertThat(log(conv, "list_engagement_recommendations").getResponseSummary()).isEqualTo("[]");
     }
 
     @Test

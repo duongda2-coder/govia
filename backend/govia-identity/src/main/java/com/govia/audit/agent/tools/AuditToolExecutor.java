@@ -42,11 +42,14 @@ public class AuditToolExecutor {
     private final AgentWorkToolsService workTools;
     private final AgentPlanTdkpToolsService planTdkpTools;
     private final AgentFileService fileService;
+    private final AgentQualityToolsService qualityTools;
     private final ObjectMapper objectMapper;
 
     public AuditToolExecutor(AuditToolsController controller, AgentToolsController agentToolsController,
                              WorkflowTaskController workflowTaskController, AgentWorkToolsService workTools,
-                             AgentPlanTdkpToolsService planTdkpTools, AgentFileService fileService, ObjectMapper objectMapper) {
+                             AgentPlanTdkpToolsService planTdkpTools, AgentFileService fileService,
+                             AgentQualityToolsService qualityTools, ObjectMapper objectMapper) {
+        this.qualityTools = qualityTools;
         this.planTdkpTools = planTdkpTools;
         this.fileService = fileService;
         this.workTools = workTools;
@@ -108,6 +111,11 @@ public class AuditToolExecutor {
             case "get_monthly_staffing" -> planTdkpTools.getMonthlyStaffing(requireInt(a, "year"));
             case "list_attachments" -> fileService.listAttachments(requireString(a, "entityType"), requireUuid(a, "entityId"));
             case "read_attachment_text" -> fileService.readAttachmentText(requireUuid(a, "attachmentId"));
+            case "get_dgcl_overview" -> qualityTools.getOverview(currentPrincipal(), optString(a, "engagement"));
+            case "get_dgcl_sheet" -> qualityTools.getSheet(currentPrincipal(), requireString(a, "engagement"), requireString(a, "subject"),
+                    requireString(a, "appendix"), optBoolean(a, "issuesOnly"));
+            case "get_engagement_dossier" -> qualityTools.getDossier(currentPrincipal(), requireString(a, "engagement"));
+            case "get_dgcl_evaluator_variance" -> qualityTools.getEvaluatorVariance(currentPrincipal(), optInt(a, "year"));
             default -> null;
         };
     }

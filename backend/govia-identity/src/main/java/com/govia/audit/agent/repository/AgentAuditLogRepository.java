@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface AgentAuditLogRepository extends JpaRepository<AgentAuditLog, UUID> {
     List<AgentAuditLog> findByTenantIdAndConversationIdOrderByTurnSeqAsc(UUID tenantId, UUID conversationId);
+
+    List<AgentAuditLog> findByTenantIdAndCreatedAtAfter(UUID tenantId, java.time.Instant after);
 }

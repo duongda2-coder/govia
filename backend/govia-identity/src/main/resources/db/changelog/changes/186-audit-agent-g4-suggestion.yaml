@@ -1,0 +1,58 @@
+databaseChangeLog:
+
+  # ===================== AI Agent G4 - muc "Goi y AI" (job theo lich) + quyen xem thong ke AI =====================
+  # Chi THEM 1 bang moi cua module agent (tien to agent_) va 1 dong quyen moi trong catalog - khong sua bang nghiep
+  # vu, khong gan quyen cho vai tro nao (SUPER_ADMIN co wildcard nen tu co). Xoa bang nay khong anh huong du lieu kiem toan.
+  - changeSet:
+      id: 186-1-agent-suggestion-schema
+      author: govia
+      comment: "Bang agent_suggestion - ket qua job Goi y AI chay theo lich (moi nguoi dung chi thay goi y cua minh)"
+      changes:
+        - createTable:
+            tableName: agent_suggestion
+            columns:
+              - column: { name: id, type: UUID, constraints: { primaryKey: true } }
+              - column: { name: tenant_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: user_id, type: UUID, constraints: { nullable: false } }
+              - column: { name: agent_code, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: category, type: VARCHAR(50), constraints: { nullable: false } }
+              - column: { name: severity, type: VARCHAR(10), constraints: { nullable: false } }
+              - column: { name: title, type: VARCHAR(300), constraints: { nullable: false } }
+              - column: { name: detail, type: VARCHAR(4000) }
+              - column: { name: link_path, type: VARCHAR(300) }
+              - column: { name: item_count, type: INT, defaultValueNumeric: 0, constraints: { nullable: false } }
+              - column: { name: run_date, type: DATE, constraints: { nullable: false } }
+              - column: { name: read_at, type: TIMESTAMP }
+              - column: { name: dismissed, type: BOOLEAN, defaultValueBoolean: false, constraints: { nullable: false } }
+              - column: { name: created_at, type: TIMESTAMP, constraints: { nullable: false } }
+              - column: { name: created_by, type: VARCHAR(64) }
+              - column: { name: updated_at, type: TIMESTAMP }
+              - column: { name: updated_by, type: VARCHAR(64) }
+              - column: { name: row_version, type: BIGINT, defaultValueNumeric: 0, constraints: { nullable: false } }
+        - addForeignKeyConstraint:
+            baseTableName: agent_suggestion
+            baseColumnNames: tenant_id
+            referencedTableName: tenant
+            referencedColumnNames: id
+            constraintName: fk_agent_suggestion_tenant
+        - createIndex:
+            tableName: agent_suggestion
+            indexName: ix_agent_suggestion_user
+            columns:
+              - column: { name: tenant_id }
+              - column: { name: user_id }
+              - column: { name: run_date }
+
+  - changeSet:
+      id: 186-2-permission-catalog-audit-agent-admin
+      author: govia
+      comment: "Quyen xem thong ke su dung Tro ly AI (KPI) - chi them vao catalog, khong gan cho vai tro nao"
+      changes:
+        - insert:
+            tableName: permission
+            columns:
+              - column: { name: id, value: "6b0f2a9e-4c1d-4e57-9a3b-2d8c7e5f1a46" }
+              - column: { name: code, value: "AUDIT.AGENT.ADMIN" }
+              - column: { name: module, value: "AUDIT" }
+              - column: { name: description, value: "Xem thong ke su dung va chat luong Tro ly AI" }
+              - column: { name: resource_label, value: "Audit AI Assistant" }

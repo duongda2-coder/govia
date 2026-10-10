@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Alert, App, Button, Collapse, Form, Input, InputNumber, List, Segmented, Select, Space, Tabs, Tag, Typography } from "antd";
+import { Alert, App, Button, Collapse, Form, Input, InputNumber, List, Select, Space, Tabs, Tag, Typography } from "antd";
 import { CopyOutlined, RobotOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import {
@@ -11,16 +11,20 @@ import {
   type RewritePurpose,
   type RewriteResult,
   type TdkpReminderSource,
+  type ImportCatalog,
 } from "../../api/agent";
 import { listAssignedAuditEngagements, type AuditEngagementItem } from "../../api/auditEngagement";
 import { listMasterDataItems, type MasterDataItem } from "../../api/auditMasterData";
 import { agentErrorKey } from "./agentErrors";
+import { DgclScoreTool, ImportCheckTool } from "./AgentG4Tools";
 
-type DraftTool = "recommendation" | "rewrite" | "reminder";
+type DraftTool = "recommendation" | "rewrite" | "reminder" | "dgcl" | "importCheck";
 
 /** Cong cu nao mo san theo man hinh dang xem - nguoi dung van doi duoc. */
 function defaultTool(path: string): DraftTool {
   if (path.startsWith("/audit/tdkp")) return "reminder";
+  if (path.startsWith("/audit/dgcl")) return "dgcl";
+  if (path.startsWith("/audit/plan/master-data") || path.startsWith("/audit/master-data/control-point")) return "importCheck";
   if (path.startsWith("/audit/plan/execution/work-management/ttss")) return "recommendation";
   return "rewrite";
 }
@@ -32,6 +36,17 @@ function defaultReminderSource(path: string): TdkpReminderSource {
   if (path.startsWith("/audit/tdkp/resolution")) return "RESOLUTION";
   if (path.startsWith("/audit/tdkp/unit-recommendation")) return "UNIT";
   return "CEO_ALL";
+}
+
+/** Danh muc mo san theo man hinh danh muc dang xem. */
+function defaultImportCatalog(path: string): ImportCatalog {
+  const qt = path.includes("master-data-qt");
+  if (path.includes("control-point")) return qt ? "control_point_qt" : "control_point";
+  if (path.includes("work-item")) return qt ? "work_item_qt" : "work_item";
+  if (path.includes("exception-type")) return qt ? "exception_type_qt" : "exception_type";
+  if (path.includes("exception-mapping")) return qt ? "exception_mapping_qt" : "exception_mapping";
+  if (path.includes("process-step")) return qt ? "process_step_qt" : "process_step";
+  return "control_point";
 }
 
 function useCopy() {
@@ -68,6 +83,8 @@ export function AgentDraftPanel({ pageContext, agents }: AgentDraftPanelProps) {
           { value: "recommendation", label: t("agent.panel.toolRecommendation"), agent: "A4" },
           { value: "rewrite", label: t("agent.panel.toolRewrite"), agent: "A4" },
           { value: "reminder", label: t("agent.panel.toolReminder"), agent: "A5" },
+          { value: "dgcl", label: t("agent.panel.toolDgcl"), agent: "A6" },
+          { value: "importCheck", label: t("agent.panel.toolImportCheck"), agent: "A7" },
         ] as const
       ).filter((tool) => enabled(tool.agent)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -86,11 +103,17 @@ export function AgentDraftPanel({ pageContext, agents }: AgentDraftPanelProps) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <Segmented<DraftTool> block value={active} onChange={setTool} options={tools.map((x) => ({ value: x.value, label: x.label }))} />
+      <Form layout="vertical" style={{ marginBottom: -12 }}>
+        <Form.Item label={t("agent.panel.tool")}>
+          <Select<DraftTool> value={active} onChange={setTool} options={tools.map((x) => ({ value: x.value, label: x.label }))} />
+        </Form.Item>
+      </Form>
       <Alert type="info" showIcon message={t("agent.panel.hint")} />
       {active === "recommendation" && <RecommendationTool />}
       {active === "rewrite" && <RewriteTool defaultPurpose={path.startsWith("/audit/phbc") ? "RECOMMENDATION" : "FINDING"} />}
       {active === "reminder" && <ReminderTool defaultSource={defaultReminderSource(path)} />}
+      {active === "dgcl" && <DgclScoreTool />}
+      {active === "importCheck" && <ImportCheckTool defaultCatalog={defaultImportCatalog(path)} />}
     </div>
   );
 }

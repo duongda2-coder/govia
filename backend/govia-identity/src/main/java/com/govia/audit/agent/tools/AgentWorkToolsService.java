@@ -13,7 +13,7 @@ import com.govia.audit.planengagement.controller.AuditEngagementController;
 import com.govia.audit.planengagement.controller.AuditWorkAssignmentController;
 import com.govia.audit.planengagement.dto.AuditEngagementResponse;
 import com.govia.audit.planengagement.dto.AuditWorkManagementItemResponse;
-import com.govia.audit.planengagement.recommendation.controller.AuditRecommendationController;
+import com.govia.audit.planengagement.recommendation.service.AuditRecommendationService;
 import com.govia.audit.planengagement.recommendation.dto.AuditRecommendationResponse;
 import com.govia.audit.planengagement.ttss.controller.AuditTtssController;
 import com.govia.audit.planengagement.ttss.dto.AuditTtssRecordResponse;
@@ -25,6 +25,9 @@ import com.govia.audit.workitemqt.controller.AuditWorkItemQtController;
 import com.govia.core.security.CurrentUserPrincipal;
 import com.govia.core.web.BusinessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -62,14 +65,14 @@ public class AgentWorkToolsService {
     private final AuditEngagementController engagementController;
     private final AuditWorkAssignmentController workAssignmentController;
     private final AuditTtssController ttssController;
-    private final AuditRecommendationController recommendationController;
+    private final AuditRecommendationService recommendationService;
     private final ObjectMapper objectMapper;
     private final Map<String, CatalogSource> catalogs = new LinkedHashMap<>();
 
     public AgentWorkToolsService(AuditEngagementController engagementController,
                                  AuditWorkAssignmentController workAssignmentController,
                                  AuditTtssController ttssController,
-                                 AuditRecommendationController recommendationController,
+                                 AuditRecommendationService recommendationService,
                                  AuditControlPointController controlPointController,
                                  AuditControlPointQtController controlPointQtController,
                                  AuditWorkItemController workItemController,
@@ -84,7 +87,7 @@ public class AgentWorkToolsService {
         this.engagementController = engagementController;
         this.workAssignmentController = workAssignmentController;
         this.ttssController = ttssController;
-        this.recommendationController = recommendationController;
+        this.recommendationService = recommendationService;
         this.objectMapper = objectMapper;
         register("control_point", "Danh mục Điểm kiểm soát (chi nhánh)", () -> controlPointController.list().data());
         register("control_point_qt", "Danh mục Điểm kiểm soát quy trình", () -> controlPointQtController.list().data());
@@ -100,6 +103,15 @@ public class AgentWorkToolsService {
 
     private void register(String key, String label, Supplier<List<?>> loader) {
         catalogs.put(key, new CatalogSource(key, label, loader));
+    }
+
+    /** Dong cua 1 danh muc (da doi sang Map) - dung cho kiem tra file truoc import (G4); quyen VIEW van do controller chan. */
+    public List<Map<String, Object>> catalogRows(String catalogKey) {
+        return rows(catalog(catalogKey));
+    }
+
+    public String catalogLabel(String catalogKey) {
+        return catalog(catalogKey).label();
     }
 
     public List<String> catalogKeys() {
@@ -202,7 +214,7 @@ public class AgentWorkToolsService {
     /** list_engagement_recommendations - danh muc "Luu ma kien nghi" cua 1 CKT. */
     public List<Map<String, Object>> listEngagementRecommendations(CurrentUserPrincipal principal, String engagementRef) {
         AuditEngagementResponse engagement = resolveEngagement(principal, engagementRef);
-        return recommendationController.list(engagement.id()).data().stream().map(AgentWorkToolsService::slimRecommendation).toList();
+        return readRecommendations(engagement.id()).stream().map(AgentWorkToolsService::slimRecommendation).toList();
     }
 
     /** search_similar_findings - tim TTSS va kien nghi co noi dung giong nhau o cac CKT nguoi dung duoc
@@ -361,10 +373,24 @@ public class AgentWorkToolsService {
 
     public List<AuditRecommendationResponse> safeRecommendations(UUID engagementId) {
         try {
-            return recommendationController.list(engagementId).data();
+            return readRecommendations(engagementId);
         } catch (RuntimeException e) {
             return List.of();
         }
+    }
+
+    /**
+     * Doc "Lưu mã kiến nghị" cua 1 CKT KHONG GHI GI. Khong goi AuditRecommendationController.list vi ham do (cua man
+     * hinh) tu tao dong kien nghi mac dinh khi CKT chua co dong nao - AI doc thi khong duoc lam phat sinh du lieu. Dung
+     * listByEngagementIds (transaction chi doc, khong seed) va kiem tra dung quyen cua endpoint man hinh (AUDIT.TTSS.VIEW).
+     */
+    public List<AuditRecommendationResponse> readRecommendations(UUID engagementId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean allowed = auth != null && auth.getAuthorities().stream().anyMatch(a -> "PERM_AUDIT.TTSS.VIEW".equals(a.getAuthority()));
+        if (!allowed) {
+            throw new AccessDeniedException("Thieu quyen AUDIT.TTSS.VIEW");
+        }
+        return recommendationService.listByEngagementIds(List.of(engagementId));
     }
 
     private List<AuditTtssRecordResponse> safeTtss(UUID engagementId, CurrentUserPrincipal principal) {

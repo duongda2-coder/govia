@@ -79,7 +79,8 @@ public class AgentController {
                 .map(p -> new AgentHealthResponse.AgentInfo(p.code(), p.name(), p.description(), profileRegistry.isEnabled(p)))
                 .toList();
         return ApiResponse.ok(new AgentHealthResponse(enabled, enabled && llmProvider.isAvailable(), llmProvider.modelId(),
-                llmProperties.getProvider(), embeddingClient.isConfigured(), fileService.enabled(), agents));
+                llmProperties.getProvider(), embeddingClient.isConfigured(), fileService.enabled(),
+                enabled && agentProperties.getSchedule().isEnabled(), agents));
     }
 
     @GetMapping("/conversations")

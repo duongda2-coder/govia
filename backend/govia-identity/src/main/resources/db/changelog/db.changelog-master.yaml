@@ -539,3 +539,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changes/185-audit-agent-g1-conversation.yaml
       relativeToChangelogFile: false
+  - include:
+      file: db/changelog/changes/186-audit-agent-g4-suggestion.yaml
+      relativeToChangelogFile: false

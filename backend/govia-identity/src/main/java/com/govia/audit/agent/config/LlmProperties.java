@@ -47,6 +47,36 @@ public class LlmProperties {
          * expose qua Cloudflare Tunnel + Access cho moi truong remote (xem huong dan trien khai). */
         private String accessClientId = "";
         private String accessClientSecret = "";
+        /** Nhiet do lay mau (giong provider vLLM = 0.1): thap de goi tool/so lieu on dinh. Mac dinh Ollama la 0.8. */
+        private double temperature = 0.1;
+        /** Gioi han so token model sinh ra moi luot (num_predict) - chan model nho "noi mai khong dung" toi het thoi gian cho. */
+        private int maxTokens = 2048;
+        /** Cua so ngu canh (num_ctx). Mac dinh Ollama 4096 qua nho cho prompt + bo tool + du lieu; 0 = dung mac dinh may chu. */
+        private int contextSize = 8192;
+
+        public double getTemperature() {
+            return temperature;
+        }
+
+        public void setTemperature(double temperature) {
+            this.temperature = temperature;
+        }
+
+        public int getMaxTokens() {
+            return maxTokens;
+        }
+
+        public void setMaxTokens(int maxTokens) {
+            this.maxTokens = maxTokens;
+        }
+
+        public int getContextSize() {
+            return contextSize;
+        }
+
+        public void setContextSize(int contextSize) {
+            this.contextSize = contextSize;
+        }
 
         public String getBaseUrl() {
             return baseUrl;

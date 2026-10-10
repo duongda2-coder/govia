@@ -162,7 +162,7 @@ class AgentG1ApiTest extends AbstractApiTest {
         agentProperties.setEnabled(true);
         health = getData(adminToken, "/api/audit/agent/health");
         assertThat(health.get("enabled").asBoolean()).isTrue();
-        assertThat(health.get("agents")).hasSize(7);
+        assertThat(health.get("agents")).hasSize(8); // G4 them A6
     }
 
     @Test
