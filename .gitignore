@@ -28,3 +28,6 @@ Thumbs.db
 
 # Local attachment storage (dev default, see application.yml GOVIA_ATTACHMENT_ROOT)
 backend/govia-identity/data/
+
+# File khoa tam cua Microsoft Office (Word/Excel dang mo)
+~$*
