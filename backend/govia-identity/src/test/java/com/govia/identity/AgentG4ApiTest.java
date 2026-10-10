@@ -193,7 +193,7 @@ class AgentG4ApiTest extends AbstractApiTest {
         String sent = fakeLlmProvider.lastMessages().get(1).content();
         assertThat(sent).contains("A014").contains("A002").doesNotContain("\"A025\"").doesNotContain("\"A005\"");
         assertThat(fakeLlmProvider.lastTools().get(0).parametersJsonSchema().toString()).contains("quyetDinh").contains("mucTieu").doesNotContain("congViec");
-        assertThat(data.get("dossierFacts").toString()).contains("Kiến nghị đã tạo");
+        assertThat(data.get("dossierFacts").toString()).contains("Kiến nghị đã tạo").contains("Thực địa: chưa có").doesNotContain("null");
 
         // Phieu van y nguyen: A005 van "khong tuan thu", diem 50
         var after = dgclService.getSheet(fx.engagementId, fx.memberKey, DgclAppendix.PL01A, fx.evaluator);

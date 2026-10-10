@@ -193,9 +193,9 @@ public class AgentQualityToolsService {
         result.put("decisionNumber", e.decisionNumber());
         result.put("decisionDate", e.decisionDate());
         Map<String, Object> timeline = new LinkedHashMap<>();
-        timeline.put("planning", e.planningStartDate() + " -> " + e.planningEndDate());
-        timeline.put("fieldwork", e.fieldworkStartDate() + " -> " + e.fieldworkEndDate());
-        timeline.put("report", e.reportStartDate() + " -> " + e.reportEndDate());
+        timeline.put("planning", period(e.planningStartDate(), e.planningEndDate()));
+        timeline.put("fieldwork", period(e.fieldworkStartDate(), e.fieldworkEndDate()));
+        timeline.put("report", period(e.reportStartDate(), e.reportEndDate()));
         result.put("timeline", timeline);
         result.put("objective", excerpt(e.objective()));
         result.put("scope", excerpt(e.scope()));
@@ -402,6 +402,16 @@ public class AgentQualityToolsService {
         if (value != null) {
             target.add(factory.create(evaluator, appendix, value.doubleValue(), engagement));
         }
+    }
+
+    /** Khoang ngay hien cho nguoi dung/model: "chưa có" khi chua nhap, "?" cho dau con thieu. */
+    public static final String NOT_SET = "chưa có";
+
+    static String period(Object from, Object to) {
+        if (from == null && to == null) {
+            return NOT_SET;
+        }
+        return (from == null ? "?" : from) + " -> " + (to == null ? "?" : to);
     }
 
     public static Double round(Double v) {

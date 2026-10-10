@@ -254,7 +254,7 @@ public class AgentQualityDraftService {
         if (d.get("timeline") instanceof Map<?, ?> t) {
             for (Map.Entry<?, ?> en : t.entrySet()) {
                 String v = String.valueOf(en.getValue());
-                if (!v.contains("null")) {
+                if (!AgentQualityToolsService.NOT_SET.equals(v)) {
                     e.put("mocThoiGian." + en.getKey(), v);
                 }
             }
