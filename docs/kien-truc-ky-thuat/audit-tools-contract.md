@@ -520,3 +520,9 @@ không seed), tự kiểm tra cùng quyền `AUDIT.TTSS.VIEW` như endpoint. Kh�
   nghị, mục tiêu, phạm vi, thời gian/ngày…; hoặc trích đúng 1 giá trị có số như số QĐ). Kết quả trên hồ sơ CN55202601
   (chỉ có quyết định + 1 kiến nghị): 1 gợi ý "Tuân thủ" (tiêu chí "Triển khai quyết định kiểm toán"), còn lại "Cần xem
   hồ sơ" — 6 câu trả lời thật của model được đưa vào `AgentG4ApiTest` để khoá hành vi.
+- Test thật lần 4: model đổi sang "Đã thấy ghi nhận trong quyết định" cho các tiêu chí biên bản — kiểm tra câu chữ luôn có
+  thể bị lách. Chốt bằng **bảng tương thích căn cứ ↔ tiêu chí do hệ thống quyết định** (xét trên nội dung tiêu chí):
+  quyết định ↔ tiêu chí có "quyết định"; công việc ↔ "phân công/nhiệm vụ/công việc"; TTSS ↔ "phát hiện/sai sót/tồn
+  tại/sai phạm"; kiến nghị ↔ "kiến nghị/khuyến nghị"; mục tiêu/phạm vi ↔ "mục tiêu"/"phạm vi"; mốc thời gian ↔ "thời
+  hạn/đúng hạn/ngày làm việc/thời gian/trước khi". Tiêu chí không có căn cứ phù hợp **không được gửi cho model**; gợi ý
+  dẫn căn cứ không phù hợp bị hạ. Các lớp kiểm tra câu chữ ở trên vẫn giữ làm lớp phụ.

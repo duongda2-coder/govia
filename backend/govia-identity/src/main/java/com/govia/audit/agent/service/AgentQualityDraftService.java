@@ -90,7 +90,7 @@ public class AgentQualityDraftService {
                 he thong). CHI tra ve tieu chi ma 1 muc trong "canCu" CHUNG MINH TRUC TIEP duoc:
                 %s
                 QUY TAC:
-                1. Chi dung "key" co trong tieuChi. "evidence" PHAI la ten 1 muc trong "canCu" chung minh cho goi y do.
+                1. Chi dung "key" co trong tieuChi. "evidence" PHAI la 1 ten trong canCuPhuHop[key] cua chinh tieu chi do.
                 2. Khong co muc nao trong canCu noi ve tieu chi -> BO QUA tieu chi do (he thong tu ghi "can xem ho so"). \
                    THIEU THONG TIN KHONG PHAI LA KHONG TUAN THU. KHONG doan, KHONG suy dien tu ten tieu chi.
                 3. "reason": tieng Viet CO DAU, toi da 25 tu, neu dung du lieu trong canCu. KHONG bia so lieu, ten, ngay.
@@ -109,17 +109,21 @@ public class AgentQualityDraftService {
         int answeredBatches = 0;
         int downgraded = 0;
         List<String> overall = new ArrayList<>();
-        if (evidence.isEmpty()) {
-            overall.add("Hồ sơ đoàn trên hệ thống chưa có dữ liệu (mốc thời gian, công việc, TTSS, kiến nghị) để AI làm căn cứ - "
-                    + "mọi tiêu chí cần người chấm xem hồ sơ.");
+        if (evidence.isEmpty() || criteria.stream().allMatch(l -> fittingEvidence(evidence, l.content()).isEmpty())) {
+            overall.add("Hồ sơ đoàn trên hệ thống chưa có dữ liệu phù hợp (mốc thời gian, công việc, TTSS, kiến nghị…) để AI làm căn cứ "
+                    + "cho các tiêu chí của phiếu này - mọi tiêu chí cần người chấm xem hồ sơ.");
         }
-        for (int from = 0; !evidence.isEmpty() && from < criteria.size(); from += BATCH) {
-            List<Line> batch = criteria.subList(from, Math.min(from + BATCH, criteria.size()));
+        List<Line> askable = criteria.stream().filter(l -> !fittingEvidence(evidence, l.content()).isEmpty()).toList();
+        for (int from = 0; from < askable.size(); from += BATCH) {
+            List<Line> batch = askable.subList(from, Math.min(from + BATCH, askable.size()));
             Map<String, Object> input = new LinkedHashMap<>();
             input.put("phieu", appendix.name());
             input.put("thanhVien", AgentQualityToolsService.subjectLabel(subject));
             input.put("nghiepVu", sheet.segmentCodes());
             input.put("canCu", evidence);
+            // Moi tieu chi kem danh sach can cu duoc phep dung cho no
+            input.put("canCuPhuHop", batch.stream().collect(java.util.stream.Collectors.toMap(Line::key,
+                    l -> fittingEvidence(evidence, l.content()), (x, y) -> x, LinkedHashMap::new)));
             input.put("tieuChi", batch.stream().map(l -> {
                 Map<String, Object> m = new LinkedHashMap<>();
                 m.put("key", l.key());
@@ -154,6 +158,7 @@ public class AgentQualityDraftService {
                 String cited = AgentDraftService.stringOrNull(item.get("evidence"));
                 Line criterion = batch.stream().filter(l -> l.key().equals(key.trim())).findFirst().orElseThrow();
                 if (cited == null || !evidence.containsKey(cited.trim()) || claimsMissingData(reason)
+                        || !fittingEvidence(evidence, criterion.content()).contains(cited.trim())
                         || !relevantTo(reason, criterion.content()) || !mentionsEvidence(reason, cited.trim(), evidence.get(cited.trim()))) {
                     // Khong chi ra duoc can cu co that, hoac "chua co thong tin" bi coi la vi pham -> ha ve "can xem ho so"
                     downgraded++;
@@ -163,7 +168,7 @@ public class AgentQualityDraftService {
                 suggestions.putIfAbsent(key.trim(), item);
             }
         }
-        if (!evidence.isEmpty() && answeredBatches == 0) {
+        if (!askable.isEmpty() && answeredBatches == 0) {
             throw new BusinessException("AGENT_DGCL_NO_SUGGESTION", "AI chua dua ra duoc goi y cho phieu nay, vui long thu lai", HttpStatus.BAD_GATEWAY);
         }
 
@@ -279,6 +284,27 @@ public class AgentQualityDraftService {
             "kiem", "toan", "trong", "voi", "cho", "la", "thuc", "hien", "nay", "do", "tren", "vao", "ve", "khi", "thi", "mot", "nhung",
             "tai", "boi", "den", "tu", "hoac", "neu", "phai", "can", "day", "du", "tuan", "thu", "dung", "quy", "dinh", "noi", "bo",
             "truong", "thanh", "vien", "tieu", "chi", "ho", "so", "ngay", "nam");
+
+    /** Loai tieu chi ma tung loai can cu CO THE chung minh - xet tren noi dung TIEU CHI (he thong quyet dinh, khong de
+     * model tu chon): vd quyet dinh kiem toan chi chung minh duoc tieu chi noi ve quyet dinh, khong chung minh duoc "da lap
+     * bien ban", "da hop doan". */
+    private static final Map<String, List<String>> CRITERION_ANCHORS = Map.of(
+            "quyetDinh", List.of("quyet dinh"),
+            "congViec", List.of("phan cong", "nhiem vu", "cong viec"),
+            "ttss", List.of("phat hien", "sai sot", "ton tai", "sai pham"),
+            "kienNghi", List.of("kien nghi", "khuyen nghi"),
+            "mucTieu", List.of("muc tieu"),
+            "phamVi", List.of("pham vi"));
+    private static final List<String> TIME_CRITERION_ANCHORS = List.of("thoi han", "dung han", "ngay lam viec", "thoi gian", "truoc khi");
+
+    /** Can cu (trong so cac truong ho so co du lieu) phu hop voi 1 tieu chi. */
+    public static List<String> fittingEvidence(Map<String, Object> evidence, String criterion) {
+        String c = AgentText.normalize(criterion);
+        return evidence.keySet().stream().filter(k -> {
+            List<String> anchors = k.startsWith("mocThoiGian.") ? TIME_CRITERION_ANCHORS : CRITERION_ANCHORS.getOrDefault(k, List.of());
+            return anchors.stream().anyMatch(a -> AgentText.containsPhrase(c, a));
+        }).toList();
+    }
 
     /** Tu "neo" cua tung loai can cu - ly do dan can cu nao thi phai nhac toi chinh can cu do. */
     private static final Map<String, List<String>> EVIDENCE_ANCHORS = Map.of(

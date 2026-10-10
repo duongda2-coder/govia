@@ -151,46 +151,48 @@ class AgentG4ApiTest extends AbstractApiTest {
     @Test
     void dgclScoreDraft_onlySuggests_validatesKeysAndNumbers_neverSavesTheSheet() throws Exception {
         Fixture fx = dgclFixture("CKT-G4-02");
+        AuditEngagement e = engagementRepository.findById(fx.engagementId).orElseThrow();
+        e.setObjective("Đánh giá tuân thủ quy trình cấp tín dụng");
+        engagementRepository.saveAndFlush(e);
         dgclService.saveSheet(fx.engagementId, fx.memberKey, DgclAppendix.PL01A,
                 new SaveRequest(List.of(ok("A002", true), ok("A005", false))), fx.evaluator);
 
+        // Ho so co: quyet dinh + muc tieu. He thong chi hoi model ve tieu chi co can cu PHU HOP: A002 (muc tieu), A014 (quyet dinh)
         fakeLlmProvider.enqueueToolCall("submit_dgcl_suggestions", Map.of(
                 "items", List.of(
-                        Map.of("key", "A002", "suggestion", "COMPLIANT", "reason", "Mục tiêu, phạm vi nêu trong quyết định QD-CKT-G4-02", "evidence", "quyetDinh"),
-                        Map.of("key", "A003", "suggestion", "NON_COMPLIANT", "reason", "Lập kế hoạch trễ 987 ngày so với quyết định", "evidence", "quyetDinh"),
-                        Map.of("key", "A005", "suggestion", "COMPLIANT", "reason", "Thiết lập thủ tục theo quyết định QD-CKT-G4-02", "evidence", "quyetDinh"),
-                        // Khong dan can cu co that / coi "chua co thong tin" la vi pham -> he thong ha ve "can xem ho so"
-                        Map.of("key", "A006", "suggestion", "COMPLIANT", "reason", "Rủi ro đã được đánh giá"),
-                        Map.of("key", "A007", "suggestion", "NON_COMPLIANT", "reason", "Hồ sơ chưa có thông tin chọn mẫu", "evidence", "quyetDinh"),
-                        Map.of("key", "A008", "suggestion", "COMPLIANT", "reason", "Đã lập báo cáo", "evidence", "congViec"),
-                        // Lay 1 can cu chung cho tieu chi khong lien quan / "chua thay" -> ha ve "can xem ho so"
-                        Map.of("key", "A009", "suggestion", "COMPLIANT", "reason", "Đã có quyết định QD-CKT-G4-02", "evidence", "quyetDinh"),
-                        Map.of("key", "A004", "suggestion", "NON_COMPLIANT", "reason", "Chưa thấy hồ sơ thu thập thông tin", "evidence", "quyetDinh"),
-                        // Lap lai tu cua tieu chi nhung khong nhac toi can cu da dan (bia "da thay bao cao") -> ha
-                        Map.of("key", "A010", "suggestion", "COMPLIANT", "reason", "Đã thấy báo cáo chuẩn bị kiểm toán được gửi", "evidence", "quyetDinh"),
-                        Map.of("key", "ZZZ99", "suggestion", "COMPLIANT", "evidence", "quyetDinh")),
+                        // nhac can cu nhung bia noi dung khong co trong ho so -> ha
+                        Map.of("key", "A014", "suggestion", "COMPLIANT", "reason", "Đã thấy biên bản triển khai", "evidence", "quyetDinh"),
+                        Map.of("key", "A014", "suggestion", "COMPLIANT", "reason", "Triển khai theo quyết định QD-CKT-G4-02", "evidence", "quyetDinh"),
+                        // "chua thay" -> thieu du lieu, khong phai vi pham -> ha
+                        Map.of("key", "A002", "suggestion", "NON_COMPLIANT", "reason", "Chưa thấy mục tiêu cụ thể", "evidence", "mucTieu"),
+                        // dan can cu khong phu hop voi tieu chi (quyet dinh cho tieu chi muc tieu) -> ha
+                        Map.of("key", "A002", "suggestion", "COMPLIANT", "reason", "Mục tiêu nêu trong quyết định", "evidence", "quyetDinh"),
+                        Map.of("key", "A002", "suggestion", "COMPLIANT", "reason", "Mục tiêu kiểm toán: đánh giá tuân thủ, kế hoạch 987", "evidence", "mucTieu"),
+                        // tieu chi khong duoc hoi (khong co can cu phu hop) / key la -> bo
+                        Map.of("key", "A025", "suggestion", "COMPLIANT", "reason", "Họp đoàn theo quyết định", "evidence", "quyetDinh"),
+                        Map.of("key", "ZZZ99", "suggestion", "COMPLIANT", "reason", "x", "evidence", "quyetDinh")),
                 "overall", "Đoàn cơ bản tuân thủ trình tự."));
         Map<String, Object> body = Map.of("engagementId", fx.engagementId.toString(), "subjectKey", fx.memberKey, "appendix", "PL01A");
         JsonNode data = postData("/api/audit/agent/drafts/dgcl-score", body);
 
-        assertThat(data.get("grounded").asBoolean()).as("so 987 khong co trong ho so + key ZZZ99 la").isFalse();
+        assertThat(data.get("grounded").asBoolean()).as("so 987 khong co trong ho so + key la").isFalse();
         assertThat(data.get("criteriaCount").asInt()).isEqualTo(data.get("items").size()).isGreaterThan(3);
         assertThat(data.toString()).doesNotContain("ZZZ99");
+        assertThat(item(data, "A014").get("suggestion").asText()).isEqualTo("COMPLIANT");
+        assertThat(item(data, "A002").get("suggestion").asText()).isEqualTo("COMPLIANT");
+        assertThat(item(data, "A002").get("current").asText()).isEqualTo("COMPLIANT");
+        assertThat(item(data, "A025").get("suggestion").asText()).as("khong co can cu phu hop -> khong hoi model").isEqualTo("NEED_REVIEW");
         JsonNode a005 = item(data, "A005");
         assertThat(a005.get("current").asText()).isEqualTo("NON_COMPLIANT");
-        assertThat(a005.get("suggestion").asText()).isEqualTo("COMPLIANT");
-        assertThat(a005.get("differsFromCurrent").asBoolean()).isTrue();
-        assertThat(item(data, "A004").get("suggestion").asText()).as("AI khong goi y -> can xem").isEqualTo("NEED_REVIEW");
+        assertThat(a005.get("suggestion").asText()).isEqualTo("NEED_REVIEW");
+        assertThat(a005.get("differsFromCurrent").asBoolean()).isFalse();
         assertThat(data.get("suggestedPositive").asInt()).isEqualTo(2);
-        assertThat(data.get("downgraded").asInt()).as("A006 khong dan can cu, A007/A004 thieu du lieu, A008 dan muc rong, A009 khong lien quan").isEqualTo(6);
-        assertThat(item(data, "A009").get("suggestion").asText()).isEqualTo("NEED_REVIEW");
-        assertThat(item(data, "A010").get("suggestion").asText()).isEqualTo("NEED_REVIEW");
-        assertThat(item(data, "A006").get("suggestion").asText()).isEqualTo("NEED_REVIEW");
-        assertThat(item(data, "A007").get("suggestion").asText()).isEqualTo("NEED_REVIEW");
-        assertThat(item(data, "A008").get("suggestion").asText()).isEqualTo("NEED_REVIEW");
-        // AI chi duoc chon can cu trong cac truong ho so CO DU LIEU (CKT test chi co quyet dinh)
-        assertThat(fakeLlmProvider.lastTools().get(0).parametersJsonSchema().toString()).contains("quyetDinh").doesNotContain("congViec");
-        assertThat(data.get("suggestedNegative").asInt()).isEqualTo(1);
+        assertThat(data.get("suggestedNegative").asInt()).isZero();
+        assertThat(data.get("downgraded").asInt()).as("A014 bia noi dung, A002 'chua thay', A002 can cu khong phu hop").isEqualTo(3);
+        // Model chi thay cac tieu chi co can cu phu hop + chi chon duoc can cu co du lieu
+        String sent = fakeLlmProvider.lastMessages().get(1).content();
+        assertThat(sent).contains("A014").contains("A002").doesNotContain("\"A025\"").doesNotContain("\"A005\"");
+        assertThat(fakeLlmProvider.lastTools().get(0).parametersJsonSchema().toString()).contains("quyetDinh").contains("mucTieu").doesNotContain("congViec");
         assertThat(data.get("dossierFacts").toString()).contains("Kiến nghị đã tạo");
 
         // Phieu van y nguyen: A005 van "khong tuan thu", diem 50
@@ -198,16 +200,14 @@ class AgentG4ApiTest extends AbstractApiTest {
         assertThat(after.summary().score()).isEqualTo(50.0);
         assertThat(after.lines().stream().filter(l -> l.key().equals("A005")).findFirst().orElseThrow().nonCompliant()).isTrue();
 
-        // Hop le hoan toan -> grounded; PL01F dung thang APPLIES/NOT_APPLIES
-        fakeLlmProvider.enqueueToolCall("submit_dgcl_suggestions", Map.of("items", List.of(
-                Map.of("key", "F013", "suggestion", "APPLIES", "violationCount", 2, "reason", "Phát hiện sai phạm trọng yếu nhưng chưa kiến nghị (QD-CKT-G4-02)", "evidence", "quyetDinh"),
-                Map.of("key", "F019", "suggestion", "NOT_APPLIES", "reason", "Quyết định không nêu quy mô, tính chất phức tạp", "evidence", "quyetDinh"))));
-        // PL01F co 14 dong nhap (8 tru diem + 3 cong + 3 tru) -> 2 lo; lo 2 AI khong thay can cu nao -> de "can xem"
+        // PL01F: chi dong F008 (nhac "muc tieu kiem toan") co can cu phu hop -> hoi model 1 lo duy nhat chi gom dong do
+        int calls = fakeLlmProvider.callCount();
         fakeLlmProvider.enqueueToolCall("submit_dgcl_suggestions", Map.of("items", List.of()));
         JsonNode f = postData("/api/audit/agent/drafts/dgcl-score",
                 Map.of("engagementId", fx.engagementId.toString(), "subjectKey", fx.memberKey, "appendix", "PL01F"));
-        assertThat(f.get("grounded").asBoolean()).isTrue();
-        assertThat(item(f, "F013").get("violationCount").asInt()).isEqualTo(2);
+        assertThat(fakeLlmProvider.callCount()).isEqualTo(calls + 1);
+        assertThat(fakeLlmProvider.lastMessages().get(1).content()).contains("F008").doesNotContain("\"F013\"");
+        assertThat(f.get("needReview").asInt()).isEqualTo(f.get("criteriaCount").asInt());
         assertThat(f.get("suggestedRatio").isNull()).isTrue();
 
         // Model khong tra dung tool -> 502 than thien; tat A6 -> 503
@@ -253,6 +253,12 @@ class AgentG4ApiTest extends AbstractApiTest {
         assertThat(kept.test("Biên bản ghi nhận kết quả kiểm toán được lập và thông qua", "Đã thấy biên bản ghi nhận kết quả kiểm toán được lập và thông qua")).isFalse();
         assertThat(kept.test("Chọn mẫu kiểm toán", "Đã có quyết định kiểm toán")).isFalse();
         assertThat(kept.test("Lập báo cáo kèm lý do điều chỉnh mẫu chọn", "Chưa thấy lập báo cáo kèm lý do điều chỉnh mẫu chọn")).isFalse();
+        // Lan 4: "Da thay ghi nhan trong quyet dinh" cho tieu chi bien ban - he thong chan bang bang tuong thich can cu<->tieu chi
+        Map<String, Object> ev = Map.of("quyetDinh", "QD-TEST-01 ngày 2026-09-04", "kienNghi", "1 kiến nghị đã tạo");
+        assertThat(com.govia.audit.agent.service.AgentQualityDraftService.fittingEvidence(ev,
+                "Biên bản ghi nhận kết quả kiểm toán được lập và thông qua khi kết thúc cuộc kiểm toán")).isEmpty();
+        assertThat(com.govia.audit.agent.service.AgentQualityDraftService.fittingEvidence(ev,
+                "Triển khai quyết định kiểm toán, tổ chức thực hiện kiểm toán")).containsExactly("quyetDinh");
         assertThat(com.govia.audit.agent.service.AgentQualityDraftService.relevantTo("Đã có quyết định kiểm toán",
                 "Triển khai quyết định kiểm toán, tổ chức thực hiện kiểm toán")).isTrue();
     }
