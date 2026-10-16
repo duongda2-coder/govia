@@ -10,6 +10,7 @@ import { OrganizationUnitListPage } from "./pages/People/OrganizationUnitListPag
 import { RoleListPage } from "./pages/Admin/RoleListPage";
 import { AccountListPage } from "./pages/Admin/AccountListPage";
 import { ActivityLogPage } from "./pages/Admin/ActivityLogPage";
+import { EmailDemoPage } from "./pages/Admin/EmailDemoPage";
 import { TaskInbox } from "./pages/Workflow/TaskInbox";
 import { ProcessInstances } from "./pages/Workflow/ProcessInstances";
 import { ApprovalMatrixPage } from "./pages/Workflow/ApprovalMatrixPage";
@@ -120,6 +121,7 @@ function App() {
           <Route path="admin/roles" element={<RoleListPage />} />
           <Route path="admin/accounts" element={<AccountListPage />} />
           <Route path="admin/activity-log" element={<ActivityLogPage />} />
+          <Route path="admin/email-demo" element={<EmailDemoPage />} />
           <Route path="workflow/tasks" element={<TaskInbox />} />
           <Route path="workflow/instances" element={<ProcessInstances />} />
           <Route path="workflow/approval-matrix" element={<ApprovalMatrixPage />} />

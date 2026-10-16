@@ -221,6 +221,7 @@
     "roles": "Vai trò & Phân quyền",
     "accounts": "Tài khoản người dùng",
     "activityLog": "Nhật ký thao tác",
+    "emailDemo": "Demo gửi email",
     "workflow": "Quy trình",
     "workflowTasks": "Việc cần xử lý",
     "workflowInstances": "Quy trình đang chạy",
@@ -2336,6 +2337,78 @@
       "deleteSuccess": "Đã xóa",
       "deleteError": "Xóa thất bại",
       "saveError": "Lưu thất bại"
+    }
+  },
+  "emailDemo": {
+    "title": "Demo gửi email",
+    "forbidden": "Chỉ quản trị hệ thống được dùng chức năng này",
+    "tabs": {
+      "send": "Gửi email demo",
+      "setting": "Cấu hình SMTP"
+    },
+    "setting": {
+      "hint": "Chức năng demo, độc lập với quy trình nghiệp vụ. Gmail: host smtp.gmail.com, cổng 587, bật STARTTLS, mật khẩu là App Password (16 ký tự). Cổng 465 thì bật SSL và tắt STARTTLS.",
+      "notSaved": "Chưa lưu cấu hình SMTP - giá trị hiển thị là gợi ý mặc định, hãy kiểm tra và bấm Lưu",
+      "host": "Máy chủ SMTP (host)",
+      "port": "Cổng (port)",
+      "smtpAuth": "Yêu cầu đăng nhập SMTP",
+      "username": "Tài khoản SMTP",
+      "password": "Mật khẩu SMTP",
+      "passwordKeep": "Đã lưu mật khẩu - để trống nếu không muốn đổi",
+      "starttls": "STARTTLS",
+      "ssl": "SSL/TLS",
+      "fromAddress": "Email người gửi",
+      "fromName": "Tên người gửi",
+      "test": "Kiểm tra kết nối"
+    },
+    "compose": {
+      "title": "Soạn email demo",
+      "to": "Người nhận",
+      "cc": "CC",
+      "multiHint": "Nhiều địa chỉ cách nhau bởi dấu phẩy hoặc chấm phẩy",
+      "subject": "Tiêu đề",
+      "html": "Nội dung dạng HTML",
+      "body": "Nội dung",
+      "send": "Gửi",
+      "sampleSubject": "[GOVIA] Email demo",
+      "includeActions": "Kèm link xem chi tiết + nút Phê duyệt/Từ chối",
+      "includeActionsHint": "Người nhận bấm nút ngay trong email, kết quả hiện ở cột \"Kết quả phê duyệt\" (bảng tự cập nhật mỗi 10 giây)",
+      "detailUrl": "Link xem chi tiết (tạm thời)"
+    },
+    "columns": {
+      "sentAt": "Thời điểm gửi",
+      "to": "Người nhận",
+      "subject": "Tiêu đề",
+      "status": "Trạng thái",
+      "error": "Lỗi",
+      "smtpHost": "Máy chủ SMTP",
+      "sentBy": "Người gửi",
+      "actionStatus": "Kết quả phê duyệt",
+      "actionAt": "Thời điểm bấm"
+    },
+    "status": {
+      "success": "Thành công",
+      "failed": "Thất bại"
+    },
+    "validation": {
+      "required": "Bắt buộc nhập",
+      "email": "Email không hợp lệ",
+      "url": "Link không hợp lệ (cần bắt đầu bằng http:// hoặc https://)"
+    },
+    "messages": {
+      "loadError": "Không tải được dữ liệu",
+      "saveSuccess": "Đã lưu cấu hình SMTP",
+      "saveError": "Lưu cấu hình thất bại",
+      "testSuccess": "Kết nối SMTP thành công",
+      "testError": "Kết nối SMTP thất bại",
+      "sendSuccess": "Đã gửi email tới {{to}}",
+      "sendFailed": "Gửi email thất bại: {{error}}",
+      "sendError": "Gửi email thất bại"
+    },
+    "actionStatus": {
+      "PENDING": "Chờ phản hồi",
+      "APPROVED": "Đã phê duyệt",
+      "REJECTED": "Đã từ chối"
     }
   },
   "activityLog": {

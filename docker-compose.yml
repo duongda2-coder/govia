@@ -12,5 +12,15 @@ services:
     volumes:
       - govia-postgres-data:/var/lib/postgresql/data
 
+  # SMTP gia lap cho man hinh "Demo gui email" (khong gui ra ngoai): cau hinh host=localhost, port=1025,
+  # tat dang nhap/STARTTLS/SSL; xem mail da gui tai http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.20
+    container_name: govia-mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
 volumes:
   govia-postgres-data:

@@ -101,6 +101,11 @@ govia:
       # spring.mail.host/port/username/password ben duoi - xem MailWorkflowNotificationService.
       enabled: ${GOVIA_NOTIFICATION_EMAIL_ENABLED:false}
       from: ${GOVIA_NOTIFICATION_EMAIL_FROM:no-reply@govia.local}
+  email-demo:
+    # Dia chi backend ma NGUOI NHAN MAIL truy cap duoc - dung de tao link nut Phe duyet/Tu choi trong
+    # mail demo. localhost chi bam duoc tren chinh may chay backend; mo tu dien thoai/may khac thi
+    # phai dat URL public (vd https://govia-backend-xxx.onrender.com hoac URL tunnel).
+    public-base-url: ${GOVIA_PUBLIC_API_URL:http://localhost:8081}
 
 springdoc:
   swagger-ui:

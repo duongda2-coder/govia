@@ -17,6 +17,7 @@ export const MENU_ROUTES: Record<string, string> = {
   "admin-roles": "/admin/roles",
   "admin-accounts": "/admin/accounts",
   "admin-activity-log": "/admin/activity-log",
+  "admin-email-demo": "/admin/email-demo",
   "workflow-tasks": "/workflow/tasks",
   "workflow-instances": "/workflow/instances",
   "workflow-approval-matrix": "/workflow/approval-matrix",
@@ -438,6 +439,7 @@ export function useAppMenu(): { moduleMenuItems: MenuProps["items"]; searchableS
         leaf("admin-roles", t("menu.roles"), adminGroupLabel),
         leaf("admin-accounts", t("menu.accounts"), adminGroupLabel),
         leaf("admin-activity-log", t("menu.activityLog"), adminGroupLabel),
+        leaf("admin-email-demo", t("menu.emailDemo"), adminGroupLabel),
       ],
     },
   ]);

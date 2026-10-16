@@ -42,6 +42,9 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/actuator/health",
+            /* Nut Phe duyet/Tu choi trong mail demo - nguoi nhan bam tu hop thu nen khong co JWT; xac thuc bang
+             * token ngau nhien trong link (xem EmailDemoActionController). */
+            "/api/public/email-demo/**",
             /* Handshake WebSocket khong the dinh kem header Authorization (gioi han cua browser
              * WebSocket API) - token duoc truyen qua query param va tu xac thuc rieng trong
              * WebSocketAuthInterceptor, KHONG phai bo qua xac thuc that su. */

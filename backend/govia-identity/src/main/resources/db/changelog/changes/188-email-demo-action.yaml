@@ -1,0 +1,15 @@
+databaseChangeLog:
+
+  # Demo gui email: nut Phe duyet/Tu choi ngay trong noi dung mail -> ghi trang thai len dong lich su.
+  - changeSet:
+      id: 188-1-email-demo-action-columns
+      author: govia
+      comment: "Token + trang thai phe duyet bam tu mail demo"
+      changes:
+        - addColumn:
+            tableName: email_demo_log
+            columns:
+              - column: { name: action_token, type: VARCHAR(64), constraints: { unique: true, uniqueConstraintName: uq_email_demo_log_action_token } }
+              - column: { name: action_status, type: VARCHAR(20) }
+              - column: { name: action_at, type: TIMESTAMP }
+              - column: { name: detail_url, type: VARCHAR(1000) }

@@ -221,6 +221,7 @@
     "roles": "Roles & Permissions",
     "accounts": "User Accounts",
     "activityLog": "Activity Log",
+    "emailDemo": "Email demo",
     "workflow": "Workflow",
     "workflowTasks": "My Tasks",
     "workflowInstances": "Running Processes",
@@ -2336,6 +2337,78 @@
       "deleteSuccess": "Deleted",
       "deleteError": "Delete failed",
       "saveError": "Save failed"
+    }
+  },
+  "emailDemo": {
+    "title": "Email demo",
+    "forbidden": "Only system administrators can use this feature",
+    "tabs": {
+      "send": "Send demo email",
+      "setting": "SMTP settings"
+    },
+    "setting": {
+      "hint": "Demo feature, independent of business workflows. Gmail: host smtp.gmail.com, port 587, enable STARTTLS, password is an App Password (16 chars). For port 465 enable SSL and disable STARTTLS.",
+      "notSaved": "SMTP settings not saved yet - the values shown are defaults, review them and click Save",
+      "host": "SMTP host",
+      "port": "Port",
+      "smtpAuth": "SMTP authentication required",
+      "username": "SMTP username",
+      "password": "SMTP password",
+      "passwordKeep": "Password saved - leave blank to keep it",
+      "starttls": "STARTTLS",
+      "ssl": "SSL/TLS",
+      "fromAddress": "Sender email",
+      "fromName": "Sender name",
+      "test": "Test connection"
+    },
+    "compose": {
+      "title": "Compose demo email",
+      "to": "To",
+      "cc": "CC",
+      "multiHint": "Separate multiple addresses with commas or semicolons",
+      "subject": "Subject",
+      "html": "HTML body",
+      "body": "Body",
+      "send": "Send",
+      "sampleSubject": "[GOVIA] Demo email",
+      "includeActions": "Include detail link + Approve/Reject buttons",
+      "includeActionsHint": "The recipient clicks a button right in the email; the result shows in the \"Approval result\" column (table refreshes every 10 seconds)",
+      "detailUrl": "Detail link (temporary)"
+    },
+    "columns": {
+      "sentAt": "Sent at",
+      "to": "To",
+      "subject": "Subject",
+      "status": "Status",
+      "error": "Error",
+      "smtpHost": "SMTP server",
+      "sentBy": "Sent by",
+      "actionStatus": "Approval result",
+      "actionAt": "Clicked at"
+    },
+    "status": {
+      "success": "Success",
+      "failed": "Failed"
+    },
+    "validation": {
+      "required": "Required",
+      "email": "Invalid email",
+      "url": "Invalid link (must start with http:// or https://)"
+    },
+    "messages": {
+      "loadError": "Failed to load data",
+      "saveSuccess": "SMTP settings saved",
+      "saveError": "Failed to save settings",
+      "testSuccess": "SMTP connection succeeded",
+      "testError": "SMTP connection failed",
+      "sendSuccess": "Email sent to {{to}}",
+      "sendFailed": "Failed to send email: {{error}}",
+      "sendError": "Failed to send email"
+    },
+    "actionStatus": {
+      "PENDING": "Awaiting response",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected"
     }
   },
   "activityLog": {
